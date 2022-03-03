@@ -1,0 +1,10 @@
+# Data
+data/
+results/
+
+# Byte-compiled files
+__pycache__
+
+# IntelliJ
+.idea/
+
