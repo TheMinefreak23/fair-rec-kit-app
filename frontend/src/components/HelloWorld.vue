@@ -3,13 +3,19 @@
 HelloWorld component: make requests to the server and handle the response
 */
 
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import Form from './Form.vue'
 
 const props = defineProps({
   msg: String,
 })
 
+onMounted(() => {
+  getOptions()
+})
+
 const flaskGreeting = ref('')
+const options = ref({ numbers: [], datasets: [], approaches: [], metrics: [] })
 
 // GET request
 async function greetServer() {
@@ -17,12 +23,29 @@ async function greetServer() {
   const data = await response.json()
   flaskGreeting.value = data.greeting
 }
+
+// GET request: Get available options for selection from server
+async function getOptions() {
+  const response = await fetch('http://localhost:5000/options')
+  const data = await response.json()
+  options.value = data.options
+  console.log(options.value)
+}
 </script>
 
 <template>
-  <div class="container p-3 mb-2 bg-secondary">
-    <p>{{ msg }}</p>
-    <p>{{ flaskGreeting }}</p>
-    <button class="btn btn-primary" @click="greetServer">Greet backend</button>
-  </div>
+  <b-container class="p-3 mb-2">
+    <b-row>
+      <b-col>
+        <h3>{{ msg }}</h3>
+        <p>{{ flaskGreeting }}</p>
+        <b-button variant="outline-primary" @click="greetServer"
+          >Greet backend</b-button
+        >
+      </b-col>
+      <b-col cols="8">
+        <Form :options="options" />
+      </b-col>
+    </b-row>
+  </b-container>
 </template>
