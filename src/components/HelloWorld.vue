@@ -29,7 +29,7 @@ async function greetServer() {
 
 // GET request: Get available options for selection from server
 async function getOptions() {
-  const response = await fetch('http://localhost:5000/options')
+  const response = await fetch('http://localhost:5000/computation/options')
   const data = await response.json()
   options.value = data.options
   console.log(options.value)

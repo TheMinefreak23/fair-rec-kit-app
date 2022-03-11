@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
+    "dev-api": "cd api && set FLASK_APP=flaskr && set FLASK_ENV=development && flask run && pause",
     "build": "vite build",
     "preview": "vite preview --port 5050"
   },

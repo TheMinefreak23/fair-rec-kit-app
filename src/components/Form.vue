@@ -15,14 +15,16 @@ function sendToServer() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(form.value),
   }
-  fetch('http://localhost:5000/calculation', requestOptions).then(() => {
-    getCalculation()
-  })
+  fetch('http://localhost:5000/computation/calculation', requestOptions).then(
+    () => {
+      getCalculation()
+    }
+  )
 }
 
 // GET request: Ask server for latest calculation
 async function getCalculation() {
-  const response = await fetch('http://localhost:5000/calculation')
+  const response = await fetch('http://localhost:5000/computation/calculation')
   const data = await response.json()
   result.value = data.calculation
   console.log(result.value)
