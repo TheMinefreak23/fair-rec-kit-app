@@ -1,8 +1,12 @@
+#This program has been developed by students from the bachelor Computer Science at
+#Utrecht University within the Software Project course.
+#© Copyright Utrecht University (Department of Information and Computing Sciences)
+
 import time
 
 from flask import (Blueprint,request)
 
-bp = Blueprint('auth', __name__, url_prefix='/auth')
+bp = Blueprint('computation', __name__, url_prefix='/computation')
 
 # constants
 DATASETS = ['LFM2B', 'LFM1B', 'LFM360K']

@@ -31,6 +31,12 @@ def create_app(test_config=None):
     # Enable Cross-Origin Resource Sharing.
     CORS(app)
 
+
+    # Route: Main.
+    @app.route('/', methods=['GET'])
+    def main():
+        return {"msg": "Server online."}
+
     # Route: Do a sanity check.
     @app.route('/greeting', methods=['GET'])
     def greet():
