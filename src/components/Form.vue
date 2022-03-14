@@ -42,13 +42,14 @@ function initForm() {
 <template>
   <b-card>
     <b-form @submit="sendToServer" @reset="initForm">
-      <b-form-group label="Pick a dataset">
+      <b-form-group label="Select a dataset">
         <b-form-select
           v-model="form.dataset"
           :options="[{ text: 'Choose...', value: null }, ...options.datasets]"
           required
         ></b-form-select>
       </b-form-group>
+<<<<<<< HEAD
       <b-form-group label="Choose recommender approaches:">
         <b-form-checkbox-group
           v-model="form.recommenders"
@@ -58,6 +59,19 @@ function initForm() {
           size="lg"
           name="buttons-2"
           stacked
+=======
+      <b-form-group label="Select a filter">
+        <b-form-select
+          v-model="form.filter"
+          :options="[{ text: 'None (default)', value: null }]"
+          required
+        ></b-form-select>
+      </b-form-group>
+      <b-form-group label="Select a rating conversion">
+        <b-form-select
+          v-model="form.conversion"
+          :options="[{ text: 'None (default)', value: null }]"
+>>>>>>> 7a61380506c51111bc06b27e1bfb9f33e771d8bb
           required
         ></b-form-checkbox-group>
       </b-form-group>
@@ -85,10 +99,29 @@ function initForm() {
       </b-form-group>
 
 
+      <b-form-group label="Select a metric">
+        <b-form-select
+          v-model="form.metric"
+          :options="[{ text: 'Choose...', value: null }, ...options.metrics]"
+          required
+        ></b-form-select>
+      </b-form-group>
+
+      <b-form-group label="Enter name for computation">
+        <b-form-input
+        placeholder="New Computation"
+        v-model="form.name"
+        ></b-form-input>
+      </b-form-group>
+      <b-form-group label="Enter e-mail (optional)">
+        <b-form-input
+        placeholder="example@mail.com"
+        v-model="form.email"
+        ></b-form-input>
+      </b-form-group>
+
       <b-button type="submit" variant="primary">Send</b-button>
       <b-button type="reset" variant="danger">Reset</b-button>
     </b-form>
-    <p v-if="form.number">{{ result.number }} {{ result.reverse }}</p>
-    <p v-else>Magic comes here..</p>
   </b-card>
 </template>
