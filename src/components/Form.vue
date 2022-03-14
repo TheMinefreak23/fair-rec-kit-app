@@ -43,24 +43,24 @@ function initForm() {
 <template>
   <b-card>
     <b-form @submit="sendToServer" @reset="initForm">
-      <b-form-group label="Pick a dataset">
+      <b-form-group label="Select a dataset">
         <b-form-select
           v-model="form.dataset"
           :options="[{ text: 'Choose...', value: null }, ...options.datasets]"
           required
         ></b-form-select>
       </b-form-group>
-      <b-form-group label="Pick a filter">
+      <b-form-group label="Select a filter">
         <b-form-select
           v-model="form.filter"
-          :options="[{ text: 'None', value: null }]"
+          :options="[{ text: 'None (default)', value: null }]"
           required
         ></b-form-select>
       </b-form-group>
-      <b-form-group label="Pick a rating conversion">
+      <b-form-group label="Select a rating conversion">
         <b-form-select
           v-model="form.conversion"
-          :options="[{ text: 'None', value: null }]"
+          :options="[{ text: 'None (default)', value: null }]"
           required
         ></b-form-select>
       </b-form-group>
@@ -72,11 +72,32 @@ function initForm() {
           max="100"
           step="5"
           id="customRange"
-          v-model="split"
+          v-model="form.split"
         ></b-form-input>
       </b-form-group>
       <p>Train: {{split}}</p>
       <p>Test: {{100-split}}</p>
+
+      <b-form-group label="Select a metric">
+        <b-form-select
+          v-model="form.metric"
+          :options="[{ text: 'Choose...', value: null }, ...options.metrics]"
+          required
+        ></b-form-select>
+      </b-form-group>
+
+      <b-form-group label="Enter name for computation">
+        <b-form-input
+        placeholder="New Computation"
+        v-model="form.name"
+        ></b-form-input>
+      </b-form-group>
+      <b-form-group label="Enter e-mail (optional)">
+        <b-form-input
+        placeholder="example@mail.com"
+        v-model="form.email"
+        ></b-form-input>
+      </b-form-group>
 
       <b-button type="submit" variant="primary">Send</b-button>
       <b-button type="reset" variant="danger">Reset</b-button>
