@@ -6,8 +6,8 @@ const props = defineProps({
 })
 
 const result = ref({})
-const form = ref({ split : 80 })
-//const split = ref(80)
+const form = ref(0)
+const split = ref(80)
 //const split = ref(80)
 
 
@@ -36,30 +36,33 @@ async function getCalculation() {
 function initForm() {
   form.value = {}
   result.value = {}
+  split = 80
 }
 </script>
 
 <template>
   <b-card>
     <b-form @submit="sendToServer" @reset="initForm">
-      <b-form-group label="Pick a dataset">
+      <b-form-group label="Select a dataset">
         <b-form-select
           v-model="form.dataset"
           :options="[{ text: 'Choose...', value: null }, ...options.datasets]"
           required
         ></b-form-select>
       </b-form-group>
-      <b-form-group label="Choose recommender approaches:">
-        <b-form-checkbox-group
-          v-model="form.recommenders"
-          :options= options.approaches
-          buttons
-          button-variant="outline-primary"
-          size="lg"
-          name="buttons-2"
-          stacked
+      <b-form-group label="Select a filter">
+        <b-form-select
+          v-model="form.filter"
+          :options="[{ text: 'None (default)', value: null }]"
           required
-        ></b-form-checkbox-group>
+        ></b-form-select>
+      </b-form-group>
+      <b-form-group label="Select a rating conversion">
+        <b-form-select
+          v-model="form.conversion"
+          :options="[{ text: 'None (default)', value: null }]"
+          required
+        ></b-form-select>
       </b-form-group>
       <h2>Train/test-split</h2>
       <b-form-group label="Choose range for test/train split">
@@ -71,19 +74,30 @@ function initForm() {
           id="customRange"
           v-model="form.split"
         ></b-form-input>
-        <p>Train: {{form.split}}</p>
-        <p>Test: {{100-form.split}}</p>
-        <b-form-checkbox
-          v-model="form.timesplit"
-          buttons
-          button-variant="outline-primary"
-          name="timesplit"
-          value="true"
-          unchecked-value="false"
+      </b-form-group>
+      <p>Train: {{split}}</p>
+      <p>Test: {{100-split}}</p>
+
+      <b-form-group label="Select a metric">
+        <b-form-select
+          v-model="form.metric"
+          :options="[{ text: 'Choose...', value: null }, ...options.metrics]"
           required
-        >Time-split</b-form-checkbox>
+        ></b-form-select>
       </b-form-group>
 
+      <b-form-group label="Enter name for computation">
+        <b-form-input
+        placeholder="New Computation"
+        v-model="form.name"
+        ></b-form-input>
+      </b-form-group>
+      <b-form-group label="Enter e-mail (optional)">
+        <b-form-input
+        placeholder="example@mail.com"
+        v-model="form.email"
+        ></b-form-input>
+      </b-form-group>
 
       <b-button type="submit" variant="primary">Send</b-button>
       <b-button type="reset" variant="danger">Reset</b-button>
