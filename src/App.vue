@@ -7,6 +7,9 @@ import Playground from './components/Playground.vue'
 </script>
 
 <template>
-  <Playground />
-  <HelloWorld msg="Hello Vue!" />
+  <b-tabs content-class="mt-3">
+    <b-tab title="Playground" active> <Playground /></b-tab>
+    <b-tab title="Hello World"> <HelloWorld msg="Hello Vue!" /></b-tab>
+    <b-tab title="Disabled" disabled><p>I'm a disabled tab!</p></b-tab>
+  </b-tabs>
 </template>

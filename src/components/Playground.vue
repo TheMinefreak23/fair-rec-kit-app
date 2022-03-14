@@ -20,10 +20,12 @@ and https://getbootstrap.com/docs/5.0/getting-started/introduction/ for more
       data-bs-target="#collapseTarget"
       data-bs-toggle="collapse"
     >
-      Toggle playground
+      Toggle collapse
     </b-button>
     
     <div class="collapse py-2" id="collapseTarget">
+      <img src="/RecCoonLogo.png"/>
+      </div>
       <h2>Modal</h2>
       <!-- Button trigger modal -->
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
@@ -77,5 +79,4 @@ and https://getbootstrap.com/docs/5.0/getting-started/introduction/ for more
   <label for="mike">Mike</label>
   <p>Checked names: <pre>{{ checkedNames }}</pre></p>
     </div>
-  </div>
 </template>
