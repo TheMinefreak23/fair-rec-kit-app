@@ -6,7 +6,7 @@ const props = defineProps({
 })
 
 const result = ref({})
-const form = ref(0)
+const form = ref({split:80})
 const split = ref(80)
 //const split = ref(80)
 
@@ -54,18 +54,39 @@ function initForm() {
         <b-form-select
           v-model="form.filter"
           :options="[{ text: 'None (default)', value: null }]"
-          required
         ></b-form-select>
       </b-form-group>
       <b-form-group label="Select a rating conversion">
         <b-form-select
           v-model="form.conversion"
           :options="[{ text: 'None (default)', value: null }]"
-          required
         ></b-form-select>
       </b-form-group>
+
+      <b-form-group label="Choose recommender approaches:">
+        <b-form-checkbox-group
+          v-model="form.recommenders"
+          :options= options.approaches
+          buttons
+          button-variant="outline-primary"
+          size="lg"
+          name="buttons-2"
+          stacked
+          required
+        ></b-form-checkbox-group>
+      </b-form-group>
+            <b-form-group label="Select number of recommendations per user">
+        <b-form-input
+          type="range"
+          min="1"
+          max="10"
+          v-model="form.recommendations"
+        ></b-form-input>
+        <p>{{form.recommendations}}</p>
+      </b-form-group>
+
       <h2>Train/test-split</h2>
-      <b-form-group label="Choose range for test/train split">
+      <b-form-group label="Select test/train split">
         <b-form-input
           type="range"
           min="0"
@@ -77,7 +98,15 @@ function initForm() {
       </b-form-group>
       <p>Train: {{split}}</p>
       <p>Test: {{100-split}}</p>
-
+      <b-form-checkbox
+          v-model="form.timesplit"
+          buttons
+          button-variant="outline-primary"
+          name="timesplit"
+          value="true"
+          unchecked-value="false"
+          required
+        >Time-split</b-form-checkbox>
       <b-form-group label="Select a metric">
         <b-form-select
           v-model="form.metric"
