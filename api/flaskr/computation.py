@@ -10,7 +10,7 @@ bp = Blueprint('computation', __name__, url_prefix='/computation')
 
 # constants
 DATASETS = ['LFM2B', 'LFM1B', 'LFM360K']
-APPROACHES = ['ALS']
+APPROACHES = ['ALS', 'POP', 'RAND']
 METRICS = ['P@K', 'R@K', 'NDCG']
 
 # list with results of calculations
