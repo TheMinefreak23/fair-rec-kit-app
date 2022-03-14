@@ -50,10 +50,17 @@ function initForm() {
           required
         ></b-form-select>
       </b-form-group>
-      <b-form-group label="Pick a number">
+      <b-form-group label="Pick a filter">
         <b-form-select
-          v-model="form.number"
-          :options="[{ text: 'Choose...', value: null }, ...options.numbers]"
+          v-model="form.filter"
+          :options="[{ text: 'None', value: null }]"
+          required
+        ></b-form-select>
+      </b-form-group>
+      <b-form-group label="Pick a rating conversion">
+        <b-form-select
+          v-model="form.conversion"
+          :options="[{ text: 'None', value: null }]"
           required
         ></b-form-select>
       </b-form-group>
@@ -74,7 +81,5 @@ function initForm() {
       <b-button type="submit" variant="primary">Send</b-button>
       <b-button type="reset" variant="danger">Reset</b-button>
     </b-form>
-    <p v-if="form.number">{{ result.number }} {{ result.reverse }}</p>
-    <p v-else>Magic comes here..</p>
   </b-card>
 </template>
