@@ -6,7 +6,10 @@ const props = defineProps({
 })
 
 const result = ref({})
-const form = ref({})
+const form = ref(0)
+const split = ref(80)
+//const split = ref(80)
+
 
 // POST request: Send form to server.
 function sendToServer() {
@@ -33,6 +36,7 @@ async function getCalculation() {
 function initForm() {
   form.value = {}
   result.value = {}
+  split = 80
 }
 </script>
 
@@ -53,6 +57,20 @@ function initForm() {
           required
         ></b-form-select>
       </b-form-group>
+      <h2>Train/test-split</h2>
+      <b-form-group label="Choose range for test/train split">
+        <b-form-input
+          type="range"
+          min="0"
+          max="100"
+          step="5"
+          id="customRange"
+          v-model="split"
+        ></b-form-input>
+      </b-form-group>
+      <p>Train: {{split}}</p>
+      <p>Test: {{100-split}}</p>
+
       <b-button type="submit" variant="primary">Send</b-button>
       <b-button type="reset" variant="danger">Reset</b-button>
     </b-form>
