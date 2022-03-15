@@ -6,7 +6,10 @@ const props = defineProps({
 })
 
 const result = ref({})
-const form = ref({split:80})
+const form = ref({split:80,
+                  recommendations:10,
+                  metricK:10
+                 })
 const split = ref(80)
 //const split = ref(80)
 
@@ -38,23 +41,30 @@ function initForm() {
   result.value = {}
   split = 80
 }
+
+function generateMetric(){ //todo: generate multiple metrics
+ 
+}
 </script>
 
 <template>
   <b-card>
     <b-form @submit="sendToServer" @reset="initForm">
+      <h2>Dataset</h2>
       <b-form-group label="Select a dataset">
         <b-form-select
           v-model="form.dataset"
           :options="[{ text: 'Choose...', value: null }, ...options.datasets]"
           required
-        ></b-form-select>
+        >
+        </b-form-select>
       </b-form-group>
       <b-form-group label="Select a filter">
         <b-form-select
           v-model="form.filter"
           :options="[{ text: 'None (default)', value: null }]"
-        ></b-form-select>
+        >
+        </b-form-select>
       </b-form-group>
       <b-form-group label="Select a rating conversion">
         <b-form-select
@@ -63,7 +73,9 @@ function initForm() {
         ></b-form-select>
       </b-form-group>
 
-      <b-form-group label="Choose recommender approaches:">
+      <b-form-group>
+        <h2>Recommenders</h2>
+        <p>Select recommender approaches:</p>
         <b-form-checkbox-group
           v-model="form.recommenders"
           :options= options.approaches
@@ -75,11 +87,11 @@ function initForm() {
           required
         ></b-form-checkbox-group>
         <b-form-group 
-          label="ALS K value:" 
+          label="ALS Features value:" 
           v-if="form.recommenders != null && form.recommenders.includes('ALS')">
           <b-form-input
-            :state = "form.alsK >= 1"
-            placeholder="K >= 1"
+            :state = "form.alsFeatures >= 1"
+            placeholder=">= 1"
             v-model="form.alsK"
           ></b-form-input>
         </b-form-group>
@@ -93,8 +105,7 @@ function initForm() {
         </b-form-group>
 
       </b-form-group>
-
-      <b-form-group label="Select number of recommendations per user">
+      <b-form-group label="Select number of recommendations per user:">
         <b-form-input
           type="range"
           min="1"
@@ -113,7 +124,7 @@ function initForm() {
       </b-form-group>
 
       <h2>Train/test-split</h2>
-      <b-form-group label="Select test/train split">
+      <b-form-group label="Select test/train split:">
         <b-form-input
           type="range"
           min="0"
@@ -122,24 +133,36 @@ function initForm() {
           id="customRange"
           v-model="form.split"
         ></b-form-input>
-      </b-form-group>
-      <p>Train: {{split}}</p>
-      <p>Test: {{100-split}}</p>
-      <b-form-checkbox
+        <p>Train: {{form.split}}</p>
+        <p>Test: {{100-form.split}}</p>
+        <b-form-checkbox
           v-model="form.timesplit"
           buttons
           button-variant="outline-primary"
           name="timesplit"
           value="true"
           unchecked-value="false"
-          required
         >Time-split</b-form-checkbox>
+      </b-form-group>
+
+      <h2>Metrics</h2>
       <b-form-group label="Select a metric">
         <b-form-select
           v-model="form.metric"
           :options="[{ text: 'Choose...', value: null }, ...options.metrics]"
           required
-        ></b-form-select>
+        >
+        </b-form-select>
+        <b-form-group v-if="form.metric != null && form.metric.includes('@')" >
+          <p>Metric @ K?:</p>
+          <b-form-input
+            v-model="form.metricK"
+            type="number"
+            min="1"
+            max="25"
+            required
+          ></b-form-input>
+        </b-form-group>
       </b-form-group>
       <b-form-group label="Select a results filter">
         <b-form-select
@@ -148,6 +171,7 @@ function initForm() {
         ></b-form-select>
       </b-form-group>
 
+      <h2>Meta</h2>
       <b-form-group label="Enter name for computation">
         <b-form-input
         placeholder="New Computation"
