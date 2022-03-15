@@ -8,11 +8,12 @@ const props = defineProps({
 const result = ref({})
 const form = ref({split:80,
                   recommendations:10,
-                  metricK:10
+                  metric:[],
+                  metricK:[10]
                  })
+const groupCount = ref(1)
 const split = ref(80)
 //const split = ref(80)
-
 
 // POST request: Send form to server.
 function sendToServer() {
@@ -146,17 +147,20 @@ function generateMetric(){ //todo: generate multiple metrics
       </b-form-group>
 
       <h2>Metrics</h2>
-      <b-form-group label="Select a metric">
+      <b-form-group 
+      v-for="i in groupCount"
+      label="Select a metric"
+      v-bind:key="i">
         <b-form-select
-          v-model="form.metric"
+          v-model="form.metric[i]"
           :options="[{ text: 'Choose...', value: null }, ...options.metrics]"
           required
         >
         </b-form-select>
-        <b-form-group v-if="form.metric != null && form.metric.includes('@')" >
+        <b-form-group v-if="form.metric[i] != null && form.metric[i].includes('@')" >
           <p>Metric @ K?:</p>
           <b-form-input
-            v-model="form.metricK"
+            v-model="form.metricK[i]"
             type="number"
             min="1"
             max="25"
@@ -164,11 +168,14 @@ function generateMetric(){ //todo: generate multiple metrics
           ></b-form-input>
         </b-form-group>
       </b-form-group>
+      
+      <b-button @click="groupCount++; form.metricK[i] = 10">Add Metric...</b-button>
+      <b-button @click="groupCount--" variant="danger">Remove Metric</b-button>
       <b-form-group label="Select a results filter">
         <b-form-select
           v-model="form.resfilter"
           :options="[{ text: 'Global (default)', value: null }]"
-        ></b-form-select>
+      ></b-form-select>
       </b-form-group>
 
       <h2>Meta</h2>
