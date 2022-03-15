@@ -8,7 +8,7 @@ const props = defineProps({
 const result = ref({})
 const form = ref({split:80,
                   recommendations:10,
-                  metricK:10
+                  metricK:1
                  })
 const split = ref(80)
 //const split = ref(80)
@@ -92,14 +92,14 @@ function generateMetric(){ //todo: generate multiple metrics
           <b-form-input
             :state = "form.alsFeatures >= 1"
             placeholder=">= 1"
-            v-model="form.alsK"
+            v-model="form.alsFeatures"
           ></b-form-input>
         </b-form-group>
         <b-form-group 
           label="POP Method:" 
           v-if="form.recommenders != null && form.recommenders.includes('POP')">
           <b-form-select
-            v-model="form.popsettings"
+            v-model="form.popSettings"
             :options="[{ text:'quantile (default)', value:'quantile'}, 'rank', 'count']"
           ></b-form-select>
         </b-form-group>
@@ -151,22 +151,20 @@ function generateMetric(){ //todo: generate multiple metrics
           v-model="form.metric"
           :options="[{ text: 'Choose...', value: null }, ...options.metrics]"
           required
-        >
-        </b-form-select>
-        <b-form-group v-if="form.metric != null && form.metric.includes('@')" >
-          <p>Metric @ K?:</p>
+        ></b-form-select>
+        <b-form-group label="Metric @ K:" 
+          v-if="form.metric != null && form.metric.includes('@')" >
           <b-form-input
             v-model="form.metricK"
-            type="number"
-            min="1"
-            max="25"
+            :state = "form.metricK >= 1 && form.metricK <= form.recommendations"
             required
           ></b-form-input>
+          <p>{{form.recommendations}} {{form.metricK}}</p>
         </b-form-group>
       </b-form-group>
       <b-form-group label="Select a results filter">
         <b-form-select
-          v-model="form.resfilter"
+          v-model="form.resFilter"
           :options="[{ text: 'Global (default)', value: null }]"
         ></b-form-select>
       </b-form-group>
