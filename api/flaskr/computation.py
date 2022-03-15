@@ -1,29 +1,21 @@
-#This program has been developed by students from the bachelor Computer Science at
-#Utrecht University within the Software Project course.
-#© Copyright Utrecht University (Department of Information and Computing Sciences)
+# This program has been developed by students from the bachelor Computer Science at
+# Utrecht University within the Software Project course.
+# © Copyright Utrecht University (Department of Information and Computing Sciences)
 
-import time
+from flask import (Blueprint, request)
 
-from flask import (Blueprint,request)
+from previous_results import save_result, newest_result
 
-bp = Blueprint('computation', __name__, url_prefix='/computation')
+compute_bp = Blueprint('computation', __name__, url_prefix='/computation')
 
 # constants
 DATASETS = ['LFM2B', 'LFM1B', 'LFM360K']
 APPROACHES = ['ALS']
 METRICS = ['P@K', 'R@K', 'NDCG']
 
-# list with results of calculations
-calculations = [
-    {
-        'timestamp': '0',
-        'number': '0',
-        'reverse': ''
-    }
-]
 
 # Route: Send selection options.
-@bp.route('/options', methods=['GET'])
+@compute_bp.route('/options', methods=['GET'])
 def params():
     options = {}
     options['datasets'] = DATASETS
@@ -35,7 +27,7 @@ def params():
 
 
 # Route: Do a calculation.
-@bp.route('/calculation', methods=['GET', 'POST'])
+@compute_bp.route('/calculation', methods=['GET', 'POST'])
 def calculate():
     response = {}
     if request.method == 'POST':
@@ -44,7 +36,7 @@ def calculate():
         print(data)
         reverse = data.get('dataset')[::-1]
         magic = data.get('number') ** 2 + len(reverse)
-        calculations.insert(0, {'timestamp': time.time(), 'number': magic, 'reverse': reverse})
+        save_result(magic, reverse)
     else:
-        response['calculation'] = calculations[0]
+        response['calculation'] = newest_result()
     return response

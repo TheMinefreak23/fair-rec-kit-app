@@ -1,12 +1,14 @@
-#This program has been developed by students from the bachelor Computer Science at
-#Utrecht University within the Software Project course.
-#© Copyright Utrecht University (Department of Information and Computing Sciences)
+# This program has been developed by students from the bachelor Computer Science at
+# Utrecht University within the Software Project course.
+# © Copyright Utrecht University (Department of Information and Computing Sciences)
 import os
 
 from flask import Flask, request
 from flask_cors import CORS
 
+import previous_results
 from . import computation
+
 
 def create_app(test_config=None):
     # Instantiate the app.
@@ -31,7 +33,6 @@ def create_app(test_config=None):
     # Enable Cross-Origin Resource Sharing.
     CORS(app)
 
-
     # Route: Main.
     @app.route('/', methods=['GET'])
     def main():
@@ -42,6 +43,6 @@ def create_app(test_config=None):
     def greet():
         return {"greeting": "Greetings from the backend :)"}
 
-    app.register_blueprint(computation.bp)
+    app.register_blueprint(computation.compute_bp)
+    app.register_blueprint(previous_results.results_bp)
     return app
-

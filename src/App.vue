@@ -4,9 +4,11 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import HelloWorld from './components/HelloWorld.vue'
 import Playground from './components/Playground.vue'
+import PreviousResults from './components/PreviousResults.vue'
 </script>
 
 <template>
   <Playground />
   <HelloWorld msg="Hello Vue!" />
+  <PreviousResults />
 </template>
