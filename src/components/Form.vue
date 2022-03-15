@@ -93,14 +93,14 @@ function generateMetric(){ //todo: generate multiple metrics
           <b-form-input
             :state = "form.alsFeatures >= 1"
             placeholder=">= 1"
-            v-model="form.alsK"
+            v-model="form.alsFeatures"
           ></b-form-input>
         </b-form-group>
         <b-form-group 
           label="POP Method:" 
           v-if="form.recommenders != null && form.recommenders.includes('POP')">
           <b-form-select
-            v-model="form.popsettings"
+            v-model="form.popSettings"
             :options="[{ text:'quantile (default)', value:'quantile'}, 'rank', 'count']"
           ></b-form-select>
         </b-form-group>
@@ -166,6 +166,7 @@ function generateMetric(){ //todo: generate multiple metrics
             max="25"
             required
           ></b-form-input>
+          <p>{{form.recommendations}} {{form.metricK}}</p>
         </b-form-group>
       </b-form-group>
       
@@ -173,7 +174,7 @@ function generateMetric(){ //todo: generate multiple metrics
       <b-button @click="groupCount--" variant="danger">Remove Metric</b-button>
       <b-form-group label="Select a results filter">
         <b-form-select
-          v-model="form.resfilter"
+          v-model="form.resFilter"
           :options="[{ text: 'Global (default)', value: null }]"
       ></b-form-select>
       </b-form-group>
