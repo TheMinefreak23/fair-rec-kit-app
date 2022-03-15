@@ -4,7 +4,7 @@
 
 from flask import (Blueprint, request)
 
-from previous_results import save_result, newest_result
+from . import result_storage
 
 compute_bp = Blueprint('computation', __name__, url_prefix='/computation')
 
@@ -36,7 +36,7 @@ def calculate():
         print(data)
         reverse = data.get('dataset')[::-1]
         magic = data.get('number') ** 2 + len(reverse)
-        save_result(magic, reverse)
+        result_storage.save_result(magic, reverse)
     else:
-        response['calculation'] = newest_result()
+        response['calculation'] = result_storage.newest_result()
     return response

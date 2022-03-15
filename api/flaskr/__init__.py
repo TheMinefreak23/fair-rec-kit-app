@@ -6,7 +6,7 @@ import os
 from flask import Flask, request
 from flask_cors import CORS
 
-import previous_results
+from . import previous_results
 from . import computation
 
 
