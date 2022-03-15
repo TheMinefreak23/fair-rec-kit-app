@@ -74,8 +74,27 @@ function initForm() {
           stacked
           required
         ></b-form-checkbox-group>
+        <b-form-group 
+          label="ALS K value:" 
+          v-if="form.recommenders != null && form.recommenders.includes('ALS')">
+          <b-form-input
+            :state = "form.alsK >= 1"
+            placeholder="K >= 1"
+            v-model="form.alsK"
+          ></b-form-input>
+        </b-form-group>
+        <b-form-group 
+          label="POP Method:" 
+          v-if="form.recommenders != null && form.recommenders.includes('POP')">
+          <b-form-select
+            v-model="form.popsettings"
+            :options="[{ text:'quantile (default)', value:'quantile'}, 'rank', 'count']"
+          ></b-form-select>
+        </b-form-group>
+
       </b-form-group>
-            <b-form-group label="Select number of recommendations per user">
+
+      <b-form-group label="Select number of recommendations per user">
         <b-form-input
           type="range"
           min="1"
@@ -83,6 +102,14 @@ function initForm() {
           v-model="form.recommendations"
         ></b-form-input>
         <p>{{form.recommendations}}</p>
+        <b-form-checkbox
+          v-model="form.includeRatedItems"
+          buttons
+          button-variant="outline-primary"
+          value="true"
+          unchecked-value="false"
+          required
+        >Include already rated items in recommendations</b-form-checkbox>
       </b-form-group>
 
       <h2>Train/test-split</h2>
@@ -114,11 +141,22 @@ function initForm() {
           required
         ></b-form-select>
       </b-form-group>
+      <b-form-group label="Select a results filter">
+        <b-form-select
+          v-model="form.resfilter"
+          :options="[{ text: 'Global (default)', value: null }]"
+        ></b-form-select>
+      </b-form-group>
 
       <b-form-group label="Enter name for computation">
         <b-form-input
         placeholder="New Computation"
         v-model="form.name"
+        ></b-form-input>
+      </b-form-group>
+      <b-form-group label="Enter tags (optional)">
+        <b-form-input
+        v-model="form.tags"
         ></b-form-input>
       </b-form-group>
       <b-form-group label="Enter e-mail (optional)">
