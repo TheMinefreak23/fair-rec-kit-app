@@ -4,12 +4,16 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import HelloWorld from './components/HelloWorld.vue'
 import Playground from './components/Playground.vue'
+import Documentation from './components/Documentation.vue'
+import Results from './components/Results.vue'
 </script>
 
 <template>
-  <b-tabs content-class="mt-3">
-    <b-tab title="Playground" active> <Playground /></b-tab>
-    <b-tab title="Hello World"> <HelloWorld msg="Hello Vue!" /></b-tab>
-    <b-tab title="Disabled" disabled><p>I'm a disabled tab!</p></b-tab>
+  <h1 class="text-center">FairRecKit</h1>
+
+  <b-tabs pills card>
+    <b-tab title="Computation"> <Playground /></b-tab>
+    <b-tab title="Documentation"> <Documentation /></b-tab>
+    <b-tab title="Results"> <Results /></b-tab>
   </b-tabs>
 </template>
