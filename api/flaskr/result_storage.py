@@ -6,16 +6,20 @@ from csv import writer
 import time
 
 # Result format
-# Magic mock
-# timestamp, name, tag, email, number, reverse
+# group ID
+# metadata: timestamp, name, tag
+# settings: dataset, approach, metrics
+# result: ranking, metrics results
 
 current_result = {}
 
 
-def save_result(name, tag, email, number, reverse):
+def save_result(metadata,settings,result):
     timestamp = time.time()
     global current_result # TODO use class instead of global?
-    current_result = [timestamp, name, tag, email, number, reverse]
+    metadata[timestamp] = timestamp
+    # use timestamp as group_id for now
+    current_result = [timestamp,metadata,settings,result]
     add_csv_row(current_result, 'results.tsv')
 
 
