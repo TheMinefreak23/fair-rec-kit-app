@@ -8,6 +8,7 @@ Check out https://vuejs.org/examples
 and https://getbootstrap.com/docs/5.0/getting-started/introduction/ for more
 */
 const props = defineProps({
+  pretty_headers: Array,
   results: Array,
   headers: Array,
 })
@@ -19,7 +20,7 @@ console.log(props.results)
   <b-table-simple striped hover>
     <b-thead head-variant="dark">
       <b-tr>
-        <b-th v-for="header in headers" :key="header.id">
+        <b-th v-for="header in pretty_headers" :key="header.id">
           {{ header }}
         </b-th>
       </b-tr>
