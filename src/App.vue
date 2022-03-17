@@ -16,8 +16,8 @@ import Results from './components/Results.vue'
       <img src="/RecCoonLogo.png" class="" style="height: 50px;"/>
       <h1 class="text-white my-0 p-0">FairRecKit</h1>
     </div>
-  <div class="nav-center mt-2">
-    <b-tabs class="m-0" align="center">
+  <div class="nav-center">
+    <b-tabs class="m-0 pt-2" align="center">
       <b-tab title="Computation">   <HelloWorld /></b-tab>
       <b-tab title="Documentation"> <Documentation /></b-tab>
       <b-tab title="Results">       <Results /></b-tab>
