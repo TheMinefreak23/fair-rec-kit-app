@@ -9,11 +9,10 @@ const result = ref({})
 const form = ref({split:80,
                   recommendations:10,
                   metric:[],
-                  metricK:[10]
+                  metricK:[],
+                  splitMethod:"random"
                  })
 const groupCount = ref(1)
-const split = ref(80)
-//const split = ref(80)
 
 // POST request: Send form to server.
 function sendToServer() {
@@ -40,11 +39,6 @@ async function getCalculation() {
 function initForm() {
   form.value = {}
   result.value = {}
-  split = 80
-}
-
-function generateMetric(){ //todo: generate multiple metrics
- 
 }
 </script>
 
@@ -74,8 +68,8 @@ function generateMetric(){ //todo: generate multiple metrics
         ></b-form-select>
       </b-form-group>
 
+      <h2>Recommenders</h2>
       <b-form-group>
-        <h2>Recommenders</h2>
         <p>Select recommender approaches:</p>
         <b-form-checkbox-group
           v-model="form.recommenders"
@@ -136,14 +130,8 @@ function generateMetric(){ //todo: generate multiple metrics
         ></b-form-input>
         <p>Train: {{form.split}}</p>
         <p>Test: {{100-form.split}}</p>
-        <b-form-checkbox
-          v-model="form.timesplit"
-          buttons
-          button-variant="outline-primary"
-          name="timesplit"
-          value="true"
-          unchecked-value="false"
-        >Time-split</b-form-checkbox>
+        <b-form-radio v-model="form.splitMethod" value="random">Random (default)</b-form-radio>
+        <b-form-radio v-model="form.splitMethod" value="timesplit">Timesplit</b-form-radio>
       </b-form-group>
 
       <h2>Metrics</h2>
@@ -161,16 +149,13 @@ function generateMetric(){ //todo: generate multiple metrics
           <p>Metric @ K?:</p>
           <b-form-input
             v-model="form.metricK[i]"
-            type="number"
-            min="1"
-            max="25"
+            :state = "form.metricK[i] <= form.recommendations"
             required
           ></b-form-input>
-          <p>{{form.recommendations}} {{form.metricK}}</p>
         </b-form-group>
       </b-form-group>
       
-      <b-button @click="groupCount++; form.metricK[i] = 10">Add Metric...</b-button>
+      <b-button @click="groupCount++">Add Metric...</b-button>
       <b-button @click="groupCount--" variant="danger">Remove Metric</b-button>
       <b-form-group label="Select a results filter">
         <b-form-select
@@ -184,6 +169,7 @@ function generateMetric(){ //todo: generate multiple metrics
         <b-form-input
         placeholder="New Computation"
         v-model="form.name"
+        required
         ></b-form-input>
       </b-form-group>
       <b-form-group label="Enter tags (optional)">
