@@ -1,4 +1,7 @@
 <script setup>
+/*This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import { ref } from 'vue'
 
 const props = defineProps({
@@ -44,7 +47,10 @@ function initForm() {
 
 <template>
   <b-card>
+
+    <!--This form contains all the necessary parameters for a user to submit a request for a computation-->
     <b-form @submit="sendToServer" @reset="initForm">
+      <!--User can select a dataset. TODO: Multiple Datasets-->
       <h2>Dataset</h2>
       <b-form-group label="Select a dataset">
         <!-- Select a dataset from the options received from the server -->
@@ -54,6 +60,8 @@ function initForm() {
           required
         ></b-form-select>
       </b-form-group>
+
+      <!--User can select an optional filter-->
       <b-form-group label="Select a filter">
         <!-- Select a dataset filter from the options received from the server -->
         <b-form-select
@@ -61,6 +69,8 @@ function initForm() {
           :options="[{ text: 'None (default)', value: null }]"
         ></b-form-select>
       </b-form-group>
+
+      <!--User provides an optional rating conversion-->
       <b-form-group label="Select a rating conversion">
         <!-- Select a rating conversion from the options received from the server -->
         <b-form-select
@@ -69,6 +79,7 @@ function initForm() {
         ></b-form-select>
       </b-form-group>
 
+      <!--User can select which recommender approaches they want-->
       <h2>Recommenders</h2>
       <b-form-group>
         <p>Select recommender approaches:</p>
@@ -82,6 +93,8 @@ function initForm() {
           stacked
           required
         ></b-form-checkbox-group>
+
+        <!--User gets additional options for the selected recommender approaches-->
         <b-form-group 
           label="ALS Features value:" 
           v-if="form.recommenders != null && form.recommenders.includes('ALS')">
@@ -99,8 +112,9 @@ function initForm() {
             :options="[{ text:'quantile (default)', value:'quantile'}, 'rank', 'count']"
           ></b-form-select>
         </b-form-group>
-
       </b-form-group>
+
+      <!--User can select the amount of recommendations per user -->
       <b-form-group label="Select number of recommendations per user:">
         <b-form-input
           type="range"
@@ -118,7 +132,8 @@ function initForm() {
           required
         >Include already rated items in recommendations</b-form-checkbox>
       </b-form-group>
-
+      
+      <!--Input for train/test split-->
       <h2>Train/test-split</h2>
       <b-form-group label="Select test/train split:">
         <b-form-input
@@ -131,10 +146,13 @@ function initForm() {
         ></b-form-input>
         <p>Train: {{form.split}}</p>
         <p>Test: {{100-form.split}}</p>
+
+        <!--User can choose between a random and time-based train/testsplit-->
         <b-form-radio v-model="form.splitMethod" value="random">Random (default)</b-form-radio>
         <b-form-radio v-model="form.splitMethod" value="timesplit">Timesplit</b-form-radio>
       </b-form-group>
 
+      <!--Input for metrics, user can add infinite metrics -->
       <h2>Metrics</h2>
       <b-form-group 
       v-for="i in groupCount"
@@ -158,6 +176,8 @@ function initForm() {
       
       <b-button @click="groupCount++">Add Metric...</b-button>
       <b-button @click="groupCount--" variant="danger">Remove Metric</b-button>
+
+      <!--Input for results filter -->
       <b-form-group label="Select a results filter">
         <b-form-select
           v-model="form.resFilter"
@@ -165,6 +185,10 @@ function initForm() {
       ></b-form-select>
       </b-form-group>
 
+<!-- Input for metadata such as:
+     Computation Name
+     Optional Tags
+     Optional Email for notification -->
       <h2>Meta</h2>
       <b-form-group label="Enter name for computation">
         <b-form-input
