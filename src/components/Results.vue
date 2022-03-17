@@ -7,7 +7,7 @@ import Table from './Table.vue'
 import { ref } from 'vue'
 
 const results = ref([
-  { dataset: 'LFM-1b', algorithm: 'ALS', hellinger_distance: '0.0988' , precision_p1 : '0.4505' },
+  { dataset: 'LFM-1b', algorithm: 'ALS', fst_female: '6.7717', fst_male : '0.6142' , hellinger_distance: '0.0988' , precision_p1 : '0.4505' },
   { dataset: 'LFM-1b', algorithm: 'POP', hellinger_distance: '0.1577' , precision_p1 : '0.1033' }
 ])
 
@@ -15,7 +15,12 @@ const recommendations = ref([
   { user_id: '1', rec_item1: 'song1', rec_item2:'song2' }
 ])
 
-const headers = ref(['dataset', 'algorithm', 'hellinger_distance', 'precision_p1'])
+const headers = ref([
+  {name: 'dataset',},
+  {name: 'algorithm'},
+  {name: 'avg_position' , subheaders: ['fst_female', 'fst_male']},
+  {name: 'hellinger_distance'},
+  {name:'precision_p1'}])
 const headers_rec = ref(['user_id', 'rec_item1', 'rec_item2'])
 const pretty_headers = ref(['Dataset', 'Algorithm', 'Hellinger distance', 'Precision p1@k'])
 const pretty_headers_rec= ref([ 'User id', 'First recommended item', 'Second recommended item'])
