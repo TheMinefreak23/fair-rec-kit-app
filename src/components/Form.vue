@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 
 const props = defineProps({
-  options: Array,
+  options: Object,
 })
 
 const result = ref({})
