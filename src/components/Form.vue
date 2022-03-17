@@ -7,12 +7,12 @@ const props = defineProps({
 
 const result = ref({})
 const form = ref({split:80,
-                  recommendations:10,
-                  metric:[],
-                  metricK:[],
-                  splitMethod:"random"
+                  recommendations:10, //The default amount per user.
+                  metric:[], //Multiple metrics can be selected.
+                  metricK:[], //Multiple metrics requires multiple settings.
+                  splitMethod:"random" //The default split method.
                  })
-const groupCount = ref(1)
+const groupCount = ref(1) //The minimum amount of metrics is 1.
 
 // POST request: Send form to server.
 function sendToServer() {
@@ -47,21 +47,22 @@ function initForm() {
     <b-form @submit="sendToServer" @reset="initForm">
       <h2>Dataset</h2>
       <b-form-group label="Select a dataset">
+        <!-- Select a dataset from the options received from the server -->
         <b-form-select
           v-model="form.dataset"
           :options="[{ text: 'Choose...', value: null }, ...options.datasets]"
           required
-        >
-        </b-form-select>
+        ></b-form-select>
       </b-form-group>
       <b-form-group label="Select a filter">
+        <!-- Select a dataset filter from the options received from the server -->
         <b-form-select
           v-model="form.filter"
           :options="[{ text: 'None (default)', value: null }]"
-        >
-        </b-form-select>
+        ></b-form-select>
       </b-form-group>
       <b-form-group label="Select a rating conversion">
+        <!-- Select a rating conversion from the options received from the server -->
         <b-form-select
           v-model="form.conversion"
           :options="[{ text: 'None (default)', value: null }]"
