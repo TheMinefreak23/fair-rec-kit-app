@@ -158,28 +158,39 @@ function initForm() {
 
       <!--Input for metrics, user can add infinite metrics -->
       <h2>Metrics</h2>
-      <b-form-group 
+      <div 
       v-for="i in groupCount"
-      label="Select a metric"
       v-bind:key="i">
+      <b-row>
+        <b-col>
+        <b-form-group
+        label="Select a metric"
+        >
+          
         <b-form-select
           v-model="form.metric[i-1]"
           :options="[{ text: 'Choose...', value: null }, ...options.metrics]"
           required
         >
         </b-form-select>
+        </b-form-group>
+        </b-col>
+        <b-col v-if="form.metric[i-1] != null && form.metric[i-1].includes('@')">
         <!--Show settings for selected metrics-->
-        <b-form-group v-if="form.metric[i-1] != null && form.metric[i-1].includes('@')" >
-          <p>Metric @ K?:</p>
+        <b-form-group  label="Metric@k?">
           <b-form-input
             v-model="form.metricK[i-1]"
             :state = "form.metricK[i-1] <= form.recommendations"
             required
           ></b-form-input>
+          
         </b-form-group>
-        <b-button @click="  if (groupCount != 0){groupCount--}; form.metric.splice(i-1,1); form.metricK.splice(i-1,1)" variant="danger">X</b-button>
-  
-      </b-form-group>
+        </b-col>
+        <b-col>
+          <b-button v-if="i != 1" @click="  if (groupCount != 1){groupCount--}; form.metric.splice(i-1,1); form.metricK.splice(i-1,1)" variant="danger" class="mb-2 mr-sm-2 mb-sm-0" >X</b-button>
+        </b-col>
+      </b-row>
+      </div>
       
       <b-button @click="groupCount++">Add Metric...</b-button>
 
