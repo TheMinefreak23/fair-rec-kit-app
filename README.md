@@ -35,3 +35,17 @@ If you're using Anaconda, you need to install the package python-dotenv. Then us
 You can also use the run-anaconda batch file from Discord.
 
 In all cases, you might want to add a configuration (to the .bat file) in PyCharm.
+
+###########
+
+## How to test client
+
+Execute the run-test batch file, or run in the terminal:
+
+### npm run test
+
+## How to test server
+
+Execute the run-test batch file, or run in the terminal:
+
+### python -m pytest
