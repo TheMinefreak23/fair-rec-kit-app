@@ -98,6 +98,7 @@ function initForm() {
         <b-form-group 
           label="ALS Features value:" 
           v-if="form.recommenders != null && form.recommenders.includes('ALS')">
+          <!--ALS Feature value needs to be a number higher than 1-->
           <b-form-input
             :state = "form.alsFeatures >= 1"
             placeholder=">= 1"
@@ -107,6 +108,7 @@ function initForm() {
         <b-form-group 
           label="POP Method:" 
           v-if="form.recommenders != null && form.recommenders.includes('POP')">
+          <!--POP has three modes to choose from-->
           <b-form-select
             v-model="form.popSettings"
             :options="[{ text:'quantile (default)', value:'quantile'}, 'rank', 'count']"
@@ -164,6 +166,7 @@ function initForm() {
           required
         >
         </b-form-select>
+        <!--Show settings for selected metrics-->
         <b-form-group v-if="form.metric[i] != null && form.metric[i].includes('@')" >
           <p>Metric @ K?:</p>
           <b-form-input
