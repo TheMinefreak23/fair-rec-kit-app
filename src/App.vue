@@ -15,7 +15,7 @@ import Results from './components/Results.vue'
   <div class="nav-center">
     <h1 class="text-center bg-dark text-white my-0 py-2">FairRecKit</h1>
     <b-tabs class="m-0" align="center">
-      <b-tab title="Computation">   <Form /></b-tab>
+      <b-tab title="Computation">   <HelloWorld /></b-tab>
       <b-tab title="Documentation"> <Documentation /></b-tab>
       <b-tab title="Results">       <Results /></b-tab>
     </b-tabs>
