@@ -171,7 +171,7 @@ function initForm() {
           <p>Metric @ K?:</p>
           <b-form-input
             v-model="form.metricK[i]"
-            :state = "form.metricK[i] <= form.recommendations"
+            :state = "form.metricK[i] <= form.recommendations && form.metricK[i] >= 1"
             required
           ></b-form-input>
         </b-form-group>
