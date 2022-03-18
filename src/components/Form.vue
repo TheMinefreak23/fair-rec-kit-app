@@ -32,6 +32,7 @@ function sendToServer() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(form.value),
   }
+  console.log(form.value)
   fetch('http://localhost:5000/computation/calculation', requestOptions).then(
     () => {
       getCalculation()

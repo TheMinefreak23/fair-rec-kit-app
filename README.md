@@ -4,7 +4,7 @@
 
 ## How to run client & server
 
-(Install Node.js first)
+(Install Node.js first and run npm install)
 Either click the run.bat file in the app directory, or run (in cmd):
 
 ### `run`
@@ -24,12 +24,14 @@ Run in the terminal:
 
 ## How to run server separately
 
-The easiest way is to install the packages (flask, flask_cors) with pip. Either click the run-api batch file or run in the terminal:
+The easiest way is to install the packages (flask, flask-cors) with pip. Either click the run-api batch file or run in the terminal:
 
 ## run-api
 
-If you're using Anaconda, use the Anaconda prompt and run: (Note: make sure you're in the right environment, using activate <env-name>)
+If you're using Anaconda, you need to install the package python-dotenv. Then use the Anaconda prompt and run: (Note: make sure you're in the right environment, using activate <env-name>)
 
 ### `flask run`
 
-In both cases, you might want to add a configuration (to the .bat file) in PyCharm.
+You can also use the run-anaconda batch file from Discord.
+
+In all cases, you might want to add a configuration (to the .bat file) in PyCharm.
