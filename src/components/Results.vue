@@ -13,6 +13,7 @@ const results = ref([{
     fst_male: '0.6142',
     hellinger_distance: '0.0988',
     precision_p1: '0.4505',
+    precision_p10: '0.2997'
 }, {
     dataset: 'LFM-1b',
     algorithm: 'POP',
@@ -20,12 +21,16 @@ const results = ref([{
     fst_male: '1.7299',
     hellinger_distance: '0.1577',
     precision_p1: '0.1033',
+    precision_p10: '0.0919'
 }]);
 
-const headers = ref([{ name: 'dataset' }, { name: 'algorithm' }, {
-    name: 'avg_position',
-    subheaders: ['fst_female', 'fst_male'],
-}, { name: 'hellinger_distance' }, { name: 'precision_p1' }]);
+const headers = ref([
+  { name: 'Dataset' }, 
+  { name: 'Algorithm' }, 
+  { name: 'Average position', subheaders: ['1st female', '1st male'],},
+  { name: 'Hellinger Distance' }, 
+  { name: 'Precision', subheaders: ['P@1', 'P@10'] }
+  ]);
 
 
 const recommendations = ref([
@@ -36,15 +41,12 @@ const recommendations = ref([
 ])
 
 const headers_rec = ref([
-  {name: 'user'},
-  {name: 'dataset'},
-  {name: 'algorithm'},
-  {name: 'item_1' },
-  {name: 'item_2'},
-  {name:'item_3'}])
-
-const pretty_headers = ref(['Dataset', 'Algorithm', 'Hellinger distance', 'Precision p1@k'])
-const pretty_headers_rec= ref([ 'User id', 'First recommended item', 'Second recommended item'])
+  {name: 'User'},
+  {name: 'Dataset'},
+  {name: 'Algorithm'},
+  {name: 'Item 1' },
+  {name: 'Item 2'},
+  {name:'Item 3'}])
 
 const computation_name = ref('computation1')
 const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
