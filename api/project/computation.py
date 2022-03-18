@@ -34,7 +34,21 @@ def calculate():
         response = {'status': 'success'}
         data = request.get_json()
         print(data)
-        result_storage.save_result(data.get('metadata'), data.get('settings'), data.get('result'))
+        settings = data.get('settings')
+
+        result = []
+        # Mocks result computation. TODO compute result with libs here
+        for dataset in settings['datasets']:
+            recs = []
+            for approach in settings['approaches']:
+                recommendation = {'recommendation': approach[::-1], 'evals': []}
+                for metric in settings['metrics']:
+                    evaluation = len(approach) * len(metric['name']) * metric['k']
+                    recommendation['evals'].append(evaluation)
+                recs.append(recommendation)
+            result.append({'dataset': dataset, 'recs': recs})
+
+        result_storage.save_result(data.get('metadata'), settings, result)
     else:
         response['calculation'] = result_storage.newest_result()
     return response

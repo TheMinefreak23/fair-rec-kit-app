@@ -2,25 +2,29 @@
 # Utrecht University within the Software Project course.
 # © Copyright Utrecht University (Department of Information and Computing Sciences)
 import csv  # TODO fix this import
+import json
+import os
 from csv import writer
 import time
 
-# Result format
-# group ID
-# metadata: timestamp, name, tag
-# settings: dataset, approach, metrics
-# result: ranking, metrics results
+# Results overview format
+# timestamp (ID)
+# metadata: name, tag
+# settings: datasets, approaches, metrics, per metric: name, k value
+
+# Result detail format
+# timestamp (ID), per dataset: recommendations result, per recs result: metrics evaluations
 
 current_result = {}
+results_path = 'results.json'
+recommendations_path = 'recs.json'
+evaluations_path = 'evals.json'
 
-
-def save_result(metadata,settings,result):
+def save_result(metadata, settings, result):
     timestamp = time.time()
-    global current_result # TODO use class instead of global?
-    metadata[timestamp] = timestamp
-    # use timestamp as group_id for now
-    current_result = [timestamp,metadata,settings,result]
-    add_csv_row(current_result, 'results.tsv')
+    global current_result  # TODO use class instead of global?
+    current_result = {'timestamp': timestamp, 'metadata': metadata, 'settings': settings, 'result': result}
+    update_results(current_result)
 
 
 def newest_result():
@@ -28,22 +32,22 @@ def newest_result():
 
 
 def load_results():
-    #path = 'test_results/magic_mock.tsv'
-    path = 'results.tsv'
-    return list_from_csv(path)
+    with open(results_path, 'r') as file:
+        return json.load(file)  # Load existing data into a dict.
 
 
-def add_csv_row(row_list, path):
-    # Open our existing CSV file in append mode
-    # Create a file object and write a row to it
-    with open(path, 'a') as file:
-        file_writer = writer(file)
-        file_writer.writerow(row_list)
-        file.close()
+def update_results(new_result):
+    file_data = load_results()
+    file_data['all_results'].append(new_result)
+    with open(results_path, 'w') as file:  # Open the file in write mode.
+        # Rewind file pointer's position.
+        file.seek(0)
+        # Store it as json data.
+        json.dump(file_data, file)
 
 
-def list_from_csv(path):
-    with open(path, mode='r') as file:
-        reader = csv.reader(file)
-        rows = list(reader)
-        return rows
+# Create results file if it doesn't exist yet or is empty
+def create_results():
+    if not os.path.exists(results_path) or os.stat(results_path).st_size == 0:
+        with open(results_path, 'w') as file:  # Open the file in write mode.
+            json.dump({'all_results': []}, file)

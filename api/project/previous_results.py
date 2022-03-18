@@ -7,7 +7,7 @@ from . import result_storage
 
 results_bp = Blueprint('results', __name__, url_prefix='/all-results')
 
-@results_bp.route('/results', methods=['GET'])
+@results_bp.route('/', methods=['GET'])
 def results():
     return result_storage.load_results()
 
