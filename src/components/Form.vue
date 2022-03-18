@@ -4,7 +4,6 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import { onMounted, ref } from 'vue'
 import FormGroupList from './FormGroupList.vue'
-import FormGroupList1 from './FormGroupList.vue'
 
 const result = ref({})
 const options = ref()
@@ -49,18 +48,13 @@ async function getCalculation() {
 }
 
 async function initForm() {
-  console.log(options.value)
-  console.log(options.value.defaults)
+  //console.log(options.value)
+  //console.log(options.value.defaults)
   form.value = {}
   form.value.recommendations = options.value.defaults.recCount.default
   form.value.split = options.value.defaults.split
   form.splitMethod = [{ text: 'Random', value: 'random' }]
   //form.value.result.value = {}
-}
-
-function updateForm(form, field) {
-  if (field == 'metrics') form.value.metrics = form
-  if (field == 'approaches') form.value.approaches = form
 }
 </script>
 
@@ -116,8 +110,7 @@ function updateForm(form, field) {
 
       <b-form-group label="Select recommender approaches:"> </b-form-group>
       <FormGroupList
-        @formChange="updateForm"
-        v-model="form.approaches"
+        @formChange="(x) => (form.approaches = x)"
         name="approach"
         plural="Recommender approaches"
         selectName="an approach"
@@ -192,7 +185,7 @@ function updateForm(form, field) {
 
       <!--Input for metrics, user can add infinite metrics -->
       <FormGroupList
-        @formChange="updateForm"
+        @formChange="(x) => (form.metrics = x)"
         name="metric"
         plural="metrics"
         selectName="a metric"
