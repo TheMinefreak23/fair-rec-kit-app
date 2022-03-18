@@ -60,5 +60,7 @@ const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
   <div class="container">
     <Table :results="recommendations" :headers="headers_rec" :pretty_headers="pretty_headers_rec"/>
   </div>
+
+
 </template>
 
