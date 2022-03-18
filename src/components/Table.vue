@@ -3,44 +3,16 @@ import { computed, ref } from 'vue'
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
-/*
-Playground component: Shows off a couple Vue 3 + Bootstrap 5 features.
-Check out https://vuejs.org/examples 
-and https://getbootstrap.com/docs/5.0/getting-started/introduction/ for more
-*/
+
 const props = defineProps({
   results: Array,
   headers: Array,
-
 })
-
-
-
-const results = ref([{
-    dataset: 'LFM-1b',
-    algorithm: 'ALS',
-    fst_female: '6.7717',
-    fst_male: '0.6142',
-    hellinger_distance: '0.0988',
-    precision_p1: '0.4505',
-}, {
-    dataset: 'LFM-1b',
-    algorithm: 'POP',
-    fst_female: '0.1325',
-    fst_male: '1.7299',
-    hellinger_distance: '0.1577',
-    precision_p1: '0.1033',
-}]);
-
-const headers = ref([{ name: 'dataset' }, { name: 'algorithm' }, {
-    name: 'avg_position',
-    subheaders: ['fst_female', 'fst_male'],
-}, { name: 'hellinger_distance' }, { name: 'precision_p1' }]);
 
 const subheaders = computed(() => {
     const result = [];
 
-    for (const header of headers.value) {
+    for (const header of props.headers) {
         if (header.subheaders) {
             result.push(...header.subheaders);
         } else {
@@ -50,6 +22,7 @@ const subheaders = computed(() => {
 
     return result;
 });
+
 </script>
 
 <template>

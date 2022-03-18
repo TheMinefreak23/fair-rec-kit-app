@@ -6,10 +6,27 @@ Utrecht University within the Software Project course.
 import Table from './Table.vue'
 import { ref } from 'vue'
 
-const results = ref([
-  { dataset: 'LFM-1b', algorithm: 'ALS', fst_female: '6.7717', fst_male : '0.6142' , hellinger_distance: '0.0988' , precision_p1 : '0.4505' },
-  { dataset: 'LFM-1b', algorithm: 'POP', fst_female: '0.1325', fst_male: '1.7299', hellinger_distance: '0.1577' , precision_p1 : '0.1033' }
-])
+const results = ref([{
+    dataset: 'LFM-1b',
+    algorithm: 'ALS',
+    fst_female: '6.7717',
+    fst_male: '0.6142',
+    hellinger_distance: '0.0988',
+    precision_p1: '0.4505',
+}, {
+    dataset: 'LFM-1b',
+    algorithm: 'POP',
+    fst_female: '0.1325',
+    fst_male: '1.7299',
+    hellinger_distance: '0.1577',
+    precision_p1: '0.1033',
+}]);
+
+const headers = ref([{ name: 'dataset' }, { name: 'algorithm' }, {
+    name: 'avg_position',
+    subheaders: ['fst_female', 'fst_male'],
+}, { name: 'hellinger_distance' }, { name: 'precision_p1' }]);
+
 
 const recommendations = ref([
   { user: '1', dataset: 'LFM-1b' , algorithm: 'ALS', item_1: 'Rolling in the deep', item_2: 'Umbrella', item_3: 'Firework' },
@@ -18,13 +35,6 @@ const recommendations = ref([
    { user: '2', dataset: 'LFM-1b' , algorithm: 'POP', item_1: 'Umbrella', item_2: 'Rolling in de deep', item_3: 'Firework' }
 ])
 
-
-const headers = ref([
-  {name: 'dataset',},
-  {name: 'algorithm'},
-  {name: 'avg_position' , subheaders: ['fst_female', 'fst_male']},
-  {name: 'hellinger_distance'},
-  {name:'precision_p1'}])
 const headers_rec = ref([
   {name: 'user'},
   {name: 'dataset'},
@@ -53,12 +63,12 @@ const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
   </p>
 
   <div class = "container">
-    <Table :results="results" :headers="headers" :pretty_headers="pretty_headers"/>
+    <Table :results="results" :headers="headers"/>
   </div>
 
   <h6> Recommended items per user for dataset x and algorithm y </h6>
   <div class="container">
-    <Table :results="recommendations" :headers="headers_rec" :pretty_headers="pretty_headers_rec"/>
+    <Table :results="recommendations" :headers="headers_rec" />
   </div>
 
 
