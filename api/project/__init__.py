@@ -6,8 +6,8 @@ import os
 from flask import Flask
 from flask_cors import CORS
 
-import project.computation
-
+from project.computation import compute_bp
+from project.previous_results import results_bp
 
 
 def create_app(test_config=None):
@@ -16,7 +16,7 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECRET_KEY='dev',
         # Get the folder of the top-level directory of this project
-        BASEDIR = os.path.abspath(os.path.dirname(__file__))
+        BASEDIR=os.path.abspath(os.path.dirname(__file__))
     )
 
     if test_config is None:
@@ -48,6 +48,7 @@ def create_app(test_config=None):
     register_blueprints(app)
     return app
 
+
 def register_blueprints(app):
-    app.register_blueprint(project.computation.bp)
-    app.register_blueprint(project.results_bp)
+    app.register_blueprint(compute_bp)
+    app.register_blueprint(results_bp)

@@ -34,9 +34,7 @@ def calculate():
         response = {'status': 'success'}
         data = request.get_json()
         print(data)
-        reverse = data.get('dataset')[::-1]
-        magic = data.get('number') ** 2 + len(reverse)
-        result_storage.save_result(magic, reverse)
+        result_storage.save_result(data.get('metadata'), data.get('settings'), data.get('result'))
     else:
         response['calculation'] = result_storage.newest_result()
     return response
