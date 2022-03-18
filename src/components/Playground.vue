@@ -29,6 +29,7 @@ and https://getbootstrap.com/docs/5.0/getting-started/introduction/ for more
     
     <div class="collapse py-2" id="collapseTarget">
       <img src="/RecCoonLogo.png"/>
+      <p>RecCoons</p>
       </div>
       <h2>Modal</h2>
       <!-- Button trigger modal -->

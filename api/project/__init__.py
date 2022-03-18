@@ -3,18 +3,20 @@
 # © Copyright Utrecht University (Department of Information and Computing Sciences)
 import os
 
-from flask import Flask, request
+from flask import Flask
 from flask_cors import CORS
 
-from . import previous_results
-from . import computation
+import project.computation
+
 
 
 def create_app(test_config=None):
     # Instantiate the app.
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
-        SECRET_KEY='dev'
+        SECRET_KEY='dev',
+        # Get the folder of the top-level directory of this project
+        BASEDIR = os.path.abspath(os.path.dirname(__file__))
     )
 
     if test_config is None:
@@ -43,6 +45,9 @@ def create_app(test_config=None):
     def greet():
         return {"greeting": "Greetings from the backend :)"}
 
-    app.register_blueprint(computation.compute_bp)
-    app.register_blueprint(previous_results.results_bp)
+    register_blueprints(app)
     return app
+
+def register_blueprints(app):
+    app.register_blueprint(project.computation.bp)
+    app.register_blueprint(project.results_bp)
