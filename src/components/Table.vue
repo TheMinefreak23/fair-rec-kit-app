@@ -30,8 +30,7 @@ console.log(props.results)
       </b-tr>
       <b-tr>
         <b-th v-for="header in headers" :key="header.id">
-          <b-th v-if="header.subheaders == null">test</b-th>
-          <b-th v-else v-for="subheader in header.subheaders" :key="subheader.id">
+          <b-th v-for="subheader in header.subheaders" :key="subheader.id">
               {{ subheader }}
           </b-th>          
         </b-th>
