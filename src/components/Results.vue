@@ -1,6 +1,7 @@
 <script setup>
 import Result from './Result.vue'
 import VDismissButton from './VDismissButton.vue'
+import PreviousResults from './PreviousResults.vue'
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
@@ -29,7 +30,7 @@ Utrecht University within the Software Project course.
     </div>
     <div class="col-md-4 border-top-0 p-0">
       <h3 class="text-center py-2 m-0 border-bottom">Previous Results</h3>
-      <ul class="list-group overflow-auto" style="max-height: 500px">
+      <!--<ul class="list-group overflow-auto" style="max-height: 500px">
         <a
           href="#"
           class="list-group-item list-group-item-action flex-column align-items-start border-0 border-bottom"
@@ -110,7 +111,8 @@ Utrecht University within the Software Project course.
           <p class="m-0">description text</p>
           <p class="m-0"><em>01-01-22</em></p>
         </a>
-      </ul>
+      </ul>-->
+      <PreviousResults />
     </div>
   </div>
 </template>

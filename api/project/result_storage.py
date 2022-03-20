@@ -6,6 +6,7 @@ import json
 import os
 from csv import writer
 import time
+import datetime
 
 # Results overview format
 # timestamp (ID)
@@ -22,8 +23,11 @@ evaluations_path = 'evals.json'
 
 def save_result(metadata, settings, result):
     timestamp = time.time()
+    now = datetime.datetime.now()
+    currentDt = now.strftime('%Y-%m-%dT%H:%M:%S') + ('-%02d' % (now.microsecond / 10000))
+
     global current_result  # TODO use class instead of global?
-    current_result = {'timestamp': timestamp, 'metadata': metadata, 'settings': settings, 'result': result}
+    current_result = {'timestamp': {'stamp': timestamp, 'datetime' : currentDt}, 'metadata': metadata, 'settings': settings, 'result': result}
     update_results(current_result)
 
 
@@ -37,6 +41,7 @@ def load_results():
 
 
 def update_results(new_result):
+    create_results()
     file_data = load_results()
     file_data['all_results'].append(new_result)
     with open(results_path, 'w') as file:  # Open the file in write mode.
