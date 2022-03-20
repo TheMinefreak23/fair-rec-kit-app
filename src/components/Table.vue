@@ -1,33 +1,71 @@
 <script setup>
+import { computed, ref } from 'vue'
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
-/*
-Playground component: Shows off a couple Vue 3 + Bootstrap 5 features.
-Check out https://vuejs.org/examples 
-and https://getbootstrap.com/docs/5.0/getting-started/introduction/ for more
-*/
+
 const props = defineProps({
   results: Array,
   headers: Array,
 })
 
-console.log(props.results)
+const subheaders = computed(() => {
+    const result = [];
+
+    for (const header of props.headers) {
+        if (header.subheaders) {
+            result.push(...header.subheaders);
+        } else {
+            result.push('');
+        }
+    }
+
+    return result;
+});
+
 </script>
 
 <template>
-  <b-table-simple striped hover>
-    <b-thead head-variant="dark">
-      <b-tr>
-        <b-th v-for="header in headers" :key="header.id">
-          {{ header }}
-        </b-th>
-      </b-tr>
-    </b-thead>
-    <b-tr v-for="item of results" :key="item.id">
-      <b-td v-for="header in headers" :key="header.id">
-        {{ item[header] }}
-      </b-td>
-    </b-tr>
-  </b-table-simple>
+    <b-table-simple
+        hover
+        striped
+        responsive
+    >
+        <b-thead head-variant="dark">
+            <b-tr>
+                <b-th
+                    v-for="(header, index) in headers"
+                    :key="`header-${index}`"
+                    :colspan="header.subheaders ? header.subheaders.length : 1"
+                >
+                    {{ header.name }}
+                </b-th>
+            </b-tr>
+            <b-tr>
+                <b-th
+                    v-for="(subheader, index) in subheaders"
+                    :key="`subheader-${index}`"
+                >
+                    {{ subheader }}
+                </b-th>
+            </b-tr>
+        </b-thead>
+        <b-tbody>
+            <b-tr
+                v-for="(item, index) of results"
+                :key="`item-${index}`"
+            >
+                <b-td
+                    v-for="[key, value] in Object.entries(item)"
+                    :key="`${index}-${key}`"
+                >
+                    <b-td>
+                        {{ value }}
+                    </b-td>
+                </b-td>
+            </b-tr>
+        </b-tbody>
+    </b-table-simple>
 </template>
+
+

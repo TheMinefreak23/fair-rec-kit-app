@@ -4,7 +4,6 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
 import Form from './components/Form.vue'
-import HelloWorld from './components/HelloWorld.vue'
 import Playground from './components/Playground.vue'
 import Documentation from './components/Documentation.vue'
 import Results from './components/Results.vue'
