@@ -3,6 +3,7 @@
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import { ref } from 'vue'
+import ActiveComputation from './ActiveComputation.vue'
 
 const props = defineProps({
   options: Array,
@@ -230,4 +231,7 @@ function initForm() {
       <b-button type="reset" variant="danger">Reset</b-button>
     </b-form>
   </b-card>
+  <div>
+   <ActiveComputation :name = "form.name" />
+  </div>
 </template>
