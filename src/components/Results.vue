@@ -5,7 +5,7 @@ Utrecht University within the Software Project course.
 </script>
 
 <template>
-    <div class="row">
+  <!--<div class="row">
         <div class="col-md-8 border-top-0 p-0">
             <h3 class="py-2 border-bottom text-center m-0">Results</h3>
             <div>
@@ -84,5 +84,5 @@ Utrecht University within the Software Project course.
                 </a>
             </ul>
         </div>
-    </div>
+    </div>-->
 </template>
