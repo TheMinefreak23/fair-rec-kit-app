@@ -44,69 +44,75 @@ function removeGroup(i) {
   <div>
     <!--Capitalise the title.-->
     <h2>{{ plural.charAt(0).toUpperCase() + plural.slice(1) }}</h2>
-    <b-form-group
-      v-for="i in groupCount"
-      :label="'Select ' + selectName"
-      :key="i - 1"
-    >
-      <b-form-select
-        v-model="form.main[i - 1]"
-        :options="[
-          { text: 'Choose...', value: null },
-          ...options.map((x) => x.name),
-        ]"
-        @change="setParameter(i - 1, $event), $emit('formChange', form)"
-        required
-        ><!--TODO use placeholder-->
-      </b-form-select>
-
-      <!--Show settings for selected option.-->
-      <div v-if="form.main[i - 1] != null">
-        <!--Use an input form for values.-->
-        <template v-for="(value, index) in getFromIndex(i - 1).params.values">
-          <b-form-group
-            :label="
-              'Give a ' +
-              value.name +
-              ' between ' +
-              value.min +
-              ' and ' +
-              value.max
-            "
-          >
-            <b-form-input
-              v-model="form.inputs[i - 1]"
+    <div v-for="i in groupCount" :key="i - 1">
+      <b-row>
+        <b-col>
+          <b-form-group :label="'Select ' + selectName">
+            <b-form-select
+              v-model="form.main[i - 1]"
+              :options="[
+                { text: 'Choose...', value: null },
+                ...options.map((x) => x.name),
+              ]"
+              @change="setParameter(i - 1, $event), $emit('formChange', form)"
               required
-              :state="
-                form.inputs[i - 1] >= value.min &&
-                form.inputs[i - 1] <= value.max
-              "
-              @input="$emit('formChange', form)"
-              validated="true"
-            ></b-form-input>
+              ><!--TODO use placeholder-->
+            </b-form-select>
           </b-form-group>
-        </template>
+        </b-col>
 
-        <!--Use a select form for options.-->
-        <template v-for="(option, index) in getFromIndex(i - 1).params.options">
-          <b-form-select
-            :label="'Choose a ' + option.name"
-            v-model="form.selects[i - 1]"
-            :options="[{ text: 'Choose...', value: null }, ...option.options]"
-            @input="$emit('formChange', form)"
-            required
-            ><!--TODO use placeholder-->
-          </b-form-select>
-        </template>
-      </div>
-      <b-button
-        v-if="i != 1"
-        @click="removeGroup(i - 1)"
-        variant="danger"
-        class="mb-2 mr-sm-2 mb-sm-0"
-        >X</b-button
-      >
-    </b-form-group>
+        <!--Show settings for selected option.-->
+        <b-col v-if="form.main[i - 1] != null">
+          <!--Use an input form for values.-->
+          <template v-for="(value, index) in getFromIndex(i - 1).params.values">
+            <b-form-group
+              :label="
+                'Give a ' +
+                value.name +
+                ' between ' +
+                value.min +
+                ' and ' +
+                value.max
+              "
+            >
+              <b-form-input
+                v-model="form.inputs[i - 1]"
+                required
+                :state="
+                  form.inputs[i - 1] >= value.min &&
+                  form.inputs[i - 1] <= value.max
+                "
+                @input="$emit('formChange', form)"
+                validated="true"
+              ></b-form-input>
+            </b-form-group>
+          </template>
+
+          <!--Use a select form for options.-->
+          <template
+            v-for="(option, index) in getFromIndex(i - 1).params.options"
+          >
+            <b-form-select
+              :label="'Choose a ' + option.name"
+              v-model="form.selects[i - 1]"
+              :options="[{ text: 'Choose...', value: null }, ...option.options]"
+              @input="$emit('formChange', form)"
+              required
+              ><!--TODO use placeholder-->
+            </b-form-select>
+          </template>
+        </b-col>
+        <b-col>
+          <b-button
+            v-if="i != 1"
+            @click="removeGroup(i - 1)"
+            variant="danger"
+            class="mb-2 mr-sm-2 mb-sm-0"
+            >X</b-button
+          >
+        </b-col>
+      </b-row>
+    </div>
 
     <b-button @click="groupCount++">Add {{ name }}...</b-button>
   </div>
