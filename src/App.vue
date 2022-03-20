@@ -17,7 +17,7 @@ import Results from './components/Results.vue'
   </div>
   <div class="nav-center">
     <b-tabs class="m-0 pt-2" align="center">
-      <b-tab title="Computation"> <HelloWorld /></b-tab>
+      <b-tab title="Computation"> <Form /></b-tab>
       <b-tab title="Documentation"> <Documentation /></b-tab>
       <b-tab title="Results"> <Results /></b-tab>
     </b-tabs>
