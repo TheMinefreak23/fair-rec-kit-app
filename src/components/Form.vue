@@ -8,8 +8,10 @@ import FormGroupList from './FormGroupList.vue'
 const result = ref({})
 const options = ref()
 const form = ref({
+  datasets: [],
   splitMethod: 'random', //The default split method.
 })
+const metadata = ref({})
 
 onMounted(async () => {
   await getOptions()
@@ -26,14 +28,12 @@ async function getOptions() {
 
 // POST request: Send form to server.
 function sendToServer() {
-  console.log(form.value)
   form.value.approaches = reformat(form.value.approaches)
   form.value.metrics = reformat(form.value.metrics)
-  console.log(form.value.approaches)
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(form.value),
+    body: JSON.stringify({ metadata: metadata.value, settings: form.value }),
   }
   console.log(form.value)
   fetch('http://localhost:5000/computation/calculation', requestOptions).then(
@@ -46,11 +46,9 @@ function sendToServer() {
 // Change the form format (SoA) into a managable data format (AoS)
 // TODO just don't use SoA in the first place
 function reformat(property) {
-  console.log(property)
-  let choices = {}
+  let choices = []
   for (let i in property.main) {
     let parameter = null
-    console.log(i)
     if (property.inputs[i] != null) parameter = property.inputs[i]
     else if (property.selects[i] != null) parameter = property.selects[i]
     choices[i] = { name: property.main[i], parameter: parameter }
@@ -71,6 +69,8 @@ async function initForm() {
   //console.log(options.value)
   //console.log(options.value.defaults)
   form.value = {}
+  metadata.value = {}
+  form.value.datasets = []
   form.value.recommendations = options.value.defaults.recCount.default
   form.value.split = options.value.defaults.split
   form.value.splitMethod = 'random'
@@ -89,7 +89,7 @@ async function initForm() {
           <b-form-group label="Select a dataset">
             <!-- Select a dataset from the options received from the server -->
             <b-form-select
-              v-model="form.dataset"
+              v-model="form.datasets[0]"
               :options="[
                 { text: 'Choose...', value: null },
                 ...options.datasets,
@@ -232,17 +232,17 @@ async function initForm() {
           <b-form-group label="Enter name for computation">
             <b-form-input
               placeholder="New Computation"
-              v-model="form.name"
+              v-model="metadata.name"
               required
             ></b-form-input>
           </b-form-group>
           <b-form-group label="Enter tags (optional)">
-            <b-form-input v-model="form.tags"></b-form-input>
+            <b-form-input v-model="metadata.tags"></b-form-input>
           </b-form-group>
           <b-form-group label="Enter e-mail (optional)">
             <b-form-input
               placeholder="example@mail.com"
-              v-model="form.email"
+              v-model="metadata.email"
             ></b-form-input>
           </b-form-group>
 

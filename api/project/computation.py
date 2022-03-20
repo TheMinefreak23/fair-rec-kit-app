@@ -1,6 +1,7 @@
 # This program has been developed by students from the bachelor Computer Science at
 # Utrecht University within the Software Project course.
 # © Copyright Utrecht University (Department of Information and Computing Sciences)
+import json
 
 from flask import (Blueprint, request)
 
@@ -20,7 +21,6 @@ OTHER_METRICS = ['DCG']
 DEFAULTS = {'split': 80,
             'recCount': {'min': 0, 'max': 100, 'default': 10},
             }  # default values
-
 
 
 # Route: Send selection options.
@@ -51,22 +51,32 @@ def calculate():
     if request.method == 'POST':
         response = {'status': 'success'}
         data = request.get_json()
-        print(data)
         settings = data.get('settings')
+        print(data)
 
         result = []
         # Mocks result computation. TODO compute result with libs here
-        for dataset in settings['datasets']:
+        datasets = settings['datasets']
+        for dataset in datasets:
             recs = []
             for approach in settings['approaches']:
-                recommendation = {'recommendation': approach[::-1], 'evals': []}
+                recommendation = {'recommendation': recommend(dataset, approach), 'evals': []}
                 for metric in settings['metrics']:
-                    evaluation = len(approach) * len(metric['name']) * metric['k']
-                    recommendation['evals'].append(evaluation)
+                    evaluation = evaluate(approach, metric)
+                    recommendation['evals'].append({'name': metric['name'], 'evaluation': evaluation})
                 recs.append(recommendation)
             result.append({'dataset': dataset, 'recs': recs})
 
         result_storage.save_result(data.get('metadata'), settings, result)
     else:
         response['calculation'] = result_storage.newest_result()
+        print(response)
     return response
+
+
+def recommend(dataset, approach):
+    return dataset + approach['name'][::-1]  # Mock
+
+
+def evaluate(approach, metric):
+    return len(approach['name']) * len(metric['name']) * len(metric['parameter']['name'])  # Mock
