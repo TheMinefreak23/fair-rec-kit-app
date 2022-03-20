@@ -14,15 +14,27 @@ const form = ref({ main: [], inputs: [], selects: [] })
 // Set default values for the group parameters.
 function setParameter(i, val) {
   let option = props.options.find((option) => option.name === val)
+  let param
   if (option.params) {
-    if (option.params.values && option.params.values.length > 0)
-      form.value.inputs[i] = option.params.values[0].default
+    if (option.params.values && option.params.values.length > 0) {
+      param = option.params.values[0]
+      form.value.inputs[i] = {
+        name: param.name,
+        value: param.default,
+      }
+    }
 
-    if (option.params.options && option.params.options.length > 0)
-      form.value.selects[i] = option.params.options[0].default
+    if (option.params.options && option.params.options.length > 0) {
+      param = option.params.options[0]
+      form.value.selects[i] = {
+        name: param.name,
+        value: param.default,
+      }
+    }
   }
 }
 
+// Get options from group index
 function getFromIndex(i) {
   //console.log(props.options)
   //console.log(form.value.main)
@@ -30,6 +42,7 @@ function getFromIndex(i) {
   return props.options.find((option) => option.name === form.value.main[i])
 }
 
+// Splice groups array to remove a group
 function removeGroup(i) {
   if (groupCount.value != 1) {
     groupCount.value--
@@ -76,11 +89,11 @@ function removeGroup(i) {
               "
             >
               <b-form-input
-                v-model="form.inputs[i - 1]"
+                v-model="form.inputs[i - 1].value"
                 required
                 :state="
-                  form.inputs[i - 1] >= value.min &&
-                  form.inputs[i - 1] <= value.max
+                  form.inputs[i - 1].value >= value.min &&
+                  form.inputs[i - 1].value <= value.max
                 "
                 @input="$emit('formChange', form)"
                 validated="true"
@@ -94,7 +107,7 @@ function removeGroup(i) {
           >
             <b-form-select
               :label="'Choose a ' + option.name"
-              v-model="form.selects[i - 1]"
+              v-model="form.selects[i - 1].value"
               :options="[{ text: 'Choose...', value: null }, ...option.options]"
               @input="$emit('formChange', form)"
               required

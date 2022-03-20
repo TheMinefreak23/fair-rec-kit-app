@@ -7,10 +7,13 @@ def test_greeting_example(client):
 # JSON form data
 def test_form_example(client):
     response = client.post("/computation/calculation", json={
-        'metadata': {'name': 'Jon Snow', 'tag': 'I dun wan it'},
-        'settings': {'datasets': ['test_set1','test_set2'],
-                     'approaches': ['foo','bar_approach'],
-                     'metrics': [{'name': 'foo', 'k': 0},{'name': 'bar_metric','k':2}]
-                     },
+        'settings': {
+            'metadata': {'name': 'Jon Snow', 'tag': 'I dont want it'},
+            'datasets': ['test_set1', 'test_set2'],
+            'approaches': [{'name': 'foo', 'parameter': {'name': 'method', 'value': 'quantile'}},
+                           {'name': 'bar_approach'}],
+            'metrics': [{'name': 'foo', 'parameter': {'name': 'bar', 'value': ''}},
+                        {'name': 'bar_metric', 'parameter': {'name': 'foob'}}]
+        },
     })
     assert response.status_code == 200
