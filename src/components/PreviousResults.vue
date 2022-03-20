@@ -12,11 +12,26 @@ const headers = ref(['id', 'age', 'first_name', 'last_name'])
 const ex1CurrentPage = ref(1)
 const ex1PerPage = ref(10)
 const ex1Rows = ref(100)
+
+const returnMessage = ref('')
+
+async function getResults(){
+  const response = await fetch('http://localhost:5000/all-results')
+  const data = await response.json()
+  returnMessage.value = 'the results have been gotten'
+  toRequest.value = ''
+}
+
 </script>
 
 <template>
   <div class="container p-3 mb-2 bg-secondary">
     <Table :results="results" :headers="headers" />
+    <form @submit.prevent="getResults">
+      <input v-model="toRequest">
+      <button>request data</button>
+      <p>{{ returnMessage }}</p>
+    </form>
     <b-card>
       <div class="overflow-auto py-2">
         <h1>Previous results</h1>

@@ -7,6 +7,7 @@ import Form from './components/Form.vue'
 import Playground from './components/Playground.vue'
 import Documentation from './components/Documentation.vue'
 import Results from './components/Results.vue'
+import PreviousResults from './components/PreviousResults.vue';
 </script>
 
 <template>
