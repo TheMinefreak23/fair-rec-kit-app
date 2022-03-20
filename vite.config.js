@@ -6,14 +6,15 @@ import vue from '@vitejs/plugin-vue'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    vue({
+    vue(/*{
       template: {
         compilerOptions: {
           //isCustomElement: (tag) => tag.startsWith('b-'),
         },
       },
-    }),
-  ],
+    }*/), 
+  ],// I'm not sure what the above part is supposed to do
+    // but it broke the tabs and tables so I commented it out
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

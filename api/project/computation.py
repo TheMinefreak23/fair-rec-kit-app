@@ -2,11 +2,11 @@
 # Utrecht University within the Software Project course.
 # © Copyright Utrecht University (Department of Information and Computing Sciences)
 
-import time
-
 from flask import (Blueprint, request)
 
-bp = Blueprint('computation', __name__, url_prefix='/computation')
+from . import result_storage
+
+compute_bp = Blueprint('computation', __name__, url_prefix='/computation')
 
 # constants
 DATASETS = ['LFM2B', 'LFM1B', 'LFM360K']
@@ -21,18 +21,10 @@ DEFAULTS = {'split': 80,
             'recCount': {'min': 0, 'max': 100, 'default': 10},
             }  # default values
 
-# list with results of calculations
-calculations = [
-    {
-        'timestamp': '0',
-        'number': '0',
-        'reverse': ''
-    }
-]
 
 
 # Route: Send selection options.
-@bp.route('/options', methods=['GET'])
+@compute_bp.route('/options', methods=['GET'])
 def params():
     options = {}
     options['datasets'] = DATASETS
@@ -53,16 +45,28 @@ def params():
 
 
 # Route: Do a calculation.
-@bp.route('/calculation', methods=['GET', 'POST'])
+@compute_bp.route('/calculation', methods=['GET', 'POST'])
 def calculate():
     response = {}
     if request.method == 'POST':
         response = {'status': 'success'}
         data = request.get_json()
         print(data)
-        reverse = data.get('dataset')[::-1]
-        magic = data.get('number') ** 2 + len(reverse)
-        calculations.insert(0, {'timestamp': time.time(), 'number': magic, 'reverse': reverse})
+        settings = data.get('settings')
+
+        result = []
+        # Mocks result computation. TODO compute result with libs here
+        for dataset in settings['datasets']:
+            recs = []
+            for approach in settings['approaches']:
+                recommendation = {'recommendation': approach[::-1], 'evals': []}
+                for metric in settings['metrics']:
+                    evaluation = len(approach) * len(metric['name']) * metric['k']
+                    recommendation['evals'].append(evaluation)
+                recs.append(recommendation)
+            result.append({'dataset': dataset, 'recs': recs})
+
+        result_storage.save_result(data.get('metadata'), settings, result)
     else:
-        response['calculation'] = calculations[0]
+        response['calculation'] = result_storage.newest_result()
     return response
