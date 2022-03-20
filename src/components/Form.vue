@@ -26,6 +26,10 @@ async function getOptions() {
 
 // POST request: Send form to server.
 function sendToServer() {
+  console.log(form.value)
+  form.value.approaches = reformat(form.value.approaches)
+  form.value.metrics = reformat(form.value.metrics)
+  console.log(form.value.approaches)
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -37,6 +41,22 @@ function sendToServer() {
       getCalculation()
     }
   )
+}
+
+// Change the form format (SoA) into a managable data format (AoS)
+// TODO just don't use SoA in the first place
+function reformat(property) {
+  console.log(property)
+  let choices = {}
+  for (let i in property.main) {
+    let parameter = null
+    console.log(i)
+    if (property.inputs[i] != null) parameter = property.inputs[i]
+    else if (property.selects[i] != null) parameter = property.selects[i]
+    choices[i] = { name: property.main[i], parameter: parameter }
+    console.log('choices:' + choices.value)
+  }
+  return choices
 }
 
 // GET request: Ask server for latest calculation
