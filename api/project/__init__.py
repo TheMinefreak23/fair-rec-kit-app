@@ -1,18 +1,23 @@
-#This program has been developed by students from the bachelor Computer Science at
-#Utrecht University within the Software Project course.
-#© Copyright Utrecht University (Department of Information and Computing Sciences)
+# This program has been developed by students from the bachelor Computer Science at
+# Utrecht University within the Software Project course.
+# © Copyright Utrecht University (Department of Information and Computing Sciences)
 import os
 
-from flask import Flask, request
+from flask import Flask
 from flask_cors import CORS
 
-from . import computation
+from project.computation import compute_bp
+from project.previous_results import results_bp
+from project.result_storage import create_results
+
 
 def create_app(test_config=None):
     # Instantiate the app.
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
-        SECRET_KEY='dev'
+        SECRET_KEY='dev',
+        # Get the folder of the top-level directory of this project
+        BASEDIR=os.path.abspath(os.path.dirname(__file__))
     )
 
     if test_config is None:
@@ -31,7 +36,6 @@ def create_app(test_config=None):
     # Enable Cross-Origin Resource Sharing.
     CORS(app)
 
-
     # Route: Main.
     @app.route('/', methods=['GET'])
     def main():
@@ -42,6 +46,12 @@ def create_app(test_config=None):
     def greet():
         return {"greeting": "Greetings from the backend :)"}
 
-    app.register_blueprint(computation.bp)
+    register_blueprints(app)
+    create_results()
     return app
+
+
+def register_blueprints(app):
+    app.register_blueprint(compute_bp)
+    app.register_blueprint(results_bp)
 

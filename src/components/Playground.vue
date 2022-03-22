@@ -8,13 +8,17 @@ Check out https://vuejs.org/examples
 and https://getbootstrap.com/docs/5.0/getting-started/introduction/ for more
 */
     import { ref } from 'vue'
+    import Table from './Table.vue'
     const rangeValue = ref(0)
     const checkedNames = ref(['Jack'])
+    const headers = ref(['header1','header2'])
+    const results = ref([{header1:'foo1',header2:'bar1'},{header1:'foo2',header2:'bar2'}])
 </script>
 
 <template>
 
   <div class="container p-3 mb-2 bg-secondary">
+    <Table :headers=headers :results=results />
     <b-button
       variant="primary"
       data-bs-target="#collapseTarget"
@@ -25,6 +29,7 @@ and https://getbootstrap.com/docs/5.0/getting-started/introduction/ for more
     
     <div class="collapse py-2" id="collapseTarget">
       <img src="/RecCoonLogo.png"/>
+      <p>RecCoons</p>
       </div>
       <h2>Modal</h2>
       <!-- Button trigger modal -->

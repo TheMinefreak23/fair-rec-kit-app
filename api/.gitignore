@@ -1,6 +1,6 @@
 # Data
-data/
-results/
+results.tsv
+results.json
 
 # Byte-compiled files
 __pycache__
