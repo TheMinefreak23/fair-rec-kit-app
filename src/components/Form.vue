@@ -253,7 +253,4 @@ async function initForm() {
       </b-row>
     </b-form>
   </b-card>
-  <div>
-   <ActiveComputation :name = "form.name" />
-  </div>
 </template>
