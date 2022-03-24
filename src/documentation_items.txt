@@ -1,0 +1,27 @@
+Item list for in documentation tab
+Only lines within curly brackets in the following format are read:
+
+{
+<name> sometext abcdef </name>
+<definition> sometext abcdef </definition>
+<link> sometext abcdef </link>
+<other1> sometext abcdef </other1>
+<other?> sometext abcdef </other?>
+}
+
+blabla I'm just a comment...
+Documentation items:
+{
+<name> test1 algorithm </name>
+<definition> test1 is a blablabla. </definition>
+<link> https://www.hiiii.com </link>
+<other1> extendable. </other1>
+I'm also a comment actually.
+}
+
+{
+<name> LFM2B </name>
+<definition> Last FM 2 Billion dataset is a corpus of Music Listening Events for Music Recommendation and </definition>
+<link> Retrieval.eeeeeeee </link>
+<other1> http://www.cp.jku.at/datasets/LFM-2b/ </other1>
+}
