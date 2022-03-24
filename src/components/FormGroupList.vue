@@ -56,7 +56,7 @@ function removeGroup(i) {
 <template>
   <div>
     <!--Capitalise the title.-->
-    <h2>{{ plural.charAt(0).toUpperCase() + plural.slice(1) }}</h2>
+    <h3 class="text-center">{{ plural.charAt(0).toUpperCase() + plural.slice(1) }}</h3>
     <div v-for="i in groupCount" :key="i - 1">
       <b-row>
         <b-col>

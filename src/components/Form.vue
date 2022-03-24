@@ -79,13 +79,15 @@ async function initForm() {
 </script>
 
 <template>
+  <div class="py-2 mx-5">
   <b-card>
     <!--This form contains all the necessary parameters for a user to submit a request for a computation-->
     <b-form v-if="options" @submit="sendToServer" @reset="initForm">
       <b-row>
-        <b-col>
+        <b-col class="p-0">
+          <div class="p-2 m-2" style="background-color: red;">
           <!--User can select a dataset. TODO: Multiple Datasets-->
-          <h2>Dataset</h2>
+          <h3 class="text-center">Dataset</h3>
           <b-form-group label="Select a dataset">
             <!-- Select a dataset from the options received from the server -->
             <b-form-select
@@ -115,10 +117,11 @@ async function initForm() {
               :options="[{ text: 'None (default)', value: null }]"
             ></b-form-select>
           </b-form-group>
+          </div>
 
           <!--
       <!-User can select which recommender approaches they want->
-      <h2>Recommenders</h2>
+      <h3>Recommenders</h3>
       <b-form-group>
         <p>Select recommender approaches:</p>
         <b-form-checkbox-group
@@ -133,7 +136,8 @@ async function initForm() {
         ></b-form-checkbox-group>
       </b-form-group>-->
 
-          <b-form-group label="Select recommender approaches:"> </b-form-group>
+          <div class="p-2 m-2" style="background-color: red;">
+          <b-form-group> </b-form-group>
           <FormGroupList
             @formChange="(x) => (form.approaches = x)"
             name="approach"
@@ -141,6 +145,24 @@ async function initForm() {
             selectName="an approach"
             :options="options.approaches"
           />
+
+          <b-form-group label="Select number of recommendations per user:">
+            <b-form-input
+              type="range"
+              :min="options.defaults.recCount.min"
+              :max="options.defaults.recCount.max"
+              v-model="form.recommendations"
+            ></b-form-input>
+            <p>{{ form.recommendations }}</p>
+            <b-form-checkbox
+              v-model="form.includeRatedItems"
+              buttons
+              button-variant="outline-primary"
+              required
+              >Include already rated items in recommendations</b-form-checkbox
+            >
+          </b-form-group>
+          </div>
           <!--
         User gets additional options for the selected recommender approaches
         <b-form-group 
@@ -166,26 +188,12 @@ async function initForm() {
       -->
 
           <!--User can select the amount of recommendations per user -->
-          <b-form-group label="Select number of recommendations per user:">
-            <b-form-input
-              type="range"
-              :min="options.defaults.recCount.min"
-              :max="options.defaults.recCount.max"
-              v-model="form.recommendations"
-            ></b-form-input>
-            <p>{{ form.recommendations }}</p>
-            <b-form-checkbox
-              v-model="form.includeRatedItems"
-              buttons
-              button-variant="outline-primary"
-              required
-              >Include already rated items in recommendations</b-form-checkbox
-            >
-          </b-form-group>
+
         </b-col>
-        <b-col>
+        <b-col class="p-0">
           <!--Input for train/test split-->
-          <h2>Train/test-split</h2>
+          <div class="p-2 m-2" style="background-color: red;">
+          <h3 class="text-center">Train/test-split</h3>
           <b-form-group label="Select test/train split:">
             <b-form-input
               type="range"
@@ -195,8 +203,10 @@ async function initForm() {
               id="customRange"
               v-model="form.split"
             ></b-form-input>
-            <p>Train: {{ form.split }}</p>
-            <p>Test: {{ 100 - form.split }}</p>
+            <div class="text-center">
+              <p class="d-inline px-5"><strong>Train: </strong><i>{{ form.split }}</i></p>
+              <p class="d-inline px-5"><strong>Test: </strong><i>{{ 100 - form.split }}</i></p>
+            </div>
           </b-form-group>
 
           <!--User can choose between a random and time-based train/testsplit-->
@@ -206,8 +216,10 @@ async function initForm() {
               <b-form-radio value="timesplit">Timesplit</b-form-radio>
             </b-form-radio-group>
           </b-form-group>
+          </div>
 
           <!--Input for metrics, user can add infinite metrics -->
+          <div class="p-2 m-2" style="background-color: red;">
           <FormGroupList
             @formChange="(x) => (form.metrics = x)"
             name="metric"
@@ -223,12 +235,14 @@ async function initForm() {
               :options="[{ text: 'Global (default)', value: null }]"
             ></b-form-select>
           </b-form-group>
+          </div>
 
           <!-- Input for metadata such as:
      Computation Name
      Optional Tags
      Optional Email for notification -->
-          <h2>Meta</h2>
+          <div class="p-2 m-2" style="background-color: red;">
+          <h3 class="text-center">Meta</h3>
           <b-form-group label="Enter name for computation">
             <b-form-input
               placeholder="New Computation"
@@ -245,11 +259,14 @@ async function initForm() {
               v-model="metadata.email"
             ></b-form-input>
           </b-form-group>
-
-          <b-button type="submit" variant="primary">Send</b-button>
-          <b-button type="reset" variant="danger">Reset</b-button>
+          </div>
         </b-col>
+        <div class="d-flex justify-content-center">
+            <b-button class="mx-2" type="reset" variant="danger">Reset</b-button>
+            <b-button class="mx-2" type="submit" variant="primary">Send</b-button>
+          </div>
       </b-row>
     </b-form>
   </b-card>
+  </div>
 </template>
