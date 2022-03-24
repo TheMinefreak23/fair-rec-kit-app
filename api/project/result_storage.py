@@ -48,11 +48,11 @@ def update_results(new_result):
         # Rewind file pointer's position.
         file.seek(0)
         # Store it as json data.
-        json.dump(file_data, file)
+        json.dump(file_data, file, indent=4)
 
 
 # Create results file if it doesn't exist yet or is empty
 def create_results():
     if not os.path.exists(results_path) or os.stat(results_path).st_size == 0:
         with open(results_path, 'w') as file:  # Open the file in write mode.
-            json.dump({'all_results': []}, file)
+            json.dump({'all_results': []}, file, indent=4)
