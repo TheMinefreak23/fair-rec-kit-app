@@ -27,7 +27,7 @@ const headers = ref([
 const computations = ref([])
 
 onMounted(() => {
-  getResults()
+  //getResults()
 })
 
 
