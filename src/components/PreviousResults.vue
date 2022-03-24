@@ -1,5 +1,5 @@
 <script setup>
-import Table from './Table.vue'
+import TableWithButtons from './TableWithButtons.vue'
 import { onMounted, ref } from 'vue'
 const exResults = ref([
   { id: 1, age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
@@ -20,7 +20,7 @@ const ex1CurrentPage = ref(1)
 const ex1PerPage = ref(10)
 const ex1Rows = ref(100)
 
-//const returnMessage = ref('')
+const testMessage = ref('')
 const results = ref([])
 
 onMounted(() => {
@@ -48,17 +48,21 @@ async function getResults() {
     }
   }
 }
+
+function edit(){
+  testMessage.value = 'edit!'
+}
+
+function deleteSomething(){
+  testMessage.value = 'delete!'
+}
 </script>
 
 <template>
   <div>
-    <Table :results="results" :headers="headers" />
-    <!--<form @submit.prevent="getResults">
-      <input v-model="toRequest" />
-      <button>request data</button>
-    </form>-->
+    <TableWithButtons :results="results" :headers="headers" :editFunction="edit" :deleteFunction="deleteSomething" />
     <b-button @click="getResults">Request results</b-button>
-    <p>{{ returnMessage }}</p>
+    <p>{{ testMessage }}</p>
     <!--<b-card>
       <div class="overflow-auto py-2">
         <h1>Previous results</h1>
