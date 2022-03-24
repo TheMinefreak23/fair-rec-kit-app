@@ -1,4 +1,6 @@
 {
+    "computation_name": "computation1",
+    "computation_tags": ["tag1", "tag2", "tag3", "tag4"],
     "headers": [
         { "name": "Dataset" },
         { "name": "Algorithm" },
