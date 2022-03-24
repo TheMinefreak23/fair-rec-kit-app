@@ -66,6 +66,7 @@ const subheaders = computed(() => {
                     </b-td>
                 </b-td>
                 <b-button @click="editFunction">edit</b-button>
+                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
                 <b-button variant = "danger" @click="deleteFunction">delete</b-button>
             </b-tr>
         </b-tbody>

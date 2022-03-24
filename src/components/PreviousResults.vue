@@ -1,5 +1,5 @@
 <script setup>
-import TableWithButtons from './TableWithButtons.vue'
+import TableWithButtons from './TableEditDelete.vue'
 import { onMounted, ref } from 'vue'
 const exResults = ref([
   { id: 1, age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
@@ -14,6 +14,7 @@ const headers = ref([
   { name: 'Datasets' },
   { name: 'Approaches' },
   { name: 'Metrics' },
+  { name: ''},
 ])
 
 const ex1CurrentPage = ref(1)
