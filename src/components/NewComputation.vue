@@ -4,6 +4,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import { onMounted, ref } from 'vue'
 import FormGroupList from './FormGroupList.vue'
+import ActiveComputation from './ActiveComputation.vue'
 
 const result = ref({})
 const options = ref()
@@ -143,8 +144,8 @@ async function initForm() {
           />
           <!--
         User gets additional options for the selected recommender approaches
-        <b-form-group 
-          label="ALS Features value:" 
+        <b-form-group
+          label="ALS Features value:"
           v-if="form.recommenders != null && form.recommenders.includes('ALS')">
           ALS Feature value needs to be a number higher than 1
           <b-form-input
@@ -153,8 +154,8 @@ async function initForm() {
             v-model="form.alsFeatures"
           ></b-form-input>
         </b-form-group>
-        <b-form-group 
-          label="POP Method:" 
+        <b-form-group
+          label="POP Method:"
           v-if="form.recommenders != null && form.recommenders.includes('POP')">
           POP has three modes to choose from-
           <b-form-select
