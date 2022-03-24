@@ -1,0 +1,28 @@
+Item list for in documentation tab
+Only lines within curly brackets in the following format are read:
+
+{
+name: <name>
+definition: <text>
+link: <link>
+other1: <text>
+other?: <text>
+}
+
+#Documentation items:
+{
+name: test1 algorithm
+definition: test1 is a blablabla.
+link: https://www.hiiii.com
+other1: extendable.
+
+}
+
+blabla comments
+trfiyugh;ijomk
+
+{
+name: LFM2B
+definition: Last FM 2 Billion dataset is a corpus of Music Listening Events for Music Recommendation and Retrieval.eeeeeeee
+link: http://www.cp.jku.at/datasets/LFM-2b/
+}
