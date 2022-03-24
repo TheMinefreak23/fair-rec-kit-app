@@ -26,6 +26,7 @@ const subheaders = computed(() => {
 });
 
 function removeEntry() {
+    console.log('erm... hallo?')
   console.log(selectedEntry)
   props.results.splice(selectedEntry.value, 1)
   console.log(props.results.value)

@@ -7,10 +7,10 @@ Utrecht University within the Software Project course.
 const props = defineProps({
   results: Array,
   headers: Array,
-  editFunction: Function,
-  deleteFunction: Function,
+  buttonText: String,
 })
 
+const selectedEntry = ref(0)
 const subheaders = computed(() => {
     const result = [];
 
@@ -25,9 +25,23 @@ const subheaders = computed(() => {
     return result;
 });
 
+function removeEntry() {
+  console.log(selectedEntry)
+  props.results.splice(selectedEntry.value, 1)
+  console.log(props.results.value)
+}
+
 </script>
 
 <template>
+    <b-modal id="popup" 
+           title="Remove entry?" 
+           ok-title ="Yes"
+           ok-variant ="danger"
+           cancel-title="No"
+           @ok ="removeEntry()">
+      <p>Are you sure you want to remove this entry from the list?</p>
+    </b-modal>
     <b-table-simple
         hover
         striped
@@ -54,8 +68,8 @@ const subheaders = computed(() => {
         </b-thead>
         <b-tbody>
             <b-tr
-                v-for="(item, index) of results"
-                :key="`item-${index}`"
+                v-for="(item, index) of props.results"
+                :key="item"
             >
                 <b-td
                     v-for="[key, value] in Object.entries(item)"
@@ -65,9 +79,9 @@ const subheaders = computed(() => {
                         {{ value }}
                     </b-td>
                 </b-td>
-                <b-button @click="editFunction">edit</b-button>
+                <b-button @click="editFunction">Edit</b-button>
                 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                <b-button variant = "danger" @click="deleteFunction">delete</b-button>
+                <b-button v-b-modal.popup  variant="danger" @click="selectedEntry = index" >{{buttonText}}</b-button>
             </b-tr>
         </b-tbody>
     </b-table-simple>

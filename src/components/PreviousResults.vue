@@ -1,5 +1,6 @@
 <script setup>
-import TableWithButtons from './TableEditDelete.vue'
+import TableWithButtons from './TableWithEdit.vue'
+import Table from './Table.vue'
 import { onMounted, ref } from 'vue'
 const exResults = ref([
   { id: 1, age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
@@ -61,7 +62,7 @@ function deleteSomething(){
 
 <template>
   <div>
-    <TableWithButtons :results="results" :headers="headers" :editFunction="edit" :deleteFunction="deleteSomething" />
+    <Table :results="results" :headers="headers" :buttonText="'Delete'" />
     <b-button @click="getResults">Request results</b-button>
     <p>{{ testMessage }}</p>
     <!--<b-card>
