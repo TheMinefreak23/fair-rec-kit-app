@@ -12,6 +12,7 @@ const props = defineProps({
   buttonText: String,
 })
 
+const modalShow = ref(false)
 const selectedEntry = ref(0)
 const subheaders = computed(() => {
   const result = []
@@ -26,9 +27,20 @@ const subheaders = computed(() => {
 
   return result
 })
+
 </script>
 
 <template>
+  <b-modal 
+    id="deletion-modal" 
+    v-model="modalShow"
+    title="You are trying to delete this result"
+    @ok="$emit('deleteResult', selectedEntry)"
+  >
+    <div class="d-block text-center">
+      <h3>Warning: if you delete this result it will be gone forever</h3>
+    </div>
+  </b-modal>
   <b-table-simple hover striped responsive>
     <b-thead head-variant="dark">
       <b-tr>
@@ -60,6 +72,11 @@ const subheaders = computed(() => {
           v-for="[key, value] in Object.entries(item)"
           :key="`${index}-${key}`"
           ><b-td>{{ value }}</b-td>
+        </b-td>
+        <b-td v-if="overview">
+          <b-button pill @click="$emit('edit', item.id)">Edit</b-button>
+          &nbsp;
+          <b-button variant="danger" @click="modalShow = !modalShow, selectedEntry = item.id">Delete</b-button>
         </b-td>
       </b-tr>
     </b-tbody>

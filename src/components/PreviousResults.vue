@@ -1,5 +1,4 @@
 <script setup>
-import TableWithButtons from './TableWithEdit.vue'
 import Table from './Table.vue'
 import { onMounted, ref } from 'vue'
 
@@ -57,12 +56,12 @@ async function getResults() {
   }
 }
 
-function edit(){
-  testMessage.value = 'edit!'
+function edit(id){
+  testMessage.value = 'edit results number ' + id + '!'
 }
 
-function deleteSomething(){
-  testMessage.value = 'delete!'
+function deleteResult(id){
+  testMessage.value = 'delete result number ' + id + '!'
 }
 </script>
 
@@ -70,6 +69,8 @@ function deleteSomething(){
   <div>
     <Table
       @loadResult="(id) => $emit('loadResult', id)"
+      @edit="(id) => edit(id)"
+      @deleteResult="(id) => deleteResult(id)"
       :overview="true"
       :results="results"
       :headers="headers"
