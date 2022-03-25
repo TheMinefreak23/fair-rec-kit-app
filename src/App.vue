@@ -36,7 +36,7 @@ b-tab.success{
       </template>
       </b-tab>
       <b-tab title="Documentation"> <Documentation /></b-tab>
-      <b-tab title="Results"> <Results /></b-tab>
+      <b-tab title="Results" :results="results"> <Results /></b-tab>
       <b-tab title="All results"> <PreviousResults /></b-tab>
     </b-tabs>
   </div>

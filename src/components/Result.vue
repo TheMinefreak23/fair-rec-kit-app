@@ -6,6 +6,8 @@ Utrecht University within the Software Project course.
 import Table from './Table.vue'
 import { ref } from 'vue'
 
+const props = defineProps({ results: Array })
+
 const results = ref([
   {
     dataset: 'LFM-1b',
@@ -96,7 +98,10 @@ const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
   </p>
 
   <div class="container">
-    <Table :results="results" :headers="headers" />
+    <Table
+      :results="props.results.length == 0 ? results : props.results"
+      :headers="headers"
+    />
   </div>
 
   <h6>Recommended items per user for dataset x and algorithm y</h6>
