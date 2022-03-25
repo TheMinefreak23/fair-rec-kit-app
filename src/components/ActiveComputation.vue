@@ -24,10 +24,17 @@ async function cancelComputation() {
 }
 
 async function getComputations(){
-  const response = await fetch('http://localhost:5000/activecomputations')
+  const response = await fetch('http://localhost:5000/queue')
   const data = await response.json()
-  //if active computations:
-  emit('computing')
+  if(/* computing */ true)
+  {
+      emit('computing')
+  }
+  if(/* all computations done */ false)
+  {
+      emit('done')
+      alert('computations done!!!!')
+  }
 }
 
 var done;
