@@ -47,12 +47,13 @@ async function getResults() {
       metric: metricName,
     }
   }
+  console.log(results.value)
 }
 </script>
 
 <template>
   <div>
-    <Table :results="results" :headers="headers" :buttonText="'Remove'" />
+    <Table :results="results" :headers="headers" :buttonText="'Remove'" :removable="true" />
     <!--<form @submit.prevent="getResults">
       <input v-model="toRequest" />
       <button>request data</button>
