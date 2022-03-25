@@ -8,7 +8,7 @@ from flask_cors import CORS
 
 from project.computation import compute_bp
 from project.previous_results import results_bp
-from project.result_storage import create_results
+from project.result_storage import create_results_overview
 
 
 def create_app(test_config=None):
@@ -47,7 +47,7 @@ def create_app(test_config=None):
         return {"greeting": "Greetings from the backend :)"}
 
     register_blueprints(app)
-    create_results()
+    create_results_overview()
     return app
 
 
