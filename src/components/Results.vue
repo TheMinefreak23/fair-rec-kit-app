@@ -2,9 +2,58 @@
 import Result from './Result.vue'
 import VDismissButton from './VDismissButton.vue'
 import PreviousResults from './PreviousResults.vue'
+import { ref } from 'vue'
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
+
+const results = ref([])
+
+const url = 'http://localhost:5000/all-results/result-by-id'
+
+// Request full result from result ID (timestamp)
+async function loadResult(resultId) {
+  console.log('Result ID:' + resultId)
+
+  //test
+  results.value = [
+    {
+      dataset: 'LFM-1b',
+      algorithm: 'ALS',
+      fst_female: '6.7717',
+      fst_male: '0.6142',
+      hellinger_distance: '0.0988',
+      precision_p1: '0.4505',
+      precision_p10: '0.2997',
+    },
+    {
+      dataset: 'LFM-1b',
+      algorithm: 'POP',
+      fst_female: '0.1325',
+      fst_male: '1.7299',
+      hellinger_distance: '0.1577',
+      precision_p1: '0.1033',
+      precision_p10: '0.0919',
+    },
+  ]
+
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: resultId }),
+  }
+  fetch(url, requestOptions).then(() => {
+    getResult()
+  })
+}
+
+// Get result back from result ID request
+async function getResult() {
+  const response = await fetch(url)
+  const data = await response.json()
+  results.value = [data]
+  console.log(results.value)
+}
 </script>
 
 <template>
@@ -19,7 +68,7 @@ Utrecht University within the Software Project course.
               <VDismissButton />
             </template>
 
-            <Result />
+            <Result :results="results" />
           </b-tab>
 
           <b-tab title="Result1"><p>I'm Result 1</p></b-tab>
@@ -112,7 +161,7 @@ Utrecht University within the Software Project course.
           <p class="m-0"><em>01-01-22</em></p>
         </a>
       </ul>-->
-      <PreviousResults />
+      <PreviousResults @loadResult="(resultId) => loadResult(resultId)" />
     </div>
   </div>
 </template>
