@@ -2,6 +2,8 @@
 # Utrecht University within the Software Project course.
 # © Copyright Utrecht University (Department of Information and Computing Sciences)
 import json
+import time
+import datetime
 
 from flask import (Blueprint, request)
 
@@ -21,6 +23,8 @@ OTHER_METRICS = ['DCG']
 DEFAULTS = {'split': 80,
             'recCount': {'min': 0, 'max': 100, 'default': 10},
             }  # default values
+
+computation_queue = []
 
 
 # Route: Send selection options.
@@ -53,6 +57,7 @@ def calculate():
         data = request.get_json()
         settings = data.get('settings')
         print(data)
+        append_queue(data.get('metadata'), settings)
 
         result = []
         # Mocks result computation. TODO compute result with libs here
@@ -67,12 +72,22 @@ def calculate():
                 recs.append(recommendation)
             result.append({'dataset': dataset, 'recs': recs})
 
-        result_storage.save_result(data.get('metadata'), settings, result)
+        #result_storage.save_result(data.get('metadata'), settings, result)
+        
     else:
         response['calculation'] = result_storage.newest_result()
         print(response)
     return response
 
+@compute_bp.route('/queue', methods=['GET'])
+def returnQueue():
+    return json.dumps(computation_queue)
+
+@compute_bp.route('/queue/delete', methods=['POST'])
+def deleteItem():
+    index = request.body
+    computation_queue.pop(index)
+    return "Removed index"
 
 def recommend(dataset, approach):
     return dataset + approach['name'][::-1]  # Mock
@@ -80,3 +95,11 @@ def recommend(dataset, approach):
 
 def evaluate(approach, metric):
     return len(approach['name']) * len(metric['name']) * len(metric['parameter']['name'])  # Mock
+
+#add a computation request to the queue
+def append_queue(metadata, settings):
+    timestamp = time.time()
+    now = datetime.datetime.now()
+    currentDt = now.strftime('%Y-%m-%dT%H:%M:%S') + ('-%02d' % (now.microsecond / 10000))
+    current_request = {'timestamp': {'stamp': timestamp, 'datetime' : currentDt}, 'metadata': metadata, 'settings': settings}
+    computation_queue.append(current_request)

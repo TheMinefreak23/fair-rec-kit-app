@@ -241,7 +241,9 @@ async function initForm() {
             <b-form-input v-model="metadata.tags"></b-form-input>
           </b-form-group>
           <b-form-group label="Enter e-mail (optional)">
+            
             <b-form-input
+              type="email"
               placeholder="example@mail.com"
               v-model="metadata.email"
             ></b-form-input>

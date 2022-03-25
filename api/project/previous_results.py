@@ -10,8 +10,8 @@ results_bp = Blueprint('results', __name__, url_prefix='/all-results')
 @results_bp.route('/', methods=['GET'])
 def results():
     #result_storage.create_results()
-    return result_storage.load_results()
-
+    #return result_storage.load_results()
+    return {}
 
 @results_bp.route('/edit', methods=['POST'])
 def edit():
