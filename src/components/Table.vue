@@ -5,7 +5,6 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
 const props = defineProps({
-  name: String,
   results: Array,
   headers: Array,
   buttonText: String,
@@ -29,9 +28,10 @@ const subheaders = computed(() => {
 });
 
 function removeEntry() {
-  console.log(selectedEntry)
+  let entry = props.results[selectedEntry.value].datetime
+  console.log(entry)
+  //updateserver(selectedEntry.value)
   props.results.splice(selectedEntry.value, 1)
-  console.log(props.results)
 }
 
 </script>
@@ -45,7 +45,7 @@ function removeEntry() {
         ok-variant ="danger"
         cancel-title="No"
         @ok ="removeEntry()">
-      <p>Are you sure you want to remove this entry from the list? {{props.results}}</p>
+      <p>Are you sure you want to remove this entry from the list?</p>
     </b-modal>
     <b-table-simple
         hover
