@@ -98,7 +98,10 @@ const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
   </p>
 
   <div class="container">
-    <Table :results="props.results" :headers="headers" />
+    <Table
+      :results="props.results.length == 0 ? results : props.results"
+      :headers="headers"
+    />
   </div>
 
   <h6>Recommended items per user for dataset x and algorithm y</h6>

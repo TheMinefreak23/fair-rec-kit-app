@@ -50,7 +50,7 @@ const subheaders = computed(() => {
       </b-tr>
     </b-thead>
     <b-tbody>
-      <b-tr v-for="(item, index) of results" :key="`item-${index}`">
+      <b-tr v-for="(item, index) of results" :key="item.id">
         <b-td v-if="overview">
           <b-button @click="$emit('loadResult', item.id)">View result</b-button>
         </b-td>

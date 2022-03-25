@@ -15,28 +15,6 @@ const url = 'http://localhost:5000/all-results/result-by-id'
 async function loadResult(resultId) {
   console.log('Result ID:' + resultId)
 
-  //test
-  results.value = [
-    {
-      dataset: 'LFM-1b',
-      algorithm: 'ALS',
-      fst_female: '6.7717',
-      fst_male: '0.6142',
-      hellinger_distance: '0.0988',
-      precision_p1: '0.4505',
-      precision_p10: '0.2997',
-    },
-    {
-      dataset: 'LFM-1b',
-      algorithm: 'POP',
-      fst_female: '0.1325',
-      fst_male: '1.7299',
-      hellinger_distance: '0.1577',
-      precision_p1: '0.1033',
-      precision_p10: '0.0919',
-    },
-  ]
-
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
