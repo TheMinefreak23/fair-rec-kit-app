@@ -54,7 +54,7 @@ var done;
       <b-button v-b-modal.popup variant="danger">Cancel</b-button>
     </div>
     <div>
-      <Table :results="results" :headers="headers" :buttonText="'Cancel'" />
+      <Table :results="results" :headers="headers" :buttonText="'Cancel'" :removable="true" />
 
       <b-button @click="$emit('computing')">Computing</b-button>
       <b-button @click="$emit('done')">Done</b-button>

@@ -5,11 +5,14 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
 const props = defineProps({
+  name: String,
   results: Array,
   headers: Array,
   buttonText: String,
+  removable: Boolean,
 })
 
+const modalShow = ref(false)
 const selectedEntry = ref(0)
 const subheaders = computed(() => {
     const result = [];
@@ -28,19 +31,21 @@ const subheaders = computed(() => {
 function removeEntry() {
   console.log(selectedEntry)
   props.results.splice(selectedEntry.value, 1)
-  console.log(props.results.value)
+  console.log(props.results)
 }
 
 </script>
 
 <template>
-    <b-modal id="popup" 
-           title="Remove entry?" 
-           ok-title ="Yes"
-           ok-variant ="danger"
-           cancel-title="No"
-           @ok ="removeEntry()">
-      <p>Are you sure you want to remove this entry from the list?</p>
+    <b-modal 
+        id="popup"
+        v-model="modalShow"
+        title="Remove entry?" 
+        ok-title ="Yes"
+        ok-variant ="danger"
+        cancel-title="No"
+        @ok ="removeEntry()">
+      <p>Are you sure you want to remove this entry from the list? {{props.results}}</p>
     </b-modal>
     <b-table-simple
         hover
@@ -79,7 +84,7 @@ function removeEntry() {
                         {{ value }}
                     </b-td>
                 </b-td>
-                <b-button v-b-modal.popup  variant="danger" @click="selectedEntry = index" >{{buttonText}}</b-button>
+                <b-button v-if="removable" variant="danger" @click="modalShow = !modalShow, selectedEntry = index" >{{buttonText}}</b-button>
             </b-tr>
         </b-tbody>
     </b-table-simple>
