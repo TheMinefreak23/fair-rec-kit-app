@@ -56,8 +56,16 @@ async function getResults() {
   }
 }
 
-function edit(id){
-  testMessage.value = 'edit results number ' + id + '!'
+function edit(id, newName, newTags){
+  if(newName != ''){
+    testMessage.value = 'Result number ' + id + 's new name is ' + newName + '. '
+  }else{
+    testMessage.value = ''
+  }
+  if(newTags != ''){
+    testMessage.value += 'Result number ' + id + 's new tags are ' + newTags + '.'
+  }
+
 }
 
 function deleteResult(id){
@@ -69,7 +77,7 @@ function deleteResult(id){
   <div>
     <Table
       @loadResult="(id) => $emit('loadResult', id)"
-      @edit="(id) => edit(id)"
+      @edit="(id, newName, newTags) => edit(id, newName, newTags)"
       @deleteResult="(id) => deleteResult(id)"
       :overview="true"
       :results="results"

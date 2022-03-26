@@ -12,7 +12,10 @@ const props = defineProps({
   buttonText: String,
 })
 
-const modalShow = ref(false)
+const deleteModalShow = ref(false)
+const editModalShow = ref(false)
+const newName = ref('')
+const newTags = ref('')
 const selectedEntry = ref(0)
 const subheaders = computed(() => {
   const result = []
@@ -33,7 +36,7 @@ const subheaders = computed(() => {
 <template>
   <b-modal 
     id="deletion-modal" 
-    v-model="modalShow"
+    v-model="deleteModalShow"
     title="You are trying to delete this result"
     @ok="$emit('deleteResult', selectedEntry)"
   >
@@ -41,6 +44,22 @@ const subheaders = computed(() => {
       <h3>Warning: if you delete this result it will be gone forever</h3>
     </div>
   </b-modal>
+
+  <b-modal
+    id="edit-modal"
+    v-model="editModalShow"
+    title="Editing results"
+    size="lg"
+    @ok="$emit('edit', selectedEntry, newName, newTags)"
+  >
+    <h6>Please type in the new values. Blank fields will be left unchanged.</h6>
+    Name:
+    <b-form-input v-model="newName" placeholder="New name"></b-form-input>
+    <br>
+    Tags:
+    <b-form-input v-model="newTags" placeholder="New tags"></b-form-input>
+  </b-modal>
+
   <b-table-simple hover striped responsive>
     <b-thead head-variant="dark">
       <b-tr>
@@ -74,9 +93,9 @@ const subheaders = computed(() => {
           ><b-td>{{ value }}</b-td>
         </b-td>
         <b-td v-if="overview">
-          <b-button pill @click="$emit('edit', item.id)">Edit</b-button>
+          <b-button pill @click="editModalShow = !editModalShow, selectedEntry = item.id">Edit</b-button>
           &nbsp;
-          <b-button variant="danger" @click="modalShow = !modalShow, selectedEntry = item.id">Delete</b-button>
+          <b-button variant="danger" @click="deleteModalShow = !deleteModalShow, selectedEntry = item.id">Delete</b-button>
         </b-td>
       </b-tr>
     </b-tbody>
