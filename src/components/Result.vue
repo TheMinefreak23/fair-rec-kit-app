@@ -4,8 +4,10 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
 import Table from './Table.vue'
-import mockdata from "../../api/mock/1647818279_HelloWorld/results-table.json"
+import mockdata from '../../api/mock/1647818279_HelloWorld/results-table.json'
 import { ref } from 'vue'
+
+const props = defineProps({ results: Array })
 
 const recommendations = ref([
   {
@@ -52,7 +54,6 @@ const headers_rec = ref([
 ])
 </script>
 
-
 <template>
   <h1 class="display-2">Results</h1>
   <p class="lead">
@@ -66,7 +67,10 @@ const headers_rec = ref([
   </p>
 
   <div class="container">
-    <Table :results="mockdata.body" :headers="mockdata.headers" />
+    <Table
+      :results="props.results.length == 0 ? mockdata.body : props.results"
+      :headers="props.results.length == 0 ? mockdata.headers : headers"
+    />
   </div>
 
   <h6>Recommended items per user for dataset x and algorithm y</h6>

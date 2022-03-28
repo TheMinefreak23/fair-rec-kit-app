@@ -30,25 +30,45 @@ def save_result(metadata, settings, result):
     currentDt = now.strftime('%Y-%m-%dT%H:%M:%S') + ('-%02d' % (now.microsecond / 10000))
 
     global current_result  # TODO use class instead of global?
-    current_result = {'timestamp': {'stamp': timestamp, 'datetime': currentDt}, 'metadata': metadata,
-                      'settings': settings, 'result': result}
+    # current_result = {'timestamp': {'stamp': timestamp, 'datetime': currentDt}, 'metadata': metadata,
+    #                  'settings': settings, 'result': result}
+    current_result = {'id': 0, 'value': 0}
     update_results_overview(current_result)
+
+
+def result_by_id(id):
+    results = load_json(mock_results_path)
+
+    # Filter: Loop through all results and find the one with the matching ID.
+    for result in results['results']:
+        if result['id'] == id:
+            print(result)
+            global current_result
+            current_result = result
+
+    print(current_result)
+
+    # current_result = results_df.filter(like='')
 
 
 def newest_result():
     return current_result
 
 
-def load_results():
-    with open(results_overview_path, 'r') as file:
+def load_json(path):
+    with open(path, 'r') as file:
         return json.load(file)  # Load existing data into a dict.
+
+
+def load_results_overview():
+    return load_json(mock_results_overview_path)
 
 
 def update_results_overview(new_result):
     create_results_overview()
-    file_data = load_results()
+    file_data = load_json(results_overview_path)
     file_data['all_results'].append(new_result)
-    with open(results_overview_path, 'w') as file:  # Open the file in write mode.
+    with open(mock_results_path, 'w') as file:  # Open the file in write mode.
         # Rewind file pointer's position.
         file.seek(0)
         # Store it as json data.

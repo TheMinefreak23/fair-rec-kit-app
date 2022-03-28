@@ -1,6 +1,9 @@
 <script setup>
 import Table from './Table.vue'
 import { onMounted, ref } from 'vue'
+
+const emit = defineEmits(['loadResult'])
+
 const exResults = ref([
   { id: 1, age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
   { id: 2, age: 21, first_name: 'Larsen', last_name: 'Shaw' },
@@ -9,6 +12,7 @@ const exResults = ref([
 ])
 const exHeaders = ref(['id', 'age', 'first_name', 'last_name'])
 const headers = ref([
+  { name: 'ID' },
   { name: 'Date Time' },
   { name: 'Name' },
   { name: 'Datasets' },
@@ -34,15 +38,17 @@ async function getResults() {
   console.log(data)
   let allResults = data.all_results
   for (let i in allResults) {
-    let approach = allResults[i].settings.approaches[0]
+    const result = allResults[i]
+    let approach = result.settings.approaches[0]
     let apprName = approach ? approach.name : 'NULL'
-    let metric = allResults[i].settings.metrics[0]
+    let metric = result.settings.metrics[0]
     let metricName = metric ? metric.name : 'NULL'
 
     results.value[i] = {
-      datetime: allResults[i].timestamp.datetime,
-      name: allResults[i].metadata.name,
-      dataset: allResults[i].settings.datasets[0],
+      id: result.timestamp.stamp,
+      datetime: result.timestamp.datetime,
+      name: result.metadata.name,
+      dataset: result.settings.datasets[0],
       approach: apprName,
       metric: metricName,
     }
@@ -52,7 +58,12 @@ async function getResults() {
 
 <template>
   <div>
-    <Table :results="results" :headers="headers" />
+    <Table
+      @loadResult="(id) => $emit('loadResult', id)"
+      :overview="true"
+      :results="results"
+      :headers="headers"
+    />
     <!--<form @submit.prevent="getResults">
       <input v-model="toRequest" />
       <button>request data</button>
