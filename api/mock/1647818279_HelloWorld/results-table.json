@@ -10,7 +10,7 @@
     ],
     "body":[
         {
-            "dataset": "LFM-1b",
+            "dataset": "LFM-1bcum",
             "algorithm": "ALS",
             "fst_female": "6.7717",
             "fst_male": "0.6142",
