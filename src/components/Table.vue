@@ -12,6 +12,7 @@ const props = defineProps({
   buttonText: String,
   removable: Boolean,
   serverFile: String,
+  serverFile2: String,
 })
 
 const deleteModalShow = ref(false)
@@ -33,8 +34,18 @@ const subheaders = computed(() => {
   return result
 })
 
-function handleEditOk(){
-  emit('edit', selectedEntry.value, newName.value, newTags.value)
+async function handleEditOk(){
+  // emit('edit', selectedEntry.value, newName.value, newTags.value)
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({index: selectedEntry.value, new_name: newName.value, new_tags: newTags.value}),
+  }
+  fetch('http://localhost:5000' + props.serverFile2, requestOptions).then(
+    () => {
+        console.log("Item edited succesfully")
+    }
+  )
   newName.value = ''
   newTags.value = ''
 }

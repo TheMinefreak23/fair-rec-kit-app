@@ -80,6 +80,7 @@ function edit(id, newName, newTags){
       :removable="true" 
       :overview="true"
       :serverFile="'/all-results/delete'"
+      :serverFile2="'/all-results/edit'"
     />
     <b-button @click="getResults">Request results</b-button>
     <p>{{ testMessage }}</p>

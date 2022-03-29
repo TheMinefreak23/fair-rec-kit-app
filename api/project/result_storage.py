@@ -84,6 +84,22 @@ def delete_result(index):
         # Store it as json data.
         json.dump(file_data, file)
 
+def edit_result(index, new_name, new_tags):
+    create_results_overview()
+    file_data = load_results_overview()
+    to_edit_result = file_data['all_results'].pop(index)
+
+    if new_name != '':  # Don't change the name if the input field has been left empty
+        to_edit_result['metadata']['name'] = new_name
+        print(to_edit_result['metadata']['name'])
+    file_data['all_results'].insert(index, to_edit_result)
+
+    with open(results_overview_path, 'w') as file:  # Open the file in write mode.
+        # Rewind file pointer's position.
+        file.seek(0)
+        # Store it as json data.
+        json.dump(file_data, file)
+
 # Create results file if it doesn't exist yet or is empty
 def create_results_overview():
     if not os.path.exists(results_overview_path) or os.stat(results_overview_path).st_size == 0:
