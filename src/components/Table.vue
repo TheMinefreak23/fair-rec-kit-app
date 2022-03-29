@@ -10,6 +10,8 @@ const props = defineProps({
   results: Array,
   headers: Array,
   buttonText: String,
+  removable: Boolean,
+  serverFile: String,
 })
 
 const deleteModalShow = ref(false)
@@ -36,20 +38,34 @@ function handleEditOk(){
   newName.value = ''
   newTags.value = ''
 }
+
+async function removeEntry() {
+  let entry = selectedEntry.value
+  props.results.splice(entry, 1)
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({index: entry}),
+  }
+  fetch('http://localhost:5000' + props.serverFile, requestOptions).then(
+    () => {
+        console.log("Item removed succesfully")
+    }
+  )
+}
 </script>
 
 <template>
-  <b-modal 
-    id="deletion-modal" 
-    v-model="deleteModalShow"
-    title="You are trying to delete this result"
-    @ok="$emit('deleteResult', selectedEntry)"
-  >
-    <div class="d-block text-center">
-      <h3>Warning: if you delete this result it will be gone forever</h3>
-    </div>
-  </b-modal>
-
+    <b-modal 
+        id="deletion-modal"
+        v-model="deleteModalShow"
+        title="Remove entry?" 
+        ok-title ="Yes"
+        ok-variant ="danger"
+        cancel-title="No"
+        @ok ="removeEntry()">
+      <p>Are you sure you want to remove this entry from the list?</p>
+    </b-modal>
   <b-modal
     id="edit-modal"
     v-model="editModalShow"
@@ -97,11 +113,11 @@ function handleEditOk(){
           :key="`${index}-${key}`"
           ><b-td>{{ value }}</b-td>
         </b-td>
-        <b-td v-if="overview">
-          <b-button pill @click="editModalShow = !editModalShow, selectedEntry = item.id">Edit</b-button>
+        
+          <b-button v-if="overview" pill @click="editModalShow = !editModalShow, selectedEntry = item.id">Edit</b-button>
           &nbsp;
-          <b-button variant="danger" @click="deleteModalShow = !deleteModalShow, selectedEntry = item.id">Delete</b-button>
-        </b-td>
+          <b-button v-if="removable" variant="danger" @click="deleteModalShow = !deleteModalShow, selectedEntry = item.id">Delete</b-button>
+        
       </b-tr>
     </b-tbody>
   </b-table-simple>

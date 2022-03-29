@@ -54,6 +54,7 @@ async function getResults() {
       metric: metricName,
     }
   }
+  console.log(results.value)
 }
 
 function edit(id, newName, newTags){
@@ -82,6 +83,9 @@ function deleteResult(id){
       :overview="true"
       :results="results"
       :headers="headers"
+      :buttonText="'Remove'" 
+      :removable="true" 
+      :serverFile="'/all-results/delete'"
     />
     <!--<form @submit.prevent="getResults">
       <input v-model="toRequest" />

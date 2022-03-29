@@ -34,3 +34,10 @@ def edit():
     #data.get('email')
     #data.get('name')
     #data.get('tag')
+
+@results_bp.route('/delete', methods=['POST'])
+def delete():
+    data = request.get_json()
+    index = data.get('index')
+    result_storage.delete_result(index)
+    return "Removed index"
