@@ -54,7 +54,7 @@ function removeEntry() {
         <b-th v-if="overview"></b-th>
         <b-th
           v-for="(header, index) in headers"
-          :key="`header-${index}`"
+          :key="header"
           :colspan="header.subheaders ? header.subheaders.length : 1"
         >
           {{ header.name }}
@@ -62,10 +62,7 @@ function removeEntry() {
       </b-tr>
       <b-tr>
         <b-th v-if="overview"></b-th>
-        <b-th
-          v-for="(subheader, index) in subheaders"
-          :key="`subheader-${index}`"
-        >
+        <b-th v-for="(subheader, index) in subheaders" :key="subheader">
           {{ subheader }}
         </b-th>
       </b-tr>

@@ -46,7 +46,11 @@ async function getResult() {
               <VDismissButton />
             </template>
 
-            <Result :results="results" />
+            // Mock headers for now
+            <Result
+              :results="results"
+              :headers="[{ name: 'id' }, { name: 'value' }]"
+            />
           </b-tab>
 
           <b-tab title="Result1"><p>I'm Result 1</p></b-tab>

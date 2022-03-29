@@ -7,7 +7,7 @@ import Table from './Table.vue'
 import mockdata from '../../api/mock/1647818279_HelloWorld/results-table.json'
 import { ref } from 'vue'
 
-const props = defineProps({ results: Array })
+const props = defineProps({ results: Array, headers: Array })
 
 const recommendations = ref([
   {
@@ -69,7 +69,7 @@ const headers_rec = ref([
   <div class="container">
     <Table
       :results="props.results.length == 0 ? mockdata.body : props.results"
-      :headers="props.results.length == 0 ? mockdata.headers : headers"
+      :headers="props.results.length == 0 ? mockdata.headers : props.headers"
       :removable="false"
     />
   </div>
