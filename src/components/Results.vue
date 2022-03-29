@@ -2,9 +2,36 @@
 import Result from './Result.vue'
 import VDismissButton from './VDismissButton.vue'
 import PreviousResults from './PreviousResults.vue'
+import { ref } from 'vue'
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
+
+const results = ref([])
+
+const url = 'http://localhost:5000/all-results/result-by-id'
+
+// Request full result from result ID (timestamp)
+async function loadResult(resultId) {
+  console.log('Result ID:' + resultId)
+
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: resultId }),
+  }
+  fetch(url, requestOptions).then(() => {
+    getResult()
+  })
+}
+
+// Get result back from result ID request
+async function getResult() {
+  const response = await fetch(url)
+  const data = await response.json()
+  results.value = [data]
+  console.log(results.value)
+}
 </script>
 
 <template>
@@ -19,7 +46,11 @@ Utrecht University within the Software Project course.
               <VDismissButton />
             </template>
 
-            <Result />
+            // Mock headers for now
+            <Result
+              :results="results"
+              :headers="[{ name: 'id' }, { name: 'value' }]"
+            />
           </b-tab>
 
           <b-tab title="Result1"><p>I'm Result 1</p></b-tab>
@@ -112,7 +143,7 @@ Utrecht University within the Software Project course.
           <p class="m-0"><em>01-01-22</em></p>
         </a>
       </ul>-->
-      <PreviousResults />
+      <PreviousResults @loadResult="(resultId) => loadResult(resultId)" />
     </div>
   </div>
 </template>
