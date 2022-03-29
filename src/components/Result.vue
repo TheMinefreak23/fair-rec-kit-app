@@ -6,6 +6,7 @@ Utrecht University within the Software Project course.
 import Table from './Table.vue'
 import mockdata from '../../api/mock/1647818279_HelloWorld/results-table.json'
 import { ref } from 'vue'
+import { store } from '../store.js'
 
 const props = defineProps({ results: Array, headers: Array })
 
@@ -56,6 +57,7 @@ const headers_rec = ref([
 
 <template>
   <h1 class="display-2">Results</h1>
+  Counter: {{ store.count }}
   <p class="lead">
     These are the results for your computation with the following name:
     {{ mockdata.computation_name }}.
