@@ -46,7 +46,7 @@ async function getResult() {
               <VDismissButton />
             </template>
 
-            // Mock headers for now
+            <!-- Mock headers for now -->
             <Result
               :results="results"
               :headers="[{ name: 'id' }, { name: 'value' }]"
