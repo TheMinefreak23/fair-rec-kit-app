@@ -58,8 +58,8 @@ function removeGroup(i) {
     <!--Capitalise the title.-->
     <h2>{{ plural.charAt(0).toUpperCase() + plural.slice(1) }}</h2>
     <div v-for="i in groupCount" :key="i - 1">
-      <b-row>
-        <b-col align-v="end">
+      <b-row class="align-items-end">
+        <b-col cols="4">
           <b-form-group :label="'Select ' + selectName">
             <b-form-select
               v-model="form.main[i - 1]"
@@ -75,9 +75,17 @@ function removeGroup(i) {
         </b-col>
 
         <!--Show settings for selected option.-->
-        <b-col v-if="form.main[i - 1] != null" align-v="end">
+        <b-col
+          cols="4"
+          v-if="
+            form.main[i - 1] != null && getFromIndex(i - 1).params.length != 0
+          "
+        >
           <!--Use an input form for values.-->
-          <template v-for="(value) in getFromIndex(i - 1).params.values" :key="value" align-v="end">
+          <template
+            v-for="value in getFromIndex(i - 1).params.values"
+            :key="value"
+          >
             <b-form-group
               :label="
                 'Give a ' +
@@ -103,26 +111,33 @@ function removeGroup(i) {
 
           <!--Use a select form for options.-->
           <template
-            v-for="(option) in getFromIndex(i - 1).params.options" :key="option"
+            v-for="option in getFromIndex(i - 1).params.options"
+            :key="option"
           >
-            <b-form-select
-              :label="'Choose a ' + option.name"
-              v-model="form.selects[i - 1].value"
-              :options="[{ text: 'Choose...', value: null }, ...option.options]"
-              @input="$emit('formChange', form)"
-              required
-              ><!--TODO use placeholder-->
-            </b-form-select>
+            <b-form-group :label="'Choose a ' + option.name">
+              <b-form-select
+                v-model="form.selects[i - 1].value"
+                :options="[
+                  { text: 'Choose...', value: null },
+                  ...option.options,
+                ]"
+                @input="$emit('formChange', form)"
+                required
+                ><!--TODO use placeholder-->
+              </b-form-select>
+            </b-form-group>
           </template>
         </b-col>
-        <b-col align-v="end">
-          <b-button
-            v-if="i != 1"
-            @click="removeGroup(i - 1)"
-            variant="danger"
-            class="mb-2 mr-sm-2 mb-sm-0"
-            >X</b-button
-          >
+        <b-col cols="4">
+          <b-form-group>
+            <b-button
+              v-if="i != 1"
+              @click="removeGroup(i - 1)"
+              variant="danger"
+              class="mb-2 mr-sm-2 mb-sm-0"
+              >X</b-button
+            >
+          </b-form-group>
         </b-col>
       </b-row>
     </div>

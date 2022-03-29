@@ -12,7 +12,6 @@ const form = ref({
   splitMethod: 'random', //The default split method.
 })
 const metadata = ref({})
-const datasets = ref(1)
 
 onMounted(async () => {
   await getOptions()
@@ -187,13 +186,21 @@ async function initForm() {
           Optional Email for notification-->
           <h2>Meta</h2>
           <b-form-group label="Enter name for computation">
-            <b-form-input placeholder="New Computation" v-model="metadata.name" required></b-form-input>
+            <b-form-input
+              placeholder="New Computation"
+              v-model="metadata.name"
+              required
+            ></b-form-input>
           </b-form-group>
           <b-form-group label="Enter tags (optional)">
             <b-form-input v-model="metadata.tags"></b-form-input>
           </b-form-group>
           <b-form-group label="Enter e-mail (optional)">
-            <b-form-input type="email" placeholder="example@mail.com" v-model="metadata.email"></b-form-input>
+            <b-form-input
+              type="email"
+              placeholder="example@mail.com"
+              v-model="metadata.email"
+            ></b-form-input>
           </b-form-group>
 
           <b-button type="submit" variant="primary">Send</b-button>
