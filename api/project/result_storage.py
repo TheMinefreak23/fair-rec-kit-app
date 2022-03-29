@@ -68,7 +68,7 @@ def update_results_overview(new_result):
     create_results_overview()
     file_data = load_json(results_overview_path)
     file_data['all_results'].append(new_result)
-    with open(mock_results_path, 'w') as file:  # Open the file in write mode.
+    with open(results_path, 'w') as file:  # Open the file in write mode.
         # Rewind file pointer's position.
         file.seek(0)
         # Store it as json data.
