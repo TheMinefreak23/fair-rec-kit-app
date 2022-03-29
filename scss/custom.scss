@@ -1,11 +1,10 @@
-// Required
-@import "../node_modules/bootstrap/scss/functions";
+// Custom.scss
+// Option A: Include all of Bootstrap
 
-// Default variable overrides
-$body-bg: #000;
-$body-color: #111;
+// Include any default variable overrides here (though functions won't be available)
 $primary: purple;
 
-// Required
-@import "../node_modules/bootstrap/scss/variables";
-@import "../node_modules/bootstrap/scss/mixins";
+
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+// Then add additional custom code here
