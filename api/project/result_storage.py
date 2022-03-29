@@ -61,7 +61,7 @@ def load_json(path):
 
 
 def load_results_overview():
-    return load_json(mock_results_overview_path)
+    return load_json(results_overview_path)
 
 
 def update_results_overview(new_result):
@@ -75,10 +75,10 @@ def update_results_overview(new_result):
         json.dump(file_data, file, indent=4)
 
 def delete_result(index):
-    create_results()
-    file_data = load_results()
+    create_results_overview()
+    file_data = load_results_overview()
     file_data['all_results'].pop(index)
-    with open(results_path, 'w') as file:  # Open the file in write mode.
+    with open(results_overview_path, 'w') as file:  # Open the file in write mode.
         # Rewind file pointer's position.
         file.seek(0)
         # Store it as json data.
