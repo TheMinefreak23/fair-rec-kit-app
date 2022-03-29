@@ -84,7 +84,7 @@ def calculate():
                 recs.append(recommendation)
             result.append({'dataset': dataset, 'recs': recs})
 
-        #result_storage.save_result(data.get('metadata'), settings, result)
+        result_storage.save_result(data.get('metadata'), settings, result)
         
     else:
         response['calculation'] = result_storage.newest_result()

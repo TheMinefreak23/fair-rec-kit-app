@@ -58,7 +58,7 @@ function removeGroup(i) {
     <!--Capitalise the title.-->
     <h2>{{ plural.charAt(0).toUpperCase() + plural.slice(1) }}</h2>
     <div v-for="i in groupCount" :key="i - 1">
-      <b-row>
+      <b-row align-v="end">
         <b-col align-v="end">
           <b-form-group :label="'Select ' + selectName">
             <b-form-select
@@ -127,6 +127,6 @@ function removeGroup(i) {
       </b-row>
     </div>
 
-    <b-button @click="groupCount++">Add {{ name }}...</b-button>
+    <b-button @click="groupCount++" align-v="end">Add {{ name }}...</b-button>
   </div>
 </template>

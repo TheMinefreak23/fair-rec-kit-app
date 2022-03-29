@@ -4,6 +4,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import { onMounted, ref } from 'vue'
 import FormGroupList from './FormGroupList.vue'
+import {sendMockData} from '../test/mockComputation.js'
 
 const result = ref({})
 const options = ref()
@@ -12,7 +13,6 @@ const form = ref({
   splitMethod: 'random', //The default split method.
 })
 const metadata = ref({})
-const datasets = ref(1)
 
 onMounted(async () => {
   await getOptions()
@@ -67,6 +67,7 @@ async function getCalculation() {
   result.value = data.calculation
   console.log(result.value)
 }
+
 
 async function initForm() {
   //console.log(options.value)
@@ -201,5 +202,6 @@ async function initForm() {
         </b-col>
       </b-row>
     </b-form>
+    <b-button type="test" variant="warning" @click="sendMockData">Mock</b-button>
   </b-card>
 </template>
