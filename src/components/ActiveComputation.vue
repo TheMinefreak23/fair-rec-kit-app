@@ -67,7 +67,7 @@ var done;
 
 <template>
     <div>
-      <Table :results="computations" :headers="headers" :buttonText="'Cancel'" :removable="true" :serverFile="'/computation/queue/delete'" />
+      <Table :results="computations" :headers="headers" :buttonText="'Cancel'" :removable="true" :overview="false" :serverFile="'/computation/queue/delete'" />
 
       <b-button @click="$emit('computing')">Computing</b-button>
       <b-button @click="$emit('done')">Done</b-button>
