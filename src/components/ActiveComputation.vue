@@ -4,6 +4,7 @@
     © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import Table from './Table.vue'
 import { onMounted, ref } from 'vue'
+import { formatResults } from '../helpers/resultFormatter.js'
 
 const emit = defineEmits(['computing', 'done', 'stop'])
 const props = defineProps({
@@ -32,21 +33,7 @@ async function getComputations() {
   const data = await response.json()
 
   console.log(data)
-  let allResults = data
-  for (let i in allResults) {
-    let approaches = allResults[i].settings.approaches
-    let apprName = approaches[0] ? approaches[0].name : 'NULL'
-    let metric = allResults[i].settings.metrics[0]
-    let metricName = metric ? metric.name : 'NULL'
-
-    computations.value[i] = {
-      datetime: allResults[i].timestamp.datetime,
-      name: allResults[i].metadata.name,
-      datasets: allResults[i].settings.datasets,
-      approaches: approaches,
-      metric: metricName,
-    }
-  }
+  computations.value = formatResults(data)
   if (data != []) {
     emit('computing')
     console.log(computations.value)

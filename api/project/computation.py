@@ -107,7 +107,7 @@ def deleteItem():
 
 
 def recommend(dataset, approach):
-    return dataset + approach['name'][::-1]  # Mock
+    return dataset['name'] + approach['name'][::-1]  # Mock
 
 
 def evaluate(approach, metric):
