@@ -116,4 +116,5 @@ function setsorting(i){
       </b-tr>
     </b-tbody>
   </b-table-simple>
+  <b-button @click="loadMore()" variant="outline-primary">Show more</b-button>
 </template>

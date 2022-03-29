@@ -24,9 +24,14 @@ const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 const data = ref([])
 
 async function getUserRecs() {
-  const response = await fetch('http://localhost:5000/all-results/result')
-  data.value = (await response.json()).slice(0,20)
-  console.log(data.value)
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ start: 1 }),
+  }
+
+  const response = await fetch('http://localhost:5000/all-results/result', requestOptions)
+  data.value = (await response.json())
 }
 
 onMounted(() => {

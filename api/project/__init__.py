@@ -10,7 +10,6 @@ from project.computation import compute_bp
 from project.previous_results import results_bp
 from project.result_storage import create_results_overview
 
-
 def create_app(test_config=None):
     # Instantiate the app.
     app = Flask(__name__, instance_relative_config=True)

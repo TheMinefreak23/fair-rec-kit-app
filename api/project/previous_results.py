@@ -35,10 +35,13 @@ def edit():
     #data.get('email')
     #data.get('name')
     #data.get('tag')
-  
+
+
 ## only get one results
-@results_bp.route('/result', methods=['GET'])
+@results_bp.route('/result', methods=['POST'])
 def user_result():
-    data = pd.read_csv('mock/1647818279_HelloWorld/1647818279_run_0/LFM-360K_0/Foo_ALS_0/ratings.tsv', sep='\t', header=None)
-    return data.to_json(orient='records')
+    json = request.json
+    reader = pd.read_csv('mock/1647818279_HelloWorld/1647818279_run_0/LFM-360K_0/Foo_ALS_0/ratings.tsv', sep='\t',
+                           header=None, skiprows=json.get("start", 0), chunksize=20, iterator=True)
+    return reader.get_chunk().to_json(orient='records')
     
