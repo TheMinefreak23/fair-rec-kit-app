@@ -91,13 +91,14 @@ def calculate():
         print(response)
     return response
 
-@compute_bp.route('/queue', methods=['GET'])
-def returnQueue():
+@compute_bp.route('/queue', methods=['GET','POST'])
+def queue():
     return json.dumps(computation_queue)
 
 @compute_bp.route('/queue/delete', methods=['POST'])
 def deleteItem():
-    index = request.body
+    data = request.get_json()
+    index = data.get('index')
     computation_queue.pop(index)
     return "Removed index"
 

@@ -4,7 +4,6 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import { onMounted, ref } from 'vue'
 import FormGroupList from './FormGroupList.vue'
-import ActiveComputation from './ActiveComputation.vue'
 
 const result = ref({})
 const options = ref()
