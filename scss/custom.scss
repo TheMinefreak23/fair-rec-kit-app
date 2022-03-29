@@ -2,7 +2,14 @@
 // Option A: Include all of Bootstrap
 
 // Include any default variable overrides here (though functions won't be available)
-$primary: purple;
+$primary:       #ff0000;
+$secondary:     #00ff44;
+$success:       $green;
+$info:          $cyan;
+$warning:       $yellow;
+$danger:        $red;
+$light:         $gray-100;
+$dark:          $gray-900;
 
 
 @import "../node_modules/bootstrap/scss/bootstrap";

@@ -85,7 +85,7 @@ async function initForm() {
     <b-form v-if="options" @submit="sendToServer" @reset="initForm">
       <b-row>
         <b-col class="p-0">
-          <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
+          <div class="p-2 my-2 mx-1 rounded-3 bg-gray-300">
           <!--User can select a dataset. TODO: Multiple Datasets-->
           <h3 class="text-center">Dataset</h3>
           <b-form-group label="Select a dataset">
@@ -241,7 +241,7 @@ async function initForm() {
      Computation Name
      Optional Tags
      Optional Email for notification -->
-          <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
+          <div class="p-2 m-1 rounded-3 bg-secondary">
           <h3 class="text-center">Meta</h3>
           <b-form-group label="Enter name for computation">
             <b-form-input
@@ -262,8 +262,8 @@ async function initForm() {
           </div>
         </b-col>
         <div class="d-flex justify-content-center">
-            <b-button class="mx-2" type="reset" variant="danger">Reset</b-button>
-            <b-button class="mx-2" type="submit" variant="primary">Send</b-button>
+            <b-button class="mx-1" type="reset" variant="danger">Reset</b-button>
+            <b-button class="mx-1" type="submit" variant="primary">Send</b-button>
           </div>
       </b-row>
     </b-form>
