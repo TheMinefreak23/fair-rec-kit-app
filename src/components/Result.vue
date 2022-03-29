@@ -24,10 +24,15 @@ const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 const data = ref([])
 
 async function getUserRecs() {
-  const response = await fetch('http://localhost:5000/all-results/result')
-  data.value = (await response.json()).slice(0,20)
+  const response = await fetch('http://localhost:5000/all-results/result/?start=0')
+  data.value = (await response.json())
   console.log(data.value)
 }
+
+function handleScrol() {
+  console.log("test")
+}
+
 
 onMounted(() => {
   getUserRecs()
@@ -71,7 +76,7 @@ onMounted(() => {
   <div class="container">
     <div class="row">
       <div class="col-6">
-          <Table :results="data" :headers="headers_rec" :removable="false" />
+          <Table  v-on:scroll.passive="handleScroll" :results="data" :headers="headers_rec" :removable="false" />
       </div>
       <div class="col-6">
           <Table :results="data" :headers="headers_rec" :removable="false" />
