@@ -7,7 +7,7 @@ import Form from './components/Form.vue'
 import Playground from './components/Playground.vue'
 import Documentation from './components/Documentation.vue'
 import Results from './components/Results.vue'
-import PreviousResults from './components/PreviousResults.vue';
+import PreviousResults from './components/PreviousResults.vue'
 </script>
 
 <template>
@@ -19,7 +19,7 @@ import PreviousResults from './components/PreviousResults.vue';
     <b-tabs class="m-0 pt-2" align="center">
       <b-tab title="Computation"> <Form /></b-tab>
       <b-tab title="Documentation"> <Documentation /></b-tab>
-      <b-tab title="Results"> <Results /></b-tab>
+      <b-tab title="Results" :results="results"> <Results /></b-tab>
       <b-tab title="All results"> <PreviousResults /></b-tab>
     </b-tabs>
   </div>

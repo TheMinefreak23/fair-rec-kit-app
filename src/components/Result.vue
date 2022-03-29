@@ -7,35 +7,9 @@ import Table from './Table.vue'
 import { onMounted, ref } from 'vue'
 
 
+import mockdata from '../../api/mock/1647818279_HelloWorld/results-table.json'
 
-const results = ref([
-  {
-    dataset: 'LFM-1b',
-    algorithm: 'ALS',
-    fst_female: '6.7717',
-    fst_male: '0.6142',
-    hellinger_distance: '0.0988',
-    precision_p1: '0.4505',
-    precision_p10: '0.2997',
-  },
-  {
-    dataset: 'LFM-1b',
-    algorithm: 'POP',
-    fst_female: '0.1325',
-    fst_male: '1.7299',
-    hellinger_distance: '0.1577',
-    precision_p1: '0.1033',
-    precision_p10: '0.0919',
-  },
-])
-
-const headers = ref([
-  { name: 'Dataset' },
-  { name: 'Algorithm' },
-  { name: 'Average position', subheaders: ['1st female', '1st male'] },
-  { name: 'Hellinger Distance' },
-  { name: 'Precision', subheaders: ['P@1', 'P@10'] },
-])
+const props = defineProps({ results: Array })
 
 
 const headers_rec = ref([
@@ -65,24 +39,29 @@ onMounted(() => {
   <h1 class="display-2">Results</h1>
   <p class="lead">
     These are the results for your computation with the following name:
-    {{ computation_name }}.
+    {{ mockdata.computation_name }}.
   </p>
 
   <p>
     Tags:
-    <tags v-for="tag in computation_tags"> {{ tag }} </tags>
+    <tags v-for="tag in mockdata.tags"> {{ tag }} </tags>
   </p>
 
   <div class="container">
     <div class="row">
       <div class="col-6">
-         <Table :results="results" :headers="headers" />
+         <Table
+          :results="props.results.length == 0 ? mockdata.body : props.results"
+          :headers="props.results.length == 0 ? mockdata.headers : headers"
+          />
       </div>
       <div class="col-6">
-         <Table :results="results" :headers="headers" />
+         <Table
+          :results="props.results.length == 0 ? mockdata.body : props.results"
+          :headers="props.results.length == 0 ? mockdata.headers : headers"
+          />
       </div>
     </div>
-   
   </div>
   
 

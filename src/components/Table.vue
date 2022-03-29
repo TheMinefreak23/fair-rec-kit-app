@@ -5,21 +5,23 @@ import sortBy from 'just-sort-by';
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
+const emit = defineEmits(['loadResult'])
 const props = defineProps({
+  overview: Boolean,
   results: Array,
   headers: Array,
 })
 
 const subheaders = computed(() => {
-    const result = [];
+  const result = []
 
-    for (const header of props.headers) {
-        if (header.subheaders) {
-            result.push(...header.subheaders);
-        } else {
-            result.push('');
-        }
+  for (const header of props.headers) {
+    if (header.subheaders) {
+      result.push(...header.subheaders)
+    } else {
+      result.push('')
     }
+  }
 
     return result;
 });
@@ -91,5 +93,3 @@ function setsorting(i){
         </b-tbody>
     </b-table-simple>
 </template>
-
-
