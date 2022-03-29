@@ -31,6 +31,11 @@ const subheaders = computed(() => {
   return result
 })
 
+function handleEditOk(){
+  emit('edit', selectedEntry.value, newName.value, newTags.value)
+  newName.value = ''
+  newTags.value = ''
+}
 </script>
 
 <template>
@@ -50,7 +55,7 @@ const subheaders = computed(() => {
     v-model="editModalShow"
     title="Editing results"
     size="lg"
-    @ok="$emit('edit', selectedEntry, newName, newTags)"
+    @ok="handleEditOk"
   >
     <h6>Please type in the new values. Blank fields will be left unchanged.</h6>
     Name:
