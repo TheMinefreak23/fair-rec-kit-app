@@ -59,7 +59,7 @@ function removeGroup(i) {
     <h2>{{ plural.charAt(0).toUpperCase() + plural.slice(1) }}</h2>
     <div v-for="i in groupCount" :key="i - 1">
       <b-row>
-        <b-col>
+        <b-col align-v="end">
           <b-form-group :label="'Select ' + selectName">
             <b-form-select
               v-model="form.main[i - 1]"
@@ -75,9 +75,9 @@ function removeGroup(i) {
         </b-col>
 
         <!--Show settings for selected option.-->
-        <b-col v-if="form.main[i - 1] != null">
+        <b-col v-if="form.main[i - 1] != null" align-v="end">
           <!--Use an input form for values.-->
-          <template v-for="(value, index) in getFromIndex(i - 1).params.values">
+          <template v-for="(value, index) in getFromIndex(i - 1).params.values" align-v="end">
             <b-form-group
               :label="
                 'Give a ' +
@@ -115,7 +115,7 @@ function removeGroup(i) {
             </b-form-select>
           </template>
         </b-col>
-        <b-col>
+        <b-col align-v="end">
           <b-button
             v-if="i != 1"
             @click="removeGroup(i - 1)"
