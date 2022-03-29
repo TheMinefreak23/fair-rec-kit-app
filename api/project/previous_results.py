@@ -39,6 +39,6 @@ def edit():
 ## only get one results
 @results_bp.route('/result', methods=['GET'])
 def user_result():
-    data = pd.read_csv('ALS Biased Matrix Factorization.tsv', sep='\t', header=None)
+    data = pd.read_csv('mock/1647818279_HelloWorld/1647818279_run_0/LFM-360K_0/Foo_ALS_0/ratings.tsv', sep='\t', header=None)
     return data.to_json(orient='records')
     
