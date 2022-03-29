@@ -22,16 +22,30 @@ const computation_name = ref('computation1')
 const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
 const data = ref([])
+const page = ref(0)
 
 async function getUserRecs() {
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ start: 1 }),
+    body: JSON.stringify({ start: page.value }),
   }
 
   const response = await fetch('http://localhost:5000/all-results/result', requestOptions)
   data.value = (await response.json())
+}
+
+function log(){
+  console.log("hi2");
+}
+function loadMore(){
+  console.log("button pressed");
+  page.value++
+  getUserRecs()
+}
+
+function paginationSort(index){
+  
 }
 
 onMounted(() => {
@@ -49,7 +63,7 @@ onMounted(() => {
 
   <p>
     Tags:
-    <tags v-for="tag in mockdata.tags"> {{ tag }} </tags>
+    <div v-for="tag in mockdata.tags"> {{ tag }} </div>
   </p>
 
   <div class="container">
@@ -76,10 +90,22 @@ onMounted(() => {
   <div class="container">
     <div class="row">
       <div class="col-6">
-          <Table :results="data" :headers="headers_rec" :removable="false" />
+          <Table 
+            :results="data" 
+            :headers="headers_rec" 
+            :removable="false"
+            pagination
+            @loadMore="() => loadMore()" 
+            />
       </div>
       <div class="col-6">
-          <Table :results="data" :headers="headers_rec" :removable="false" />
+          <Table 
+          :results="data" 
+          :headers="headers_rec" 
+          :removable="false" 
+          pagination
+          @loadMore="() => loadMore()" 
+          />
       </div>
     </div>  
   </div>

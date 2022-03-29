@@ -41,7 +41,8 @@ def edit():
 @results_bp.route('/result', methods=['POST'])
 def user_result():
     json = request.json
+    chunksize = 20
     reader = pd.read_csv('mock/1647818279_HelloWorld/1647818279_run_0/LFM-360K_0/Foo_ALS_0/ratings.tsv', sep='\t',
-                           header=None, skiprows=json.get("start", 0), chunksize=20, iterator=True)
+                           header=None, skiprows=chunksize * json.get("start", 0), chunksize= chunksize, iterator=True)
     return reader.get_chunk().to_json(orient='records')
     

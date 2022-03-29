@@ -5,13 +5,14 @@ import sortBy from 'just-sort-by';
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
-const emit = defineEmits(['loadResult'])
+const emit = defineEmits(['loadResult', 'loadMore', 'paginationSort'])
 const props = defineProps({
   overview: Boolean,
   results: Array,
   headers: Array,
   buttonText: String,
   removable: Boolean,
+  pagination: Boolean
 })
 
 const modalShow = ref(false)
@@ -36,7 +37,12 @@ function removeEntry() {
   props.results.splice(selectedEntry.value, 1)
 }
 
-const sorted = computed(() => sort(sortindex.value))
+const sorted = computed(() => {
+  if(!props.pagination)
+    return sort(sortindex.value)
+  else
+    return props.results
+  })
 
 const sortindex = ref(0)
 const descending = ref(false)
@@ -57,7 +63,9 @@ function setsorting(i){
         descending.value = !descending.value
     }
     sortindex.value = i
+    emit('paginationSort', i)
 }
+
 
 </script>
 
@@ -116,5 +124,5 @@ function setsorting(i){
       </b-tr>
     </b-tbody>
   </b-table-simple>
-  <b-button @click="loadMore()" variant="outline-primary">Show more</b-button>
+  <b-button v-if="pagination" @click="$emit('loadMore')" variant="outline-primary">Show more</b-button>
 </template>
