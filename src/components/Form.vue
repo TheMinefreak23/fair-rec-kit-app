@@ -85,7 +85,7 @@ async function initForm() {
     <b-form v-if="options" @submit="sendToServer" @reset="initForm">
       <b-row>
         <b-col class="p-0">
-          <div class="p-2 m-2" style="background-color: red;">
+          <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
           <!--User can select a dataset. TODO: Multiple Datasets-->
           <h3 class="text-center">Dataset</h3>
           <b-form-group label="Select a dataset">
@@ -136,7 +136,7 @@ async function initForm() {
         ></b-form-checkbox-group>
       </b-form-group>-->
 
-          <div class="p-2 m-2" style="background-color: red;">
+          <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
           <b-form-group> </b-form-group>
           <FormGroupList
             @formChange="(x) => (form.approaches = x)"
@@ -192,7 +192,7 @@ async function initForm() {
         </b-col>
         <b-col class="p-0">
           <!--Input for train/test split-->
-          <div class="p-2 m-2" style="background-color: red;">
+          <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
           <h3 class="text-center">Train/test-split</h3>
           <b-form-group label="Select test/train split:">
             <b-form-input
@@ -219,7 +219,7 @@ async function initForm() {
           </div>
 
           <!--Input for metrics, user can add infinite metrics -->
-          <div class="p-2 m-2" style="background-color: red;">
+          <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
           <FormGroupList
             @formChange="(x) => (form.metrics = x)"
             name="metric"
@@ -241,7 +241,7 @@ async function initForm() {
      Computation Name
      Optional Tags
      Optional Email for notification -->
-          <div class="p-2 m-2" style="background-color: red;">
+          <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
           <h3 class="text-center">Meta</h3>
           <b-form-group label="Enter name for computation">
             <b-form-input
