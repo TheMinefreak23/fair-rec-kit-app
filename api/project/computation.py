@@ -12,17 +12,28 @@ from . import result_storage
 compute_bp = Blueprint('computation', __name__, url_prefix='/computation')
 
 # constants
-DATASETS = ['LFM2B', 'LFM1B', 'LFM360K']
+DATASETS = [
+    {'name' : 'LFM2B', 'timestamp' : True, 'params' : {'filters' : ['age', 'gender', 'country']}}, 
+    {'name' : 'LFM1B', 'timestamp' : True, 'params' : {'filters' : ['age', 'gender', 'occupation']}},
+    {'name' : 'LFM360K', 'timestamp' : False, 'params' : {'filters' : ['age', 'gender', 'occupation']}},
+    {'name' : 'ML25M', 'timestamp' : True, 'params' : []},
+    {'name' : 'ML100K', 'timestamp' : True, 'params' : {'filters' : ['age', 'gender', 'occupation']}},
+    ]
 APPROACHES = [
     {'name': 'ALS', 'params': {'values': [{'name': 'features', 'min': 1, 'max': 1000, 'default': 10}]}},
     {'name': 'POP',
      'params': {'options': [{'name': 'method', 'options': ['quantile', 'rank', 'count'], 'default': 'quantile'}]}},
     {'name': 'RAND', 'params': []}]
 K_METRICS = ['P@K', 'R@K', 'HR@K', 'RR@K', 'NDCG@K']
-OTHER_METRICS = ['DCG']
+OTHER_METRICS = ['DCG', 'RMSE', 'MAE', 'MRR', 'Item Coverage', 'Gini index']
 DEFAULTS = {'split': 80,
             'recCount': {'min': 0, 'max': 100, 'default': 10},
             }  # default values
+FILTERS = [{'name' : 'Artist Gender', 'params' : {'options' : [{'name':'Gender', 'options' : ['Male', 'Female']}]}},
+           {'name' : 'User Gender', 'params' : {'options' : [{'name':'Gender', 'options' : ['Male', 'Female']}]}},
+           {'name' : 'Country user threshold', 'params' : {'values' : [{'name' : 'threshold', 'min' : 1, 'max':1000, 'default':10}]}},
+           {'name' : 'Minimum age', 'params' : {'values' : [{'name' : 'threshold', 'min' : 1, 'max':1000, 'default':18}]}},
+           {'name' : 'Maximum age', 'params' : {'values' : [{'name' : 'threshold', 'min' : 1, 'max':1000, 'default':18}]}}]
 
 computation_queue = []
 
@@ -44,6 +55,7 @@ def params():
 
     options['metrics'] = metrics
     options['defaults'] = DEFAULTS
+    options['filters'] = FILTERS
     response = {'options': options}
     return response
 
