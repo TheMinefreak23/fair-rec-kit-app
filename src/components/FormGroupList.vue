@@ -77,7 +77,7 @@ function removeGroup(i) {
         <!--Show settings for selected option.-->
         <b-col v-if="form.main[i - 1] != null" align-v="end">
           <!--Use an input form for values.-->
-          <template v-for="(value, index) in getFromIndex(i - 1).params.values" align-v="end">
+          <template v-for="(value) in getFromIndex(i - 1).params.values" :key="value" align-v="end">
             <b-form-group
               :label="
                 'Give a ' +
@@ -103,7 +103,7 @@ function removeGroup(i) {
 
           <!--Use a select form for options.-->
           <template
-            v-for="(option, index) in getFromIndex(i - 1).params.options"
+            v-for="(option) in getFromIndex(i - 1).params.options" :key="option"
           >
             <b-form-select
               :label="'Choose a ' + option.name"
