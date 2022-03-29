@@ -53,7 +53,7 @@ async function getResults() {
 
 <template>
   <div>
-    <Table :results="results" :headers="headers" :buttonText="'Remove'" :removable="true" />
+    <Table :results="results" :headers="headers" :buttonText="'Remove'" :removable="true" :serverFile="'/all-results/delete'" />
     <!--<form @submit.prevent="getResults">
       <input v-model="toRequest" />
       <button>request data</button>

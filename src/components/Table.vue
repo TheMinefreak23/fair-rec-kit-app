@@ -9,6 +9,7 @@ const props = defineProps({
   headers: Array,
   buttonText: String,
   removable: Boolean,
+  serverFile: String,
 })
 
 const modalShow = ref(false)
@@ -27,11 +28,19 @@ const subheaders = computed(() => {
     return result;
 });
 
-function removeEntry() {
-  let entry = props.results[selectedEntry.value].datetime
-  console.log(entry)
-  //updateserver(selectedEntry.value)
-  props.results.splice(selectedEntry.value, 1)
+async function removeEntry() {
+  let entry = selectedEntry.value
+  props.results.splice(entry, 1)
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({index: entry}),
+  }
+  fetch('http://localhost:5000' + props.serverFile, requestOptions).then(
+    () => {
+        console.log("Item removed succesfully")
+    }
+  )
 }
 
 </script>
