@@ -1,6 +1,7 @@
 <script setup>
 import Table from './Table.vue'
 import { onMounted, ref } from 'vue'
+import { formatResults } from '../helpers/resultFormatter.js'
 
 const emit = defineEmits(['loadResult'])
 
@@ -37,22 +38,7 @@ async function getResults() {
   //returnMessage.value = 'the results have been gotten'
   console.log(data)
   let allResults = data.all_results
-  for (let i in allResults) {
-    const result = allResults[i]
-    let approach = result.settings.approaches[0]
-    let apprName = approach ? approach.name : 'NULL'
-    let metric = result.settings.metrics[0]
-    let metricName = metric ? metric.name : 'NULL'
-
-    results.value[i] = {
-      id: result.timestamp.stamp,
-      datetime: result.timestamp.datetime,
-      name: result.metadata.name,
-      dataset: result.settings.datasets[0],
-      approach: apprName,
-      metric: metricName,
-    }
-  }
+  results.value = formatResults(allResults)
   console.log(results.value)
 }
 </script>

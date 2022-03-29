@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
-import sortBy from 'just-sort-by';
+import sortBy from 'just-sort-by'
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
@@ -36,13 +36,11 @@ async function removeEntry() {
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({index: entry}),
+    body: JSON.stringify({ index: entry }),
   }
-  fetch('http://localhost:5000' + props.serverFile, requestOptions).then(
-    () => {
-        console.log("Item removed succesfully")
-    }
-  )
+  fetch('http://localhost:5000' + props.serverFile, requestOptions).then(() => {
+    console.log('Item removed succesfully')
+  })
 }
 
 const sorted = computed(() => sort(sortindex.value))
@@ -50,24 +48,23 @@ const sorted = computed(() => sort(sortindex.value))
 const sortindex = ref(0)
 const descending = ref(false)
 
-function sort(i){
-    const res = sortBy(props.results, function(o){
-        return Object.values(o)[i]
-    } )
-    
-    if(descending.value){
-        return res.reverse()
-    }
-    return res
+function sort(i) {
+  const res = sortBy(props.results, function (o) {
+    return Object.values(o)[i]
+  })
+
+  if (descending.value) {
+    return res.reverse()
+  }
+  return res
 }
 
-function setsorting(i){
-    if(i === sortindex.value){
-        descending.value = !descending.value
-    }
-    sortindex.value = i
+function setsorting(i) {
+  if (i === sortindex.value) {
+    descending.value = !descending.value
+  }
+  sortindex.value = i
 }
-
 </script>
 
 <template>
@@ -90,8 +87,8 @@ function setsorting(i){
           v-for="(header, index) in headers"
           :key="header"
           :colspan="header.subheaders ? header.subheaders.length : 1"
-          style="cursor: pointer;"
-            @click="setsorting(index)"
+          style="cursor: pointer"
+          @click="setsorting(index)"
         >
           {{ header.name }}
         </b-th>
