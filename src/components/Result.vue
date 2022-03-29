@@ -70,11 +70,16 @@ const headers_rec = ref([
     <Table
       :results="props.results.length == 0 ? mockdata.body : props.results"
       :headers="props.results.length == 0 ? mockdata.headers : headers"
+      :removable="false"
     />
   </div>
 
   <h6>Recommended items per user for dataset x and algorithm y</h6>
   <div class="container">
-    <Table :results="recommendations" :headers="headers_rec" />
+    <Table
+      :results="recommendations"
+      :headers="headers_rec"
+      :removable="false"
+    />
   </div>
 </template>

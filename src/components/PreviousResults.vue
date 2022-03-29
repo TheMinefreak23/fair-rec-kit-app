@@ -53,6 +53,7 @@ async function getResults() {
       metric: metricName,
     }
   }
+  console.log(results.value)
 }
 </script>
 
@@ -63,6 +64,8 @@ async function getResults() {
       :overview="true"
       :results="results"
       :headers="headers"
+      :buttonText="'Remove'"
+      :removable="true"
     />
     <!--<form @submit.prevent="getResults">
       <input v-model="toRequest" />
