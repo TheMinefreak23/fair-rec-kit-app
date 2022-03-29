@@ -114,9 +114,9 @@ async function removeEntry() {
           ><b-td>{{ value }}</b-td>
         </b-td>
         
-          <b-button v-if="overview" pill @click="editModalShow = !editModalShow, selectedEntry = item.id">Edit</b-button>
+          <b-button v-if="overview" pill @click="editModalShow = !editModalShow, selectedEntry = index">Edit</b-button>
           &nbsp;
-          <b-button v-if="removable" variant="danger" @click="deleteModalShow = !deleteModalShow, selectedEntry = item.id">Delete</b-button>
+          <b-button v-if="removable" variant="danger" @click="deleteModalShow = !deleteModalShow, selectedEntry = index">Delete</b-button>
         
       </b-tr>
     </b-tbody>

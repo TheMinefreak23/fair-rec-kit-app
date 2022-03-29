@@ -79,7 +79,6 @@ function deleteResult(id){
     <Table
       @loadResult="(id) => $emit('loadResult', id)"
       @edit="(id, newName, newTags) => edit(id, newName, newTags)"
-      @deleteResult="(id) => deleteResult(id)"
       :overview="true"
       :results="results"
       :headers="headers"
