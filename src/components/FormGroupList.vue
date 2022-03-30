@@ -48,12 +48,12 @@ function setParameter(i, val) {
 
 // Get options from group index
 function getFromIndex(i) {
-  console.log(props.options)
-  console.log(form.value.main[i])
+  //console.log(props.options)
+  //console.log(form.value.main[i])
   const option = props.options.find(
     (option) => option.name === form.value.main[i]
   )
-  console.log(option)
+  //console.log(option)
   return option
 }
 
