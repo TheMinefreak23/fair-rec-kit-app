@@ -4,6 +4,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import { onMounted, ref } from 'vue'
 import FormGroupList from './FormGroupList.vue'
+import { store } from '../store.js'
 
 const result = ref({})
 const options = ref()
@@ -53,8 +54,8 @@ function sendToServer() {
 async function getCalculation() {
   const response = await fetch('http://localhost:5000/computation/calculation')
   const data = await response.json()
-  result.value = data.calculation
-  console.log(result.value)
+  store.currentResult = data.calculation
+  console.log(store.currentResult)
 }
 
 async function initForm() {

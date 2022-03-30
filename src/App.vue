@@ -11,8 +11,9 @@ import NewComputation from './components/NewComputation.vue'
 import TestForm from './test/TestForm.vue'
 import { ref } from 'vue'
 
-const activeComputations = ref(false)
-const done = ref(false)
+function activeComputations() {
+  return store.currentResult.queue != []
+}
 </script>
 
 <style scoped>
@@ -42,7 +43,7 @@ b-tab.success {
         </template>
       </b-tab>
       <b-tab title="Documentation"> <Documentation /></b-tab>
-      <b-tab title="Results" :results="results"> <Results /></b-tab>
+      <b-tab title="Results"> <Results /></b-tab>
       <b-tab title="All results"> <PreviousResults /></b-tab>
     </b-tabs>
   </div>
