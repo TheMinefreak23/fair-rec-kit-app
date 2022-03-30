@@ -84,7 +84,7 @@ def delete_result(index):
         # Store it as json data.
         json.dump(file_data, file)
 
-def edit_result(index, new_name, new_tags):
+def edit_result(index, new_name, new_tags, new_email):
     create_results_overview()
     file_data = load_results_overview()
     to_edit_result = file_data['all_results'].pop(index)
@@ -95,6 +95,9 @@ def edit_result(index, new_name, new_tags):
     if new_tags != '':  # Don't change the tags if the input field has been left empty
         to_edit_result['metadata']['tags'] = new_tags
         print(to_edit_result['metadata']['tags'])
+    if new_email != '':  # Don't change the e-mail if the input field has been left empty
+        to_edit_result['metadata']['email'] = new_email
+        print(to_edit_result['metadata']['email'])
     
     # TODO Add more editable values
     file_data['all_results'].insert(index, to_edit_result)

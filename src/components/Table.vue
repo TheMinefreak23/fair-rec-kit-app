@@ -19,6 +19,7 @@ const deleteModalShow = ref(false)
 const editModalShow = ref(false)
 const newName = ref('')
 const newTags = ref('')
+const newEmail = ref('')
 const selectedEntry = ref(0)
 const subheaders = computed(() => {
   const result = []
@@ -34,12 +35,11 @@ const subheaders = computed(() => {
   return result
 })
 
-async function handleEditOk(){
-  // emit('edit', selectedEntry.value, newName.value, newTags.value)
+async function editEntry(){
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({index: selectedEntry.value, new_name: newName.value, new_tags: newTags.value}),
+    body: JSON.stringify({index: selectedEntry.value, new_name: newName.value, new_tags: newTags.value, new_email: newEmail.value}),
   }
   fetch('http://localhost:5000' + props.serverFile2, requestOptions).then(
     () => {
@@ -48,6 +48,7 @@ async function handleEditOk(){
   )
   newName.value = ''
   newTags.value = ''
+  newEmail.value = ''
 }
 
 async function removeEntry() {
@@ -82,7 +83,7 @@ async function removeEntry() {
     v-model="editModalShow"
     title="Editing results"
     size="lg"
-    @ok="handleEditOk"
+    @ok="editEntry"
   >
     <h6>Please type in the new values. Blank fields will be left unchanged.</h6>
     Name:
@@ -90,6 +91,18 @@ async function removeEntry() {
     <br>
     Tags:
     <b-form-input v-model="newTags" placeholder="New tags"></b-form-input>
+    <br>
+    E-mail:
+    <b-form-input v-model="newEmail" placeholder="New e-mail" type="email"></b-form-input>
+    <br>
+    Color (this doesn't do anything): <!-- I may have gotten a little carried away -->
+    <b-form-input type="color"></b-form-input>
+    <br>
+    Date (this doesn't do anything):
+    <b-form-input type="date"></b-form-input>
+    <br>
+    Credit card number (this doesn't do anything):
+    <b-form-input type="password"></b-form-input>
   </b-modal>
 
   <b-table-simple hover striped responsive>

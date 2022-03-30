@@ -33,12 +33,9 @@ def edit():
     index = data.get('index')
     new_name = data.get('new_name')
     new_tags = data.get('new_tags')
-    result_storage.edit_result(index, new_name, new_tags)
+    new_email = data.get('new_email')
+    result_storage.edit_result(index, new_name, new_tags, new_email)
     return "Edited index"
-    #print(data)
-    #data.get('email')
-    #data.get('name')
-    #data.get('tag')
 
 @results_bp.route('/delete', methods=['POST'])
 def delete():
