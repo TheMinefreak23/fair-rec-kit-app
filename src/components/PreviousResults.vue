@@ -25,7 +25,6 @@ const ex1CurrentPage = ref(1)
 const ex1PerPage = ref(10)
 const ex1Rows = ref(100)
 
-//const returnMessage = ref('')
 const results = ref([])
 
 onMounted(() => {
@@ -35,11 +34,10 @@ onMounted(() => {
 async function getResults() {
   const response = await fetch('http://localhost:5000/all-results')
   const data = await response.json()
-  //returnMessage.value = 'the results have been gotten'
-  console.log(data)
+  //console.log(data)
   let allResults = data.all_results
   results.value = formatResults(allResults)
-  console.log(results.value)
+  //console.log(results.value)
 }
 </script>
 
@@ -59,7 +57,6 @@ async function getResults() {
       <button>request data</button>
     </form>-->
     <b-button @click="getResults">Request results</b-button>
-    <p>{{ returnMessage }}</p>
     <!--<b-card>
       <div class="overflow-auto py-2">
         <h1>Previous results</h1>

@@ -23,7 +23,7 @@ async function getOptions() {
   const response = await fetch('http://localhost:5000/computation/options')
   const data = await response.json()
   options.value = data.options
-  console.log(options.value)
+  //console.log(options.value)
 }
 
 // POST request: Send form to server.
