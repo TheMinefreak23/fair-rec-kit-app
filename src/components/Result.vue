@@ -6,17 +6,12 @@ Utrecht University within the Software Project course.
 import Table from './Table.vue'
 import { onMounted, ref } from 'vue'
 
-
 import mockdata from '../../api/mock/1647818279_HelloWorld/results-table.json'
+import { store } from '../store.js'
 
-const props = defineProps({ results: Array, headers: Array })
+const props = defineProps({ headers: Array })
 
-
-const headers_rec = ref([
-  { name: 'User' },
-  { name: 'Item' },
-  { name: 'Score' },
-])
+const headers_rec = ref([{ name: 'User' }, { name: 'Item' }, { name: 'Score' }])
 
 const computation_name = ref('computation1')
 const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
@@ -24,20 +19,20 @@ const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 const data = ref([])
 
 async function getUserRecs() {
-  const response = await fetch('http://localhost:5000/all-results/result/?start=0')
-  data.value = (await response.json())
+  const response = await fetch(
+    'http://localhost:5000/all-results/result/?start=0'
+  )
+  data.value = await response.json()
   console.log(data.value)
 }
 
-function handleScrol() {
-  console.log("test")
+function handleScroll() {
+  console.log('test')
 }
-
 
 onMounted(() => {
   getUserRecs()
 })
-
 </script>
 
 <template>
@@ -55,32 +50,50 @@ onMounted(() => {
   <div class="container">
     <div class="row">
       <div class="col-6">
-         <Table
-          :results="props.results.length == 0 ? mockdata.body : props.results"
-          :headers="props.results.length == 0 ? mockdata.headers : headers"
+        <Table
+          :key="1"
+          :results="
+            store.currentResult.length == 0
+              ? mockdata.body
+              : store.currentResult
+          "
+          :headers="
+            store.currentResult.length == 0 ? mockdata.headers : headers
+          "
           :removable="false"
-          />
+        />
       </div>
       <div class="col-6">
-         <Table
-          :results="props.results.length == 0 ? mockdata.body : props.results"
-          :headers="props.results.length == 0 ? mockdata.headers : headers"
+        <Table
+          :key="2"
+          :results="
+            store.currentResult.length == 0
+              ? mockdata.body
+              : store.currentResult
+          "
+          :headers="
+            store.currentResult.length == 0 ? mockdata.headers : headers
+          "
           :removable="false"
-          />
+        />
       </div>
     </div>
   </div>
-  
 
   <h6>Recommended items per user for dataset x and algorithm y</h6>
   <div class="container">
     <div class="row">
       <div class="col-6">
-          <Table  v-on:scroll.passive="handleScroll" :results="data" :headers="headers_rec" :removable="false" />
+        <Table
+          v-on:scroll.passive="handleScroll"
+          :results="data"
+          :headers="headers_rec"
+          :removable="false"
+        />
       </div>
       <div class="col-6">
-          <Table :results="data" :headers="headers_rec" :removable="false" />
+        <Table :results="data" :headers="headers_rec" :removable="false" />
       </div>
-    </div>  
+    </div>
   </div>
 </template>
