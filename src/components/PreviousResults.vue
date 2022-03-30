@@ -3,6 +3,8 @@ import Table from './Table.vue'
 import { onMounted, ref } from 'vue'
 import { formatResults } from '../helpers/resultFormatter.js'
 
+import { store } from '../store.js'
+
 const emit = defineEmits(['loadResult'])
 
 const exResults = ref([
@@ -41,12 +43,38 @@ async function getResults() {
   results.value = formatResults(allResults)
   console.log(results.value)
 }
+
+const url = 'http://localhost:5000/all-results/result-by-id'
+
+// Request full result from result ID (timestamp)
+async function loadResult(resultId) {
+  console.log('Result ID:' + resultId)
+
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: resultId }),
+  }
+  fetch(url, requestOptions).then(() => {
+    getResult()
+  })
+}
+
+// Get result back from result ID request
+async function getResult() {
+  const response = await fetch(url)
+  const data = await response.json()
+  store.currentResult = [data]
+  console.log(store.currentResult)
+}
 </script>
 
 <template>
   <div>
+    <b-button @click="store.count++">Increment</b-button>
+    Counter: {{ store.count }}
     <Table
-      @loadResult="(id) => $emit('loadResult', id)"
+      @loadResult="loadResult"
       :overview="true"
       :results="results"
       :headers="headers"

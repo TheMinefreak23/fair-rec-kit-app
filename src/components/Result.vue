@@ -7,10 +7,9 @@ import Table from './Table.vue'
 import { onMounted, ref } from 'vue'
 
 import mockdata from '../../api/mock/1647818279_HelloWorld/results-table.json'
-import { ref } from 'vue'
 import { store } from '../store.js'
 
-const props = defineProps({ results: Array, headers: Array })
+const props = defineProps({ headers: Array })
 
 const headers_rec = ref([{ name: 'User' }, { name: 'Item' }, { name: 'Score' }])
 
@@ -53,15 +52,27 @@ onMounted(() => {
     <div class="row">
       <div class="col-6">
         <Table
-          :results="props.results.length == 0 ? mockdata.body : props.results"
-          :headers="props.results.length == 0 ? mockdata.headers : headers"
+          :results="
+            store.currentResult.length == 0
+              ? mockdata.body
+              : store.currentResult
+          "
+          :headers="
+            store.currentResult.length == 0 ? mockdata.headers : headers
+          "
           :removable="false"
         />
       </div>
       <div class="col-6">
         <Table
-          :results="props.results.length == 0 ? mockdata.body : props.results"
-          :headers="props.results.length == 0 ? mockdata.headers : headers"
+          :results="
+            store.currentResult.length == 0
+              ? mockdata.body
+              : store.currentResult
+          "
+          :headers="
+            store.currentResult.length == 0 ? mockdata.headers : headers
+          "
           :removable="false"
         />
       </div>

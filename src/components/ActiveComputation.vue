@@ -3,8 +3,9 @@
     Utrecht University within the Software Project course.
     © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import Table from './Table.vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { formatResults } from '../helpers/resultFormatter.js'
+import { store } from '../store.js'
 
 const emit = defineEmits(['computing', 'done', 'stop'])
 const props = defineProps({
@@ -23,6 +24,14 @@ const headers = ref([
 onMounted(() => {
   getComputations()
 })
+
+watch(
+  () => store.currentResult,
+  (result) => {
+    getComputations()
+    console.log(result)
+  }
+)
 
 async function cancelComputation() {
   emit('stop')
