@@ -1,15 +1,27 @@
 <script setup>
-import { ref } from 'vue'
-const emit = defineEmits(['formChange'])
+import { computed, ref } from 'vue'
+//const emit = defineEmits(['formChange'])
 const props = defineProps({
   name: String,
   plural: String,
   selectName: String,
   options: Array,
+  data: { type: Object, required: true },
 })
 
 const groupCount = ref(1) //The minimum amount of group items is 1.
-const form = ref({ main: [], inputs: [], selects: [] })
+const form = computed({
+  // getter
+  get() {
+    console.log(props.data)
+    return props.data
+  },
+  // setter
+  set(localValue) {
+    emit('input', localValue)
+    console.log('local form change')
+  },
+})
 
 // Set default values for the group parameters.
 function setParameter(i, val) {
@@ -36,10 +48,13 @@ function setParameter(i, val) {
 
 // Get options from group index
 function getFromIndex(i) {
-  //console.log(props.options)
-  //console.log(form.value.main)
-  //console.log(form.value.main[i])
-  return props.options.find((option) => option.name === form.value.main[i])
+  console.log(props.options)
+  console.log(form.value.main[i])
+  const option = props.options.find(
+    (option) => option.name === form.value.main[i]
+  )
+  console.log(option)
+  return option
 }
 
 // Splice groups array to remove a group
@@ -67,7 +82,7 @@ function removeGroup(i) {
                 { text: 'Choose...', value: null },
                 ...options.map((x) => x.name),
               ]"
-              @change="setParameter(i - 1, $event), $emit('formChange', form)"
+              @change="setParameter(i - 1, $event)"
               required
               ><!--TODO use placeholder-->
             </b-form-select>
@@ -103,7 +118,6 @@ function removeGroup(i) {
                   form.inputs[i - 1].value >= value.min &&
                   form.inputs[i - 1].value <= value.max
                 "
-                @input="$emit('formChange', form)"
                 validated="true"
               ></b-form-input>
             </b-form-group>
@@ -121,7 +135,6 @@ function removeGroup(i) {
                   { text: 'Choose...', value: null },
                   ...option.options,
                 ]"
-                @input="$emit('formChange', form)"
                 required
                 ><!--TODO use placeholder-->
               </b-form-select>

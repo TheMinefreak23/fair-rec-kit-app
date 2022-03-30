@@ -78,7 +78,7 @@ def calculate():
         for dataset in datasets:
             recs = []
             for approach in settings['approaches']:
-                recommendation = {'recommendation': recommend(dataset['name'], approach), 'evals': []}
+                recommendation = {'recommendation': recommend(dataset, approach), 'evals': []}
                 for metric in settings['metrics']:
                     evaluation = evaluate(approach, metric)
                     recommendation['evals'].append({'name': metric['name'], 'evaluation': evaluation})
@@ -111,7 +111,10 @@ def recommend(dataset, approach):
 
 
 def evaluate(approach, metric):
-    return len(approach['name']) * len(metric['name']) * len(metric['parameter']['name'])  # Mock
+    value = len(approach['name']) * len(metric['name'])
+    parameter = metric['parameter']
+    if parameter:
+        value *= parameter['name'] # Mock
 
 
 # add a computation request to the queue

@@ -8,6 +8,7 @@ import Results from './components/Results.vue'
 import PreviousResults from './components/PreviousResults.vue'
 import ActiveComputation from './components/ActiveComputation.vue'
 import NewComputation from './components/NewComputation.vue'
+import TestForm from './test/TestForm.vue'
 import { ref } from 'vue'
 
 const activeComputations = ref(false)

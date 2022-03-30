@@ -8,7 +8,10 @@ import FormGroupList from './FormGroupList.vue'
 const result = ref({})
 const options = ref()
 const form = ref({
-  datasets: [],
+  datasets: { main: [], inputs: [], selects: [] },
+  metrics: { main: [], inputs: [], selects: [] },
+  approaches: { main: [], inputs: [], selects: [] },
+  filters: { main: [], inputs: [], selects: [] },
   splitMethod: 'random', //The default split method.
 })
 const metadata = ref({})
@@ -23,40 +26,27 @@ async function getOptions() {
   const response = await fetch('http://localhost:5000/computation/options')
   const data = await response.json()
   options.value = data.options
-  //console.log(options.value)
+  console.log(options.value)
 }
 
 // POST request: Send form to server.
 function sendToServer() {
-  form.value.approaches = reformat(form.value.approaches)
-  form.value.metrics = reformat(form.value.metrics)
-  form.value.datasets = reformat(form.value.datasets)
-  form.value.filters = reformat(form.value.filters)
+  var sendForm = { ...form.value } // clone
+  sendForm.approaches = reformat(form.value.approaches)
+  sendForm.metrics = reformat(form.value.metrics)
+  sendForm.datasets = reformat(form.value.datasets)
+  sendForm.filters = reformat(form.value.filters)
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ metadata: metadata.value, settings: form.value }),
+    body: JSON.stringify({ metadata: metadata.value, settings: sendForm }),
   }
-  console.log(form.value)
+  console.log(sendForm)
   fetch('http://localhost:5000/computation/calculation', requestOptions).then(
     () => {
       getCalculation()
     }
   )
-}
-
-// Change the form format (SoA) into a managable data format (AoS)
-// TODO just don't use SoA in the first place
-function reformat(property) {
-  let choices = []
-  for (let i in property.main) {
-    let parameter = null
-    if (property.inputs[i] != null) parameter = property.inputs[i]
-    else if (property.selects[i] != null) parameter = property.selects[i]
-    choices[i] = { name: property.main[i], parameter: parameter }
-    console.log('choices:' + choices.value)
-  }
-  return choices
 }
 
 // GET request: Ask server for latest calculation
@@ -72,11 +62,32 @@ async function initForm() {
   //console.log(options.value.defaults)
   form.value = {}
   metadata.value = {}
-  form.value.datasets = []
+  form.value.datasets = emptyFormGroup()
+  form.value.metrics = emptyFormGroup()
+  form.value.approaches = emptyFormGroup()
+  form.value.filters = emptyFormGroup()
   form.value.recommendations = options.value.defaults.recCount.default
   form.value.split = options.value.defaults.split
   form.value.splitMethod = 'random'
   //form.value.result.value = {}
+}
+
+function emptyFormGroup() {
+  return { main: [], inputs: [], selects: [] }
+}
+
+// Change the form format (SoA) into a managable data format (AoS)
+// TODO just don't use SoA in the first place
+function reformat(property) {
+  let choices = []
+  for (let i in property.main) {
+    let parameter = null
+    if (property.inputs[i] != null) parameter = property.inputs[i]
+    else if (property.selects[i] != null) parameter = property.selects[i]
+    choices[i] = { name: property.main[i], parameter: parameter }
+    console.log('choices:' + choices.value)
+  }
+  return choices
 }
 </script>
 
@@ -86,9 +97,9 @@ async function initForm() {
     <b-form v-if="options" @submit="sendToServer" @reset="initForm">
       <b-row>
         <b-col>
-          <!--User can select a dataset. TODO: Multiple Datasets-->
+          <!--User can select a dataset.-->
           <FormGroupList
-            @formChange="(x) => (form.datasets = x)"
+            v-model:data="form.datasets"
             name="Dataset"
             plural="Datasets"
             selectName="a dataset"
@@ -97,7 +108,7 @@ async function initForm() {
 
           <!--User can select optional filters-->
           <FormGroupList
-            @formChange="(x) => (form.filters = x)"
+            v-model:data="form.filters"
             name="filter"
             plural="Filters"
             selectName="a filter"
@@ -108,13 +119,13 @@ async function initForm() {
           <b-form-group label="Select a rating conversion">
             <!-- Select a rating conversion from the options received from the server -->
             <b-form-select
-              v-model="form.conversion"
+              v-model:data="form.conversion"
               :options="[{ text: 'None (default)', value: null }]"
             ></b-form-select>
           </b-form-group>
 
           <FormGroupList
-            @formChange="(x) => (form.approaches = x)"
+            v-model:data="form.approaches"
             name="approach"
             plural="Recommender approaches"
             selectName="an approach"
@@ -165,7 +176,7 @@ async function initForm() {
 
           <!--Input for metrics, user can add infinite metrics -->
           <FormGroupList
-            @formChange="(x) => (form.metrics = x)"
+            v-model:data="form.metrics"
             name="metric"
             plural="metrics"
             selectName="a metric"
