@@ -26,7 +26,7 @@ async function getUserRecs() {
   console.log(data.value)
 }
 
-function handleScrol() {
+function handleScroll() {
   console.log('test')
 }
 
@@ -37,7 +37,6 @@ onMounted(() => {
 
 <template>
   <h1 class="display-2">Results</h1>
-  Counter: {{ store.count }}
   <p class="lead">
     These are the results for your computation with the following name:
     {{ mockdata.computation_name }}.
@@ -52,6 +51,7 @@ onMounted(() => {
     <div class="row">
       <div class="col-6">
         <Table
+          :key="1"
           :results="
             store.currentResult.length == 0
               ? mockdata.body
@@ -65,6 +65,7 @@ onMounted(() => {
       </div>
       <div class="col-6">
         <Table
+          :key="2"
           :results="
             store.currentResult.length == 0
               ? mockdata.body

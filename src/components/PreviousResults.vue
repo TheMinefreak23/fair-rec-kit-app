@@ -1,6 +1,6 @@
 <script setup>
 import Table from './Table.vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { formatResults } from '../helpers/resultFormatter.js'
 
 import { store } from '../store.js'
@@ -33,6 +33,14 @@ const results = ref([])
 onMounted(() => {
   getResults()
 })
+
+watch(
+  () => store.currentResult,
+  (result) => {
+    getResults()
+    console.log(result)
+  }
+)
 
 async function getResults() {
   const response = await fetch('http://localhost:5000/all-results')
@@ -71,8 +79,6 @@ async function getResult() {
 
 <template>
   <div>
-    <b-button @click="store.count++">Increment</b-button>
-    Counter: {{ store.count }}
     <Table
       @loadResult="loadResult"
       :overview="true"
@@ -86,7 +92,6 @@ async function getResult() {
       <input v-model="toRequest" />
       <button>request data</button>
     </form>-->
-    <b-button @click="getResults">Request results</b-button>
     <p>{{ returnMessage }}</p>
     <!--<b-card>
       <div class="overflow-auto py-2">
