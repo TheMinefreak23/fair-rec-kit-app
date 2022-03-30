@@ -68,12 +68,21 @@ def update_results_overview(new_result):
     create_results_overview()
     file_data = load_json(results_overview_path)
     file_data['all_results'].append(new_result)
-    with open(results_path, 'w') as file:  # Open the file in write mode.
+    with open(results_overview_path, 'w') as file:  # Open the file in write mode.
         # Rewind file pointer's position.
         file.seek(0)
         # Store it as json data.
         json.dump(file_data, file, indent=4)
 
+def delete_result(index):
+    create_results_overview()
+    file_data = load_results_overview()
+    file_data['all_results'].pop(index)
+    with open(mock_results_overview_path, 'w') as file:  # Open the file in write mode.
+        # Rewind file pointer's position.
+        file.seek(0)
+        # Store it as json data.
+        json.dump(file_data, file)
 
 # Create results file if it doesn't exist yet or is empty
 def create_results_overview():

@@ -4,7 +4,6 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import { onMounted, ref } from 'vue'
 import FormGroupList from './FormGroupList.vue'
-import ActiveComputation from './ActiveComputation.vue'
 
 const result = ref({})
 const options = ref()
@@ -31,6 +30,8 @@ async function getOptions() {
 function sendToServer() {
   form.value.approaches = reformat(form.value.approaches)
   form.value.metrics = reformat(form.value.metrics)
+  form.value.datasets = reformat(form.value.datasets)
+  form.value.filters = reformat(form.value.filters)
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -86,27 +87,22 @@ async function initForm() {
       <b-row>
         <b-col>
           <!--User can select a dataset. TODO: Multiple Datasets-->
-          <h2>Dataset</h2>
-          <b-form-group label="Select a dataset">
-            <!-- Select a dataset from the options received from the server -->
-            <b-form-select
-              v-model="form.datasets[0]"
-              :options="[
-                { text: 'Choose...', value: null },
-                ...options.datasets,
-              ]"
-              required
-            ></b-form-select>
-          </b-form-group>
+          <FormGroupList
+            @formChange="(x) => (form.datasets = x)"
+            name="Dataset"
+            plural="Datasets"
+            selectName="a dataset"
+            :options="options.datasets"
+          />
 
-          <!--User can select an optional filter-->
-          <b-form-group label="Select a filter">
-            <!-- Select a dataset filter from the options received from the server -->
-            <b-form-select
-              v-model="form.filter"
-              :options="[{ text: 'None (default)', value: null }]"
-            ></b-form-select>
-          </b-form-group>
+          <!--User can select optional filters-->
+          <FormGroupList
+            @formChange="(x) => (form.filters = x)"
+            name="filter"
+            plural="Filters"
+            selectName="a filter"
+            :options="options.filters"
+          />
 
           <!--User provides an optional rating conversion-->
           <b-form-group label="Select a rating conversion">
@@ -117,24 +113,6 @@ async function initForm() {
             ></b-form-select>
           </b-form-group>
 
-          <!--
-      <!-User can select which recommender approaches they want->
-      <h2>Recommenders</h2>
-      <b-form-group>
-        <p>Select recommender approaches:</p>
-        <b-form-checkbox-group
-          v-model="form.recommenders"
-          :options="options.approaches"
-          buttons
-          button-variant="outline-primary"
-          size="lg"
-          name="buttons-2"
-          stacked
-          required
-        ></b-form-checkbox-group>
-      </b-form-group>-->
-
-          <b-form-group label="Select recommender approaches:"> </b-form-group>
           <FormGroupList
             @formChange="(x) => (form.approaches = x)"
             name="approach"
@@ -142,29 +120,6 @@ async function initForm() {
             selectName="an approach"
             :options="options.approaches"
           />
-          <!--
-        User gets additional options for the selected recommender approaches
-        <b-form-group
-          label="ALS Features value:"
-          v-if="form.recommenders != null && form.recommenders.includes('ALS')">
-          ALS Feature value needs to be a number higher than 1
-          <b-form-input
-            :state = "form.alsFeatures >= 1"
-            placeholder=">= 1"
-            v-model="form.alsFeatures"
-          ></b-form-input>
-        </b-form-group>
-        <b-form-group
-          label="POP Method:"
-          v-if="form.recommenders != null && form.recommenders.includes('POP')">
-          POP has three modes to choose from-
-          <b-form-select
-            v-model="form.popSettings"
-            :options="[{ text:'quantile (default)', value:'quantile'}, 'rank', 'count']"
-          ></b-form-select>
-        </b-form-group>
-      </b-form-group>
-      -->
 
           <!--User can select the amount of recommendations per user -->
           <b-form-group label="Select number of recommendations per user:">
@@ -175,13 +130,13 @@ async function initForm() {
               v-model="form.recommendations"
             ></b-form-input>
             <p>{{ form.recommendations }}</p>
-            <b-form-checkbox
+            <!--  No longer feasible from a back-end perspective -Bug V22H-194<b-form-checkbox
               v-model="form.includeRatedItems"
               buttons
               button-variant="outline-primary"
               required
               >Include already rated items in recommendations</b-form-checkbox
-            >
+            >-->
           </b-form-group>
         </b-col>
         <b-col>
@@ -228,7 +183,7 @@ async function initForm() {
           <!-- Input for metadata such as:
      Computation Name
      Optional Tags
-     Optional Email for notification -->
+          Optional Email for notification-->
           <h2>Meta</h2>
           <b-form-group label="Enter name for computation">
             <b-form-input
@@ -241,7 +196,6 @@ async function initForm() {
             <b-form-input v-model="metadata.tags"></b-form-input>
           </b-form-group>
           <b-form-group label="Enter e-mail (optional)">
-            
             <b-form-input
               type="email"
               placeholder="example@mail.com"

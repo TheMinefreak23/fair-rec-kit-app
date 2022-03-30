@@ -2,6 +2,7 @@
 # Utrecht University within the Software Project course.
 # © Copyright Utrecht University (Department of Information and Computing Sciences)
 from flask import (Blueprint, request)
+import pandas as pd
 
 from . import result_storage
 
@@ -34,3 +35,19 @@ def edit():
     #data.get('email')
     #data.get('name')
     #data.get('tag')
+
+@results_bp.route('/delete', methods=['POST'])
+def delete():
+    data = request.get_json()
+    index = data.get('index')
+    result_storage.delete_result(index)
+    return "Removed index"
+  
+## only get one results
+@results_bp.route('/result', methods=['GET'])
+def user_result():
+    start = request.args.get("start")
+    data = pd.read_csv('mock/1647818279_HelloWorld/1647818279_run_0/LFM-360K_0/Foo_ALS_0/ratings.tsv', sep='\t', header=None, skiprows = start, nrows = 5)
+    results = data.to_json(orient='records')
+    return results
+    
