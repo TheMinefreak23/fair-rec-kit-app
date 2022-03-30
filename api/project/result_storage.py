@@ -92,6 +92,11 @@ def edit_result(index, new_name, new_tags):
     if new_name != '':  # Don't change the name if the input field has been left empty
         to_edit_result['metadata']['name'] = new_name
         print(to_edit_result['metadata']['name'])
+    if new_tags != '':  # Don't change the tags if the input field has been left empty
+        to_edit_result['metadata']['tags'] = new_tags
+        print(to_edit_result['metadata']['tags'])
+    
+    # TODO Add more editable values
     file_data['all_results'].insert(index, to_edit_result)
 
     with open(results_overview_path, 'w') as file:  # Open the file in write mode.
