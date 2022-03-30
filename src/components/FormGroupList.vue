@@ -8,6 +8,7 @@ const props = defineProps({
   options: Array,
 })
 
+
 const groupCount = ref(1) //The minimum amount of group items is 1.
 const form = ref({ main: [], inputs: [], selects: [] })
 

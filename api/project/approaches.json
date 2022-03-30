@@ -1,0 +1,577 @@
+{
+    "libraries": [
+        {
+            "name": "Elliot",
+            "recommenders": [
+                {
+                    "name": "FunkSVD",
+                    "params": {
+                        "values": [
+                            {
+                                "name": "epochs",
+                                "min": 1,
+                                "max": 50,
+                                "default": 10
+                            },
+                            {
+                                "name": "batch_size",
+                                "min": 100,
+                                "max": 10000,
+                                "default": 512
+                            },
+                            {
+                                "name": "factors",
+                                "min": 1,
+                                "max": 100,
+                                "default": 10
+                            },
+                            {
+                                "name": "lr",
+                                "min": 0.0001,
+                                "max": 1.0,
+                                "default": 0.001
+                            },
+                            {
+                                "name": "reg_w",
+                                "min": 0.0001,
+                                "max": 1.0,
+                                "default": 0.1
+                            },
+                            {
+                                "name": "reg_b",
+                                "min": 0.0001,
+                                "max": 1.0,
+                                "default": 0.001
+                            },
+                            {
+                                "name": "seed",
+                                "min": 0,
+                                "max": 9223372036854775807,
+                                "default": null
+                            }
+                        ],
+                        "options": []
+                    }
+                },
+                {
+                    "name": "ItemKNN",
+                    "params": {
+                        "values": [
+                            {
+                                "name": "neighbours",
+                                "min": 1,
+                                "max": 50,
+                                "default": 40
+                            }
+                        ],
+                        "options": [
+                            {
+                                "name": "similarity",
+                                "options": [
+                                    "cosine",
+                                    "adjusted",
+                                    "asymmetric",
+                                    "pearson",
+                                    "jaccard",
+                                    "dice",
+                                    "tversky",
+                                    "tanimoto"
+                                ],
+                                "default": "cosine"
+                            },
+                            {
+                                "name": "implementation",
+                                "options": [
+                                    "aiolli",
+                                    "classical"
+                                ],
+                                "default": "aiolli"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "MultiVAE",
+                    "params": {
+                        "values": [
+                            {
+                                "name": "batch_size",
+                                "min": 100,
+                                "max": 10000,
+                                "default": 512
+                            },
+                            {
+                                "name": "epochs",
+                                "min": 1,
+                                "max": 50,
+                                "default": 10
+                            },
+                            {
+                                "name": "lr",
+                                "min": 0.0001,
+                                "max": 1.0,
+                                "default": 0.001
+                            },
+                            {
+                                "name": "reg_lambda",
+                                "min": 0.0001,
+                                "max": 1.0,
+                                "default": 0.01
+                            },
+                            {
+                                "name": "intermediate_dim",
+                                "min": 100,
+                                "max": 1000,
+                                "default": 600
+                            },
+                            {
+                                "name": "latent_dim",
+                                "min": 100,
+                                "max": 500,
+                                "default": 200
+                            },
+                            {
+                                "name": "dropout_keep",
+                                "min": 0.0,
+                                "max": 1.0,
+                                "default": 1.0
+                            },
+                            {
+                                "name": "seed",
+                                "min": 0,
+                                "max": 9223372036854775807,
+                                "default": null
+                            }
+                        ],
+                        "options": []
+                    }
+                },
+                {
+                    "name": "MostPop",
+                    "params": {
+                        "values": [],
+                        "options": []
+                    }
+                },
+                {
+                    "name": "PureSVD",
+                    "params": {
+                        "values": [
+                            {
+                                "name": "factors",
+                                "min": 1,
+                                "max": 100,
+                                "default": 10
+                            },
+                            {
+                                "name": "seed",
+                                "min": 0,
+                                "max": 9223372036854775807,
+                                "default": null
+                            }
+                        ],
+                        "options": []
+                    }
+                },
+                {
+                    "name": "Random",
+                    "params": {
+                        "values": [
+                            {
+                                "name": "random_seed",
+                                "min": 0,
+                                "max": 9223372036854775807,
+                                "default": null
+                            }
+                        ],
+                        "options": []
+                    }
+                },
+                {
+                    "name": "SVDpp",
+                    "params": {
+                        "values": [
+                            {
+                                "name": "epochs",
+                                "min": 1,
+                                "max": 50,
+                                "default": 10
+                            },
+                            {
+                                "name": "batch_size",
+                                "min": 100,
+                                "max": 10000,
+                                "default": 512
+                            },
+                            {
+                                "name": "factors",
+                                "min": 1,
+                                "max": 100,
+                                "default": 50
+                            },
+                            {
+                                "name": "lr",
+                                "min": 0.0001,
+                                "max": 1.0,
+                                "default": 0.001
+                            },
+                            {
+                                "name": "reg_w",
+                                "min": 0.0001,
+                                "max": 1.0,
+                                "default": 0.1
+                            },
+                            {
+                                "name": "reg_b",
+                                "min": 0.0001,
+                                "max": 1.0,
+                                "default": 0.001
+                            },
+                            {
+                                "name": "seed",
+                                "min": 0,
+                                "max": 9223372036854775807,
+                                "default": null
+                            }
+                        ],
+                        "options": []
+                    }
+                },
+                {
+                    "name": "UserKNN",
+                    "params": {
+                        "values": [
+                            {
+                                "name": "neighbours",
+                                "min": 1,
+                                "max": 50,
+                                "default": 40
+                            }
+                        ],
+                        "options": [
+                            {
+                                "name": "similarity",
+                                "options": [
+                                    "cosine",
+                                    "adjusted",
+                                    "asymmetric",
+                                    "pearson",
+                                    "jaccard",
+                                    "dice",
+                                    "tversky",
+                                    "tanimoto"
+                                ],
+                                "default": "cosine"
+                            },
+                            {
+                                "name": "implementation",
+                                "options": [
+                                    "aiolli",
+                                    "classical"
+                                ],
+                                "default": "aiolli"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Implicit",
+            "recommenders": [
+                {
+                    "name": "AlternatingLeastSquares",
+                    "params": {
+                        "values": [
+                            {
+                                "name": "factors",
+                                "min": 1,
+                                "max": 100,
+                                "default": 100
+                            },
+                            {
+                                "name": "iterations",
+                                "min": 1,
+                                "max": 50,
+                                "default": 15
+                            },
+                            {
+                                "name": "regularization",
+                                "min": 0.0001,
+                                "max": 1.0,
+                                "default": 0.01
+                            },
+                            {
+                                "name": "random_seed",
+                                "min": 0,
+                                "max": 9223372036854775807,
+                                "default": null
+                            }
+                        ],
+                        "options": [
+                            {
+                                "name": "calculate_training_loss",
+                                "options": [
+                                    true,
+                                    false
+                                ],
+                                "default": false
+                            },
+                            {
+                                "name": "use_cg",
+                                "options": [
+                                    true,
+                                    false
+                                ],
+                                "default": true
+                            },
+                            {
+                                "name": "use_native",
+                                "options": [
+                                    true,
+                                    false
+                                ],
+                                "default": true
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "BayesianPersonalizedRanking",
+                    "params": {
+                        "values": [
+                            {
+                                "name": "factors",
+                                "min": 1,
+                                "max": 100,
+                                "default": 100
+                            },
+                            {
+                                "name": "iterations",
+                                "min": 1,
+                                "max": 1000,
+                                "default": 100
+                            },
+                            {
+                                "name": "regularization",
+                                "min": 0.0001,
+                                "max": 1.0,
+                                "default": 0.01
+                            },
+                            {
+                                "name": "learning_rate",
+                                "min": 0.0001,
+                                "max": 1.0,
+                                "default": 0.01
+                            },
+                            {
+                                "name": "random_seed",
+                                "min": 0,
+                                "max": 9223372036854775807,
+                                "default": null
+                            }
+                        ],
+                        "options": [
+                            {
+                                "name": "verify_negative_samples",
+                                "options": [
+                                    true,
+                                    false
+                                ],
+                                "default": true
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "LogisticMatrixFactorization",
+                    "params": {
+                        "values": [
+                            {
+                                "name": "factors",
+                                "min": 1,
+                                "max": 100,
+                                "default": 30
+                            },
+                            {
+                                "name": "iterations",
+                                "min": 1,
+                                "max": 100,
+                                "default": 30
+                            },
+                            {
+                                "name": "regularization",
+                                "min": 0.0001,
+                                "max": 1.0,
+                                "default": 0.6
+                            },
+                            {
+                                "name": "learning_rate",
+                                "min": 0.0001,
+                                "max": 1.0,
+                                "default": 1.0
+                            },
+                            {
+                                "name": "neg_prop",
+                                "min": 1,
+                                "max": 50,
+                                "default": 30
+                            },
+                            {
+                                "name": "random_seed",
+                                "min": 0,
+                                "max": 9223372036854775807,
+                                "default": null
+                            }
+                        ],
+                        "options": []
+                    }
+                }
+            ]
+        },
+        {
+            "name": "LensKit",
+            "recommenders": [
+                {
+                    "name": "BiasedMF",
+                    "params": {
+                        "values": [
+                            {
+                                "name": "features",
+                                "min": 0,
+                                "max": 50,
+                                "default": 10
+                            },
+                            {
+                                "name": "iterations",
+                                "min": 1,
+                                "max": 50,
+                                "default": 20
+                            },
+                            {
+                                "name": "user_reg",
+                                "min": 0.0001,
+                                "max": 1.0,
+                                "default": 0.1
+                            },
+                            {
+                                "name": "item_reg",
+                                "min": 0.0001,
+                                "max": 1.0,
+                                "default": 0.1
+                            },
+                            {
+                                "name": "damping",
+                                "min": 0.0,
+                                "max": 1000.0,
+                                "default": 5.0
+                            },
+                            {
+                                "name": "random_seed",
+                                "min": 0,
+                                "max": 9223372036854775807,
+                                "default": null
+                            }
+                        ],
+                        "options": [
+                            {
+                                "name": "method",
+                                "options": [
+                                    "cd",
+                                    "lu"
+                                ],
+                                "default": "cd"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "ImplicitMF",
+                    "params": {
+                        "values": [
+                            {
+                                "name": "features",
+                                "min": 3,
+                                "max": 50,
+                                "default": 10
+                            },
+                            {
+                                "name": "iterations",
+                                "min": 1,
+                                "max": 50,
+                                "default": 20
+                            },
+                            {
+                                "name": "reg",
+                                "min": 0.0001,
+                                "max": 1.0,
+                                "default": 0.1
+                            },
+                            {
+                                "name": "weight",
+                                "min": 1.0,
+                                "max": 10000.0,
+                                "default": 40.0
+                            },
+                            {
+                                "name": "random_seed",
+                                "min": 0,
+                                "max": 9223372036854775807,
+                                "default": null
+                            }
+                        ],
+                        "options": [
+                            {
+                                "name": "method",
+                                "options": [
+                                    "cg",
+                                    "lu"
+                                ],
+                                "default": "cg"
+                            },
+                            {
+                                "name": "use_ratings",
+                                "options": [
+                                    true,
+                                    false
+                                ],
+                                "default": false
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "PopScore",
+                    "params": {
+                        "values": [],
+                        "options": [
+                            {
+                                "name": "score_method",
+                                "options": [
+                                    "quantile",
+                                    "rank",
+                                    "count"
+                                ],
+                                "default": "quantile"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Random",
+                    "params": {
+                        "values": [
+                            {
+                                "name": "random_seed",
+                                "min": 0,
+                                "max": 9223372036854775807,
+                                "default": null
+                            }
+                        ],
+                        "options": []
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -13,17 +13,16 @@ compute_bp = Blueprint('computation', __name__, url_prefix='/computation')
 
 # constants
 DATASETS = [
-    {'name': 'LFM2B', 'timestamp': True, 'params': {'filters': ['age', 'gender', 'country']}},
-    {'name': 'LFM1B', 'timestamp': True, 'params': {'filters': ['age', 'gender', 'occupation']}},
-    {'name': 'LFM360K', 'timestamp': False, 'params': {'filters': ['age', 'gender', 'occupation']}},
-    {'name': 'ML25M', 'timestamp': True, 'params': []},
-    {'name': 'ML100K', 'timestamp': True, 'params': {'filters': ['age', 'gender', 'occupation']}},
+    {'name': 'LFM2B', 'timestamp': True, 'params': {}},
+    {'name': 'LFM1B', 'timestamp': True, 'params': {}},
+    {'name': 'LFM360K', 'timestamp': False, 'params': {}},
+    {'name': 'ML25M', 'timestamp': True, 'params': {}},
+    {'name': 'ML100K', 'timestamp': True, 'params': {}},
 ]
-APPROACHES = [
-    {'name': 'ALS', 'params': {'values': [{'name': 'features', 'min': 1, 'max': 1000, 'default': 10}]}},
-    {'name': 'POP',
-     'params': {'options': [{'name': 'method', 'options': ['quantile', 'rank', 'count'], 'default': 'quantile'}]}},
-    {'name': 'RAND', 'params': []}]
+
+JSONapproach = open('project/approaches.json')
+APPROACHES = json.load(JSONapproach)
+
 K_METRICS = ['P@K', 'R@K', 'HR@K', 'RR@K', 'NDCG@K']
 OTHER_METRICS = ['DCG', 'RMSE', 'MAE', 'MRR', 'Item Coverage', 'Gini index']
 DEFAULTS = {'split': 80,

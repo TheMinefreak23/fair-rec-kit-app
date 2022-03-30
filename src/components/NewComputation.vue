@@ -120,8 +120,10 @@ async function initForm() {
             name="approach"
             plural="Recommender approaches"
             selectName="an approach"
-            :options="options.approaches"
+            :options="[].concat(options.approaches.libraries[0].recommenders,options.approaches.libraries[0].recommenders,options.approaches.libraries[1].recommenders,options.approaches.libraries[2].recommenders)"
           />
+          
+          
 
           <!--User can select the amount of recommendations per user -->
           <b-form-group label="Select number of recommendations per user:">
@@ -132,7 +134,8 @@ async function initForm() {
               v-model="form.recommendations"
             ></b-form-input>
             <p>{{ form.recommendations }}</p>
-            <!--  No longer feasible from a back-end perspective -Bug V22H-194<b-form-checkbox
+            <!--  No longer feasible from a back-end perspective -Bug V22H-194
+              <b-form-checkbox
               v-model="form.includeRatedItems"
               buttons
               button-variant="outline-primary"

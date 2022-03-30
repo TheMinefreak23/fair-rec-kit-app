@@ -19,7 +19,7 @@ async function sendMockData() {
         tags : randomWords()
     }
 
-    console.log('xd')
+    console.log(randomWords())
 
     const requestOptions = {
         method: 'POST',
@@ -43,7 +43,7 @@ function randomWord(){
 
 function randomWords(){
     var array = []
-    for (let i = 0; i < rand(10); i++) {
+    for (let i = 0; i < 5; i++) {
         array[i] = randomWord()
     }
     return array
