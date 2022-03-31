@@ -22,6 +22,7 @@ const page = ref(0)
 const index = ref(0)
 const ascending = ref(true)
 
+
 watch(
   () => store.queue,
   (newQueue, oldQueue) => {
@@ -58,10 +59,6 @@ async function getUserRecs() {
 
   const response = await fetch('http://localhost:5000/all-results/result', requestOptions)
   data.value = (await response.json())
-}
-
-function log(){
-  console.log("hi2");
 }
 
 //Loads more data, keeps track of which "page" of data user is on.

@@ -71,6 +71,7 @@ async function removeEntry() {
 }
 
 const sorted = computed(() => {
+  console.log(props.results)
   if(!props.pagination)
     return sort(sortindex.value)
   else
