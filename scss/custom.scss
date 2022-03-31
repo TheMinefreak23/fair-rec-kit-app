@@ -1,34 +1,12 @@
-// Custom.scss
-// Option A: Include all of Bootstrap
-
-// Include any default variable overrides here (though functions won't be available)
-$primary:       #ff0000;
-$secondary:     #00ff44;
-$success:       $green;
-$info:          $cyan;
-$warning:       $yellow;
-$danger:        $red;
-$light:         $gray-100;
-$dark:          $gray-900;
-
-$enable-extended-color-palette: true;
-
-
-@import "../node_modules/bootstrap/scss/bootstrap";
-@import "bootstrap/scss/utilities";
-
-// Then add additional custom code here
-$utilities: map-merge(
-  $utilities,
-  (
-      "background-color": (
-        property: background-color,
-        class: bg,
-        values: map-merge(
-        $theme-colors,
-        (
-          "red": #ff0000
-        )
-      )
-    )
-  );
+custom.scss
+/* import only the necessary Bootstrap files */
+@import "bootstrap/scss/functions"; 
+@import "bootstrap/scss/variables";
+/* -------begin customization-------- */
+/* change the primary theme color to red */
+$theme-colors: (
+  primary: red;
+);
+/* -------end customization-------- */
+/* finally, import Bootstrap to set the changes! */
+@import "../node_modules/scss/bootstrap/bootstrap";
