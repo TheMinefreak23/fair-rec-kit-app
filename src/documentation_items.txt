@@ -21,7 +21,11 @@ I'm also a comment actually.
 
 {
 <name> LFM2B </name>
-<definition> Last FM 2 Billion dataset is a corpus of Music Listening Events for Music Recommendation and </definition>
+<definition> Last FM 2 Billion dataset is a corpus of Music Listening Events for Music Recommendation and. 
+Next. paragraph.
+
+Paragraph with extra newline.
+</definition>
 <link> Retrieval.eeeeeeee </link>
 <other1> http://www.cp.jku.at/datasets/LFM-2b/ </other1>
 }
