@@ -4,10 +4,11 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
 import Table from './Table.vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 
 import mockdata from '../../api/mock/1647818279_HelloWorld/results-table.json'
 import { store } from '../store.js'
+import { formatResult } from '../helpers/resultFormatter'
 
 const props = defineProps({ headers: Array })
 
@@ -18,6 +19,13 @@ const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
 const data = ref([])
 
+watch(
+  () => store.queue,
+  (newQueue, oldQueue) => {
+    if (newQueue.length < oldQueue.length) getCalculation()
+  }
+)
+
 function makeHeaders(result) {
   //console.log(result)
   const headers = Object.keys(result).map((key) => ({
@@ -25,6 +33,16 @@ function makeHeaders(result) {
   }))
   //console.log(headers)
   return headers
+}
+
+// GET request: Ask server for latest calculation
+async function getCalculation() {
+  const response = await fetch('http://localhost:5000/computation/calculation')
+  const data = await response.json()
+  console.log(data)
+  if (Object.keys(data).length === 0)
+    store.currentResult = formatResult(data.calculation)
+  console.log(store.currentResult)
 }
 
 async function getUserRecs() {
