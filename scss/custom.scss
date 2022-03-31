@@ -1,26 +1,16 @@
-// Required
-@import "../node_modules/bootstrap/scss/bootstrap";
-@import "../node_modules/bootstrap/scss/functions";
+// Custom.scss
+// Option A: Include all of Bootstrap
 
-// Default variable overrides
-$primary: #000;
-$danger: #ff4136;
+// Include any default variable overrides here (though functions won't be available)
 
-// Create your own map
-$custom-colors: (
-  "custom-color": #900
+$primary: #000000;
+$danger: #000000;
+
+$theme-colors: (
+  "primary": $primary,
+  "danger": $danger
 );
 
-// Merge the maps
-$theme-colors: map-merge($theme-colors, $custom-colors);
-
-// Required
-@import "../node_modules/bootstrap/scss/variables";
-@import "../node_modules/bootstrap/scss/mixins";
-@import "../node_modules/bootstrap/scss/root";
-
-// Optional Bootstrap components here
-@import "../node_modules/bootstrap/scss/reboot";
-@import "../node_modules/bootstrap/scss/type";
-// etc
 @import "../node_modules/bootstrap/scss/bootstrap";
+
+// Then add additional custom code here
