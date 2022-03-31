@@ -23,7 +23,7 @@ b-tab.success {
 
 <template>
   <div class="bg-dark nav justify-content-center py-2">
-    <img src="/RecCoonLogo.png" class="" style="height: 50px" />
+    <img src="/RecCoonLogo.png" style="height: 50px" />
     <h1 class="text-white my-0 p-0">FairRecKit</h1>
   </div>
   <div class="nav-center">
