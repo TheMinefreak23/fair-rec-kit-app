@@ -18,6 +18,9 @@ const computation_name = ref('computation1')
 const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
 const data = ref([])
+const page = ref(0)
+const index = ref(0)
+const ascending = ref(true)
 
 watch(
   () => store.queue,
@@ -46,11 +49,42 @@ async function getCalculation() {
 }
 
 async function getUserRecs() {
-  const response = await fetch(
-    'http://localhost:5000/all-results/result/?start=0'
-  )
-  data.value = await response.json()
-  console.log(data.value)
+
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ start: page.value , sortindex: index.value, ascending: ascending.value}),
+  }
+
+  const response = await fetch('http://localhost:5000/all-results/result', requestOptions)
+  data.value = (await response.json())
+}
+
+function log(){
+  console.log("hi2");
+}
+
+//Loads more data, keeps track of which "page" of data user is on.
+function loadMore(increase){
+  if(!increase && page.value > 0)
+    page.value--
+  else if(increase)
+    page.value++
+  else
+    page.value = 0
+  getUserRecs()
+}
+
+function paginationSort(indexVar){ 
+  //When sorting on the same column twice in a row, switch to descending.
+  if(index.value === indexVar){
+    ascending.value = !ascending.value
+  }
+
+  //When sorting, start at page 0 again to see either highest or lowest, passing on which column is sorted.
+  index.value = indexVar
+  page.value = 0
+  getUserRecs()  
 }
 
 function handleScroll() {
@@ -75,7 +109,7 @@ onMounted(() => {
 
   <p>
     Tags:
-    <tags v-for="tag in mockdata.tags"> {{ tag }} </tags>
+    <div v-for="tag in mockdata.tags"> {{ tag }} </div>
   </p>
 
   <div class="container">
@@ -117,15 +151,22 @@ onMounted(() => {
   <div class="container">
     <div class="row">
       <div class="col-6">
-        <Table
-          v-on:scroll.passive="handleScroll"
-          :results="data"
-          :headers="headers_rec"
-          :removable="false"
-        />
+          <Table 
+            :results="data" 
+            :headers="headers_rec" 
+            pagination
+            @paginationSort="(i) => paginationSort(i)"
+            @loadMore="(increase) => loadMore(increase)" 
+            />
       </div>
       <div class="col-6">
-        <Table :results="data" :headers="headers_rec" :removable="false" />
+          <Table 
+          :results="data" 
+          :headers="headers_rec" 
+          pagination
+          @paginationSort="(i) => paginationSort(i)"
+          @loadMore="(increase) => loadMore(increase)" 
+          />
       </div>
     </div>
   </div>

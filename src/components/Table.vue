@@ -5,7 +5,7 @@ import sortBy from 'just-sort-by'
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
-const emit = defineEmits(['loadResult', 'edit'])
+const emit = defineEmits(['loadResult', 'edit', 'loadMore', 'paginationSort'])
 const props = defineProps({
   overview: Boolean,
   results: Array,
@@ -14,6 +14,7 @@ const props = defineProps({
   removable: Boolean,
   serverFile: String,
   serverFile2: String,
+  pagination: Boolean
 })
 
 const deleteModalShow = ref(false)
@@ -69,7 +70,12 @@ async function removeEntry() {
   })
 }
 
-const sorted = computed(() => sort(sortindex.value))
+const sorted = computed(() => {
+  if(!props.pagination)
+    return sort(sortindex.value)
+  else
+    return props.results
+  })
 
 const sortindex = ref(0)
 const descending = ref(false)
@@ -79,18 +85,15 @@ function sort(i) {
     return Object.values(o)[i]
   })
 
-  if (descending.value) {
-    return res.reverse()
-  }
-  return res
+function setsorting(i){
+    if(i === sortindex.value){
+        descending.value = !descending.value
+    }
+    sortindex.value = i
+    emit('paginationSort', i)
 }
 
-function setsorting(i) {
-  if (i === sortindex.value) {
-    descending.value = !descending.value
-  }
-  sortindex.value = i
-}
+
 </script>
 
 <template>
@@ -190,4 +193,6 @@ function setsorting(i) {
       </b-tr>
     </b-tbody>
   </b-table-simple>
+  <b-button v-if="pagination" @click="$emit('loadMore', false)" variant="outline-primary">Show previous 20 items</b-button>
+  <b-button v-if="pagination" @click="$emit('loadMore', true)" variant="outline-primary">Show next 20 items</b-button>
 </template>
