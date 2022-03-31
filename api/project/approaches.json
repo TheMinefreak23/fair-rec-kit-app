@@ -1,50 +1,50 @@
 {
     "libraries": [
         {
-            "name": "Elliot",
-            "recommenders": [
+            "text": "Elliot",
+            "options": [
                 {
-                    "name": "FunkSVD",
+                    "text": "FunkSVD",
                     "params": {
                         "values": [
                             {
-                                "name": "epochs",
+                                "text": "epochs",
                                 "min": 1,
                                 "max": 50,
                                 "default": 10
                             },
                             {
-                                "name": "batch_size",
+                                "text": "batch_size",
                                 "min": 100,
                                 "max": 10000,
                                 "default": 512
                             },
                             {
-                                "name": "factors",
+                                "text": "factors",
                                 "min": 1,
                                 "max": 100,
                                 "default": 10
                             },
                             {
-                                "name": "lr",
+                                "text": "lr",
                                 "min": 0.0001,
                                 "max": 1.0,
                                 "default": 0.001
                             },
                             {
-                                "name": "reg_w",
+                                "text": "reg_w",
                                 "min": 0.0001,
                                 "max": 1.0,
                                 "default": 0.1
                             },
                             {
-                                "name": "reg_b",
+                                "text": "reg_b",
                                 "min": 0.0001,
                                 "max": 1.0,
                                 "default": 0.001
                             },
                             {
-                                "name": "seed",
+                                "text": "seed",
                                 "min": 0,
                                 "max": 9223372036854775807,
                                 "default": null
@@ -54,11 +54,11 @@
                     }
                 },
                 {
-                    "name": "ItemKNN",
+                    "text": "ItemKNN",
                     "params": {
                         "values": [
                             {
-                                "name": "neighbours",
+                                "text": "neighbours",
                                 "min": 1,
                                 "max": 50,
                                 "default": 40
@@ -66,7 +66,7 @@
                         ],
                         "options": [
                             {
-                                "name": "similarity",
+                                "text": "similarity",
                                 "options": [
                                     "cosine",
                                     "adjusted",
@@ -80,7 +80,7 @@
                                 "default": "cosine"
                             },
                             {
-                                "name": "implementation",
+                                "text": "implementation",
                                 "options": [
                                     "aiolli",
                                     "classical"
@@ -91,53 +91,53 @@
                     }
                 },
                 {
-                    "name": "MultiVAE",
+                    "text": "MultiVAE",
                     "params": {
                         "values": [
                             {
-                                "name": "batch_size",
+                                "text": "batch_size",
                                 "min": 100,
                                 "max": 10000,
                                 "default": 512
                             },
                             {
-                                "name": "epochs",
+                                "text": "epochs",
                                 "min": 1,
                                 "max": 50,
                                 "default": 10
                             },
                             {
-                                "name": "lr",
+                                "text": "lr",
                                 "min": 0.0001,
                                 "max": 1.0,
                                 "default": 0.001
                             },
                             {
-                                "name": "reg_lambda",
+                                "text": "reg_lambda",
                                 "min": 0.0001,
                                 "max": 1.0,
                                 "default": 0.01
                             },
                             {
-                                "name": "intermediate_dim",
+                                "text": "intermediate_dim",
                                 "min": 100,
                                 "max": 1000,
                                 "default": 600
                             },
                             {
-                                "name": "latent_dim",
+                                "text": "latent_dim",
                                 "min": 100,
                                 "max": 500,
                                 "default": 200
                             },
                             {
-                                "name": "dropout_keep",
+                                "text": "dropout_keep",
                                 "min": 0.0,
                                 "max": 1.0,
                                 "default": 1.0
                             },
                             {
-                                "name": "seed",
+                                "text": "seed",
                                 "min": 0,
                                 "max": 9223372036854775807,
                                 "default": null
@@ -147,24 +147,24 @@
                     }
                 },
                 {
-                    "name": "MostPop",
+                    "text": "MostPop",
                     "params": {
                         "values": [],
                         "options": []
                     }
                 },
                 {
-                    "name": "PureSVD",
+                    "text": "PureSVD",
                     "params": {
                         "values": [
                             {
-                                "name": "factors",
+                                "text": "factors",
                                 "min": 1,
                                 "max": 100,
                                 "default": 10
                             },
                             {
-                                "name": "seed",
+                                "text": "seed",
                                 "min": 0,
                                 "max": 9223372036854775807,
                                 "default": null
@@ -174,11 +174,11 @@
                     }
                 },
                 {
-                    "name": "Random",
+                    "text": "Random",
                     "params": {
                         "values": [
                             {
-                                "name": "random_seed",
+                                "text": "random_seed",
                                 "min": 0,
                                 "max": 9223372036854775807,
                                 "default": null
@@ -188,47 +188,47 @@
                     }
                 },
                 {
-                    "name": "SVDpp",
+                    "text": "SVDpp",
                     "params": {
                         "values": [
                             {
-                                "name": "epochs",
+                                "text": "epochs",
                                 "min": 1,
                                 "max": 50,
                                 "default": 10
                             },
                             {
-                                "name": "batch_size",
+                                "text": "batch_size",
                                 "min": 100,
                                 "max": 10000,
                                 "default": 512
                             },
                             {
-                                "name": "factors",
+                                "text": "factors",
                                 "min": 1,
                                 "max": 100,
                                 "default": 50
                             },
                             {
-                                "name": "lr",
+                                "text": "lr",
                                 "min": 0.0001,
                                 "max": 1.0,
                                 "default": 0.001
                             },
                             {
-                                "name": "reg_w",
+                                "text": "reg_w",
                                 "min": 0.0001,
                                 "max": 1.0,
                                 "default": 0.1
                             },
                             {
-                                "name": "reg_b",
+                                "text": "reg_b",
                                 "min": 0.0001,
                                 "max": 1.0,
                                 "default": 0.001
                             },
                             {
-                                "name": "seed",
+                                "text": "seed",
                                 "min": 0,
                                 "max": 9223372036854775807,
                                 "default": null
@@ -238,11 +238,11 @@
                     }
                 },
                 {
-                    "name": "UserKNN",
+                    "text": "UserKNN",
                     "params": {
                         "values": [
                             {
-                                "name": "neighbours",
+                                "text": "neighbours",
                                 "min": 1,
                                 "max": 50,
                                 "default": 40
@@ -250,7 +250,7 @@
                         ],
                         "options": [
                             {
-                                "name": "similarity",
+                                "text": "similarity",
                                 "options": [
                                     "cosine",
                                     "adjusted",
@@ -264,7 +264,7 @@
                                 "default": "cosine"
                             },
                             {
-                                "name": "implementation",
+                                "text": "implementation",
                                 "options": [
                                     "aiolli",
                                     "classical"
@@ -277,32 +277,32 @@
             ]
         },
         {
-            "name": "Implicit",
-            "recommenders": [
+            "text": "Implicit",
+            "options": [
                 {
-                    "name": "AlternatingLeastSquares",
+                    "text": "AlternatingLeastSquares",
                     "params": {
                         "values": [
                             {
-                                "name": "factors",
+                                "text": "factors",
                                 "min": 1,
                                 "max": 100,
                                 "default": 100
                             },
                             {
-                                "name": "iterations",
+                                "text": "iterations",
                                 "min": 1,
                                 "max": 50,
                                 "default": 15
                             },
                             {
-                                "name": "regularization",
+                                "text": "regularization",
                                 "min": 0.0001,
                                 "max": 1.0,
                                 "default": 0.01
                             },
                             {
-                                "name": "random_seed",
+                                "text": "random_seed",
                                 "min": 0,
                                 "max": 9223372036854775807,
                                 "default": null
@@ -310,7 +310,7 @@
                         ],
                         "options": [
                             {
-                                "name": "calculate_training_loss",
+                                "text": "calculate_training_loss",
                                 "options": [
                                     true,
                                     false
@@ -318,7 +318,7 @@
                                 "default": false
                             },
                             {
-                                "name": "use_cg",
+                                "text": "use_cg",
                                 "options": [
                                     true,
                                     false
@@ -326,7 +326,7 @@
                                 "default": true
                             },
                             {
-                                "name": "use_native",
+                                "text": "use_native",
                                 "options": [
                                     true,
                                     false
@@ -337,35 +337,35 @@
                     }
                 },
                 {
-                    "name": "BayesianPersonalizedRanking",
+                    "text": "BayesianPersonalizedRanking",
                     "params": {
                         "values": [
                             {
-                                "name": "factors",
+                                "text": "factors",
                                 "min": 1,
                                 "max": 100,
                                 "default": 100
                             },
                             {
-                                "name": "iterations",
+                                "text": "iterations",
                                 "min": 1,
                                 "max": 1000,
                                 "default": 100
                             },
                             {
-                                "name": "regularization",
+                                "text": "regularization",
                                 "min": 0.0001,
                                 "max": 1.0,
                                 "default": 0.01
                             },
                             {
-                                "name": "learning_rate",
+                                "text": "learning_rate",
                                 "min": 0.0001,
                                 "max": 1.0,
                                 "default": 0.01
                             },
                             {
-                                "name": "random_seed",
+                                "text": "random_seed",
                                 "min": 0,
                                 "max": 9223372036854775807,
                                 "default": null
@@ -373,7 +373,7 @@
                         ],
                         "options": [
                             {
-                                "name": "verify_negative_samples",
+                                "text": "verify_negative_samples",
                                 "options": [
                                     true,
                                     false
@@ -384,41 +384,41 @@
                     }
                 },
                 {
-                    "name": "LogisticMatrixFactorization",
+                    "text": "LogisticMatrixFactorization",
                     "params": {
                         "values": [
                             {
-                                "name": "factors",
+                                "text": "factors",
                                 "min": 1,
                                 "max": 100,
                                 "default": 30
                             },
                             {
-                                "name": "iterations",
+                                "text": "iterations",
                                 "min": 1,
                                 "max": 100,
                                 "default": 30
                             },
                             {
-                                "name": "regularization",
+                                "text": "regularization",
                                 "min": 0.0001,
                                 "max": 1.0,
                                 "default": 0.6
                             },
                             {
-                                "name": "learning_rate",
+                                "text": "learning_rate",
                                 "min": 0.0001,
                                 "max": 1.0,
                                 "default": 1.0
                             },
                             {
-                                "name": "neg_prop",
+                                "text": "neg_prop",
                                 "min": 1,
                                 "max": 50,
                                 "default": 30
                             },
                             {
-                                "name": "random_seed",
+                                "text": "random_seed",
                                 "min": 0,
                                 "max": 9223372036854775807,
                                 "default": null
@@ -430,44 +430,44 @@
             ]
         },
         {
-            "name": "LensKit",
-            "recommenders": [
+            "text": "LensKit",
+            "options": [
                 {
-                    "name": "BiasedMF",
+                    "text": "BiasedMF",
                     "params": {
                         "values": [
                             {
-                                "name": "features",
+                                "text": "features",
                                 "min": 0,
                                 "max": 50,
                                 "default": 10
                             },
                             {
-                                "name": "iterations",
+                                "text": "iterations",
                                 "min": 1,
                                 "max": 50,
                                 "default": 20
                             },
                             {
-                                "name": "user_reg",
+                                "text": "user_reg",
                                 "min": 0.0001,
                                 "max": 1.0,
                                 "default": 0.1
                             },
                             {
-                                "name": "item_reg",
+                                "text": "item_reg",
                                 "min": 0.0001,
                                 "max": 1.0,
                                 "default": 0.1
                             },
                             {
-                                "name": "damping",
+                                "text": "damping",
                                 "min": 0.0,
                                 "max": 1000.0,
                                 "default": 5.0
                             },
                             {
-                                "name": "random_seed",
+                                "text": "random_seed",
                                 "min": 0,
                                 "max": 9223372036854775807,
                                 "default": null
@@ -475,7 +475,7 @@
                         ],
                         "options": [
                             {
-                                "name": "method",
+                                "text": "method",
                                 "options": [
                                     "cd",
                                     "lu"
@@ -486,35 +486,35 @@
                     }
                 },
                 {
-                    "name": "ImplicitMF",
+                    "text": "ImplicitMF",
                     "params": {
                         "values": [
                             {
-                                "name": "features",
+                                "text": "features",
                                 "min": 3,
                                 "max": 50,
                                 "default": 10
                             },
                             {
-                                "name": "iterations",
+                                "text": "iterations",
                                 "min": 1,
                                 "max": 50,
                                 "default": 20
                             },
                             {
-                                "name": "reg",
+                                "text": "reg",
                                 "min": 0.0001,
                                 "max": 1.0,
                                 "default": 0.1
                             },
                             {
-                                "name": "weight",
+                                "text": "weight",
                                 "min": 1.0,
                                 "max": 10000.0,
                                 "default": 40.0
                             },
                             {
-                                "name": "random_seed",
+                                "text": "random_seed",
                                 "min": 0,
                                 "max": 9223372036854775807,
                                 "default": null
@@ -522,7 +522,7 @@
                         ],
                         "options": [
                             {
-                                "name": "method",
+                                "text": "method",
                                 "options": [
                                     "cg",
                                     "lu"
@@ -530,7 +530,7 @@
                                 "default": "cg"
                             },
                             {
-                                "name": "use_ratings",
+                                "text": "use_ratings",
                                 "options": [
                                     true,
                                     false
@@ -541,12 +541,12 @@
                     }
                 },
                 {
-                    "name": "PopScore",
+                    "text": "PopScore",
                     "params": {
                         "values": [],
                         "options": [
                             {
-                                "name": "score_method",
+                                "text": "score_method",
                                 "options": [
                                     "quantile",
                                     "rank",
@@ -558,11 +558,11 @@
                     }
                 },
                 {
-                    "name": "Random",
+                    "text": "Random",
                     "params": {
                         "values": [
                             {
-                                "name": "random_seed",
+                                "text": "random_seed",
                                 "min": 0,
                                 "max": 9223372036854775807,
                                 "default": null

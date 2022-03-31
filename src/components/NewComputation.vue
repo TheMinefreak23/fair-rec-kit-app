@@ -112,6 +112,7 @@ function reformat(property) {
             plural="Datasets"
             selectName="a dataset"
             :options="options.datasets"
+            required
           />
 
           <!--User can select optional filters-->
@@ -137,7 +138,7 @@ function reformat(property) {
             name="approach"
             plural="Recommender approaches"
             selectName="an approach"
-            :options="[].concat(options.approaches.libraries[0].recommenders,options.approaches.libraries[0].recommenders,options.approaches.libraries[1].recommenders,options.approaches.libraries[2].recommenders)"
+            :options="options.approaches.libraries"
           />
           
           
