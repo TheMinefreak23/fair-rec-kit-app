@@ -13,13 +13,13 @@ const groupCount = ref(1) //The minimum amount of group items is 1.
 const form = computed({
   // getter
   get() {
-    console.log(props.data)
+    //console.log(props.data)
     return props.data
   },
   // setter
   set(localValue) {
     emit('input', localValue)
-    console.log('local form change')
+    //console.log('local form change')
   },
 })
 

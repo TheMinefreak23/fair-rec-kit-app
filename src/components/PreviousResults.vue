@@ -1,11 +1,9 @@
 <script setup>
 import Table from './Table.vue'
 import { onMounted, ref, watch } from 'vue'
-import { formatResults } from '../helpers/resultFormatter.js'
+import { formatResults, formatResult } from '../helpers/resultFormatter.js'
 
 import { store } from '../store.js'
-
-const emit = defineEmits(['loadResult'])
 
 const exResults = ref([
   { id: 1, age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
@@ -21,12 +19,14 @@ const headers = ref([
   { name: 'Datasets' },
   { name: 'Approaches' },
   { name: 'Metrics' },
+  { name: '' },
 ])
 
 const ex1CurrentPage = ref(1)
 const ex1PerPage = ref(10)
 const ex1Rows = ref(100)
 
+const testMessage = ref('')
 const results = ref([])
 
 onMounted(() => {
@@ -37,14 +37,13 @@ watch(
   () => store.currentResult,
   (result) => {
     getResults()
-    console.log(result)
   }
 )
 
 async function getResults() {
   const response = await fetch('http://localhost:5000/all-results')
   const data = await response.json()
-  //console.log(data)
+  console.log(data)
   let allResults = data.all_results
   results.value = formatResults(allResults)
   //console.log(results.value)
@@ -70,8 +69,21 @@ async function loadResult(resultId) {
 async function getResult() {
   const response = await fetch(url)
   const data = await response.json()
-  store.currentResult = [data]
+  store.currentResult = formatResult(data.result)
   console.log(store.currentResult)
+}
+
+function edit(id, newName, newTags) {
+  if (newName != '') {
+    testMessage.value =
+      'Result number ' + id + 's new name is ' + newName + '. '
+  } else {
+    testMessage.value = ''
+  }
+  if (newTags != '') {
+    testMessage.value +=
+      'Result number ' + id + 's new tags are ' + newTags + '.'
+  }
 }
 </script>
 
@@ -79,30 +91,15 @@ async function getResult() {
   <div>
     <Table
       @loadResult="loadResult"
-      :overview="true"
+      @edit="edit"
       :results="results"
       :headers="headers"
       :buttonText="'Remove'"
       :removable="true"
+      :overview="true"
       :serverFile="'/all-results/delete'"
+      :serverFile2="'/all-results/edit'"
     />
-    <!--<form @submit.prevent="getResults">
-      <input v-model="toRequest" />
-      <button>request data</button>
-    </form>-->
-    <!--<b-card>
-      <div class="overflow-auto py-2">
-        <h1>Previous results</h1>
-        <b-pagination
-          v-model="ex1CurrentPage"
-          :total-rows="ex1Rows"
-          :per-page="ex1PerPage"
-          first-text="First"
-          prev-text="Prev"
-          next-text="Next"
-          last-text="Last"
-        ></b-pagination>
-      </div>
-    </b-card>-->
+    <p>{{ testMessage }}</p>
   </div>
 </template>

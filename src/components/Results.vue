@@ -21,7 +21,7 @@ Utrecht University within the Software Project course.
             </template>
 
             <!-- Mock headers for now -->
-            <Result :headers="[{ name: 'id' }, { name: 'value' }]" />
+            <Result />
           </b-tab>
 
           <b-tab title="Result1"><p>I'm Result 1</p></b-tab>
@@ -114,7 +114,7 @@ Utrecht University within the Software Project course.
           <p class="m-0"><em>01-01-22</em></p>
         </a>
       </ul>-->
-      <PreviousResults @loadResult="(resultId) => loadResult(resultId)" />
+      <PreviousResults />
     </div>
   </div>
 </template>

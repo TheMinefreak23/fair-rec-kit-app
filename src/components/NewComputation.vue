@@ -5,6 +5,7 @@ Utrecht University within the Software Project course.
 import { onMounted, ref } from 'vue'
 import FormGroupList from './FormGroupList.vue'
 import { store } from '../store.js'
+import { formatResult } from '../helpers/resultFormatter.js'
 
 const result = ref({})
 const options = ref()
@@ -31,7 +32,7 @@ async function getOptions() {
 }
 
 // POST request: Send form to server.
-function sendToServer() {
+async function sendToServer() {
   var sendForm = { ...form.value } // clone
   sendForm.approaches = reformat(form.value.approaches)
   sendForm.metrics = reformat(form.value.metrics)
@@ -43,20 +44,24 @@ function sendToServer() {
     body: JSON.stringify({ metadata: metadata.value, settings: sendForm }),
   }
   console.log(sendForm)
-  fetch('http://localhost:5000/computation/calculation', requestOptions).then(
-    () => {
-      getCalculation()
-    }
+  const response = await fetch(
+    'http://localhost:5000/computation/calculation',
+    requestOptions
   )
+  const data = await response.json()
+  store.currentResult = formatResult(data.calculation)
+  console.log(store.currentResult)
+  //getCalculation()
 }
 
+/*
 // GET request: Ask server for latest calculation
 async function getCalculation() {
   const response = await fetch('http://localhost:5000/computation/calculation')
   const data = await response.json()
-  store.currentResult = data.calculation
+  store.currentResult = formatResult(data.calculation)
   console.log(store.currentResult)
-}
+}*/
 
 async function initForm() {
   //console.log(options.value)

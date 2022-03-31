@@ -23,4 +23,20 @@ function formatMultipleItems(items) {
   return string
 }
 
-export { formatResults }
+function formatResult(result) {
+  console.log(result)
+  return {
+    name: result.metadata.name,
+    result: result.result
+      .map((combo) =>
+        combo.recs.map((rec) => ({
+          dataset: combo.dataset.name,
+          recommendation: rec.recommendation,
+          evaluation: formatMultipleItems(rec.evals), // mock
+        }))
+      )
+      .flat(),
+  }
+}
+
+export { formatResults, formatResult }

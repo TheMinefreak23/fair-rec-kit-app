@@ -18,6 +18,15 @@ const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
 const data = ref([])
 
+function makeHeaders(result) {
+  //console.log(result)
+  const headers = Object.keys(result).map((key) => ({
+    name: key,
+  }))
+  //console.log(headers)
+  return headers
+}
+
 async function getUserRecs() {
   const response = await fetch(
     'http://localhost:5000/all-results/result/?start=0'
@@ -39,7 +48,11 @@ onMounted(() => {
   <h1 class="display-2">Results</h1>
   <p class="lead">
     These are the results for your computation with the following name:
-    {{ mockdata.computation_name }}.
+    {{
+      store.currentResult.length == 0
+        ? mockdata.computation_name
+        : store.currentResult.name
+    }}.
   </p>
 
   <p>
@@ -51,28 +64,30 @@ onMounted(() => {
     <div class="row">
       <div class="col-6">
         <Table
-          :key="1"
           :results="
             store.currentResult.length == 0
               ? mockdata.body
-              : store.currentResult
+              : store.currentResult.result
           "
           :headers="
-            store.currentResult.length == 0 ? mockdata.headers : headers
+            store.currentResult.length == 0
+              ? mockdata.headers
+              : makeHeaders(store.currentResult.result[0])
           "
           :removable="false"
         />
       </div>
       <div class="col-6">
         <Table
-          :key="2"
           :results="
             store.currentResult.length == 0
               ? mockdata.body
-              : store.currentResult
+              : store.currentResult.result
           "
           :headers="
-            store.currentResult.length == 0 ? mockdata.headers : headers
+            store.currentResult.length == 0
+              ? mockdata.headers
+              : makeHeaders(store.currentResult.result[0])
           "
           :removable="false"
         />

@@ -29,7 +29,6 @@ watch(
   () => store.currentResult,
   (result) => {
     getComputations()
-    console.log(result)
   }
 )
 
@@ -41,18 +40,16 @@ async function getComputations() {
   const response = await fetch('http://localhost:5000/computation/queue')
   const data = await response.json()
 
-  //console.log(data)
+  console.log(data)
   computations.value = formatResults(data)
-  if (data != []) {
+  if (data.length != 0) {
     emit('computing')
     //console.log(computations.value)
   } else {
     emit('done')
-    alert('computations done!!!!')
+    //alert('computations done!!!!')
   }
 }
-
-var done
 </script>
 
 <template>
