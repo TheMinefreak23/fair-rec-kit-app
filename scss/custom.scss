@@ -1,12 +1,26 @@
-custom.scss
-/* import only the necessary Bootstrap files */
-@import "bootstrap/scss/functions"; 
-@import "bootstrap/scss/variables";
-/* -------begin customization-------- */
-/* change the primary theme color to red */
-$theme-colors: (
-  primary: red;
+// Required
+@import "../node_modules/bootstrap/scss/bootstrap";
+@import "../node_modules/bootstrap/scss/functions";
+
+// Default variable overrides
+$primary: #000;
+$danger: #ff4136;
+
+// Create your own map
+$custom-colors: (
+  "custom-color": #900
 );
-/* -------end customization-------- */
-/* finally, import Bootstrap to set the changes! */
-@import "../node_modules/scss/bootstrap/bootstrap";
+
+// Merge the maps
+$theme-colors: map-merge($theme-colors, $custom-colors);
+
+// Required
+@import "../node_modules/bootstrap/scss/variables";
+@import "../node_modules/bootstrap/scss/mixins";
+@import "../node_modules/bootstrap/scss/root";
+
+// Optional Bootstrap components here
+@import "../node_modules/bootstrap/scss/reboot";
+@import "../node_modules/bootstrap/scss/type";
+// etc
+@import "../node_modules/bootstrap/scss/bootstrap";
