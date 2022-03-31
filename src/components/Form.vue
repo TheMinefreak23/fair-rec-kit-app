@@ -85,7 +85,7 @@ async function initForm() {
     <b-form v-if="options" @submit="sendToServer" @reset="initForm">
       <b-row>
         <b-col class="p-0">
-          <div class="p-2 my-2 mx-1 rounded-3 bg-gray-300">
+          <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
           <!--User can select a dataset. TODO: Multiple Datasets-->
           <h3 class="text-center">Dataset</h3>
           <b-form-group label="Select a dataset">
