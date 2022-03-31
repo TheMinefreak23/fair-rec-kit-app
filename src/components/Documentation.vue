@@ -8,7 +8,39 @@ Documentation tab which shows all algorithms, metrics, datasets, etc. and their 
 
 import { ref } from 'vue'
 
-let doctext = ref('');
+let doctexthard = 
+`Item list for in documentation tab
+Only lines within curly brackets in the following format are read:
+
+{
+<name> sometext abcdef </name>
+<definition> sometext abcdef </definition>
+<link> sometext abcdef </link>
+<other1> sometext abcdef </other1>
+<other?> sometext abcdef </other?>
+}
+
+blabla I'm just a comment...
+Documentation items:
+{
+<name> test1 algorithm </name>
+<definition> test1 is a blablabla. </definition>
+<link> https://www.hiiii.com </link>
+<other1> extendable. </other1>
+I'm also a comment actually.
+}
+
+{
+<name> LFM2B </name>
+<definition> Last FM 2 Billion dataset is a corpus of Music Listening Events for Music Recommendation and. 
+Next. paragraph.
+\n\n\\n
+Paragraph with extra newline.
+</definition>
+<link> Retrieval.eeeeeeee </link>
+<other1> http://www.cp.jku.at/datasets/LFM-2b/ </other1>
+}`;
+let itemDicts = ref();
 
 /**
  * Has to be changed to internal file selector: no user input needed.
@@ -17,21 +49,22 @@ function previewFile() {
   const content = document.querySelector('.content');
   const [file] = document.querySelector('input[type=file]').files;
   const reader = new FileReader();
-
+  
   // Temporary Main
   reader.addEventListener("load", () => {
+    let doctext = "";
     // this will then display a text file
     doctext = reader.result;
-    content.innerText = doctext;
-    // console.log(doctext);
-    console.log(parse(doctext));
+    itemDicts.value = parse(doctext);
+    console.log(itemDicts);
   }, false);
 
   if (file) {
     reader.readAsText(file);
   }
 }
-
+itemDicts = parse(doctexthard);
+console.log(itemDicts);
 /**
  * Parses the content of documentation_items.txt into items.
  * @param {String} text - documentation_items.txt as one string.
@@ -111,15 +144,24 @@ function parseItem(item) {
 </script>
 
 <template>
+  <!-- b-sidebar -->
   <div class="text-center py-2 mx-5">
     <h3>Documentation</h3>
     <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea.</p>
   </div>
-  
+
   <input type="file" v-on:change=previewFile()><br>
   <p class="content"></p>
   
-  
+  <div v-for="itemDict in itemDicts" :key="itemDict">
+    <b-card>
+      <b-card-title>{{ itemDict["name"] }}</b-card-title>
+      <b-card-text>{{ itemDict["definition"] }}</b-card-text>
+      <b-link :href='itemDict["link"]'>{{ itemDict["link"] }}</b-link>
+      <br>
+      <b-button :href='itemDict["other?"]' v-if='itemDict["other?"]'>
+        {{ itemDict["other?"] }}
+      </b-button>
+    </b-card>
+  </div>
 </template>
-
-
