@@ -21,20 +21,18 @@ const headers = ref([
   { name: 'Metrics' },
 ])
 
+//Retrieve the queue when the page is loaded
 onMounted(() => {
   getComputations()
 })
 
+//Reload the queue when a new computation is added
 watch(
   () => store.currentResult,
   (result) => {
     getComputations()
   }
 )
-
-async function cancelComputation() {
-  emit('stop')
-}
 
 async function getComputations() {
   const response = await fetch('http://localhost:5000/computation/queue')
@@ -44,10 +42,8 @@ async function getComputations() {
   computations.value = formatResults(data)
   if (data.length != 0) {
     emit('computing')
-    //console.log(computations.value)
   } else {
     emit('done')
-    //alert('computations done!!!!')
   }
 }
 </script>
@@ -61,6 +57,7 @@ async function getComputations() {
       :removable="true"
       :serverFile="'/computation/queue/delete'"
     />
+    <!--Temporary test buttons-->
     <b-button @click="$emit('computing')">Computing</b-button>
     <b-button @click="$emit('done')">Done</b-button>
   </div>

@@ -89,6 +89,7 @@ def queue():
 
 
 @compute_bp.route('/queue/delete', methods=['POST'])
+#Pop the selected index from the queue
 def deleteItem():
     data = request.get_json()
     index = data.get('index')
