@@ -10,7 +10,6 @@ results_bp = Blueprint('results', __name__, url_prefix='/all-results')
 
 @results_bp.route('/', methods=['GET'])
 def results():
-    #result_storage.create_results()
     return result_storage.load_results_overview()
 
 
@@ -48,8 +47,7 @@ def delete():
 ## only get one results
 @results_bp.route('/result', methods=['GET'])
 def user_result():
-    start = request.args.get("start")
-    data = pd.read_csv('mock/1647818279_HelloWorld/1647818279_run_0/LFM-360K_0/Foo_ALS_0/ratings.tsv', sep='\t', header=None, skiprows = start, nrows = 5)
+    data = pd.read_csv('mock/1647818279_HelloWorld/1647818279_run_0/LFM-360K_0/Foo_ALS_0/ratings.tsv', sep='\t', header=None)
     results = data.to_json(orient='records')
     return results
     
