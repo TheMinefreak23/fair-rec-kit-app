@@ -7,7 +7,7 @@ const props = defineProps({
   selectName: String,
   options: Array,
   required: Boolean,
-  groups: Array,
+  nested: false,
   data: { type: Object, required: true },
 })
 
@@ -24,17 +24,19 @@ const form = computed({
     //console.log('local form change')
   },
 })
-
+const flatOptions = props.nested ? flattenOptions() : props.options
 
 // Set default values for the group parameters.
 function setParameter(i, val) {
-  let option = props.options.find((option) => option.text === val)
+  console.log(flatOptions)
+  //console.log(options)
+  let option = flatOptions.find((option) => option.text === val)
   let choices
   console.log(option.params)
   if (option.params) {
     if (option.params.values && option.params.values.length > 0) {
       choices = option.params.values
-      form.value.inputs[i] = choices.map(param => ({
+      form.value.inputs[i] = choices.map((param) => ({
         name: param.text,
         value: param.default,
       }))
@@ -42,7 +44,7 @@ function setParameter(i, val) {
 
     if (option.params.options && option.params.options.length > 0) {
       choices = option.params.options
-      form.value.selects[i] = choices.map(param => ({
+      form.value.selects[i] = choices.map((param) => ({
         name: param.text,
         value: param.default,
       }))
@@ -52,12 +54,13 @@ function setParameter(i, val) {
 
 // Get options from group index
 function getFromIndex(i) {
-  //console.log(props.options)
-  //console.log(form.value.main[i])
-  const option = props.options.find(
+  console.log(props.options)
+  console.log(form.value.main[i])
+
+  const option = flatOptions.find(
     (option) => option.text === form.value.main[i]
   )
-  //console.log(option)
+  console.log(option)
   return option
 }
 
@@ -69,6 +72,19 @@ function removeGroup(i) {
   form.value.main.splice(i, 1)
   form.value.inputs.splice(i, 1)
   form.value.selects.splice(i, 1)
+}
+
+// Flatten options API structure
+function flattenOptions() {
+  /*const options = []
+  console.log(props.options)
+  for (let api of props.options) options = [...options, ...api.options.keys()]
+  return options*/
+
+  return props.options
+    .map((api) => api.options)
+    .concat()
+    .flat()
 }
 </script>
 
@@ -103,7 +119,10 @@ function removeGroup(i) {
           "
         >
           <!--Use an input form for values.-->
-          <template v-for="(value, index) in getFromIndex(i - 1).params.values" :key="value">
+          <template
+            v-for="(value, index) in getFromIndex(i - 1).params.values"
+            :key="value"
+          >
             <b-form-group
               :label="
                 'Give a ' +
@@ -127,7 +146,10 @@ function removeGroup(i) {
           </template>
 
           <!--Use a select form for options.-->
-          <template v-for="(option, index) in getFromIndex(i - 1).params.options" :key="option">
+          <template
+            v-for="(option, index) in getFromIndex(i - 1).params.options"
+            :key="option"
+          >
             <b-form-group :label="'Choose a ' + option.text">
               <b-form-select
                 v-model="form.selects[i - 1][index].value"
@@ -149,7 +171,8 @@ function removeGroup(i) {
               @click="removeGroup(i - 1)"
               variant="danger"
               class="mb-2 mr-sm-2 mb-sm-0"
-            >X</b-button>
+              >X</b-button
+            >
           </b-form-group>
         </b-col>
       </b-row>

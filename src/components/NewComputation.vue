@@ -4,7 +4,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import { onMounted, ref } from 'vue'
 import FormGroupList from './FormGroupList.vue'
-import {sendMockData} from '../test/mockComputation.js'
+import { sendMockData } from '../test/mockComputation.js'
 import { store } from '../store.js'
 import { formatResult } from '../helpers/resultFormatter.js'
 
@@ -63,7 +63,6 @@ async function getCalculation() {
   store.currentResult = formatResult(data.calculation)
   console.log(store.currentResult)
 }*/
-
 
 async function initForm() {
   //console.log(options.value)
@@ -135,13 +134,12 @@ function reformat(property) {
 
           <FormGroupList
             v-model:data="form.approaches"
+            nested="true"
             name="approach"
             plural="Recommender approaches"
             selectName="an approach"
             :options="options.approaches.libraries"
           />
-          
-          
 
           <!--User can select the amount of recommendations per user -->
           <b-form-group label="Select number of recommendations per user:">
@@ -231,6 +229,8 @@ function reformat(property) {
         </b-col>
       </b-row>
     </b-form>
-    <b-button type="test" variant="warning" @click="sendMockData">Mock</b-button>
+    <b-button type="test" variant="warning" @click="sendMockData"
+      >Mock</b-button
+    >
   </b-card>
 </template>

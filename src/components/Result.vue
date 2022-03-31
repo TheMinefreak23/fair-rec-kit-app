@@ -28,9 +28,7 @@ function makeHeaders(result) {
 }
 
 async function getUserRecs() {
-  const response = await fetch(
-    'http://localhost:5000/all-results/result'
-  )
+  const response = await fetch('http://localhost:5000/all-results/result')
   data.value = await response.json()
   console.log(data.value)
 }
@@ -40,7 +38,7 @@ function handleScroll() {
 }
 
 onMounted(() => {
-  getUserRecs()
+  //getUserRecs()
 })
 </script>
 
