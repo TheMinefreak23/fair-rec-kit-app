@@ -124,5 +124,6 @@ function setsorting(i){
       </b-tr>
     </b-tbody>
   </b-table-simple>
-  <b-button v-if="pagination" @click="$emit('loadMore')" variant="outline-primary">Show more</b-button>
+  <b-button v-if="pagination" @click="$emit('loadMore', false)" variant="outline-primary">Show previous 20 items</b-button>
+  <b-button v-if="pagination" @click="$emit('loadMore', true)" variant="outline-primary">Show next 20 items</b-button>
 </template>

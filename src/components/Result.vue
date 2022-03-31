@@ -8,6 +8,7 @@ import { onMounted, ref } from 'vue'
 
 
 import mockdata from '../../api/mock/1647818279_HelloWorld/results-table.json'
+//import { start } from 'repl';
 
 const props = defineProps({ results: Array, headers: Array })
 
@@ -23,12 +24,15 @@ const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
 const data = ref([])
 const page = ref(0)
+const index = ref(0)
+const ascending = ref(true)
 
 async function getUserRecs() {
+
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ start: page.value }),
+    body: JSON.stringify({ start: page.value , sortindex: index.value, ascending: ascending.value}),
   }
 
   const response = await fetch('http://localhost:5000/all-results/result', requestOptions)
@@ -38,14 +42,28 @@ async function getUserRecs() {
 function log(){
   console.log("hi2");
 }
-function loadMore(){
-  console.log("button pressed");
-  page.value++
+
+//Loads more data, keeps track of which "page" of data user is on.
+function loadMore(increase){
+  if(!increase && page.value > 0)
+    page.value--
+  else if(increase)
+    page.value++
+  else
+    page.value = 0
   getUserRecs()
 }
 
-function paginationSort(index){
-  
+function paginationSort(indexVar){ 
+  //When sorting on the same column twice in a row, switch to descending.
+  if(index.value === indexVar){
+    ascending.value = !ascending.value
+  }
+
+  //When sorting, start at page 0 again to see either highest or lowest, passing on which column is sorted.
+  index.value = indexVar
+  page.value = 0
+  getUserRecs()  
 }
 
 onMounted(() => {
@@ -63,7 +81,7 @@ onMounted(() => {
 
   <p>
     Tags:
-    <div v-for="tag in mockdata.tags"> {{ tag }} </div>
+    <tag v-for="tag in mockdata.tags"> {{ tag }} </tag>
   </p>
 
   <div class="container">
@@ -72,14 +90,12 @@ onMounted(() => {
          <Table
           :results="props.results.length == 0 ? mockdata.body : props.results"
           :headers="props.results.length == 0 ? mockdata.headers : headers"
-          :removable="false"
           />
       </div>
       <div class="col-6">
          <Table
           :results="props.results.length == 0 ? mockdata.body : props.results"
           :headers="props.results.length == 0 ? mockdata.headers : headers"
-          :removable="false"
           />
       </div>
     </div>
@@ -93,18 +109,18 @@ onMounted(() => {
           <Table 
             :results="data" 
             :headers="headers_rec" 
-            :removable="false"
             pagination
-            @loadMore="() => loadMore()" 
+            @paginationSort="(i) => paginationSort(i)"
+            @loadMore="(increase) => loadMore(increase)" 
             />
       </div>
       <div class="col-6">
           <Table 
           :results="data" 
           :headers="headers_rec" 
-          :removable="false" 
           pagination
-          @loadMore="() => loadMore()" 
+          @paginationSort="(i) => paginationSort(i)"
+          @loadMore="(increase) => loadMore(increase)" 
           />
       </div>
     </div>  

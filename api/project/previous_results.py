@@ -42,7 +42,16 @@ def edit():
 def user_result():
     json = request.json
     chunksize = 20
-    reader = pd.read_csv('mock/1647818279_HelloWorld/1647818279_run_0/LFM-360K_0/Foo_ALS_0/ratings.tsv', sep='\t',
-                           header=None, skiprows=chunksize * json.get("start", 0), chunksize= chunksize, iterator=True)
-    return reader.get_chunk().to_json(orient='records')
-    
+
+    ##read mock dataframe
+    df = pd.read_csv('mock/1647818279_HelloWorld/1647818279_run_0/LFM-360K_0/Foo_ALS_0/ratings.tsv', sep='\t',
+                            header=None)
+
+    ##sort dataframe based on index and ascending or not
+    dfSorted = df.sort_values(by=df.columns[json.get("sortindex",0)], ascending=json.get("ascending"))
+
+    #getting only chunk of data
+    startrows = chunksize * json.get("start", 0)
+    endrows = startrows + chunksize
+    dfSubset = dfSorted[startrows:endrows]
+    return dfSubset.to_json(orient='records')
