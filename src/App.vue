@@ -8,6 +8,7 @@ import Results from './components/Results.vue'
 import PreviousResults from './components/PreviousResults.vue'
 import ActiveComputation from './components/ActiveComputation.vue'
 import NewComputation from './components/NewComputation.vue'
+import TestForm from './test/TestForm.vue'
 import { ref } from 'vue'
 
 const activeComputations = ref(false)
@@ -28,20 +29,20 @@ b-tab.success {
   <div class="nav-center">
     <b-tabs class="m-0 pt-2" align="center">
       <b-tab title="New Computation"> <NewComputation /></b-tab>
-      <b-tab :class="[done ? success : '']">
+      <b-tab :class="{ success: done }">
         <ActiveComputation
           @computing=";(activeComputations = true), (done = false)"
           @done=";(activeComputations = false), (done = true)"
           @stop=";(activeComputations = false), (done = false)"
         />
-        <template v-slot:title :class="[done ? success : '']">
+        <template v-slot:title :class="{ success: done }">
           <b-spinner v-if="activeComputations" small align="center"></b-spinner>
           <b-icon v-if="done" align="center" icon="check">√</b-icon>
           Active Computations
         </template>
       </b-tab>
       <b-tab title="Documentation"> <Documentation /></b-tab>
-      <b-tab title="Results" :results="results"> <Results /></b-tab>
+      <b-tab title="Results"> <Results /></b-tab>
       <b-tab title="All results"> <PreviousResults /></b-tab>
     </b-tabs>
   </div>

@@ -2,6 +2,7 @@
 # Utrecht University within the Software Project course.
 # © Copyright Utrecht University (Department of Information and Computing Sciences)
 import json
+import threading
 import time
 import datetime
 
@@ -63,30 +64,20 @@ def params():
 # Route: Do a calculation.
 @compute_bp.route('/calculation', methods=['GET', 'POST'])
 def calculate():
+    computation_thread = threading.Thread(target=calculate_first)
     response = {}
     if request.method == 'POST':
-        response = {'status': 'success'}
         data = request.get_json()
         settings = data.get('settings')
         print(data)
         append_queue(data.get('metadata'), settings)
 
-        result = []
-        # Mocks result computation. TODO compute result with libs here
-        datasets = settings['datasets']
-        for dataset in datasets:
-            recs = []
-            for approach in settings['approaches']:
-                recommendation = {'recommendation': recommend(dataset['name'], approach), 'evals': []}
-                for metric in settings['metrics']:
-                    evaluation = evaluate(approach, metric)
-                    recommendation['evals'].append({'name': metric['name'], 'evaluation': evaluation})
-                recs.append(recommendation)
-            result.append({'dataset': dataset, 'recs': recs})
+        # Handle computation thread.
+        computation_thread.start()
 
-        result_storage.save_result(data.get('metadata'), settings, result)
-        
-    else:
+    #   response = {'status': 'success'}
+    #else:
+        computation_thread.join()
         response['calculation'] = result_storage.newest_result()
         print(response)
     return response
@@ -110,14 +101,39 @@ def recommend(dataset, approach):
 
 
 def evaluate(approach, metric):
-    return len(approach['name']) * len(metric['name']) * len(metric['parameter']['name'])  # Mock
+    value = len(approach['name']) * len(metric['name'])
+    parameter = metric['parameter']
+    if parameter:
+        value *= parameter['name']  # Mock
 
 
 # add a computation request to the queue
 def append_queue(metadata, settings):
     timestamp = time.time()
     now = datetime.datetime.now()
-    currentDt = now.strftime('%Y-%m-%dT%H:%M:%S') + ('-%02d' % (now.microsecond / 10000))
-    current_request = {'timestamp': {'stamp': timestamp, 'datetime': currentDt}, 'metadata': metadata,
+    current_dt = now.strftime('%Y-%m-%dT%H:%M:%S') + ('-%02d' % (now.microsecond / 10000))
+    current_request = {'timestamp': {'stamp': timestamp, 'datetime': current_dt}, 'metadata': metadata,
                        'settings': settings}
     computation_queue.append(current_request)
+
+
+def calculate_first():
+    time.sleep(5) # Mock computation duration.
+
+    computation = computation_queue.pop() # Get the oldest computation from the queue.
+
+    settings = computation['settings']
+    # Mocks result computation. TODO compute result with libs here
+    result = []
+    datasets = settings['datasets']
+    for dataset in datasets:
+        recs = []
+        for approach in settings['approaches']:
+            recommendation = {'recommendation': recommend(dataset, approach), 'evals': []}
+            for metric in settings['metrics']:
+                evaluation = evaluate(approach, metric)
+                recommendation['evals'].append({'name': metric['name'], 'evaluation': evaluation})
+            recs.append(recommendation)
+        result.append({'dataset': dataset, 'recs': recs})
+
+    result_storage.save_result(computation,result)

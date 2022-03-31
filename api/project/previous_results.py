@@ -23,7 +23,7 @@ def result_by_id():
         response = {'status': 'success'}
 
     else: # GET request
-        response = result_storage.current_result
+        response = {'result' : result_storage.current_result}
 
     return response
 
@@ -31,10 +31,12 @@ def result_by_id():
 @results_bp.route('/edit', methods=['POST'])
 def edit():
     data = request.get_json()
-    print(data)
-    #data.get('email')
-    #data.get('name')
-    #data.get('tag')
+    index = data.get('index')
+    new_name = data.get('new_name')
+    new_tags = data.get('new_tags')
+    new_email = data.get('new_email')
+    result_storage.edit_result(index, new_name, new_tags, new_email)
+    return "Edited index"
 
 @results_bp.route('/delete', methods=['POST'])
 def delete():

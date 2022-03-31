@@ -5,7 +5,7 @@ import sortBy from 'just-sort-by'
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
-const emit = defineEmits(['loadResult'])
+const emit = defineEmits(['loadResult', 'edit'])
 const props = defineProps({
   overview: Boolean,
   results: Array,
@@ -13,9 +13,14 @@ const props = defineProps({
   buttonText: String,
   removable: Boolean,
   serverFile: String,
+  serverFile2: String,
 })
 
-const modalShow = ref(false)
+const deleteModalShow = ref(false)
+const editModalShow = ref(false)
+const newName = ref('')
+const newTags = ref('')
+const newEmail = ref('')
 const selectedEntry = ref(0)
 const subheaders = computed(() => {
   const result = []
@@ -29,6 +34,27 @@ const subheaders = computed(() => {
   }
   return result
 })
+
+async function editEntry() {
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      index: selectedEntry.value,
+      new_name: newName.value,
+      new_tags: newTags.value,
+      new_email: newEmail.value,
+    }),
+  }
+  fetch('http://localhost:5000' + props.serverFile2, requestOptions).then(
+    () => {
+      console.log('Item edited succesfully')
+    }
+  )
+  newName.value = ''
+  newTags.value = ''
+  newEmail.value = ''
+}
 
 async function removeEntry() {
   let entry = selectedEntry.value
@@ -69,8 +95,8 @@ function setsorting(i) {
 
 <template>
   <b-modal
-    id="popup"
-    v-model="modalShow"
+    id="deletion-modal"
+    v-model="deleteModalShow"
     title="Remove entry?"
     ok-title="Yes"
     ok-variant="danger"
@@ -79,6 +105,38 @@ function setsorting(i) {
   >
     <p>Are you sure you want to remove this entry from the list?</p>
   </b-modal>
+  <b-modal
+    id="edit-modal"
+    v-model="editModalShow"
+    title="Editing results"
+    size="lg"
+    @ok="editEntry"
+  >
+    <h6>Please type in the new values. Blank fields will be left unchanged.</h6>
+    Name:
+    <b-form-input v-model="newName" placeholder="New name"></b-form-input>
+    <br />
+    Tags:
+    <b-form-input v-model="newTags" placeholder="New tags"></b-form-input>
+    <br />
+    E-mail:
+    <b-form-input
+      v-model="newEmail"
+      placeholder="New e-mail"
+      type="email"
+    ></b-form-input>
+    <br />
+    Color (this doesn't do anything):
+    <!-- I may have gotten a little carried away -->
+    <b-form-input type="color"></b-form-input>
+    <br />
+    Date (this doesn't do anything):
+    <b-form-input type="date"></b-form-input>
+    <br />
+    Credit card number (this doesn't do anything):
+    <b-form-input type="password"></b-form-input>
+  </b-modal>
+
   <b-table-simple hover striped responsive>
     <b-thead head-variant="dark">
       <b-tr>
@@ -113,11 +171,21 @@ function setsorting(i) {
             {{ value }}
           </b-td>
         </b-td>
+
+        <b-button
+          v-if="overview"
+          pill
+          @click=";(editModalShow = !editModalShow), (selectedEntry = index)"
+          >Edit</b-button
+        >
+        &nbsp;
         <b-button
           v-if="removable"
           variant="danger"
-          @click=";(modalShow = !modalShow), (selectedEntry = index)"
-          >{{ buttonText }}</b-button
+          @click="
+            ;(deleteModalShow = !deleteModalShow), (selectedEntry = index)
+          "
+          >Delete</b-button
         >
       </b-tr>
     </b-tbody>
