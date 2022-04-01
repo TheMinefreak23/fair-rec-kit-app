@@ -1,12 +1,14 @@
-# This program has been developed by students from the bachelor Computer Science at
+  # This program has been developed by students from the bachelor Computer Science at
 # Utrecht University within the Software Project course.
 # © Copyright Utrecht University (Department of Information and Computing Sciences)
 import csv  # TODO fix this import
 import json
 import os
+from os import walk
 from csv import writer
 import time
 import datetime
+import pandas as pd
 
 # Results overview format
 # timestamp (ID)
@@ -16,10 +18,13 @@ import datetime
 # Result detail format
 # timestamp (ID), per dataset: recommendations result, per recs result: metrics evaluations
 
+
+
 current_result = {}
 results_overview_path = 'results.json'
 mock_results_overview_path = 'mock/results_overview.json'
 mock_results_path = 'mock/results.json'
+results_root_folder = 'mock/'
 recommendations_path = 'recs.json'
 evaluations_path = 'evals.json'
 
@@ -37,16 +42,28 @@ def save_result(metadata, settings, result):
 
 
 def result_by_id(id):
-    results = load_json(mock_results_path)
 
+    results_overview = load_json(results_overview_path)
+    current_result_overview = {}
     # Filter: Loop through all results and find the one with the matching ID.
-    for result in results['results']:
-        if result['id'] == id:
-            print(result)
-            global current_result
-            current_result = result
+    for result in results_overview['all-results']:
+        if result['timestamp']['datetime'] == id:
+            current_result_overview = result
 
-    print(current_result)
+    resultList = []
+    current_name = current_result_overview['metadata']['name']
+    relative_path = results_root_folder + id + "_" + current_name
+    #loops through all the subdirectories, and thus - runs, of a certain calculation
+    for subdir in [f.path for f in os.scandir(relative_path) if f.is_dir()]:
+        run_overview_name = os.path.basename(os.path.normpath(subdir) + "_overview.json"
+        run_overview = load_json(subdir + "/" + run_overview_name)
+        for run_result in run_overview["results"]:
+            resultList.append(run_result)
+
+    print(resultList)
+    #Currently, this function only returns a list of runs, their subresults (splitted on different datasets, algorithms and filters)
+    #and finally for each of these results a path to the evaluation and ratings file
+    #TODO instead of returning a path, this function should convert the tsv files at each path to JSON, then return the JSON instead
 
     # current_result = results_df.filter(like='')
 
