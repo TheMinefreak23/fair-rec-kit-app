@@ -1,0 +1,49 @@
+FILE STRUCTURE FOR RESULTS, AS CURRENTLY IN 'MOCK' SUBDIRECTORY, SHOULD FOLLOW THE GENERAL STRUCTURE DESCRIBED BELOW:
++---------------------------------------------------------------------------------------------------------------------------+
+In the root folder there should be a JSON named results_overview.json
+this JSON contains a general overview of calculations and their parameters, but should not contain results
++---------------------------------------------------------------------------------------------------------------------------+
+Each calculation has its own subdirectory inside the root folder with name:
+
+{CALCULATION ID}_{CALCULATION NAME}
+
+as an example, in the mock data, the Hello World calculation has path:
+mock\1647818279_HelloWorld
++---------------------------------------------------------------------------------------------------------------------------+
+each calculation subdirectory contains one subfolder per run with name:
+
+{CALCULATION_ID}_run_{RUN_INDEX}
+
+in the mock data the first run has path:
+mock\1647818279_HelloWorld\1647818279_run_0
++---------------------------------------------------------------------------------------------------------------------------+
+In each of these subfolders is a JSON file describing the location of the result files:
+
+{CALCULATION_ID}_run_{RUN_INDEX}_overview.json
+
+Each pair of dataset-algorithm, plus any results that were created using filters, has an individual entry in the JSON
+
++===========================================================================================================================+
+
+{
+    "overview": [
+        {
+            "name":"LMF-360K - Elliot, n=50",
+            "evaluation_path": "LFM-360K_0\\Elliot_UserKnn_0\\evaluation.tsv",
+            "ratings_path": "LFM-360K_0\\Elliot_UserKnn_0\\ratings_n=50.tsv"
+        },
+        {
+            "name": "LFM-360K - Foo_ALS",
+            "evaluation_path": "LFM-360K_0\\Foo_ALS_0\\evaluation.tsv",
+            "ratings.tsv": "LFM-360K_0\\Foo_ALS_0\\ratings.tsv"
+        }
+    ]
+}
+
++===========================================================================================================================+
+
+In this example in mock, the "overview" array has 2 entries because there are 2 different sets of results.
+
+THE FILE STRUCTURE WITHIN THE SUBFOLDERS FOR EACH RUN CAN BE STRUCTURED IN WHATEVER WAY YOU WANT
+AS LONG AS THE ENTRIES IN THE OVERVIEW ARRAY POINT TO THE CORRECT LOCATIONS
+

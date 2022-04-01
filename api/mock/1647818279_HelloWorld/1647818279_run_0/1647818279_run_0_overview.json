@@ -1,0 +1,14 @@
+{
+    "overview": [
+        {
+            "name":"LMF-360K - Elliot, n=50",
+            "evaluation_path": "LFM-360K_0\\Elliot_UserKnn_0\\evaluation.tsv",
+            "ratings_path": "LFM-360K_0\\Elliot_UserKnn_0\\ratings_n=50.tsv"
+        },
+        {
+            "name": "LFM-360K - Foo_ALS",
+            "evaluation_path": "LFM-360K_0\\Foo_ALS_0\\evaluation.tsv",
+            "ratings.tsv": "LFM-360K_0\\Foo_ALS_0\\ratings.tsv"
+        }
+    ]
+}
