@@ -73,25 +73,12 @@ async function getResult() {
   console.log(store.currentResult)
 }
 
-function edit(id, newName, newTags) {
-  if (newName != '') {
-    testMessage.value =
-      'Result number ' + id + 's new name is ' + newName + '. '
-  } else {
-    testMessage.value = ''
-  }
-  if (newTags != '') {
-    testMessage.value +=
-      'Result number ' + id + 's new tags are ' + newTags + '.'
-  }
-}
 </script>
 
 <template>
   <div>
     <Table
       @loadResult="loadResult"
-      @edit="edit"
       :results="results"
       :headers="headers"
       :buttonText="'Remove'"

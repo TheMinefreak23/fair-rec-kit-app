@@ -5,7 +5,7 @@ import sortBy from 'just-sort-by'
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
-const emit = defineEmits(['loadResult', 'edit', 'loadMore', 'paginationSort'])
+const emit = defineEmits(['loadResult', 'loadMore', 'paginationSort'])
 const props = defineProps({
   overview: Boolean,
   results: Array,
