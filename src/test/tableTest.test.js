@@ -22,3 +22,39 @@ test('deleteTableItem', async () => {
   // check if the modal shows up
   getByTitle('Remove entry?')
 })
+
+test('editTableItem', async () => {
+  const {getByText, getByTitle} = render(Table, {
+    props: {
+      overview: true,
+      results: [{foo: 2, bar: 2}],
+      headers: [{ name: 'hello'}, { name: 'world'}],
+      buttonText: 'button',
+      removable: false,
+    },
+  })
+
+  const button = getByText('Edit')
+
+  await fireEvent.click(button)
+
+  getByTitle('Editing results')
+})
+
+// test('viewResult', async () => {
+//   const {getByText, getByTitle} = render(Table, {
+//     props: {
+//       overview: true,
+//       results: [{foo: 3, bar: 3}],
+//       headers: [{ name: 'whats'}, { name: 'up'}],
+//       buttonText: 'button',
+//       removable: false,
+//     },
+//   })
+
+//   const button = getByText('View result')
+
+//   await fireEvent.click(button)
+
+
+// })
