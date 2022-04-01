@@ -152,7 +152,7 @@ function reformat(property) {
         <b-col>
           <!--Input for train/test split-->
           <h2>Train/test-split</h2>
-          <b-form-group label="Select test/train split:">
+          <b-form-group label="Select train/test split:">
             <b-form-input
               type="range"
               min="0"

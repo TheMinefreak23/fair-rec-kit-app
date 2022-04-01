@@ -49,7 +49,7 @@ def delete():
 @results_bp.route('/result', methods=['POST'])
 def user_result():
     json = request.json
-    chunksize = 20
+    chunksize = json.get("amount", 20)
 
     ##read mock dataframe
     df = pd.read_csv('mock/1647818279_HelloWorld/1647818279_run_0/LFM-360K_0/Foo_ALS_0/ratings.tsv', sep='\t',

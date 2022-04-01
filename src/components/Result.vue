@@ -21,6 +21,7 @@ const data = ref([])
 const page = ref(0)
 const index = ref(0)
 const ascending = ref(true)
+const entryAmount = ref(20)
 
 
 watch(
@@ -54,7 +55,7 @@ async function getUserRecs() {
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ start: page.value , sortindex: index.value, ascending: ascending.value}),
+    body: JSON.stringify({ start: page.value , sortindex: index.value, ascending: ascending.value, amount: entryAmount.value}),
   }
 
   const response = await fetch('http://localhost:5000/all-results/result', requestOptions)
@@ -62,7 +63,9 @@ async function getUserRecs() {
 }
 
 //Loads more data, keeps track of which "page" of data user is on.
-function loadMore(increase){
+function loadMore(increase, amount){
+  entryAmount.value = parseInt(amount)
+  console.log(entryAmount.value)
   if(!increase && page.value > 0)
     page.value--
   else if(increase)
@@ -153,7 +156,7 @@ onMounted(() => {
             :headers="headers_rec" 
             pagination
             @paginationSort="(i) => paginationSort(i)"
-            @loadMore="(increase) => loadMore(increase)" 
+            @loadMore="(increase, amount) => loadMore(increase, amount)" 
             />
       </div>
       <div class="col-6">
@@ -162,7 +165,7 @@ onMounted(() => {
           :headers="headers_rec" 
           pagination
           @paginationSort="(i) => paginationSort(i)"
-          @loadMore="(increase) => loadMore(increase)" 
+          @loadMore="(increase, amount) => loadMore(increase, amount)" 
           />
       </div>
     </div>
