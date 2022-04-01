@@ -45,11 +45,12 @@ def delete():
     result_storage.delete_result(index)
     return "Removed index"
   
-## only get one results
+## get recommender results per user
 @results_bp.route('/result', methods=['POST'])
 def user_result():
     json = request.json
     chunksize = json.get("amount", 20)
+    chunksize = int(chunksize)
 
     ##read mock dataframe
     df = pd.read_csv('mock/1647818279_HelloWorld/1647818279_run_0/LFM-360K_0/Foo_ALS_0/ratings.tsv', sep='\t',
@@ -59,7 +60,16 @@ def user_result():
     dfSorted = df.sort_values(by=df.columns[json.get("sortindex",0)], ascending=json.get("ascending"))
 
     #getting only chunk of data
-    startrows = chunksize * json.get("start", 0)
-    endrows = startrows + chunksize
+    startrows = json.get("start", 0)
+    startrows = int(startrows)
+    endrows= startrows + chunksize
+    endrows = int(endrows)
+
+    #determine if at the end of the dataset
+    columns_number = len(dfSorted)
+    if(endrows > columns_number):
+        endrows = columns_number
+
+    #return part of table that should be shown
     dfSubset = dfSorted[startrows:endrows]
     return dfSubset.to_json(orient='records')

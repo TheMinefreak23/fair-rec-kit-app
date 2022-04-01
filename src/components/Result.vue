@@ -18,7 +18,7 @@ const computation_name = ref('computation1')
 const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
 const data = ref([])
-const page = ref(0)
+const startIndex = ref(0)
 const index = ref(0)
 const ascending = ref(true)
 const entryAmount = ref(20)
@@ -50,28 +50,37 @@ async function getCalculation() {
   console.log(store.currentResult)
 }
 
+//POST request: Ask server for next part of user recommendation table.
 async function getUserRecs() {
 
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ start: page.value , sortindex: index.value, ascending: ascending.value, amount: entryAmount.value}),
+    body: JSON.stringify({ start: startIndex.value , sortindex: index.value, ascending: ascending.value, amount: entryAmount.value}),
   }
 
   const response = await fetch('http://localhost:5000/all-results/result', requestOptions)
   data.value = (await response.json())
 }
 
-//Loads more data, keeps track of which "page" of data user is on.
+//Loads more data in the table after user asks for more data.
 function loadMore(increase, amount){
-  entryAmount.value = parseInt(amount)
-  console.log(entryAmount.value)
-  if(!increase && page.value > 0)
-    page.value--
+  amount = parseInt(amount)  
+
+  //Determine the index for where the next page starts, based on how many entries were shown before.
+  if(!increase && startIndex.value > 0)
+    startIndex.value -=entryAmount.value
+      if(startIndex.value < 0)
+      startIndex.value = 0
+
   else if(increase)
-    page.value++
+    startIndex.value += entryAmount.value
+
   else
-    page.value = 0
+    startIndex.value = 0
+  
+  //Update amount to new number of entries that are shown.
+  entryAmount.value = amount 
   getUserRecs()
 }
 
@@ -81,9 +90,9 @@ function paginationSort(indexVar){
     ascending.value = !ascending.value
   }
 
-  //When sorting, start at page 0 again to see either highest or lowest, passing on which column is sorted.
+  //When sorting, start at startIndex 0 again to see either highest or lowest, passing on which column is sorted.
   index.value = indexVar
-  page.value = 0
+  startIndex.value = 0
   getUserRecs()  
 }
 
