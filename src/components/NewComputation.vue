@@ -84,7 +84,7 @@ function reformat(property) {
     if (property.inputs[i] != null) parameter = property.inputs[i]
     else if (property.selects[i] != null) parameter = property.selects[i]
     choices[i] = { name: property.main[i], parameter: parameter }
-    console.log('choices:' + choices.value)
+    //console.log('choices:' + choices)
   }
   return choices
 }

@@ -30,7 +30,7 @@ watch(
   () => store.queue,
   (data, oldQueue) => {
     // queue got bigger
-    console.log(data)
+    //console.log(data)
     //if (data.length > oldQueue.length) getComputations()
     if (data.length != 0) {
       getComputations()

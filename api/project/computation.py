@@ -137,6 +137,7 @@ def evaluate(approach, metric):
     parameter = metric['parameter']
     if parameter:
         value *= parameter['name']  # Mock
+    return value
 
 
 # add a computation request to the queue

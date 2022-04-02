@@ -14,7 +14,7 @@ const props = defineProps({
   removable: Boolean,
   serverFile: String,
   serverFile2: String,
-  pagination: Boolean
+  pagination: Boolean,
 })
 
 const entryAmount = ref(20)
@@ -73,11 +73,10 @@ async function removeEntry() {
 
 const sorted = computed(() => {
   console.log(props.results)
-  if(!props.pagination)
-    return sort(sortindex.value)
-  else
-    return props.results
-  })
+
+  if (!props.pagination) return sort(sortindex.value)
+  else return props.results
+})
 
 const sortindex = ref(0)
 const descending = ref(false)
@@ -88,15 +87,13 @@ function sort(i) {
   })
 }
 
-function setsorting(i){
-    if(i === sortindex.value){
-        descending.value = !descending.value
-    }
-    sortindex.value = i
-    emit('paginationSort', i)
+function setsorting(i) {
+  if (i === sortindex.value) {
+    descending.value = !descending.value
+  }
+  sortindex.value = i
+  emit('paginationSort', i)
 }
-
-
 </script>
 
 <template>
@@ -196,26 +193,27 @@ function setsorting(i){
       </b-tr>
     </b-tbody>
   </b-table-simple>
-  <b-button 
-    v-if="pagination" 
-    @click="$emit('loadMore', false, entryAmount)" 
+  <b-button
+    v-if="pagination"
+    @click="$emit('loadMore', false, entryAmount)"
     variant="outline-primary"
     :disabled="entryAmount < 1"
-    >
-    Show previous {{entryAmount}} items
+  >
+    Show previous {{ entryAmount }} items
   </b-button>
-  <b-button 
-    v-if="pagination" 
-    @click="$emit('loadMore', true, entryAmount)" 
+  <b-button
+    v-if="pagination"
+    @click="$emit('loadMore', true, entryAmount)"
     variant="outline-primary"
     :disabled="entryAmount < 1"
-    >
-    Show next {{entryAmount}} items
+  >
+    Show next {{ entryAmount }} items
   </b-button>
-  <b-form-input 
-    v-model="entryAmount" 
+  <b-form-input
+    v-model="entryAmount"
     v-if="pagination"
     :state="entryAmount >= 1"
     type="number"
-    >20</b-form-input>
+    >20</b-form-input
+  >
 </template>
