@@ -7,12 +7,12 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig({
   plugins: [
     vue({
-      template: {
+      options: {
         compilerOptions: {
-          //isCustomElement: (tag) => tag.startsWith('b-'),
+          isCustomElement: (tag) => tag.startsWith('b-'),
         },
       },
-    }), 
+    }),
   ],
   resolve: {
     alias: {

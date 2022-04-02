@@ -2,7 +2,7 @@
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import FormGroupList from './FormGroupList.vue'
 import { store } from '../store.js'
 import { formatResult } from '../helpers/resultFormatter.js'
@@ -38,6 +38,7 @@ async function sendToServer() {
   sendForm.metrics = reformat(form.value.metrics)
   sendForm.datasets = reformat(form.value.datasets)
   sendForm.filters = reformat(form.value.filters)
+
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -48,20 +49,12 @@ async function sendToServer() {
     'http://localhost:5000/computation/calculation',
     requestOptions
   )
-  const data = await response.json()
-  store.currentResult = formatResult(data.calculation)
-  console.log(store.currentResult)
-  //getCalculation()
-}
 
-/*
-// GET request: Ask server for latest calculation
-async function getCalculation() {
-  const response = await fetch('http://localhost:5000/computation/calculation')
-  const data = await response.json()
-  store.currentResult = formatResult(data.calculation)
-  console.log(store.currentResult)
-}*/
+  // Update queue
+  const data = response.json()
+  //if (data.status == 'success') getComputations()
+  store.queue = data
+}
 
 async function initForm() {
   //console.log(options.value)
@@ -91,7 +84,7 @@ function reformat(property) {
     if (property.inputs[i] != null) parameter = property.inputs[i]
     else if (property.selects[i] != null) parameter = property.selects[i]
     choices[i] = { name: property.main[i], parameter: parameter }
-    console.log('choices:' + choices.value)
+    //console.log('choices:' + choices)
   }
   return choices
 }
@@ -159,7 +152,7 @@ function reformat(property) {
         <b-col>
           <!--Input for train/test split-->
           <h2>Train/test-split</h2>
-          <b-form-group label="Select test/train split:">
+          <b-form-group label="Select train/test split:">
             <b-form-input
               type="range"
               min="0"

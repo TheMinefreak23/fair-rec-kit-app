@@ -40,6 +40,31 @@ FILTERS = [{'name': 'Artist Gender', 'params': {'options': [{'name': 'Gender', '
 computation_queue = []
 
 
+def calculate_first():
+    time.sleep(5)  # Mock computation duration.
+
+    computation = computation_queue.pop()  # Get the oldest computation from the queue.
+
+    settings = computation['settings']
+    # Mocks result computation. TODO compute result with libs here
+    result = []
+    datasets = settings['datasets']
+    for dataset in datasets:
+        recs = []
+        for approach in settings['approaches']:
+            recommendation = {'recommendation': recommend(dataset, approach), 'evals': []}
+            for metric in settings['metrics']:
+                evaluation = evaluate(approach, metric)
+                recommendation['evals'].append({'name': metric['name'], 'evaluation': evaluation})
+            recs.append(recommendation)
+        result.append({'dataset': dataset, 'recs': recs})
+
+    result_storage.save_result(computation, result)
+
+
+computation_thread = threading.Thread(target=calculate_first)
+
+
 # Route: Send selection options.
 @compute_bp.route('/options', methods=['GET'])
 def params():
@@ -65,7 +90,6 @@ def params():
 # Route: Do a calculation.
 @compute_bp.route('/calculation', methods=['GET', 'POST'])
 def calculate():
-    computation_thread = threading.Thread(target=calculate_first)
     response = {}
     if request.method == 'POST':
         data = request.get_json()
@@ -73,12 +97,11 @@ def calculate():
         print(data)
         append_queue(data.get('metadata'), settings)
 
-        # Handle computation thread.
-        computation_thread.start()
-
-    #   response = {'status': 'success'}
-    #else:
-        computation_thread.join()
+        #response = {'status': 'success'}
+        response = json.dumps(computation_queue)
+    else:
+        if computation_thread.is_alive():
+            computation_thread.join()
         response['calculation'] = result_storage.newest_result()
         print(response)
     return response
@@ -86,6 +109,14 @@ def calculate():
 
 @compute_bp.route('/queue', methods=['GET', 'POST'])
 def queue():
+    # Handle computation thread.
+    global computation_thread
+    if computation_thread.is_alive():
+        computation_thread.join()
+    elif computation_queue:
+        print('Starting computation thread')
+        computation_thread = threading.Thread(target=calculate_first)
+        computation_thread.start()
     return json.dumps(computation_queue)
 
 
@@ -106,6 +137,7 @@ def evaluate(approach, metric):
     parameter = metric['parameter']
     if parameter:
         value *= parameter['name']  # Mock
+    return value
 
 
 # add a computation request to the queue
@@ -116,25 +148,3 @@ def append_queue(metadata, settings):
     current_request = {'timestamp': {'stamp': timestamp, 'datetime': current_dt}, 'metadata': metadata,
                        'settings': settings}
     computation_queue.append(current_request)
-
-
-def calculate_first():
-    time.sleep(5) # Mock computation duration.
-
-    computation = computation_queue.pop() # Get the oldest computation from the queue.
-
-    settings = computation['settings']
-    # Mocks result computation. TODO compute result with libs here
-    result = []
-    datasets = settings['datasets']
-    for dataset in datasets:
-        recs = []
-        for approach in settings['approaches']:
-            recommendation = {'recommendation': recommend(dataset, approach), 'evals': []}
-            for metric in settings['metrics']:
-                evaluation = evaluate(approach, metric)
-                recommendation['evals'].append({'name': metric['name'], 'evaluation': evaluation})
-            recs.append(recommendation)
-        result.append({'dataset': dataset, 'recs': recs})
-
-    result_storage.save_result(computation,result)

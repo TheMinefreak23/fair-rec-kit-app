@@ -1,4 +1,4 @@
 // store.js
 import { reactive } from 'vue'
 
-export const store = reactive({ currentResult: [] })
+export const store = reactive({ currentResult: [], queue: [] })
