@@ -85,6 +85,7 @@ function sort(i) {
   const res = sortBy(props.results, function (o) {
     return Object.values(o)[i]
   })
+  return res
 }
 
 function setsorting(i) {
