@@ -24,6 +24,8 @@ const newName = ref('')
 const newTags = ref('')
 const newEmail = ref('')
 const selectedEntry = ref(0)
+const sortindex = ref(0)
+const descending = ref(false)
 const subheaders = computed(() => {
   const result = []
 
@@ -78,16 +80,27 @@ const sorted = computed(() => {
   else return props.results
 })
 
-const sortindex = ref(0)
-const descending = ref(false)
-
+/**
+ * Sorts data based on index.
+ * @param {Int}	i	- i is the coumn index on which is being sorted. 
+ * @return	{[Object]} Sorted array of results.
+ */
 function sort(i) {
   const res = sortBy(props.results, function (o) {
     return Object.values(o)[i]
   })
+  if(descending.value){
+    return res.reverse()
+  }
+  
   return res
 }
 
+/**
+ * Sets index on which is being sorted and determines if the
+ * sorting is ascending or descending.
+ * @param {Int}	i	- i is the coumn index on which is being sorted. 
+ */
 function setsorting(i) {
   if (i === sortindex.value) {
     descending.value = !descending.value
