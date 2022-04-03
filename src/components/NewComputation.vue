@@ -25,7 +25,7 @@ onMounted(async () => {
 
 // GET request: Get available options for selection from server
 async function getOptions() {
-  const response = await fetch('http://localhost:5000/computation/options')
+  const response = await fetch('/api/computation/options')
   const data = await response.json()
   options.value = data.options
   console.log(options.value)
@@ -45,10 +45,7 @@ async function sendToServer() {
     body: JSON.stringify({ metadata: metadata.value, settings: sendForm }),
   }
   console.log(sendForm)
-  const response = await fetch(
-    'http://localhost:5000/computation/calculation',
-    requestOptions
-  )
+  const response = await fetch('/api/computation/calculation', requestOptions)
 
   // Update queue
   const data = response.json()

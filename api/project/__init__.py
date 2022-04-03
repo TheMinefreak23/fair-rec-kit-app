@@ -21,12 +21,12 @@ def create_app(test_config=None):
     CORS(app)
 
     # Route: Main.
-    @app.route('/', methods=['GET'])
+    @app.route('/api', methods=['GET'])
     def main():
         return {"msg": "Server online."}
 
     # Route: Do a sanity check.
-    @app.route('/greeting', methods=['GET'])
+    @app.route('/api/greeting', methods=['GET'])
     def greet():
         return {"greeting": "Greetings from the backend :)"}
 

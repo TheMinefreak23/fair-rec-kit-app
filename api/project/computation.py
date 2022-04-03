@@ -10,7 +10,7 @@ from flask import (Blueprint, request)
 
 from . import result_storage
 
-compute_bp = Blueprint('computation', __name__, url_prefix='/computation')
+compute_bp = Blueprint('computation', __name__, url_prefix='/api/computation')
 
 # constants
 DATASETS = [
