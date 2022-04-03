@@ -94,7 +94,7 @@ function reformat(property) {
 
 <template>
   <div class="py-2 mx-5 bg-primary">
-    <b-card>
+    <b-card class="block">
       <!--This form contains all the necessary parameters for a user to submit a request for a computation-->
       <b-form v-if="options" @submit="sendToServer" @reset="initForm">
         <b-row>
