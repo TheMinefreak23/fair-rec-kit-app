@@ -4,103 +4,180 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
 import Table from './Table.vue'
-import { ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 
-const results = ref([
-  {
-    dataset: 'LFM-1b',
-    algorithm: 'ALS',
-    fst_female: '6.7717',
-    fst_male: '0.6142',
-    hellinger_distance: '0.0988',
-    precision_p1: '0.4505',
-    precision_p10: '0.2997',
-  },
-  {
-    dataset: 'LFM-1b',
-    algorithm: 'POP',
-    fst_female: '0.1325',
-    fst_male: '1.7299',
-    hellinger_distance: '0.1577',
-    precision_p1: '0.1033',
-    precision_p10: '0.0919',
-  },
-])
+import mockdata from '../../api/mock/1647818279_HelloWorld/results-table.json'
+import { store } from '../store.js'
+import { formatResult } from '../helpers/resultFormatter'
+import { API_URL } from '../api'
 
-const headers = ref([
-  { name: 'Dataset' },
-  { name: 'Algorithm' },
-  { name: 'Average position', subheaders: ['1st female', '1st male'] },
-  { name: 'Hellinger Distance' },
-  { name: 'Precision', subheaders: ['P@1', 'P@10'] },
-])
+const props = defineProps({ headers: Array })
 
-const recommendations = ref([
-  {
-    user: '1',
-    dataset: 'LFM-1b',
-    algorithm: 'ALS',
-    item_1: 'Rolling in the deep',
-    item_2: 'Umbrella',
-    item_3: 'Firework',
-  },
-  {
-    user: '2',
-    dataset: 'LFM-1b',
-    algorithm: 'ALS',
-    item_1: 'Umbrella',
-    item_2: 'Rolling in the deep',
-    item_3: 'Heat waves',
-  },
-  {
-    user: '1',
-    dataset: 'LFM-1b',
-    algorithm: 'POP',
-    item_1: 'Umbrella',
-    item_2: 'Heat waves',
-    item_3: 'Umbrella',
-  },
-  {
-    user: '2',
-    dataset: 'LFM-1b',
-    algorithm: 'POP',
-    item_1: 'Umbrella',
-    item_2: 'Rolling in de deep',
-    item_3: 'Firework',
-  },
-])
-
-const headers_rec = ref([
-  { name: 'User' },
-  { name: 'Dataset' },
-  { name: 'Algorithm' },
-  { name: 'Item 1' },
-  { name: 'Item 2' },
-  { name: 'Item 3' },
-])
+const headers_rec = ref([{ name: 'User' }, { name: 'Item' }, { name: 'Score' }])
 
 const computation_name = ref('computation1')
 const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
+
+const data = ref([])
+const startIndex = ref(0)
+const index = ref(0)
+const ascending = ref(true)
+const entryAmount = ref(20)
+
+
+watch(
+  () => store.queue,
+  (newQueue, oldQueue) => {
+    if (newQueue.length < oldQueue.length) getCalculation()
+  }
+)
+
+function makeHeaders(result) {
+  //console.log(result)
+  const headers = Object.keys(result).map((key) => ({
+    name: key,
+  }))
+  //console.log(headers)
+  return headers
+}
+
+// GET request: Ask server for latest calculation
+async function getCalculation() {
+  const response = await fetch(API_URL + '/computation/calculation')
+  const data = await response.json()
+  console.log(data)
+  if (Object.keys(data).length === 0)
+    store.currentResult = formatResult(data.calculation)
+  console.log(store.currentResult)
+}
+
+//POST request: Ask server for next part of user recommendation table.
+async function getUserRecs() {
+
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ start: startIndex.value , sortindex: index.value, ascending: ascending.value, amount: entryAmount.value}),
+  }
+
+  const response = await fetch(API_URL + '/all-results/result', requestOptions)
+  data.value = (await response.json())
+}
+
+//Loads more data in the table after user asks for more data.
+function loadMore(increase, amount){
+  amount = parseInt(amount)  
+
+  //Determine the index for where the next page starts, based on how many entries were shown before.
+  if(!increase && startIndex.value > 0)
+    startIndex.value -=entryAmount.value
+      if(startIndex.value < 0)
+      startIndex.value = 0
+
+  else if(increase)
+    startIndex.value += entryAmount.value
+
+  else
+    startIndex.value = 0
+  
+  //Update amount to new number of entries that are shown.
+  entryAmount.value = amount 
+  getUserRecs()
+}
+
+function paginationSort(indexVar){ 
+  //When sorting on the same column twice in a row, switch to descending.
+  if(index.value === indexVar){
+    ascending.value = !ascending.value
+  }
+
+  //When sorting, start at startIndex 0 again to see either highest or lowest, passing on which column is sorted.
+  index.value = indexVar
+  startIndex.value = 0
+  getUserRecs()  
+}
+
+function handleScroll() {
+  console.log('test')
+}
+
+onMounted(() => {
+  //getUserRecs()
+})
 </script>
 
 <template>
   <h1 class="display-2">Results</h1>
   <p class="lead">
     These are the results for your computation with the following name:
-    {{ computation_name }}.
+    {{
+      store.currentResult.length == 0
+        ? mockdata.computation_name
+        : store.currentResult.name
+    }}.
   </p>
 
   <p>
     Tags:
-    <tags v-for="tag in computation_tags"> {{ tag }} </tags>
+    <div v-for="tag in mockdata.tags"> {{ tag }} </div>
   </p>
 
   <div class="container">
-    <Table :results="results" :headers="headers" />
+    <div class="row">
+      <div class="col-6">
+        <Table
+          :results="
+            store.currentResult.length == 0
+              ? mockdata.body
+              : store.currentResult.result
+          "
+          :headers="
+            store.currentResult.length == 0
+              ? mockdata.headers
+              : makeHeaders(store.currentResult.result[0])
+          "
+          :removable="false"
+        />
+      </div>
+      <div class="col-6">
+        <Table
+          :results="
+            store.currentResult.length == 0
+              ? mockdata.body
+              : store.currentResult.result
+          "
+          :headers="
+            store.currentResult.length == 0
+              ? mockdata.headers
+              : makeHeaders(store.currentResult.result[0])
+          "
+          :removable="false"
+        />
+      </div>
+    </div>
   </div>
 
   <h6>Recommended items per user for dataset x and algorithm y</h6>
   <div class="container">
-    <Table :results="recommendations" :headers="headers_rec" />
+    <div class="row">
+      <div class="col-6">
+          <Table 
+            :results="data" 
+            :headers="headers_rec" 
+            pagination
+            @paginationSort="(i) => paginationSort(i)"
+            @loadMore="(increase, amount) => loadMore(increase, amount)" 
+            />
+      </div>
+      <div class="col-6">
+          <Table 
+          :results="data" 
+          :headers="headers_rec" 
+          pagination
+          @paginationSort="(i) => paginationSort(i)"
+          @loadMore="(increase, amount) => loadMore(increase, amount)" 
+          />
+      </div>
+    </div>
   </div>
 </template>

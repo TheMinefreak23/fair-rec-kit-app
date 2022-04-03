@@ -1,6 +1,11 @@
 <script setup>
 import Table from './Table.vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
+import { formatResults, formatResult } from '../helpers/resultFormatter.js'
+
+import { store } from '../store.js'
+import { API_URL } from '../api'
+
 const exResults = ref([
   { id: 1, age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
   { id: 2, age: 21, first_name: 'Larsen', last_name: 'Shaw' },
@@ -9,69 +14,82 @@ const exResults = ref([
 ])
 const exHeaders = ref(['id', 'age', 'first_name', 'last_name'])
 const headers = ref([
+  { name: 'ID' },
   { name: 'Date Time' },
   { name: 'Name' },
   { name: 'Datasets' },
   { name: 'Approaches' },
   { name: 'Metrics' },
+  { name: '' },
 ])
 
 const ex1CurrentPage = ref(1)
 const ex1PerPage = ref(10)
 const ex1Rows = ref(100)
 
-//const returnMessage = ref('')
+const testMessage = ref('')
 const results = ref([])
 
 onMounted(() => {
   getResults()
 })
 
+watch(
+  () => store.currentResult,
+  (result) => {
+    getResults()
+  }
+)
+
 async function getResults() {
-  const response = await fetch('http://localhost:5000/all-results')
+  const response = await fetch(API_URL + '/all-results')
   const data = await response.json()
-  //returnMessage.value = 'the results have been gotten'
   console.log(data)
   let allResults = data.all_results
-  for (let i in allResults) {
-    let approach = allResults[i].settings.approaches[0]
-    let apprName = approach ? approach.name : 'NULL'
-    let metric = allResults[i].settings.metrics[0]
-    let metricName = metric ? metric.name : 'NULL'
+  results.value = formatResults(allResults)
+  //console.log(results.value)
+}
 
-    results.value[i] = {
-      datetime: allResults[i].timestamp.datetime,
-      name: allResults[i].metadata.name,
-      dataset: allResults[i].settings.datasets[0],
-      approach: apprName,
-      metric: metricName,
-    }
+const url = API_URL + '/all-results/result-by-id'
+
+// Request full result from result ID (timestamp)
+async function loadResult(resultId) {
+  console.log('Result ID:' + resultId)
+
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: resultId }),
   }
+  fetch(url, requestOptions).then(() => {
+    getResult()
+  })
+}
+
+// Get result back from result ID request
+async function getResult() {
+  const response = await fetch(url)
+  const data = await response.json()
+  store.currentResult = formatResult(data.result)
+  console.log(store.currentResult)
 }
 </script>
 
 <template>
-  <div>
-    <Table :results="results" :headers="headers" />
-    <!--<form @submit.prevent="getResults">
-      <input v-model="toRequest" />
-      <button>request data</button>
-    </form>-->
-    <b-button @click="getResults">Request results</b-button>
-    <p>{{ returnMessage }}</p>
-    <!--<b-card>
-      <div class="overflow-auto py-2">
-        <h1>Previous results</h1>
-        <b-pagination
-          v-model="ex1CurrentPage"
-          :total-rows="ex1Rows"
-          :per-page="ex1PerPage"
-          first-text="First"
-          prev-text="Prev"
-          next-text="Next"
-          last-text="Last"
-        ></b-pagination>
-      </div>
-    </b-card>-->
-  </div>
+  <b-card>
+    <div class="text-center py-2 mx-5">
+      <h3>Previous results</h3>
+      <Table
+        @loadResult="loadResult"
+        :results="results"
+        :headers="headers"
+        :buttonText="'Remove'"
+        :removable="true"
+        :overview="true"
+        :serverFile="API_URL + '/all-results/delete'"
+        :serverFile2="API_URL + '/all-results/edit'"
+      />
+      <p>{{ testMessage }}</p>
+    </div>
+  </b-card>
 </template>

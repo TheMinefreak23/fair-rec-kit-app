@@ -17,34 +17,90 @@ import datetime
 # timestamp (ID), per dataset: recommendations result, per recs result: metrics evaluations
 
 current_result = {}
-results_path = 'results.json'
+results_overview_path = 'results.json'
+mock_results_overview_path = 'mock/results_overview.json'
+mock_results_path = 'mock/results.json'
 recommendations_path = 'recs.json'
 evaluations_path = 'evals.json'
 
-def save_result(metadata, settings, result):
-    timestamp = time.time()
-    now = datetime.datetime.now()
-    currentDt = now.strftime('%Y-%m-%dT%H:%M:%S') + ('-%02d' % (now.microsecond / 10000))
 
-    global current_result  # TODO use class instead of global?
-    current_result = {'timestamp': {'stamp': timestamp, 'datetime' : currentDt}, 'metadata': metadata, 'settings': settings, 'result': result}
-    update_results(current_result)
+def save_result(computation, result):
+    global current_result
+    computation['result'] = result
+    current_result = computation
+    update_results_overview(current_result)
+
+
+def result_by_id(id):
+    results = load_json(results_overview_path)
+
+    # Filter: Loop through all results and find the one with the matching ID.
+    for result in results['all_results']:
+        if result['timestamp']['stamp'] == id:
+            print(result)
+            global current_result
+            current_result = result
+
+    print(current_result)
+
+    # current_result = results_df.filter(like='')
 
 
 def newest_result():
     return current_result
 
 
-def load_results():
-    with open(results_path, 'r') as file:
+def load_json(path):
+    with open(path, 'r') as file:
         return json.load(file)  # Load existing data into a dict.
 
 
-def update_results(new_result):
-    create_results()
-    file_data = load_results()
+def load_results_overview():
+    create_results_overview()
+    return load_json(results_overview_path)
+
+
+def update_results_overview(new_result):
+    create_results_overview()
+    file_data = load_json(results_overview_path)
     file_data['all_results'].append(new_result)
-    with open(results_path, 'w') as file:  # Open the file in write mode.
+    with open(results_overview_path, 'w') as file:  # Open the file in write mode.
+        # Rewind file pointer's position.
+        file.seek(0)
+        # Store it as json data.
+        json.dump(file_data, file, indent=4)
+
+
+def delete_result(index):
+    create_results_overview()
+    file_data = load_results_overview()
+    file_data['all_results'].pop(index)
+    with open(results_overview_path, 'w') as file:  # Open the file in write mode.
+        # Rewind file pointer's position.
+        file.seek(0)
+        # Store it as json data.
+        json.dump(file_data, file)
+
+
+def edit_result(index, new_name, new_tags, new_email):
+    create_results_overview()
+    file_data = load_results_overview()
+    to_edit_result = file_data['all_results'].pop(index)
+
+    if new_name != '':  # Don't change the name if the input field has been left empty
+        to_edit_result['metadata']['name'] = new_name
+        print(to_edit_result['metadata']['name'])
+    if new_tags != '':  # Don't change the tags if the input field has been left empty
+        to_edit_result['metadata']['tags'] = new_tags
+        print(to_edit_result['metadata']['tags'])
+    if new_email != '':  # Don't change the e-mail if the input field has been left empty
+        to_edit_result['metadata']['email'] = new_email
+        print(to_edit_result['metadata']['email'])
+
+    # TODO Add more editable values
+    file_data['all_results'].insert(index, to_edit_result)
+
+    with open(results_overview_path, 'w') as file:  # Open the file in write mode.
         # Rewind file pointer's position.
         file.seek(0)
         # Store it as json data.
@@ -52,7 +108,7 @@ def update_results(new_result):
 
 
 # Create results file if it doesn't exist yet or is empty
-def create_results():
-    if not os.path.exists(results_path) or os.stat(results_path).st_size == 0:
-        with open(results_path, 'w') as file:  # Open the file in write mode.
-            json.dump({'all_results': []}, file)
+def create_results_overview():
+    if not os.path.exists(results_overview_path) or os.stat(results_overview_path).st_size == 0:
+        with open(results_overview_path, 'w') as file:  # Open the file in write mode.
+            json.dump({'all_results': []}, file, indent=4)
