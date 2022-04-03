@@ -1,16 +1,12 @@
-// Custom.scss
-// Option A: Include all of Bootstrap
+@import 'bootstrap/scss/functions';
 
-// Include any default variable overrides here (though functions won't be available)
-
+// Override default variables.
 $primary: #000000;
-$danger: #000000;
+$secondary: #5900ff;
+$danger: #ffffff;
 
-$theme-colors: (
-  "primary": $primary,
-  "danger": $danger
-);
+// Default variable overrides
+$body-bg: rgb(143, 143, 143);
+$body-color: #111;
 
-@import "../node_modules/bootstrap/scss/bootstrap";
-
-// Then add additional custom code here
+@import 'bootstrap/scss/bootstrap';
