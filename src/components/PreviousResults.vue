@@ -76,7 +76,8 @@ async function getResult() {
 </script>
 
 <template>
-  <div>
+  <div class="text-center py-2 mx-5">
+    <h3>Previous results</h3>
     <Table
       @loadResult="loadResult"
       :results="results"

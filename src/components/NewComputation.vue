@@ -93,6 +93,7 @@ function reformat(property) {
 </script>
 
 <template>
+  <div class="py-2 mx-5">
   <b-card>
     <!--This form contains all the necessary parameters for a user to submit a request for a computation-->
     <b-form v-if="options" @submit="sendToServer" @reset="initForm">
@@ -125,6 +126,7 @@ function reformat(property) {
               :options="[{ text: 'None (default)', value: null }]"
             ></b-form-select>
           </b-form-group>
+          </div>
 
           <FormGroupList
             v-model:data="form.approaches"
@@ -154,10 +156,11 @@ function reformat(property) {
             >-->
           </b-form-group>
         </b-col>
-        <b-col>
+        <b-col class="p-0">
           <!--Input for train/test split-->
-          <h2>Train/test-split</h2>
-          <b-form-group label="Select train/test split:">
+          <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
+          <h3 class="text-center">Train/test-split</h3>
+          <b-form-group label="Select test/train split:">
             <b-form-input
               type="range"
               min="0"
@@ -166,8 +169,10 @@ function reformat(property) {
               id="customRange"
               v-model="form.split"
             ></b-form-input>
-            <p>Train: {{ form.split }}</p>
-            <p>Test: {{ 100 - form.split }}</p>
+            <div class="text-center">
+              <p class="d-inline px-5"><strong>Train: </strong><i>{{ form.split }}</i></p>
+              <p class="d-inline px-5"><strong>Test: </strong><i>{{ 100 - form.split }}</i></p>
+            </div>
           </b-form-group>
 
           <!--User can choose between a random and time-based train/testsplit-->
@@ -177,8 +182,10 @@ function reformat(property) {
               <b-form-radio value="timesplit">Timesplit</b-form-radio>
             </b-form-radio-group>
           </b-form-group>
+          </div>
 
           <!--Input for metrics, user can add infinite metrics -->
+          <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
           <FormGroupList
             v-model:data="form.metrics"
             name="metric"
@@ -194,12 +201,14 @@ function reformat(property) {
               :options="[{ text: 'Global (default)', value: null }]"
             ></b-form-select>
           </b-form-group>
+          </div>
 
           <!-- Input for metadata such as:
      Computation Name
      Optional Tags
-          Optional Email for notification-->
-          <h2>Meta</h2>
+     Optional Email for notification -->
+          <div class="p-2 m-1 rounded-3 bg-secondary">
+          <h3 class="text-center">Meta</h3>
           <b-form-group label="Enter name for computation">
             <b-form-input
               placeholder="New Computation"
@@ -217,14 +226,17 @@ function reformat(property) {
               v-model="metadata.email"
             ></b-form-input>
           </b-form-group>
-
-          <b-button type="submit" variant="primary">Send</b-button>
-          <b-button type="reset" variant="danger">Reset</b-button>
+          </div>
         </b-col>
+        <div class="d-flex justify-content-center">
+            <b-button class="mx-1" type="reset" variant="danger">Reset</b-button>
+            <b-button class="mx-1" type="submit" variant="primary">Send</b-button>
+          </div>
       </b-row>
     </b-form>
     <b-button type="test" variant="warning" @click="sendMockData"
       >Mock</b-button
     >
   </b-card>
+  </div>
 </template>

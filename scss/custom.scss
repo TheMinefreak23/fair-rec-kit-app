@@ -1,0 +1,12 @@
+@import 'bootstrap/scss/functions';
+
+// Override default variables.
+$primary: #000000;
+$secondary: #5900ff;
+$danger: #ffffff;
+
+// Default variable overrides
+$body-bg: rgb(143, 143, 143);
+$body-color: #111;
+
+@import 'bootstrap/scss/bootstrap';
