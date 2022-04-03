@@ -34,12 +34,181 @@ I'm also a comment actually.
 <name> LFM2B </name>
 <definition> Last FM 2 Billion dataset is a corpus of Music Listening Events for Music Recommendation and. 
 Next. paragraph.
-\n\n\\n
+
 Paragraph with extra newline.
 </definition>
 <link> Retrieval.eeeeeeee </link>
 <other1> http://www.cp.jku.at/datasets/LFM-2b/ </other1>
-}`;
+}
+
+Datasets:
+{
+<name> LFM2B </name>
+<definition> sometext </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> LFM1B </name>
+<definition> sometext </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> LFM360K </name>
+<definition> sometext </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> ML25M </name>
+<definition> sometext </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> ML100K </name>
+<definition> sometext </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+------
+
+Recommender approaches:
+
+Elliot:
+{
+<name> FunkSVD </name>
+<definition> sometext </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> ItemKNN </name>
+<definition> sometext </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> MultiVAE </name>
+<definition> sometext </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> MostPop </name>
+<definition> sometext </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> PureSVD </name>
+<definition> sometext </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> Random </name>
+<definition> sometext </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> SVDpp </name>
+<definition> sometext </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> UserKNN </name>
+<definition> sometext </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+Implicit:
+{
+<name> AlternatingLeastSquares </name>
+<definition> sometext </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> BayesianPersonalizedRanking </name>
+<definition> sometext </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> LogisticMatrixFactorization </name>
+<definition> sometext </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+Lenskit:
+{
+<name> BiasedMF </name>
+<definition> sometext </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> ImplicitMF </name>
+<definition> sometext </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> PopScore </name>
+<definition> sometext </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> Random</name>
+<definition> sometext </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+`;
 let itemDicts = ref();
 
 /**
