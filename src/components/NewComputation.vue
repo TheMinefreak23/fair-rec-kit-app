@@ -6,6 +6,7 @@ import { onMounted, ref, watch } from 'vue'
 import FormGroupList from './FormGroupList.vue'
 import { store } from '../store.js'
 import { formatResult } from '../helpers/resultFormatter.js'
+import { API_URL } from '../api'
 
 const result = ref({})
 const options = ref()
@@ -25,7 +26,7 @@ onMounted(async () => {
 
 // GET request: Get available options for selection from server
 async function getOptions() {
-  const response = await fetch('/api/computation/options')
+  const response = await fetch(API_URL + '/computation/options')
   const data = await response.json()
   options.value = data.options
   console.log(options.value)
@@ -45,7 +46,10 @@ async function sendToServer() {
     body: JSON.stringify({ metadata: metadata.value, settings: sendForm }),
   }
   console.log(sendForm)
-  const response = await fetch('/api/computation/calculation', requestOptions)
+  const response = await fetch(
+    API_URL + '/computation/calculation',
+    requestOptions
+  )
 
   // Update queue
   const data = response.json()

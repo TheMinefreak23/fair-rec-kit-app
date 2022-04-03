@@ -9,6 +9,7 @@ import { onMounted, ref, watch } from 'vue'
 import mockdata from '../../api/mock/1647818279_HelloWorld/results-table.json'
 import { store } from '../store.js'
 import { formatResult } from '../helpers/resultFormatter'
+import { API_URL } from '../api'
 
 const props = defineProps({ headers: Array })
 
@@ -42,7 +43,7 @@ function makeHeaders(result) {
 
 // GET request: Ask server for latest calculation
 async function getCalculation() {
-  const response = await fetch('/api/computation/calculation')
+  const response = await fetch(API_URL + '/computation/calculation')
   const data = await response.json()
   console.log(data)
   if (Object.keys(data).length === 0)
@@ -59,7 +60,7 @@ async function getUserRecs() {
     body: JSON.stringify({ start: startIndex.value , sortindex: index.value, ascending: ascending.value, amount: entryAmount.value}),
   }
 
-  const response = await fetch('/api/all-results/result', requestOptions)
+  const response = await fetch(API_URL + '/all-results/result', requestOptions)
   data.value = (await response.json())
 }
 
