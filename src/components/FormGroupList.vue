@@ -91,7 +91,9 @@ function flattenOptions() {
 <template>
   <div>
     <!--Capitalise the title.-->
-    <h3 class="text-center">{{ plural.charAt(0).toUpperCase() + plural.slice(1) }}</h3>
+    <h3 class="text-center">
+      {{ plural.charAt(0).toUpperCase() + plural.slice(1) }}
+    </h3>
     <div v-for="i in groupCount" :key="i - 1">
       <b-row class="align-items-end">
         <b-col cols="4">
@@ -178,6 +180,8 @@ function flattenOptions() {
       </b-row>
     </div>
 
-    <b-button @click="groupCount++" align-v="end">Add {{ name }}...</b-button>
+    <b-button @click="groupCount++" align-v="end" variant="primary"
+      >Add {{ name }}...</b-button
+    >
   </div>
 </template>

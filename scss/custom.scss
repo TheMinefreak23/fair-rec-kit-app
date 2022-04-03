@@ -1,12 +1,27 @@
 @import 'bootstrap/scss/functions';
 
+// Colours
+$orange: #ffa600;
+$blue: #82d2e5;
+$green: #c1d72e;
+
+// Gradient list
+$list: $blue 0%, $blue 33%, $green 33%, $green 66%, $orange 66%, $orange 100%;
+
+@mixin gradient($direction, $list) {
+  background: -webkit-linear-gradient($direction, $list);
+  background: -moz-linear-gradient($direction, $list);
+  background: -o-linear-gradient($direction, $list);
+  background: linear-gradient($direction, $list);
+}
+
 // Override default variables.
-$primary: #000000;
-$secondary: #5900ff;
-$danger: #ffffff;
+$primary: #0aa4ca;
+$secondary: #868686;
+//$danger: #ffffff;
 
 // Default variable overrides
-$body-bg: rgb(143, 143, 143);
+$body-bg: #b3b3b3;
 $body-color: #111;
 
 @import 'bootstrap/scss/bootstrap';
