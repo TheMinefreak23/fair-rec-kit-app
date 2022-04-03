@@ -76,18 +76,20 @@ async function getResult() {
 </script>
 
 <template>
-  <div class="text-center py-2 mx-5">
-    <h3>Previous results</h3>
-    <Table
-      @loadResult="loadResult"
-      :results="results"
-      :headers="headers"
-      :buttonText="'Remove'"
-      :removable="true"
-      :overview="true"
-      :serverFile="API_URL + '/all-results/delete'"
-      :serverFile2="API_URL + '/all-results/edit'"
-    />
-    <p>{{ testMessage }}</p>
-  </div>
+  <b-card>
+    <div class="text-center py-2 mx-5">
+      <h3>Previous results</h3>
+      <Table
+        @loadResult="loadResult"
+        :results="results"
+        :headers="headers"
+        :buttonText="'Remove'"
+        :removable="true"
+        :overview="true"
+        :serverFile="API_URL + '/all-results/delete'"
+        :serverFile2="API_URL + '/all-results/edit'"
+      />
+      <p>{{ testMessage }}</p>
+    </div>
+  </b-card>
 </template>

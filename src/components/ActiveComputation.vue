@@ -58,16 +58,19 @@ async function cancelComputation() {
 </script>
 
 <template>
-  <div>
-    <Table
-      :results="store.queue"
-      :headers="headers"
-      :buttonText="'Cancel'"
-      :removable="true"
-      :serverFile="API_URL + '/computation/queue/delete'"
-    />
-    <!--Temporary test buttons-->
-    <b-button @click="$emit('computing')">Computing</b-button>
-    <b-button @click="$emit('done')">Done</b-button>
-  </div>
+  <b-card>
+    <div class="text-center py-2 mx-5">
+      <h3>Queue</h3>
+      <Table
+        :results="store.queue"
+        :headers="headers"
+        :buttonText="'Cancel'"
+        :removable="true"
+        :serverFile="API_URL + '/computation/queue/delete'"
+      />
+      <!--Temporary test buttons-->
+      <b-button @click="$emit('computing')">Computing</b-button>
+      <b-button @click="$emit('done')">Done</b-button>
+    </div>
+  </b-card>
 </template>
