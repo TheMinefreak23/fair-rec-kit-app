@@ -102,7 +102,7 @@ function handleScroll() {
 }
 
 onMounted(() => {
-  getUserRecs()
+  //getUserRecs()
 })
 </script>
 

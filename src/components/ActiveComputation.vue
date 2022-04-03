@@ -23,10 +23,12 @@ const headers = ref([
   { name: 'Metrics' },
 ])
 
+//Retrieve the queue when the page is loaded
 onMounted(() => {
   getComputations()
 })
 
+//Reload the queue when a new computation is added
 watch(
   () => store.queue,
   (data, oldQueue) => {
@@ -64,6 +66,7 @@ async function cancelComputation() {
       :removable="true"
       :serverFile="API_URL + '/computation/queue/delete'"
     />
+    <!--Temporary test buttons-->
     <b-button @click="$emit('computing')">Computing</b-button>
     <b-button @click="$emit('done')">Done</b-button>
   </div>

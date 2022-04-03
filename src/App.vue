@@ -22,6 +22,7 @@ onMounted(async () => {
   const data = await response.json()
   console.log(data)
 })
+const tabIndex = ref(0)
 </script>
 
 <style scoped>
@@ -36,11 +37,11 @@ b-tab.success {
     <h1 class="text-white my-0 p-0">FairRecKit</h1>
   </div>
   <div class="nav-center">
-    <b-tabs class="m-0 pt-2" align="center">
+    <b-tabs v-model="tabIndex" class="m-0 pt-2" align="center">
       <b-tab title="New Computation"> <NewComputation /></b-tab>
       <b-tab :class="{ success: done }">
         <ActiveComputation
-          @computing=";(activeComputations = true), (done = false)"
+          @computing=";(activeComputations = true), (done = false), (tabIndex = 1)"
           @done=";(activeComputations = false), (done = true)"
           @stop=";(activeComputations = false), (done = false)"
         />

@@ -10,7 +10,6 @@ results_bp = Blueprint('results', __name__, url_prefix='/api/all-results')
 
 @results_bp.route('/', methods=['GET'])
 def results():
-    #result_storage.create_results()
     return result_storage.load_results_overview()
 
 

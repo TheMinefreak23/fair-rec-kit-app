@@ -4,6 +4,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import { onMounted, ref, watch } from 'vue'
 import FormGroupList from './FormGroupList.vue'
+import { sendMockData } from '../test/mockComputation.js'
 import { store } from '../store.js'
 import { formatResult } from '../helpers/resultFormatter.js'
 import { API_URL } from '../api'
@@ -104,6 +105,7 @@ function reformat(property) {
             plural="Datasets"
             selectName="a dataset"
             :options="options.datasets"
+            required
           />
 
           <!--User can select optional filters-->
@@ -126,10 +128,11 @@ function reformat(property) {
 
           <FormGroupList
             v-model:data="form.approaches"
+            nested="true"
             name="approach"
             plural="Recommender approaches"
             selectName="an approach"
-            :options="options.approaches"
+            :options="options.approaches.libraries"
           />
 
           <!--User can select the amount of recommendations per user -->
@@ -141,7 +144,8 @@ function reformat(property) {
               v-model="form.recommendations"
             ></b-form-input>
             <p>{{ form.recommendations }}</p>
-            <!--  No longer feasible from a back-end perspective -Bug V22H-194<b-form-checkbox
+            <!--  No longer feasible from a back-end perspective -Bug V22H-194
+              <b-form-checkbox
               v-model="form.includeRatedItems"
               buttons
               button-variant="outline-primary"
@@ -219,5 +223,8 @@ function reformat(property) {
         </b-col>
       </b-row>
     </b-form>
+    <b-button type="test" variant="warning" @click="sendMockData"
+      >Mock</b-button
+    >
   </b-card>
 </template>

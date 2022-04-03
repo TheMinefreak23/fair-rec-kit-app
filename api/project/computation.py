@@ -14,28 +14,27 @@ compute_bp = Blueprint('computation', __name__, url_prefix='/api/computation')
 
 # constants
 DATASETS = [
-    {'name': 'LFM2B', 'timestamp': True, 'params': {'filters': ['age', 'gender', 'country']}},
-    {'name': 'LFM1B', 'timestamp': True, 'params': {'filters': ['age', 'gender', 'occupation']}},
-    {'name': 'LFM360K', 'timestamp': False, 'params': {'filters': ['age', 'gender', 'occupation']}},
-    {'name': 'ML25M', 'timestamp': True, 'params': []},
-    {'name': 'ML100K', 'timestamp': True, 'params': {'filters': ['age', 'gender', 'occupation']}},
+    {'text': 'LFM2B', 'timestamp': True, 'params': {}},
+    {'text': 'LFM1B', 'timestamp': True, 'params': {}},
+    {'text': 'LFM360K', 'timestamp': False, 'params': {}},
+    {'text': 'ML25M', 'timestamp': True, 'params': {}},
+    {'text': 'ML100K', 'timestamp': True, 'params': {}},
 ]
-APPROACHES = [
-    {'name': 'ALS', 'params': {'values': [{'name': 'features', 'min': 1, 'max': 1000, 'default': 10}]}},
-    {'name': 'POP',
-     'params': {'options': [{'name': 'method', 'options': ['quantile', 'rank', 'count'], 'default': 'quantile'}]}},
-    {'name': 'RAND', 'params': []}]
+
+JSONapproach = open('project/approaches.json')
+APPROACHES = json.load(JSONapproach)
+
 K_METRICS = ['P@K', 'R@K', 'HR@K', 'RR@K', 'NDCG@K']
 OTHER_METRICS = ['DCG', 'RMSE', 'MAE', 'MRR', 'Item Coverage', 'Gini index']
 DEFAULTS = {'split': 80,
             'recCount': {'min': 0, 'max': 100, 'default': 10},
             }  # default values
-FILTERS = [{'name': 'Artist Gender', 'params': {'options': [{'name': 'Gender', 'options': ['Male', 'Female']}]}},
-           {'name': 'User Gender', 'params': {'options': [{'name': 'Gender', 'options': ['Male', 'Female']}]}},
-           {'name': 'Country user threshold',
-            'params': {'values': [{'name': 'threshold', 'min': 1, 'max': 1000, 'default': 10}]}},
-           {'name': 'Minimum age', 'params': {'values': [{'name': 'threshold', 'min': 1, 'max': 1000, 'default': 18}]}},
-           {'name': 'Maximum age', 'params': {'values': [{'name': 'threshold', 'min': 1, 'max': 1000, 'default': 18}]}}]
+FILTERS = [{'text': 'Artist Gender', 'params': {'options': [{'text': 'Gender', 'options': ['Male', 'Female']}]}},
+           {'text': 'User Gender', 'params': {'options': [{'text': 'Gender', 'options': ['Male', 'Female']}]}},
+           {'text': 'Country user threshold',
+            'params': {'values': [{'text': 'threshold', 'min': 1, 'max': 1000, 'default': 10}]}},
+           {'text': 'Minimum age', 'params': {'values': [{'text': 'threshold', 'min': 1, 'max': 1000, 'default': 18}]}},
+           {'text': 'Maximum age', 'params': {'values': [{'text': 'threshold', 'min': 1, 'max': 1000, 'default': 18}]}}]
 
 computation_queue = []
 
@@ -75,10 +74,10 @@ def params():
     # Generate parameter data
     metrics = []
     for metric in K_METRICS:
-        metric_params = {'values': [{'name': 'k', 'default': 10, 'min': 1, 'max': 20}]}
-        metrics.append({'name': metric, 'params': metric_params})
+        metric_params = {'values': [{'text': 'k', 'default': 10, 'min': 1, 'max': 20}]}
+        metrics.append({'text': metric, 'params': metric_params})
     for metric in OTHER_METRICS:
-        metrics.append({'name': metric, 'params': []})
+        metrics.append({'text': metric, 'params': []})
 
     options['metrics'] = metrics
     options['defaults'] = DEFAULTS
@@ -121,6 +120,7 @@ def queue():
 
 
 @compute_bp.route('/queue/delete', methods=['POST'])
+#Pop the selected index from the queue
 def deleteItem():
     data = request.get_json()
     index = data.get('index')
@@ -129,11 +129,11 @@ def deleteItem():
 
 
 def recommend(dataset, approach):
-    return dataset['name'] + approach['name'][::-1]  # Mock
+    return dataset['text'] + approach['text'][::-1]  # Mock
 
 
 def evaluate(approach, metric):
-    value = len(approach['name']) * len(metric['name'])
+    value = len(approach['text']) * len(metric['text'])
     parameter = metric['parameter']
     if parameter:
         value *= parameter['name']  # Mock
@@ -148,3 +148,25 @@ def append_queue(metadata, settings):
     current_request = {'timestamp': {'stamp': timestamp, 'datetime': current_dt}, 'metadata': metadata,
                        'settings': settings}
     computation_queue.append(current_request)
+
+
+def calculate_first():
+    time.sleep(5) # Mock computation duration.
+
+    computation = computation_queue.pop() # Get the oldest computation from the queue.
+
+    settings = computation['settings']
+    # Mocks result computation. TODO compute result with libs here
+    result = []
+    datasets = settings['datasets']
+    for dataset in datasets:
+        recs = []
+        for approach in settings['approaches']:
+            recommendation = {'recommendation': recommend(dataset, approach), 'evals': []}
+            for metric in settings['metrics']:
+                evaluation = evaluate(approach, metric)
+                recommendation['evals'].append({'text': metric['text'], 'evaluation': evaluation})
+            recs.append(recommendation)
+        result.append({'dataset': dataset, 'recs': recs})
+
+    result_storage.save_result(computation,result)

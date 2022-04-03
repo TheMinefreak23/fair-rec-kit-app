@@ -41,6 +41,7 @@ const subheaders = computed(() => {
 })
 
 async function editEntry() {
+  //Inform the server of the new values at the selected index
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -60,8 +61,10 @@ async function editEntry() {
 }
 
 async function removeEntry() {
+  //Remove an entry from the list
   let entry = selectedEntry.value
   props.results.splice(entry, 1)
+  //Inform the server to remove the same entry
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -110,6 +113,7 @@ function setsorting(i) {
 </script>
 
 <template>
+  <!--Shows when the user wants to delete an entry-->
   <b-modal
     id="deletion-modal"
     v-model="deleteModalShow"
@@ -121,12 +125,13 @@ function setsorting(i) {
   >
     <p>Are you sure you want to remove this entry from the list?</p>
   </b-modal>
+  <!--Shows when the user wants to edit an entry-->
   <b-modal
     id="edit-modal"
     v-model="editModalShow"
     title="Editing results"
     size="lg"
-    @ok="editEntry"
+    @ok="editEntry()"
   >
     <h6>Please type in the new values. Blank fields will be left unchanged.</h6>
     Name:
