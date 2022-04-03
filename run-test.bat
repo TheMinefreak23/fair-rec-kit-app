@@ -1,2 +1,2 @@
 npm run test
-
+pause

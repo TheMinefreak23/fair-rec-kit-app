@@ -4,6 +4,7 @@ import { onMounted, ref, watch } from 'vue'
 import { formatResults, formatResult } from '../helpers/resultFormatter.js'
 
 import { store } from '../store.js'
+import { API_URL } from '../api'
 
 const exResults = ref([
   { id: 1, age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
@@ -41,7 +42,7 @@ watch(
 )
 
 async function getResults() {
-  const response = await fetch('http://localhost:5000/all-results')
+  const response = await fetch(API_URL + '/all-results')
   const data = await response.json()
   console.log(data)
   let allResults = data.all_results
@@ -49,7 +50,7 @@ async function getResults() {
   //console.log(results.value)
 }
 
-const url = 'http://localhost:5000/all-results/result-by-id'
+const url = API_URL + '/all-results/result-by-id'
 
 // Request full result from result ID (timestamp)
 async function loadResult(resultId) {
@@ -72,33 +73,19 @@ async function getResult() {
   store.currentResult = formatResult(data.result)
   console.log(store.currentResult)
 }
-
-function edit(id, newName, newTags) {
-  if (newName != '') {
-    testMessage.value =
-      'Result number ' + id + 's new name is ' + newName + '. '
-  } else {
-    testMessage.value = ''
-  }
-  if (newTags != '') {
-    testMessage.value +=
-      'Result number ' + id + 's new tags are ' + newTags + '.'
-  }
-}
 </script>
 
 <template>
   <div>
     <Table
       @loadResult="loadResult"
-      @edit="edit"
       :results="results"
       :headers="headers"
       :buttonText="'Remove'"
       :removable="true"
       :overview="true"
-      :serverFile="'/all-results/delete'"
-      :serverFile2="'/all-results/edit'"
+      :serverFile="API_URL + '/all-results/delete'"
+      :serverFile2="API_URL + '/all-results/edit'"
     />
     <p>{{ testMessage }}</p>
   </div>

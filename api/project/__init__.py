@@ -10,7 +10,6 @@ from project.computation import compute_bp
 from project.previous_results import results_bp
 from project.result_storage import create_results_overview
 
-
 def create_app(test_config=None):
     # Instantiate the app.
     app = Flask(__name__)
@@ -22,12 +21,12 @@ def create_app(test_config=None):
     CORS(app)
 
     # Route: Main.
-    @app.route('/', methods=['GET'])
+    @app.route('/api', methods=['GET'])
     def main():
         return {"msg": "Server online."}
 
     # Route: Do a sanity check.
-    @app.route('/greeting', methods=['GET'])
+    @app.route('/api/greeting', methods=['GET'])
     def greet():
         return {"greeting": "Greetings from the backend :)"}
 

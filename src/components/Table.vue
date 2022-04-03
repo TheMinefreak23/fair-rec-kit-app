@@ -1,11 +1,12 @@
 <script setup>
 import { computed, ref } from 'vue'
 import sortBy from 'just-sort-by'
+import { API_URL } from '../api'
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
-const emit = defineEmits(['loadResult', 'edit'])
+const emit = defineEmits(['loadResult', 'loadMore', 'paginationSort'])
 const props = defineProps({
   overview: Boolean,
   results: Array,
@@ -14,14 +15,18 @@ const props = defineProps({
   removable: Boolean,
   serverFile: String,
   serverFile2: String,
+  pagination: Boolean,
 })
 
+const entryAmount = ref(20)
 const deleteModalShow = ref(false)
 const editModalShow = ref(false)
 const newName = ref('')
 const newTags = ref('')
 const newEmail = ref('')
 const selectedEntry = ref(0)
+const sortindex = ref(0)
+const descending = ref(false)
 const subheaders = computed(() => {
   const result = []
 
@@ -47,11 +52,9 @@ async function editEntry() {
       new_email: newEmail.value,
     }),
   }
-  fetch('http://localhost:5000' + props.serverFile2, requestOptions).then(
-    () => {
-      console.log('Item edited succesfully')
-    }
-  )
+  fetch(API_URL + props.serverFile2, requestOptions).then(() => {
+    console.log('Item edited succesfully')
+  })
   newName.value = ''
   newTags.value = ''
   newEmail.value = ''
@@ -67,32 +70,45 @@ async function removeEntry() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ index: entry }),
   }
-  fetch('http://localhost:5000' + props.serverFile, requestOptions).then(() => {
+  fetch(API_URL + props.serverFile, requestOptions).then(() => {
     console.log('Item removed succesfully')
   })
 }
 
-const sorted = computed(() => sort(sortindex.value))
+const sorted = computed(() => {
+  console.log(props.results)
 
-const sortindex = ref(0)
-const descending = ref(false)
+  if (!props.pagination) return sort(sortindex.value)
+  else return props.results
+})
 
+/**
+ * Sorts data based on index.
+ * @param {Int}	i	- i is the coumn index on which is being sorted.
+ * @return	{[Object]} Sorted array of results.
+ */
 function sort(i) {
   const res = sortBy(props.results, function (o) {
     return Object.values(o)[i]
   })
-
   if (descending.value) {
     return res.reverse()
   }
+
   return res
 }
 
+/**
+ * Sets index on which is being sorted and determines if the
+ * sorting is ascending or descending.
+ * @param {Int}	i	- i is the coumn index on which is being sorted.
+ */
 function setsorting(i) {
   if (i === sortindex.value) {
     descending.value = !descending.value
   }
   sortindex.value = i
+  emit('paginationSort', i)
 }
 </script>
 
@@ -195,4 +211,27 @@ function setsorting(i) {
       </b-tr>
     </b-tbody>
   </b-table-simple>
+  <b-button
+    v-if="pagination"
+    @click="$emit('loadMore', false, entryAmount)"
+    variant="outline-primary"
+    :disabled="entryAmount < 1"
+  >
+    Show previous {{ entryAmount }} items
+  </b-button>
+  <b-button
+    v-if="pagination"
+    @click="$emit('loadMore', true, entryAmount)"
+    variant="outline-primary"
+    :disabled="entryAmount < 1"
+  >
+    Show next {{ entryAmount }} items
+  </b-button>
+  <b-form-input
+    v-model="entryAmount"
+    v-if="pagination"
+    :state="entryAmount >= 1"
+    type="number"
+    >20</b-form-input
+  >
 </template>

@@ -9,11 +9,20 @@ import PreviousResults from './components/PreviousResults.vue'
 import ActiveComputation from './components/ActiveComputation.vue'
 import NewComputation from './components/NewComputation.vue'
 import TestForm from './test/TestForm.vue'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import { API_URL } from './api'
 
 const activeComputations = ref(false)
 const done = ref(false)
 const tabIndex = ref(0)
+
+// Ping
+onMounted(async () => {
+  console.log(API_URL)
+  const response = await fetch(API_URL)
+  const data = await response.json()
+  console.log(data)
+})
 </script>
 
 <style scoped>
@@ -24,7 +33,7 @@ b-tab.success {
 
 <template>
   <div class="bg-dark nav justify-content-center py-2">
-    <img src="/RecCoonLogo.png" class="" style="height: 50px" />
+    <img src="/RecCoonLogo.png" style="height: 50px" />
     <h1 class="text-white my-0 p-0">FairRecKit</h1>
   </div>
   <div class="nav-center">
@@ -32,7 +41,9 @@ b-tab.success {
       <b-tab title="New Computation"> <NewComputation /></b-tab>
       <b-tab :class="{ success: done }">
         <ActiveComputation
-          @computing=";(activeComputations = true), (done = false), (tabIndex = 1)"
+          @computing="
+            ;(activeComputations = true), (done = false), (tabIndex = 1)
+          "
           @done=";(activeComputations = false), (done = true)"
           @stop=";(activeComputations = false), (done = false)"
         />
