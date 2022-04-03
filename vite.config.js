@@ -26,7 +26,6 @@ export default defineConfig({
     // (requires installing happy-dom as a peer dependency)
     environment: 'happy-dom',
   },
-  base: 'http://131.211.31.198/',
 
   /* TODO Why doesn't this work..?
   server: {
