@@ -31,9 +31,58 @@ Paragraph with extra newline.
 }
 
 =================================================
+
+{
+<name> FairRecKit </name>
+<definition> WebApp to compare different recommender approaches. Developed by RecCoons, from Utrecht University. </definition>
+<link> http://fairreckit.science.uu.nl/ </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+-----
 Tabs:
 
-New Computation
+{
+<name> New Computation </name>
+<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> Active Computations </name>
+<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> Documentation </name>
+<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> Results </name>
+<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> All results </name>
+<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
 
 Datasets:
 {
@@ -45,7 +94,7 @@ Datasets:
 
 {
 <name> LFM1B </name>
-<definition> sometext </definition>
+<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
 <link> sometext </link>
 <other1> sometext </other1>
 <other?> sometext </other?>
@@ -53,7 +102,7 @@ Datasets:
 
 {
 <name> LFM360K </name>
-<definition> sometext </definition>
+<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
 <link> sometext </link>
 <other1> sometext </other1>
 <other?> sometext </other?>
@@ -61,7 +110,7 @@ Datasets:
 
 {
 <name> ML25M </name>
-<definition> sometext </definition>
+<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
 <link> sometext </link>
 <other1> sometext </other1>
 <other?> sometext </other?>

@@ -12,47 +12,71 @@ let doctexthard =
 `Item list for in documentation tab
 Only lines within curly brackets in the following format are read:
 
+=================================================
+
 {
-<name> sometext abcdef </name>
-<definition> sometext abcdef </definition>
-<link> sometext abcdef </link>
-<other1> sometext abcdef </other1>
-<other?> sometext abcdef </other?>
+<name> FairRecKit </name>
+<definition> WebApp to compare different recommender approaches. Developed by RecCoons, from Utrecht University. </definition>
+<link> http://fairreckit.science.uu.nl/ </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
 }
 
-blabla I'm just a comment...
-Documentation items:
-{
-<name> test1 algorithm </name>
-<definition> test1 is a blablabla. </definition>
-<link> https://www.hiiii.com </link>
-<other1> extendable. </other1>
-I'm also a comment actually.
-}
+-----
+Tabs:
 
 {
-<name> LFM2B </name>
-<definition> Last FM 2 Billion dataset is a corpus of Music Listening Events for Music Recommendation and. 
-Next. paragraph.
-
-Paragraph with extra newline.
-</definition>
-<link> Retrieval.eeeeeeee </link>
-<other1> http://www.cp.jku.at/datasets/LFM-2b/ </other1>
-}
-
-Datasets:
-{
-<name> LFM2B </name>
-<definition> sometext </definition>
+<name> New Computation </name>
+<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
 <link> sometext </link>
 <other1> sometext </other1>
 <other?> sometext </other?>
 }
 
 {
+<name> Active Computations </name>
+<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> Documentation </name>
+<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> Results </name>
+<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> All results </name>
+<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+
+Datasets:
+{
+<name> LFM2B </name>
+<definition> Last FM 2 Billion dataset is a corpus of Music Listening Events for Music Recommendation. It contains more than two billion listening events, intended to be used for various music retrieval and recommendation tasks. </definition>
+<link> http://www.cp.jku.at/datasets/LFM-2b/ </link>
+<other1> sometext </other1>
+}
+
+{
 <name> LFM1B </name>
-<definition> sometext </definition>
+<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
 <link> sometext </link>
 <other1> sometext </other1>
 <other?> sometext </other?>
@@ -60,7 +84,7 @@ Datasets:
 
 {
 <name> LFM360K </name>
-<definition> sometext </definition>
+<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
 <link> sometext </link>
 <other1> sometext </other1>
 <other?> sometext </other?>
@@ -68,7 +92,7 @@ Datasets:
 
 {
 <name> ML25M </name>
-<definition> sometext </definition>
+<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
 <link> sometext </link>
 <other1> sometext </other1>
 <other?> sometext </other?>
@@ -208,6 +232,44 @@ Lenskit:
 <other1> sometext </other1>
 <other?> sometext </other?>
 }
+
+-----
+
+Metrics:
+http://www.cp.jku.at/datasets/LFM-2b/
+
+{
+<name> Random </name>
+<definition> sometext </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> Random </name>
+<definition> sometext </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> Random</name>
+<definition> sometext </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
+{
+<name> Random</name>
+<definition> sometext </definition>
+<link> sometext </link>
+<other1> sometext </other1>
+<other?> sometext </other?>
+}
+
 `;
 let itemDicts = ref();
 
@@ -314,14 +376,6 @@ function parseItem(item) {
 
 <template>
   <!-- b-sidebar -->
-  <div class="text-center py-2 mx-5">
-    <h3>Documentation</h3>
-    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea.</p>
-  </div>
-
-  <input type="file" v-on:change=previewFile()><br>
-  <p class="content"></p>
-  
   <div v-for="itemDict in itemDicts" :key="itemDict">
     <b-card>
       <b-card-title>{{ itemDict["name"] }}</b-card-title>
