@@ -1,6 +1,6 @@
 # Data
-results.tsv
-results.json
+/results.json
+/frkenv/bin/
 
 # Byte-compiled files
 __pycache__
