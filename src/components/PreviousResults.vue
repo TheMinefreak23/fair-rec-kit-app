@@ -41,7 +41,7 @@ watch(
 )
 
 async function getResults() {
-  const response = await fetch('http://localhost:5000/all-results')
+  const response = await fetch('/api/all-results')
   const data = await response.json()
   console.log(data)
   let allResults = data.all_results
@@ -49,7 +49,7 @@ async function getResults() {
   //console.log(results.value)
 }
 
-const url = 'http://localhost:5000/all-results/result-by-id'
+const url = '/api/all-results/result-by-id'
 
 // Request full result from result ID (timestamp)
 async function loadResult(resultId) {
@@ -72,7 +72,6 @@ async function getResult() {
   store.currentResult = formatResult(data.result)
   console.log(store.currentResult)
 }
-
 </script>
 
 <template>

@@ -44,7 +44,7 @@ watch(
 )
 
 async function getComputations() {
-  const response = await fetch('http://localhost:5000/computation/queue')
+  const response = await fetch('/api/computation/queue')
   const data = await response.json()
   store.queue = data
 }
@@ -61,7 +61,7 @@ async function cancelComputation() {
       :headers="headers"
       :buttonText="'Cancel'"
       :removable="true"
-      :serverFile="'/computation/queue/delete'"
+      :serverFile="'/api/computation/queue/delete'"
     />
     <b-button @click="$emit('computing')">Computing</b-button>
     <b-button @click="$emit('done')">Done</b-button>
