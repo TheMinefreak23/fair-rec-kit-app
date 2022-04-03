@@ -14,7 +14,6 @@ import { API_URL } from './api'
 
 const activeComputations = ref(false)
 const done = ref(false)
-const tabIndex = ref(0)
 
 // Ping
 onMounted(async () => {
@@ -23,6 +22,7 @@ onMounted(async () => {
   const data = await response.json()
   console.log(data)
 })
+const tabIndex = ref(0)
 </script>
 
 <style scoped>
