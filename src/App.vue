@@ -9,10 +9,19 @@ import PreviousResults from './components/PreviousResults.vue'
 import ActiveComputation from './components/ActiveComputation.vue'
 import NewComputation from './components/NewComputation.vue'
 import TestForm from './test/TestForm.vue'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import { API_URL } from './api'
 
 const activeComputations = ref(false)
 const done = ref(false)
+
+// Ping
+onMounted(async () => {
+  console.log(API_URL)
+  const response = await fetch(API_URL)
+  const data = await response.json()
+  console.log(data)
+})
 </script>
 
 <style scoped>

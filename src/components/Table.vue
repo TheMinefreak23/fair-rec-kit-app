@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import sortBy from 'just-sort-by'
+import { API_URL } from '../api'
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
@@ -50,11 +51,9 @@ async function editEntry() {
       new_email: newEmail.value,
     }),
   }
-  fetch('http://localhost:5000' + props.serverFile2, requestOptions).then(
-    () => {
-      console.log('Item edited succesfully')
-    }
-  )
+  fetch(API_URL + props.serverFile2, requestOptions).then(() => {
+    console.log('Item edited succesfully')
+  })
   newName.value = ''
   newTags.value = ''
   newEmail.value = ''
@@ -68,7 +67,7 @@ async function removeEntry() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ index: entry }),
   }
-  fetch('http://localhost:5000' + props.serverFile, requestOptions).then(() => {
+  fetch(API_URL + props.serverFile, requestOptions).then(() => {
     console.log('Item removed succesfully')
   })
 }
@@ -82,24 +81,24 @@ const sorted = computed(() => {
 
 /**
  * Sorts data based on index.
- * @param {Int}	i	- i is the coumn index on which is being sorted. 
+ * @param {Int}	i	- i is the coumn index on which is being sorted.
  * @return	{[Object]} Sorted array of results.
  */
 function sort(i) {
   const res = sortBy(props.results, function (o) {
     return Object.values(o)[i]
   })
-  if(descending.value){
+  if (descending.value) {
     return res.reverse()
   }
-  
+
   return res
 }
 
 /**
  * Sets index on which is being sorted and determines if the
  * sorting is ascending or descending.
- * @param {Int}	i	- i is the coumn index on which is being sorted. 
+ * @param {Int}	i	- i is the coumn index on which is being sorted.
  */
 function setsorting(i) {
   if (i === sortindex.value) {

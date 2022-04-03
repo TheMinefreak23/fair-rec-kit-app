@@ -6,7 +6,7 @@ import pandas as pd
 
 from . import result_storage
 
-results_bp = Blueprint('results', __name__, url_prefix='/all-results')
+results_bp = Blueprint('results', __name__, url_prefix='/api/all-results')
 
 @results_bp.route('/', methods=['GET'])
 def results():

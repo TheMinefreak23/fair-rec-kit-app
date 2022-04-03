@@ -2,6 +2,7 @@
 /*This program has been developed by students from the bachelor Computer Science at
     Utrecht University within the Software Project course.
     © Copyright Utrecht University (Department of Information and Computing Sciences)*/
+import { API_URL } from '../api.js'
 import Table from './Table.vue'
 import { onMounted, ref, watch } from 'vue'
 import { formatResults } from '../helpers/resultFormatter.js'
@@ -44,7 +45,7 @@ watch(
 )
 
 async function getComputations() {
-  const response = await fetch('http://localhost:5000/computation/queue')
+  const response = await fetch(API_URL + '/computation/queue')
   const data = await response.json()
   store.queue = data
 }
@@ -61,7 +62,7 @@ async function cancelComputation() {
       :headers="headers"
       :buttonText="'Cancel'"
       :removable="true"
-      :serverFile="'/computation/queue/delete'"
+      :serverFile="API_URL + '/computation/queue/delete'"
     />
     <b-button @click="$emit('computing')">Computing</b-button>
     <b-button @click="$emit('done')">Done</b-button>
