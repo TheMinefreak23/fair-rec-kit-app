@@ -52,7 +52,13 @@ function randomWords() {
   for (let i = 0; i < 5; i++) {
     array[i] = randomWord()
   }
-  return array
+  return toNameObject(array)
+}
+
+function toNameObject(obj) {
+  return obj.map((x) => ({
+    name: x,
+  }))
 }
 
 export { sendMockData }
