@@ -16,11 +16,13 @@ const props = defineProps({
 
 //const computations = ref([])
 const headers = ref([
+  { name: 'ID' },
   { name: 'Date Time' },
   { name: 'Name' },
   { name: 'Datasets' },
   { name: 'Approaches' },
   { name: 'Metrics' },
+  { name: '' },
 ])
 
 //Retrieve the queue when the page is loaded
@@ -62,7 +64,7 @@ async function cancelComputation() {
     <div class="text-center py-2 mx-5">
       <h3>Queue</h3>
       <Table
-        :results="store.queue"
+        :results="formatResults(store.queue)"
         :headers="headers"
         :buttonText="'Cancel'"
         :removable="true"
