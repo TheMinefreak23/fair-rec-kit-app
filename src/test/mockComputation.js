@@ -52,12 +52,13 @@ function randomWords() {
   for (let i = 0; i < 5; i++) {
     array[i] = randomWord()
   }
-  return toNameObject(array)
+  return toFormObject(array)
 }
 
-function toNameObject(obj) {
+function toFormObject(obj) {
   return obj.map((x) => ({
     name: x,
+    parameter: null,
   }))
 }
 

@@ -6,7 +6,6 @@ import { onMounted, ref, watch } from 'vue'
 import FormGroupList from './FormGroupList.vue'
 import { sendMockData } from '../test/mockComputation.js'
 import { store } from '../store.js'
-import { formatResult } from '../helpers/resultFormatter.js'
 import { API_URL } from '../api'
 
 const result = ref({})
