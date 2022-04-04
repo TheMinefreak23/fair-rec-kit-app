@@ -46,7 +46,8 @@ async function getCalculation() {
   const response = await fetch(API_URL + '/computation/calculation')
   const data = await response.json()
   console.log(data)
-  if (Object.keys(data).length === 0)
+  //if (Object.keys(data).length === 0) // not null check
+    //store.currentResult = data.calculation
     store.currentResult = formatResult(data.calculation)
   console.log(store.currentResult)
 }

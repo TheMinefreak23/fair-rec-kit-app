@@ -36,7 +36,6 @@ watch(
   (data, oldQueue) => {
     // queue got bigger
     //console.log(data)
-    //if (data.length > oldQueue.length) getComputations()
     if (data.length != 0) {
       getComputations()
       emit('computing')
@@ -51,6 +50,8 @@ watch(
 async function getComputations() {
   const response = await fetch(API_URL + '/computation/queue')
   const data = await response.json()
+  //store.queue = formatResults(data).map(x=>x.omit(x,'ID'))
+  //store.queue = formatResults(data)
   store.queue = data
 }
 
