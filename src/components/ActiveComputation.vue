@@ -16,11 +16,13 @@ const props = defineProps({
 
 //const computations = ref([])
 const headers = ref([
+  { name: 'ID' },
   { name: 'Date Time' },
   { name: 'Name' },
   { name: 'Datasets' },
   { name: 'Approaches' },
   { name: 'Metrics' },
+  { name: '' },
 ])
 
 //Retrieve the queue when the page is loaded
@@ -34,7 +36,6 @@ watch(
   (data, oldQueue) => {
     // queue got bigger
     //console.log(data)
-    //if (data.length > oldQueue.length) getComputations()
     if (data.length != 0) {
       getComputations()
       emit('computing')
@@ -49,6 +50,8 @@ watch(
 async function getComputations() {
   const response = await fetch(API_URL + '/computation/queue')
   const data = await response.json()
+  //store.queue = formatResults(data).map(x=>x.omit(x,'ID'))
+  //store.queue = formatResults(data)
   store.queue = data
 }
 
@@ -62,7 +65,7 @@ async function cancelComputation() {
     <div class="text-center py-2 mx-5">
       <h3>Queue</h3>
       <Table
-        :results="store.queue"
+        :results="formatResults(store.queue)"
         :headers="headers"
         :buttonText="'Cancel'"
         :removable="true"

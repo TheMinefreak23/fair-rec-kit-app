@@ -129,13 +129,13 @@ def deleteItem():
 
 
 def recommend(dataset, approach):
-    return dataset['text'] + approach['text'][::-1]  # Mock
+    return dataset['name'] + approach['name'][::-1]  # Mock
 
 
 def evaluate(approach, metric):
-    value = len(approach['text']) * len(metric['text'])
+    value = len(approach['name']) * len(metric['name'])
     parameter = metric['parameter']
-    if parameter:
+    if hasattr(parameter,'name'):
         value *= parameter['name']  # Mock
     return value
 
@@ -150,23 +150,3 @@ def append_queue(metadata, settings):
     computation_queue.append(current_request)
 
 
-def calculate_first():
-    time.sleep(5) # Mock computation duration.
-
-    computation = computation_queue.pop() # Get the oldest computation from the queue.
-
-    settings = computation['settings']
-    # Mocks result computation. TODO compute result with libs here
-    result = []
-    datasets = settings['datasets']
-    for dataset in datasets:
-        recs = []
-        for approach in settings['approaches']:
-            recommendation = {'recommendation': recommend(dataset, approach), 'evals': []}
-            for metric in settings['metrics']:
-                evaluation = evaluate(approach, metric)
-                recommendation['evals'].append({'text': metric['text'], 'evaluation': evaluation})
-            recs.append(recommendation)
-        result.append({'dataset': dataset, 'recs': recs})
-
-    result_storage.save_result(computation,result)

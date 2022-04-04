@@ -28,7 +28,7 @@ const flatOptions = props.nested ? flattenOptions() : props.options
 
 // Set default values for the group parameters.
 function setParameter(i, val) {
-  console.log(flatOptions)
+  //console.log(flatOptions)
   //console.log(options)
   let option = flatOptions.find((option) => option.text === val)
   let choices
@@ -54,8 +54,8 @@ function setParameter(i, val) {
 
 // Get options from group index
 function getFromIndex(i) {
-  console.log(props.options)
-  console.log(form.value.main[i])
+  //console.log(props.options)
+  //console.log(form.value.main[i])
 
   const option = flatOptions.find(
     (option) => option.text === form.value.main[i]
