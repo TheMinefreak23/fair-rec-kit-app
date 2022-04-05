@@ -8,6 +8,7 @@ Documentation tab which shows all algorithms, metrics, datasets, etc. and their 
 
 import { ref } from 'vue'
 
+// hardcoded documentation_items.txt
 let doctexthard = 
 `Item list for in documentation tab
 Only lines within curly brackets in the following format are read:
@@ -273,29 +274,30 @@ http://www.cp.jku.at/datasets/LFM-2b/
 `;
 let itemDicts = ref();
 
-/**
- * Has to be changed to internal file selector: no user input needed.
- */
-function previewFile() {
-  const content = document.querySelector('.content');
-  const [file] = document.querySelector('input[type=file]').files;
-  const reader = new FileReader();
+// /**
+//  * Has to be changed to internal file selector: no user input needed.
+//  */
+// function previewFile() {
+//   const content = document.querySelector('.content');
+//   const [file] = document.querySelector('input[type=file]').files;
+//   const reader = new FileReader();
   
-  // Temporary Main
-  reader.addEventListener("load", () => {
-    let doctext = "";
-    // this will then display a text file
-    doctext = reader.result;
-    itemDicts.value = parse(doctext);
-    console.log(itemDicts);
-  }, false);
+//   // Temporary Main
+//   reader.addEventListener("load", () => {
+//     let doctext = "";
+//     // this will then display a text file
+//     doctext = reader.result;
+//     itemDicts.value = parse(doctext);
+//     console.log(itemDicts);
+//   }, false);
 
-  if (file) {
-    reader.readAsText(file);
-  }
-}
+//   if (file) {
+//     reader.readAsText(file);
+//   }
+// }
+
 itemDicts = parse(doctexthard);
-console.log(itemDicts);
+
 /**
  * Parses the content of documentation_items.txt into items.
  * @param {String} text - documentation_items.txt as one string.
@@ -370,7 +372,6 @@ function parseItem(item) {
   }
   return dict;
 }
-
 
 </script>
 
