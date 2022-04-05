@@ -120,7 +120,7 @@ onMounted(() => {
 
   <p>
     Tags:
-    <div v-for="tag in mockdata.tags"> {{ tag }} </div>
+    <div v-for="tag in mockdata.computation_tags"> {{ tag }} </div>
   </p>
 
   <div class="container">
