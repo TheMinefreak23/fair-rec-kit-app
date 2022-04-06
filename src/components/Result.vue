@@ -103,11 +103,12 @@ function handleScroll() {
 }
 
 onMounted(() => {
-  //getUserRecs()
+  getUserRecs()
 })
 </script>
 
 <template>
+<div class="container">
   <h1 class="display-2">Results</h1>
   <p class="lead">
     These are the results for your computation with the following name:
@@ -118,10 +119,12 @@ onMounted(() => {
     }}.
   </p>
 
-  <p>
+  <div class="col">
     Tags:
-    <div v-for="tag in mockdata.computation_tags"> {{ tag }} </div>
-  </p>
+    <template v-for="tag in mockdata.computation_tags">{{ tag }} <slot> </slot></template>
+  </div>
+
+</div>
 
   <div class="container">
     <div class="row">
@@ -158,8 +161,10 @@ onMounted(() => {
     </div>
   </div>
 
-  <h6>Recommended items per user for dataset x and algorithm y</h6>
   <div class="container">
+    <div class="row">
+      <h6>Recommended items per user for dataset x and algorithm y</h6>
+    </div>
     <div class="row">
       <div class="col-6">
           <Table 
