@@ -18,6 +18,10 @@ const form = ref({
   splitMethod: 'random', //The default split method.
 })
 const metadata = ref({})
+const splitOptions = [
+  { text: 'Random', value: 'random' },
+  { text: 'Time', value: 'time' },
+]
 
 onMounted(async () => {
   await getOptions()
@@ -183,10 +187,15 @@ function reformat(property) {
               </b-form-group>
 
               <!--User can choose between a random and time-based train/testsplit-->
-              <b-form-group>
-                <b-form-radio-group v-model="form.splitMethod">
-                  <b-form-radio value="random">Random (default)</b-form-radio>
-                  <b-form-radio value="timesplit">Timesplit</b-form-radio>
+              <b-form-group label="Type of split:">
+                <b-form-radio-group
+                  id="split-type"
+                  v-model="form.splitMethod"
+                  :options="splitOptions"
+                  name="split-type"
+                >
+                  <!--<b-form-radio value="random">Random (default)</b-form-radio>
+                  <b-form-radio value="timesplit">Timesplit</b-form-radio>-->
                 </b-form-radio-group>
               </b-form-group>
             </div>
