@@ -199,7 +199,9 @@ function setsorting(i) {
           @click=";(editModalShow = !editModalShow), (selectedEntry = index)"
           >Edit</b-button
         >
-        &nbsp;
+        <template v-if="removable">
+          &nbsp; 
+        </template>
         <b-button
           v-if="removable"
           variant="danger"
