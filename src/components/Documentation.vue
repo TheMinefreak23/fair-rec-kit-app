@@ -89,11 +89,20 @@ Tabs:
 
 {
 <name> New Computation </name>
-<definition> In the this tab you can start a new computation of your desired datasets and the recommender approach. There are a few well-known datasets built-in, but custom datasets can be uploaded as well. Apply filter </definition>
-
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
+<definition>
+<p>In this tab you can start a new computation of your desired datasets and the recommender approach. There are a few well-known datasets built-in, but custom datasets can be uploaded as well. After having chosen the datasets, one or more filters can be applied wat doet dit?.</p>
+<p>Next, add the recommender approaches that you want compared and select the number of recommendation per user wat doet dit?. Then, the train-test ratio and the different metrics to compare the performance.</p>
+<p>Lastly, enter the metadata to identify your computation. After pressing Send, this data will be added to the queue in Active Computations and send to the server to be executed.</p>
+<p>For more information about each step, refer to the list below:</p>
+<ul>
+<li><a href="#LFM2B">Datasets</li>
+<li><a href="#LFM2B">Filters</li>
+<li><a href="#FunkSVD">Recommender approaches</li>
+<li><a href="###">Train/test-split</li>
+<li><a href="tabIndex=1">Metrics</li>
+<li><a href="#">Meta</li>
+</ul>
+</definition>
 }
 
 {
@@ -490,15 +499,15 @@ tr:nth-child(even) {
   
   
   <div class="text-right py-1 mx-5" v-for="itemDict in itemDicts" :key="itemDict">
-    <b-card>
+    <b-card :id='itemDict["name"]'>
       <b-card-title>{{ itemDict["name"] }}</b-card-title>
       <b-card-text>
         <!-- Uses HTML syntax -->
         <span v-html='itemDict["definition"]'></span>
       </b-card-text>
       <b-link :href='itemDict["link"]'>{{ itemDict["link"] }}</b-link>
-      <br>
       <b-button :href='itemDict["other?"]' v-if='itemDict["other?"]'>
+        <br>
         {{ itemDict["other?"] }}
       </b-button>
     </b-card>    
