@@ -9,7 +9,7 @@ import { onMounted, ref} from 'vue'
 import mockdata from '../../api/mock/1647818279_HelloWorld/results-table.json'
 import { API_URL } from '../api'
 
-const props = defineProps({ headers: Array, result: Array})
+const props = defineProps({ headers: Array, result: Object})
 
 const headers_rec = ref([{ name: 'User' }, { name: 'Item' }, { name: 'Score' }])
 

@@ -9,7 +9,6 @@ import { ref, watch } from 'vue'
 import { store, addResult } from '../store.js'
 import { formatResult } from '../helpers/resultFormatter'
 import { API_URL } from '../api'
-import ResultPrompt from './ResultPrompt.vue'
 
 const emit = defineEmits(['goToResult'])
 const showResultModal = ref(false)
@@ -34,7 +33,18 @@ async function getCalculation() {
 </script>
 
 <template>
-  <ResultPrompt @goToResult="$emit('goToResult')" :show="showResultModal" />
+  <!--Shows when there is a new result-->
+  <b-modal
+    id="result-modal"
+    v-model="showResultModal"
+    title="New result"
+    ok-title="View new result"
+    ok-variant="danger"
+    cancel-title="Cancel"
+    @ok="$emit('goToResult')"
+  >
+    <p>An experiment has finished.</p>
+  </b-modal>
   <b-card>
     <div class="mx-5 mt-2">
       <div class="border-top-0 p-0">
