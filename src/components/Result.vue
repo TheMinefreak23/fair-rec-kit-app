@@ -4,14 +4,12 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
 import Table from './Table.vue'
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref} from 'vue'
 
 import mockdata from '../../api/mock/1647818279_HelloWorld/results-table.json'
-import { store } from '../store.js'
-import { formatResult } from '../helpers/resultFormatter'
 import { API_URL } from '../api'
 
-const props = defineProps({ headers: Array })
+const props = defineProps({ headers: Array, result: Array})
 
 const headers_rec = ref([{ name: 'User' }, { name: 'Item' }, { name: 'Score' }])
 
@@ -25,12 +23,6 @@ const ascending = ref(true)
 const entryAmount = ref(20)
 
 
-watch(
-  () => store.queue,
-  (newQueue, oldQueue) => {
-    if (newQueue.length < oldQueue.length) getCalculation()
-  }
-)
 
 function makeHeaders(result) {
   //console.log(result)
@@ -41,16 +33,6 @@ function makeHeaders(result) {
   return headers
 }
 
-// GET request: Ask server for latest calculation
-async function getCalculation() {
-  const response = await fetch(API_URL + '/computation/calculation')
-  const data = await response.json()
-  console.log(data)
-  //if (Object.keys(data).length === 0) // not null check
-    //store.currentResult = data.calculation
-    store.currentResult = formatResult(data.calculation)
-  console.log(store.currentResult)
-}
 
 //POST request: Ask server for next part of user recommendation table.
 async function getUserRecs() {
@@ -112,9 +94,9 @@ onMounted(() => {
   <p class="lead">
     These are the results for your computation with the following name:
     {{
-      store.currentResult.length == 0
+      result.length == 0
         ? mockdata.computation_name
-        : store.currentResult.name
+        : result.name
     }}.
   </p>
 
@@ -128,14 +110,14 @@ onMounted(() => {
       <div class="col-6">
         <Table
           :results="
-            store.currentResult.length == 0
+            result.length == 0
               ? mockdata.body
-              : store.currentResult.result
+              : result.result
           "
           :headers="
-            store.currentResult.length == 0
+            result.length == 0
               ? mockdata.headers
-              : makeHeaders(store.currentResult.result[0])
+              : makeHeaders(result.result[0])
           "
           :removable="false"
         />
@@ -143,14 +125,14 @@ onMounted(() => {
       <div class="col-6">
         <Table
           :results="
-            store.currentResult.length == 0
+            result.length == 0
               ? mockdata.body
-              : store.currentResult.result
+              : result.result
           "
           :headers="
-            store.currentResult.length == 0
+            result.length == 0
               ? mockdata.headers
-              : makeHeaders(store.currentResult.result[0])
+              : makeHeaders(result.result[0])
           "
           :removable="false"
         />
