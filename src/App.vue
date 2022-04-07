@@ -54,7 +54,7 @@ b-tab.success {
         </template>
       </b-tab>
       <b-tab title="Documentation"> <Documentation /></b-tab>
-      <b-tab title="Results"> <Results /></b-tab>
+      <b-tab title="Results"> <Results @goToResult="tabIndex = 3" /></b-tab>
       <b-tab title="All results"> <PreviousResults /></b-tab>
     </b-tabs>
   </div>
