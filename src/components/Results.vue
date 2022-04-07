@@ -9,6 +9,10 @@ import { ref, watch } from 'vue'
 import { store, addResult } from '../store.js'
 import { formatResult } from '../helpers/resultFormatter'
 import { API_URL } from '../api'
+import ResultPrompt from './ResultPrompt.vue'
+
+const emit = defineEmits(['goToResult'])
+const showResultModal = ref(false)
 
 watch(
   () => store.queue,
@@ -25,10 +29,12 @@ async function getCalculation() {
   //if (Object.keys(data).length === 0) // not null check
   //store.currentResult = data.calculation
   addResult(formatResult(data.calculation))
+  showResultModal.value = true
 }
 </script>
 
 <template>
+  <ResultPrompt @goToResult="$emit('goToResult')" :show="showResultModal" />
   <b-card>
     <div class="mx-5 mt-2">
       <div class="border-top-0 p-0">
