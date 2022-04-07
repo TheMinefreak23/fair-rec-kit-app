@@ -3,7 +3,7 @@ import Table from './Table.vue'
 import { onMounted, ref, watch } from 'vue'
 import { formatResults, formatResult } from '../helpers/resultFormatter.js'
 
-import { store } from '../store.js'
+import { addResult, store } from '../store.js'
 import { API_URL } from '../api'
 
 const exResults = ref([
@@ -35,8 +35,8 @@ onMounted(() => {
 })
 
 watch(
-  () => store.currentResult,
-  (result) => {
+  () => store.currentResults,
+  () => {
     getResults()
   }
 )
@@ -70,8 +70,7 @@ async function loadResult(resultId) {
 async function getResult() {
   const response = await fetch(url)
   const data = await response.json()
-  store.currentResult = formatResult(data.result)
-  console.log(store.currentResult)
+  addResult(formatResult(data.result))
 }
 </script>
 
