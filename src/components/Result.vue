@@ -24,6 +24,8 @@ const index = ref(0)
 const ascending = ref(true)
 const entryAmount = ref(20)
 
+const testcaption = ref('Dataset: LFM-1b, Algorithm: ALS')
+
 
 watch(
   () => store.queue,
@@ -163,11 +165,12 @@ onMounted(() => {
 
   <div class="container">
     <div class="row">
-      <h6>Recommended items per user for dataset x and algorithm y</h6>
+      <h4>Recommended items per user</h4>
     </div>
     <div class="row">
       <div class="col-6">
           <Table 
+            :caption="testcaption"
             :results="data" 
             :headers="headers_rec" 
             pagination
@@ -177,6 +180,7 @@ onMounted(() => {
       </div>
       <div class="col-6">
           <Table 
+          :caption="testcaption"
           :results="data" 
           :headers="headers_rec" 
           pagination

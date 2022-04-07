@@ -16,8 +16,10 @@ const props = defineProps({
   serverFile: String,
   serverFile2: String,
   pagination: Boolean,
+  caption: String,
 })
 
+const caption = ref('')
 const entryAmount = ref(20)
 const deleteModalShow = ref(false)
 const editModalShow = ref(false)
@@ -158,7 +160,10 @@ function setsorting(i) {
     <b-form-input type="password"></b-form-input>
   </b-modal>
 
-  <b-table-simple hover striped responsive>
+  <b-table-simple hover striped responsive caption-top>
+    <caption>
+      {{ props.caption }}
+    </caption>
     <b-thead head-variant="dark">
       <b-tr>
         <b-th v-if="overview"></b-th>
