@@ -40,7 +40,7 @@ computation_queue = []
 
 
 def calculate_first():
-    time.sleep(5)  # Mock computation duration.
+    time.sleep(2.5)  # Mock computation duration.
 
     computation = computation_queue.pop()  # Get the oldest computation from the queue.
 

@@ -1,11 +1,31 @@
 <script setup>
-import Result from './Result.vue'
-import VDismissButton from './VDismissButton.vue'
-import PreviousResults from './PreviousResults.vue'
-import { ref } from 'vue'
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
+import Result from './Result.vue'
+import VDismissButton from './VDismissButton.vue'
+import PreviousResults from './PreviousResults.vue'
+import { ref, watch } from 'vue'
+import { store, addResult } from '../store.js'
+import { formatResult } from '../helpers/resultFormatter'
+import { API_URL } from '../api'
+
+watch(
+  () => store.queue,
+  (newQueue, oldQueue) => {
+    if (newQueue.length < oldQueue.length) getCalculation()
+  }
+)
+
+// GET request: Ask server for latest calculation
+async function getCalculation() {
+  const response = await fetch(API_URL + '/computation/calculation')
+  const data = await response.json()
+  console.log(data)
+  //if (Object.keys(data).length === 0) // not null check
+  //store.currentResult = data.calculation
+  addResult(formatResult(data.calculation))
+}
 </script>
 
 <template>
@@ -26,19 +46,15 @@ Utrecht University within the Software Project course.
         </div>
         <div class="border">
           <b-tabs card content-class="mt-3">
-            <b-tab>
+            <b-tab v-for="result in store.currentResults" :key="result.name">
               <template #title>
-                Result 1
+                Result {{ result.name }}
                 <VDismissButton />
               </template>
 
               <!-- Mock headers for now -->
-              <Result />
-            </b-tab>
-
-            <b-tab title="Result1"><p>I'm Result 1</p></b-tab>
-            <b-tab title="Result2"><p>I'm Result 2</p></b-tab>
-            <b-tab title="Result3"><p>I'm Result 3</p></b-tab>
+              <Result :result="result"
+            /></b-tab>
           </b-tabs>
         </div>
 
