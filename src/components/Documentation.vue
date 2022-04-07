@@ -13,12 +13,73 @@ let doctexthard =
 `Item list for in documentation tab
 Only lines within curly brackets in the following format are read:
 
+\curlybracket-open
+<name> sometext abcdef </name>
+<definition> Uses HTML syntax </definition>
+<link> sometext abcdef </link>
+<other1> sometext abcdef </other1>
+Some comment...
+<other?> sometext abcdef </other?>
+\curlybracket-closed
+
+Adding new <tags> should be manually added to Documentation.vue's template.
+
 =================================================
 
 {
 <name> FairRecKit </name>
-<definition> WebApp to compare different recommender approaches. Developed by RecCoons, from Utrecht University. </definition>
+<definition> 
+WebApp to compare different recommender approaches. Developed by RecCoons, from Utrecht University. <br>
+dddsa dsfd <h1>fefs</h1>s
+cdscs
+<p>fsdf
+fd
+</p>
+<br>
+<h2>HTML Table</h2>
+
+<table>
+  <tr>
+    <th>Company</th>
+    <th>Contact</th>
+    <th>Country</th>
+  </tr>
+  <tr>
+    <td>Alfreds Futterkiste</td>
+    <td>Maria Anders</td>
+    <td>Germany</td>
+  </tr>
+  <tr>
+    <td>Centro comercial Moctezuma</td>
+    <td>Francisco Chang</td>
+    <td>Mexico</td>
+  </tr>
+  <tr>
+    <td>Ernst Handel</td>
+    <td>Roland Mendel</td>
+    <td>Austria</td>
+  </tr>
+  <tr>
+    <td>Island Trading</td>
+    <td>Helen Bennett</td>
+    <td>UK</td>
+  </tr>
+  <tr>
+    <td>Laughing Bacchus Winecellars</td>
+    <td>Yoshi Tannamuri</td>
+    <td>Canada</td>
+  </tr>
+  <tr>
+    <td>Magazzini Alimentari Riuniti</td>
+    <td>Giovanni Rovelli</td>
+    <td>Italy</td>
+  </tr>
+</table>
+
+
+</definition>
 <link> http://fairreckit.science.uu.nl/ </link>
+
 <other1> sometext </other1>
 <other?> sometext </other?>
 }
@@ -28,7 +89,8 @@ Tabs:
 
 {
 <name> New Computation </name>
-<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
+<definition> In the this tab you can start a new computation of your desired datasets and the recommender approach. There are a few well-known datasets built-in, but custom datasets can be uploaded as well. Apply filter </definition>
+
 <link> sometext </link>
 <other1> sometext </other1>
 <other?> sometext </other?>
@@ -270,7 +332,6 @@ http://www.cp.jku.at/datasets/LFM-2b/
 <other1> sometext </other1>
 <other?> sometext </other?>
 }
-
 `;
 let itemDicts = ref();
 
@@ -309,6 +370,7 @@ function parse(text) {
   for (let i in stringItems) {
     items.push(parseItem(stringItems[i]));
   }
+  console.log(items);
   return items;
 }
 
@@ -325,7 +387,6 @@ function parseTextIntoItems(text) {
   // Parse into items
   for (let i in text) {
     let character = text[i];
-    // console.log(character);
     if (character == "{") {
       readItem = true;
       continue;
@@ -351,20 +412,24 @@ function parseItem(item) {
   let dict = {};
   let key = "";
   let value = "";
+  let keytagFound = false; // Prevents nested tags
   let itemWords = item.split(/\s/);
   for (let i in itemWords) {
     let word = itemWords[i];
-    if (word.match(/(?<=<).*(?=>)/)) {
-      // Ending element e.g., </name>.
-      if (word.match(/\/.*/)) {
+    if (word.match(/<.*>/)) {
+      // Ending tag e.g., </name>.
+      const endTag = new RegExp("</" + key + ">", 'g');
+      if (word.match(endTag)) {
         value = value.slice(0, -1); // Remove trailing whitespace.
         dict[key] = value;
         key = "";
         value = "";
+        keytagFound = false;
       }
-      // Starting element e.g., <name>.
-      else {
-        key = word.match(/(?<=<).*(?=>)/);
+      // Starting tag e.g., <name>.
+      else if (!keytagFound) {
+        keytagFound = true;
+        key = word.match(/(?<=<).*(?=>)/)[0];
         continue;
       }
     }
@@ -375,17 +440,67 @@ function parseItem(item) {
 
 </script>
 
+<style>
+/* Can be added in custom.scss */
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+</style>
+
 <template>
   <!-- b-sidebar -->
-  <div v-for="itemDict in itemDicts" :key="itemDict">
+  <!-- <b-button v-b-toggle.sidebar-1>Toggle Sidebar</b-button>
+    <b-sidebar id="sidebar-1" title="Sidebar" shadow>
+      <div class="px-3 py-2">
+        <p>
+          Cras mattis consectetur purus sit amet fermentum. Cras justo odio, dapibus ac facilisis
+          in, egestas eget quam. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.
+        </p>
+        <b-img src="https://picsum.photos/500/500/?image=54" fluid thumbnail></b-img>
+      </div>
+    </b-sidebar> -->
+
+  <!-- <b-button v-b-toggle.toc-sidebar>fdd</b-button>
+  <b-collapse class="mt-2" id="toc-sidebar" visible>
+    <b-sidebar title="Sidebar" right shadow class="py-1 py-2">
+      <p>sdfdssssssssssssssssssssssssssssssssssssssf</p>ddd
+    </b-sidebar>
+  </b-collapse> -->
+  
+  <!-- <b-navbar toggleable="lg" type="dark" variant="info">
+    <b-navbar-toggle target="sidebar"></b-navbar-toggle>
+    <b-collapse id="sidebar" is-nav vertical visible right>
+      <b-nav-item>fdsfd</b-nav-item>
+      <b-nav-item>fdsfd</b-nav-item>
+      <b-nav-item>fdsfd</b-nav-item>
+    </b-collapse>
+  </b-navbar> -->
+  
+  
+  <div class="text-right py-1 mx-5" v-for="itemDict in itemDicts" :key="itemDict">
     <b-card>
       <b-card-title>{{ itemDict["name"] }}</b-card-title>
-      <b-card-text>{{ itemDict["definition"] }}</b-card-text>
+      <b-card-text>
+        <!-- Uses HTML syntax -->
+        <span v-html='itemDict["definition"]'></span>
+      </b-card-text>
       <b-link :href='itemDict["link"]'>{{ itemDict["link"] }}</b-link>
       <br>
       <b-button :href='itemDict["other?"]' v-if='itemDict["other?"]'>
         {{ itemDict["other?"] }}
       </b-button>
-    </b-card>
+    </b-card>    
   </div>
 </template>
