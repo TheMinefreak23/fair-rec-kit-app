@@ -135,7 +135,7 @@ function reformat(property) {
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
               <FormGroupList
                 v-model:data="form.approaches"
-                nested="true"
+                :nested="true"
                 name="approach"
                 plural="Recommender approaches"
                 selectName="an approach"
