@@ -68,8 +68,6 @@ computation_thread = threading.Thread(target=calculate_first)
 @compute_bp.route('/options', methods=['GET'])
 def params():
     options = {}
-    options['datasets'] = DATASETS
-    options['approaches'] = APPROACHES
 
     # Generate parameter data
     metrics = []
@@ -79,9 +77,18 @@ def params():
     for metric in OTHER_METRICS:
         metrics.append({'text': metric, 'params': []})
 
-    options['metrics'] = metrics
+    # options['metrics'] = metrics
     options['defaults'] = DEFAULTS
-    options['filters'] = FILTERS
+    # options['filters'] = FILTERS
+
+    # MOCK: for now use all filters/metrics per dataset
+    for dataset in DATASETS:
+        dataset['params'] = {'dynamic':
+                                 [{'name': 'filter', 'plural': 'Filters', 'article': 'a', 'options': FILTERS},
+                                  {'name': 'metric', 'plural': 'Metrics', 'article': 'a', 'options': metrics}]}
+    options['datasets'] = DATASETS
+    options['approaches'] = APPROACHES
+
     response = {'options': options}
     return response
 
@@ -96,7 +103,7 @@ def calculate():
         print(data)
         append_queue(data.get('metadata'), settings)
 
-        #response = {'status': 'success'}
+        # response = {'status': 'success'}
         response = json.dumps(computation_queue)
     else:
         if computation_thread.is_alive():
@@ -120,7 +127,7 @@ def queue():
 
 
 @compute_bp.route('/queue/delete', methods=['POST'])
-#Pop the selected index from the queue
+# Pop the selected index from the queue
 def deleteItem():
     data = request.get_json()
     index = data.get('index')
@@ -135,7 +142,7 @@ def recommend(dataset, approach):
 def evaluate(approach, metric):
     value = len(approach['name']) * len(metric['name'])
     parameter = metric['parameter']
-    if hasattr(parameter,'name'):
+    if hasattr(parameter, 'name'):
         value *= parameter['name']  # Mock
     return value
 
@@ -148,5 +155,3 @@ def append_queue(metadata, settings):
     current_request = {'timestamp': {'stamp': timestamp, 'datetime': current_dt}, 'metadata': metadata,
                        'settings': settings}
     computation_queue.append(current_request)
-
-

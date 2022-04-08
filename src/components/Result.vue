@@ -82,7 +82,7 @@ function handleScroll() {
 }
 
 onMounted(() => {
-  //getUserRecs()
+  getUserRecs()
 })
 </script>
 
@@ -129,8 +129,10 @@ onMounted(() => {
     </div>
   </div>
 
-  <h6>Recommended items per user for dataset x and algorithm y</h6>
   <div class="container">
+    <div class="row">
+      <h4>Recommended items per user</h4>
+    </div>
     <div class="row">
       <div class="col-6">
         <Table

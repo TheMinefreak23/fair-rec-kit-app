@@ -10,6 +10,9 @@ import { store, addResult } from '../store.js'
 import { formatResult } from '../helpers/resultFormatter'
 import { API_URL } from '../api'
 
+const emit = defineEmits(['goToResult'])
+const showResultModal = ref(false)
+
 watch(
   () => store.queue,
   (newQueue, oldQueue) => {
@@ -25,10 +28,23 @@ async function getCalculation() {
   //if (Object.keys(data).length === 0) // not null check
   //store.currentResult = data.calculation
   addResult(formatResult(data.calculation))
+  showResultModal.value = true
 }
 </script>
 
 <template>
+  <!--Shows when there is a new result-->
+  <b-modal
+    id="result-modal"
+    v-model="showResultModal"
+    title="New result"
+    ok-title="View new result"
+    ok-variant="danger"
+    cancel-title="Cancel"
+    @ok="$emit('goToResult')"
+  >
+    <p>An experiment has finished.</p>
+  </b-modal>
   <b-card>
     <div class="mx-5 mt-2">
       <div class="border-top-0 p-0">
