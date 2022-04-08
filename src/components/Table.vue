@@ -16,8 +16,10 @@ const props = defineProps({
   serverFile: String,
   serverFile2: String,
   pagination: Boolean,
+  caption: String,
 })
 
+const caption = ref('')
 const entryAmount = ref(20)
 const deleteModalShow = ref(false)
 const editModalShow = ref(false)
@@ -76,7 +78,7 @@ async function removeEntry() {
 }
 
 const sorted = computed(() => {
-  console.log(props.results)
+  //console.log(props.results)
 
   if (!props.pagination) return sort(sortindex.value)
   else return props.results
@@ -158,7 +160,12 @@ function setsorting(i) {
     <b-form-input type="password"></b-form-input>
   </b-modal>
 
-  <b-table-simple hover striped responsive>
+  <b-table-simple hover striped responsive caption-top>
+    <caption>
+      {{
+        props.caption
+      }}
+    </caption>
     <b-thead head-variant="dark">
       <b-tr>
         <b-th v-if="overview"></b-th>
@@ -199,7 +206,7 @@ function setsorting(i) {
           @click=";(editModalShow = !editModalShow), (selectedEntry = index)"
           >Edit</b-button
         >
-        &nbsp;
+        <template v-if="removable"> &nbsp; </template>
         <b-button
           v-if="removable"
           variant="danger"

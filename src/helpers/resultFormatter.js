@@ -1,3 +1,4 @@
+// Format data for a results overview
 function formatResults(allResults) {
   const results = []
   for (let i in allResults) {
@@ -13,6 +14,7 @@ function formatResults(allResults) {
   return results
 }
 
+// Format an array of named objects into a comma separated string
 function formatMultipleItems(items) {
   var string = ''
   if (items == null) {
@@ -23,20 +25,33 @@ function formatMultipleItems(items) {
   return string
 }
 
+// Format a result for the result tab
 function formatResult(result) {
   console.log(result)
-  return {
+  const formattedResult = {
     name: result.metadata.name,
     result: result.result
-      .map((combo) =>
-        combo.recs.map((rec) => ({
-          dataset: combo.dataset.name,
-          recommendation: rec.recommendation,
-          evaluation: formatMultipleItems(rec.evals), // mock
-        }))
-      )
-      .flat(),
+      // Make all combination pairs of dataset and approach
+      .map((dataset) => ({
+        ...dataset,
+        recs: dataset.recs.map((rec) => {
+          const formatted = {
+            approach: rec.approach,
+            recommendation:
+              // Stub for the format for now
+              { user: 'User', item: rec.recommendation, score: 1 },
+          }
+          // Format evaluation: Use metric as header
+          rec.evals.map((e) => {
+            formatted[e.name] = e.evaluation
+          })
+          //console.log(formatted)
+          return formatted
+        }),
+      })),
   }
+  //console.log(formattedResult)
+  return formattedResult
 }
 
 export { formatResults, formatResult }

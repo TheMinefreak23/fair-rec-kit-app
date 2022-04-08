@@ -11,13 +11,17 @@ import { API_URL } from '../api'
 const result = ref({})
 const options = ref()
 const form = ref({
-  datasets: { main: [], inputs: [], selects: [] },
-  metrics: { main: [], inputs: [], selects: [] },
-  approaches: { main: [], inputs: [], selects: [] },
-  filters: { main: [], inputs: [], selects: [] },
+  datasets: emptyFormGroup(),
+  //metrics:  emptyFormGroup(),
+  approaches: emptyFormGroup(),
+  //filters: emptyFormGroup(),
   splitMethod: 'random', //The default split method.
 })
 const metadata = ref({})
+const splitOptions = [
+  { text: 'Random', value: 'random' },
+  { text: 'Time', value: 'time' },
+]
 
 onMounted(async () => {
   await getOptions()
@@ -36,9 +40,9 @@ async function getOptions() {
 async function sendToServer() {
   var sendForm = { ...form.value } // clone
   sendForm.approaches = reformat(form.value.approaches)
-  sendForm.metrics = reformat(form.value.metrics)
+  //sendForm.metrics = reformat(form.value.metrics)
   sendForm.datasets = reformat(form.value.datasets)
-  sendForm.filters = reformat(form.value.filters)
+  //sendForm.filters = reformat(form.value.filters)
 
   const requestOptions = {
     method: 'POST',
@@ -63,9 +67,9 @@ async function initForm() {
   form.value = {}
   metadata.value = {}
   form.value.datasets = emptyFormGroup()
-  form.value.metrics = emptyFormGroup()
+  //form.value.metrics = emptyFormGroup()
   form.value.approaches = emptyFormGroup()
-  form.value.filters = emptyFormGroup()
+  //form.value.filters = emptyFormGroup()
   form.value.recommendations = options.value.defaults.recCount.default
   form.value.split = options.value.defaults.split
   form.value.splitMethod = 'random'
@@ -73,7 +77,7 @@ async function initForm() {
 }
 
 function emptyFormGroup() {
-  return { main: [], inputs: [], selects: [] }
+  return { main: [], inputs: [], selects: [], lists: [] }
 }
 
 // Change the form format (SoA) into a managable data format (AoS)
@@ -102,7 +106,7 @@ function reformat(property) {
               <!--User can select a dataset.-->
               <FormGroupList
                 v-model:data="form.datasets"
-                name="Dataset"
+                name="dataset"
                 plural="Datasets"
                 selectName="a dataset"
                 :options="options.datasets"
@@ -110,13 +114,13 @@ function reformat(property) {
               />
 
               <!--User can select optional filters-->
-              <FormGroupList
+              <!--<FormGroupList
                 v-model:data="form.filters"
                 name="filter"
                 plural="Filters"
                 selectName="a filter"
                 :options="options.filters"
-              />
+              />-->
 
               <!--User provides an optional rating conversion-->
               <b-form-group label="Select a rating conversion">
@@ -131,7 +135,7 @@ function reformat(property) {
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
               <FormGroupList
                 v-model:data="form.approaches"
-                nested="true"
+                :nested="true"
                 name="approach"
                 plural="Recommender approaches"
                 selectName="an approach"
@@ -183,23 +187,28 @@ function reformat(property) {
               </b-form-group>
 
               <!--User can choose between a random and time-based train/testsplit-->
-              <b-form-group>
-                <b-form-radio-group v-model="form.splitMethod">
-                  <b-form-radio value="random">Random (default)</b-form-radio>
-                  <b-form-radio value="timesplit">Timesplit</b-form-radio>
+              <b-form-group label="Type of split:">
+                <b-form-radio-group
+                  id="split-type"
+                  v-model="form.splitMethod"
+                  :options="splitOptions"
+                  name="split-type"
+                >
+                  <!--<b-form-radio value="random">Random (default)</b-form-radio>
+                  <b-form-radio value="timesplit">Timesplit</b-form-radio>-->
                 </b-form-radio-group>
               </b-form-group>
             </div>
 
             <!--Input for metrics, user can add infinite metrics -->
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
-              <FormGroupList
+              <!--<FormGroupList
                 v-model:data="form.metrics"
                 name="metric"
                 plural="metrics"
                 selectName="a metric"
                 :options="options.metrics"
-              />
+              />-->
 
               <!--Input for results filter -->
               <b-form-group label="Select a results filter">

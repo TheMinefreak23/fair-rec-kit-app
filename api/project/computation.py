@@ -24,8 +24,8 @@ DATASETS = [
 JSONapproach = open('project/approaches.json')
 APPROACHES = json.load(JSONapproach)
 
-K_METRICS = ['P@K', 'R@K', 'HR@K', 'RR@K', 'NDCG@K']
-OTHER_METRICS = ['DCG', 'RMSE', 'MAE', 'MRR', 'Item Coverage', 'Gini index']
+METRICS = json.load(open('project/metrics.json'))
+
 DEFAULTS = {'split': 80,
             'recCount': {'min': 0, 'max': 100, 'default': 10},
             }  # default values
@@ -40,7 +40,7 @@ computation_queue = []
 
 
 def calculate_first():
-    time.sleep(5)  # Mock computation duration.
+    time.sleep(2.5)  # Mock computation duration.
 
     computation = computation_queue.pop()  # Get the oldest computation from the queue.
 
@@ -51,7 +51,7 @@ def calculate_first():
     for dataset in datasets:
         recs = []
         for approach in settings['approaches']:
-            recommendation = {'recommendation': recommend(dataset, approach), 'evals': []}
+            recommendation = {'approach': approach['name'],'recommendation': recommend(dataset, approach), 'evals': []}
             for metric in settings['metrics']:
                 evaluation = evaluate(approach, metric)
                 recommendation['evals'].append({'name': metric['name'], 'evaluation': evaluation})
@@ -68,21 +68,33 @@ computation_thread = threading.Thread(target=calculate_first)
 @compute_bp.route('/options', methods=['GET'])
 def params():
     options = {}
+
+    # Generate parameter data
+    metric_categories = METRICS['categories']
+    for category in metric_categories:
+        metric_params = {'params': {}}
+        if category['text'] == 'Accuracy':
+            metric_params['values'] = [{'text': 'k', 'default': 10, 'min': 1, 'max': 20}]
+        else:
+            metric_params['values'] = []
+        category['options'] = list(map(lambda metric: {'text': metric, 'params': metric_params}, category['options']))
+
+    # options['metrics'] = metrics
+    options['defaults'] = DEFAULTS
+    # options['filters'] = FILTERS
+
+    # MOCK: for now use all filters/metrics per dataset
+    for dataset in DATASETS:
+        dataset['params'] = {'dynamic':
+                                 [{'name': 'filter', 'nested': False,
+                                   'plural': 'Filters', 'article': 'a', 'options': FILTERS},
+                                  {'name': 'metric', 'nested': True,
+                                   'plural': 'Metrics', 'article': 'a', 'options': metric_categories}]}
     options['datasets'] = DATASETS
     options['approaches'] = APPROACHES
 
-    # Generate parameter data
-    metrics = []
-    for metric in K_METRICS:
-        metric_params = {'values': [{'text': 'k', 'default': 10, 'min': 1, 'max': 20}]}
-        metrics.append({'text': metric, 'params': metric_params})
-    for metric in OTHER_METRICS:
-        metrics.append({'text': metric, 'params': []})
-
-    options['metrics'] = metrics
-    options['defaults'] = DEFAULTS
-    options['filters'] = FILTERS
     response = {'options': options}
+    print(response)
     return response
 
 
@@ -96,7 +108,7 @@ def calculate():
         print(data)
         append_queue(data.get('metadata'), settings)
 
-        #response = {'status': 'success'}
+        # response = {'status': 'success'}
         response = json.dumps(computation_queue)
     else:
         if computation_thread.is_alive():
@@ -120,7 +132,7 @@ def queue():
 
 
 @compute_bp.route('/queue/delete', methods=['POST'])
-#Pop the selected index from the queue
+# Pop the selected index from the queue
 def deleteItem():
     data = request.get_json()
     index = data.get('index')
@@ -135,7 +147,7 @@ def recommend(dataset, approach):
 def evaluate(approach, metric):
     value = len(approach['name']) * len(metric['name'])
     parameter = metric['parameter']
-    if hasattr(parameter,'name'):
+    if hasattr(parameter, 'name'):
         value *= parameter['name']  # Mock
     return value
 
@@ -148,5 +160,3 @@ def append_queue(metadata, settings):
     current_request = {'timestamp': {'stamp': timestamp, 'datetime': current_dt}, 'metadata': metadata,
                        'settings': settings}
     computation_queue.append(current_request)
-
-
