@@ -94,6 +94,13 @@ function omitRecommendation(arr) {
   )
 }
 
+function showDatasetInfo(dataset) {
+  return (
+    'Dataset: ' +
+    dataset.name +
+    (dataset.parameter ? 'with parameters' + dataset.parameter : '')
+  )
+}
 onMounted(() => {
   getUserRecs()
 })
@@ -133,16 +140,11 @@ onMounted(() => {
             result.result[0],
             result.result[1],
           ])"
+          :key="datasetResult"
         >
           <div class="col-6">
             <Table
-              :caption="
-                'Dataset: ' +
-                datasetResult.dataset.name +
-                (datasetResult.dataset.parameter
-                  ? 'with parameters' + datasetResult.dataset.parameter
-                  : '')
-              "
+              :caption="showDatasetInfo(datasetResult.dataset)"
               :results="datasetResult.recs"
               :headers="makeHeaders(datasetResult.recs[0])"
               :removable="false"
@@ -163,10 +165,15 @@ onMounted(() => {
         v-for="datasetResult in result.length == 0
           ? [data]
           : [result.result[0], result.result[1]]"
+        :key="datasetResult"
       >
         <div class="col-6">
           <Table
-            :caption="result.length == 0 ? testcaption : datasetResult.name"
+            :caption="
+              result.length == 0
+                ? testcaption
+                : showDatasetInfo(datasetResult.dataset)
+            "
             :results="
               result.length == 0
                 ? datasetResult
