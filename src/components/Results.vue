@@ -63,7 +63,11 @@ async function getCalculation() {
         <div class="border">
           <b-tabs card content-class="mt-3">
             <!-- Result tabs.-->
-            <b-tab v-for="result in store.currentResults" :key="result.name">
+            <!--Always show JSON Mockdata result tab.-->
+            <b-tab
+              v-for="result in [...store.currentResults, []]"
+              :key="result.name"
+            >
               <template #title>
                 Result {{ result.name }}
                 <VDismissButton />
@@ -71,15 +75,6 @@ async function getCalculation() {
               <Result :result="result"
             /></b-tab>
           </b-tabs>
-
-          <!--Always show JSON Mockdata result tab.-->
-          <b-tab>
-            <template #title>
-              Result 1
-              <VDismissButton />
-            </template>
-            <Result :result="[]"
-          /></b-tab>
         </div>
 
         <div
