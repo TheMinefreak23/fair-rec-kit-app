@@ -1,10 +1,15 @@
 <script setup>
+/*This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import Table from './Table.vue'
 import { onMounted, ref, watch } from 'vue'
 import { formatResults, formatResult } from '../helpers/resultFormatter.js'
 
 import { addResult, store } from '../store.js'
 import { API_URL } from '../api'
+
+const emit = defineEmits(['goToResult'])
 
 const exResults = ref([
   { id: 1, age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
@@ -71,6 +76,7 @@ async function getResult() {
   const response = await fetch(url)
   const data = await response.json()
   addResult(formatResult(data.result))
+  emit('goToResult')
 }
 </script>
 
