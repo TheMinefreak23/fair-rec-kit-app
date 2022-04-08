@@ -32,10 +32,10 @@ function formatResult(result) {
     name: result.metadata.name,
     result: result.result
       // Make all combination pairs of dataset and approach
-      .map((combo) =>
-        combo.recs.map((rec) => {
+      .map((dataset) => ({
+        ...dataset,
+        recs: dataset.recs.map((rec) => {
           const formatted = {
-            dataset: combo.dataset.name,
             approach: rec.approach,
             recommendation:
               // Stub for the format for now
@@ -45,13 +45,12 @@ function formatResult(result) {
           rec.evals.map((e) => {
             formatted[e.name] = e.evaluation
           })
-          console.log(formatted)
+          //console.log(formatted)
           return formatted
-        })
-      )
-      .flat(),
+        }),
+      })),
   }
-  console.log(formattedResult)
+  //console.log(formattedResult)
   return formattedResult
 }
 

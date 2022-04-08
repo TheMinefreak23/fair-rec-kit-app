@@ -25,7 +25,7 @@ const entryAmount = ref(20)
 const testcaption = ref('Dataset: LFM-1b, Algorithm: ALS')
 
 function makeHeaders(result) {
-  console.log(result)
+  //console.log(result)
   const headers = Object.keys(result).map((key) => ({
     name: key,
   }))
@@ -81,6 +81,19 @@ function handleScroll() {
   console.log('test')
 }
 
+function omitRecommendation(arr) {
+  return arr.map(
+    // Omit recommendation
+    (r) => ({
+      ...r,
+      recs: r.recs.map((rec) => {
+        const { recommendation, ...rest } = rec
+        return rest
+      }),
+    })
+  )
+}
+
 onMounted(() => {
   getUserRecs()
 })
@@ -104,29 +117,39 @@ onMounted(() => {
 
   <div class="container">
     <div class="row">
-      <div class="col-6">
-        <h4>Metrics</h4>
+      <h4>Metrics</h4>
+
+      <template v-if="result.length == 0">
         <Table
-          :results="result.length == 0 ? mockdata.body : result.result"
-          :headers="
-            result.length == 0
-              ? mockdata.headers
-              : makeHeaders(result.result[0])
-          "
+          :results="mockdata.body"
+          :headers="mockdata.headers"
           :removable="false"
         />
-      </div>
-      <div class="col-6">
-        <Table
-          :results="result.length == 0 ? mockdata.body : result.result"
-          :headers="
-            result.length == 0
-              ? mockdata.headers
-              : makeHeaders(result.result[0])
-          "
-          :removable="false"
-        />
-      </div>
+      </template>
+      <template v-else>
+        <!--Show first two dataset results for now TODO-->
+        <template
+          v-for="datasetResult in omitRecommendation([
+            result.result[0],
+            result.result[1],
+          ])"
+        >
+          <div class="col-6">
+            <Table
+              :caption="
+                'Dataset: ' +
+                datasetResult.dataset.name +
+                (datasetResult.dataset.parameter
+                  ? 'with parameters' + datasetResult.dataset.parameter
+                  : '')
+              "
+              :results="datasetResult.recs"
+              :headers="makeHeaders(datasetResult.recs[0])"
+              :removable="false"
+            />
+          </div>
+        </template>
+      </template>
     </div>
   </div>
 
@@ -135,30 +158,27 @@ onMounted(() => {
       <h4>Recommended items per user</h4>
     </div>
     <div class="row">
-      <div class="col-6">
-        <Table
-          :caption="testcaption"
-          :results="
-            result.length == 0 ? data : [result.result[0].recommendation]
-          "
-          :headers="headers_rec"
-          pagination
-          @paginationSort="(i) => paginationSort(i)"
-          @loadMore="(increase, amount) => loadMore(increase, amount)"
-        />
-      </div>
-      <div class="col-6">
-        <Table
-          :caption="testcaption"
-          :results="
-            result.length == 0 ? data : [result.result[0].recommendation]
-          "
-          :headers="headers_rec"
-          pagination
-          @paginationSort="(i) => paginationSort(i)"
-          @loadMore="(increase, amount) => loadMore(increase, amount)"
-        />
-      </div>
+      <!--Show recommendations for all datasets for now TODO-->
+      <template
+        v-for="datasetResult in result.length == 0
+          ? [data]
+          : [result.result[0], result.result[1]]"
+      >
+        <div class="col-6">
+          <Table
+            :caption="result.length == 0 ? testcaption : datasetResult.name"
+            :results="
+              result.length == 0
+                ? datasetResult
+                : datasetResult.recs.map((rec) => rec.recommendation)
+            "
+            :headers="headers_rec"
+            pagination
+            @paginationSort="(i) => paginationSort(i)"
+            @loadMore="(increase, amount) => loadMore(increase, amount)"
+          />
+        </div>
+      </template>
     </div>
   </div>
 </template>
