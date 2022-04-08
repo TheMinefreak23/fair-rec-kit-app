@@ -88,11 +88,11 @@ async function getResult() {
         @loadResult="loadResult"
         :results="results"
         :headers="headers"
-        :buttonText="'Remove'"
+        buttonText="Remove"
         :removable="true"
         :overview="true"
-        :serverFile="API_URL + '/all-results/delete'"
-        :serverFile2="API_URL + '/all-results/edit'"
+        serverFile="/all-results/delete"
+        serverFile2="/all-results/edit"
       />
       <p>{{ testMessage }}</p>
     </div>
