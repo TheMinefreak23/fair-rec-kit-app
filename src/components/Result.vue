@@ -25,7 +25,7 @@ const entryAmount = ref(20)
 const testcaption = ref('Dataset: LFM-1b, Algorithm: ALS')
 
 function makeHeaders(result) {
-  //console.log(result)
+  console.log(result)
   const headers = Object.keys(result).map((key) => ({
     name: key,
   }))
@@ -105,6 +105,7 @@ onMounted(() => {
   <div class="container">
     <div class="row">
       <div class="col-6">
+        <h4>Metrics</h4>
         <Table
           :results="result.length == 0 ? mockdata.body : result.result"
           :headers="
@@ -137,7 +138,9 @@ onMounted(() => {
       <div class="col-6">
         <Table
           :caption="testcaption"
-          :results="data"
+          :results="
+            result.length == 0 ? data : [result.result[0].recommendation]
+          "
           :headers="headers_rec"
           pagination
           @paginationSort="(i) => paginationSort(i)"
@@ -147,7 +150,9 @@ onMounted(() => {
       <div class="col-6">
         <Table
           :caption="testcaption"
-          :results="data"
+          :results="
+            result.length == 0 ? data : [result.result[0].recommendation]
+          "
           :headers="headers_rec"
           pagination
           @paginationSort="(i) => paginationSort(i)"
