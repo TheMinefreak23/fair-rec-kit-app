@@ -168,7 +168,20 @@ function flattenOptions() {
                 :key="option"
               >
                 <b-form-group :label="'Choose a ' + option.text">
+                  <b-form-radio-group
+                  v-if="option.options.length < 3"
+                  v-model="form.selects[i-1][index].value"
+                  name="choices"
+                  id= "choices"
+                  :value="option.default"
+                  :options = "option.options"
+                  required
+
+                  >
+
+                  </b-form-radio-group>
                   <b-form-select
+                    v-if="option.options.length > 2"
                     v-model="form.selects[i - 1][index].value"
                     :options="[
                       { text: 'Choose...', value: null },
@@ -199,7 +212,7 @@ function flattenOptions() {
             "
           >
             <!--Nested form group list.-->
-            <b-card class="bg-danger">
+            <b-card class="bg-info">
               <template
                 v-for="(option, index) in getFromIndex(i - 1).params.dynamic"
                 :key="option"

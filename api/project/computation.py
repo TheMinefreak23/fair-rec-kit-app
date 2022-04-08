@@ -21,9 +21,7 @@ DATASETS = [
     {'text': 'ML100K', 'timestamp': True, 'params': {}},
 ]
 
-JSONapproach = open('project/approaches.json')
-APPROACHES = json.load(JSONapproach)
-
+APPROACHES = json.load(open('project/approaches.json'))
 METRICS = json.load(open('project/metrics.json'))
 
 DEFAULTS = {'split': 80,
