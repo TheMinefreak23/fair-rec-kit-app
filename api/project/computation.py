@@ -24,8 +24,8 @@ DATASETS = [
 JSONapproach = open('project/approaches.json')
 APPROACHES = json.load(JSONapproach)
 
-K_METRICS = ['P@K', 'R@K', 'HR@K', 'RR@K', 'NDCG@K']
-OTHER_METRICS = ['DCG', 'RMSE', 'MAE', 'MRR', 'Item Coverage', 'Gini index']
+METRICS = json.load(open('project/metrics.json'))
+
 DEFAULTS = {'split': 80,
             'recCount': {'min': 0, 'max': 100, 'default': 10},
             }  # default values
@@ -70,12 +70,14 @@ def params():
     options = {}
 
     # Generate parameter data
-    metrics = []
-    for metric in K_METRICS:
-        metric_params = {'values': [{'text': 'k', 'default': 10, 'min': 1, 'max': 20}]}
-        metrics.append({'text': metric, 'params': metric_params})
-    for metric in OTHER_METRICS:
-        metrics.append({'text': metric, 'params': []})
+    metric_categories = METRICS['categories']
+    for category in metric_categories:
+        metric_params = {'params': {}}
+        if category['text'] == 'Accuracy':
+            metric_params['values'] = [{'text': 'k', 'default': 10, 'min': 1, 'max': 20}]
+        else:
+            metric_params['values'] = []
+        category['options'] = list(map(lambda metric: {'text': metric, 'params': metric_params}, category['options']))
 
     # options['metrics'] = metrics
     options['defaults'] = DEFAULTS
@@ -84,12 +86,15 @@ def params():
     # MOCK: for now use all filters/metrics per dataset
     for dataset in DATASETS:
         dataset['params'] = {'dynamic':
-                                 [{'name': 'filter', 'plural': 'Filters', 'article': 'a', 'options': FILTERS},
-                                  {'name': 'metric', 'plural': 'Metrics', 'article': 'a', 'options': metrics}]}
+                                 [{'name': 'filter', 'nested': False,
+                                   'plural': 'Filters', 'article': 'a', 'options': FILTERS},
+                                  {'name': 'metric', 'nested': True,
+                                   'plural': 'Metrics', 'article': 'a', 'options': metric_categories}]}
     options['datasets'] = DATASETS
     options['approaches'] = APPROACHES
 
     response = {'options': options}
+    print(response)
     return response
 
 

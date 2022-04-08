@@ -28,6 +28,9 @@ const flatOptions = props.nested ? flattenOptions() : props.options
 
 onMounted(() => {
   console.log(props.name)
+  console.log(props.options)
+  console.log(typeof props.options)
+  console.log(props.nested)
   console.log(form.value)
 })
 
@@ -94,13 +97,8 @@ function removeGroup(i) {
 
 // Flatten options API structure
 function flattenOptions() {
-  /*const options = []
-  console.log(props.options)
-  for (let api of props.options) options = [...options, ...api.options.keys()]
-  return options*/
-
   return props.options
-    .map((api) => api.options)
+    .map((category) => category.options)
     .concat()
     .flat()
 }
@@ -121,16 +119,11 @@ function flattenOptions() {
               <b-form-group :label="'Select ' + selectName">
                 <b-form-select
                   v-model="form.main[i - 1]"
-                  :options="[
-                    { text: 'Choose...', value: null },
-                    //...options.map((x) => x.name),
-                    ...options,
-                  ]"
+                  :options="[{ text: 'Choose...', value: null }, ...options]"
                   @change="setParameter(i - 1, $event)"
                   :required="props.required"
-                >
-                  <!--TODO use placeholder-->
-                </b-form-select>
+                />
+                <!--TODO use placeholder-->
               </b-form-group>
             </b-col>
 
@@ -165,7 +158,7 @@ function flattenOptions() {
                       form.inputs[i - 1][index].value <= value.max
                     "
                     validated="true"
-                  ></b-form-input>
+                  />
                 </b-form-group>
               </template>
 
@@ -205,19 +198,19 @@ function flattenOptions() {
               form.main[i - 1] != null && getFromIndex(i - 1).params.length != 0
             "
           >
-            <!--Nested form group list for datasets.-->
-            <b-card class="bg-danger" v-if="name == 'dataset'">
+            <!--Nested form group list.-->
+            <b-card class="bg-danger">
               <template
                 v-for="(option, index) in getFromIndex(i - 1).params.dynamic"
                 :key="option"
               >
-                <!--User can select optional filters-->
                 <FormGroupList
                   v-model:data="form.lists[i - 1][index]"
                   :name="option.name"
                   :plural="option.plural"
                   :selectName="option.article + ' ' + option.name"
                   :options="option.options"
+                  :nested="option.nested"
                 />
               </template>
             </b-card>
