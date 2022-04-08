@@ -83,7 +83,7 @@ async function getCalculation() {
           id="offcanvasRight"
           aria-labelledby="offcanvasRightLabel"
         >
-          <PreviousResults />
+          <PreviousResults @goToResult="" />
         </div>
       </div>
 
