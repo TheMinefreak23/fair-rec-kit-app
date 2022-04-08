@@ -1,5 +1,7 @@
 # Data
 /results.json
+/mock
+/mock_old
 
 # Byte-compiled files
 __pycache__

@@ -18,8 +18,6 @@ import pandas as pd
 # Result detail format
 # timestamp (ID), per dataset: recommendations result, per recs result: metrics evaluations
 
-
-
 current_result = {}
 results_overview_path = 'results.json'
 mock_results_overview_path = 'mock/results_overview.json'
@@ -41,31 +39,36 @@ def save_result(metadata, settings, result):
     update_results_overview(current_result)
 
 
-def result_by_id(id):
+def result_by_id(resultid):
 
     results_overview = load_json(results_overview_path)
     current_result_overview = {}
     # Filter: Loop through all results and find the one with the matching ID.
     for result in results_overview['all-results']:
-        if result['timestamp']['datetime'] == id:
+        if result['timestamp']['datetime'] == resultid:
             current_result_overview = result
 
-    resultList = []
     current_name = current_result_overview['metadata']['name']
-    relative_path = results_root_folder + id + "_" + current_name
-    #loops through all the subdirectories, and thus - runs, of a certain calculation
+    relative_path = results_root_folder + resultid + "_" + current_name
+    data = {'id': resultid, 'name': current_name, 'runs': []}
+    # loops through all the subdirectories, and thus - runs, of a certain calculation
     for subdir in [f.path for f in os.scandir(relative_path) if f.is_dir()]:
-        run_overview_name = os.path.basename(os.path.normpath(subdir) + "_overview.json"
-        run_overview = load_json(subdir + "/" + run_overview_name)
+        run_overview_name = os.path.basename(os.path.normpath(subdir))
+        run_overview = load_json(subdir + "/" + run_overview_name + "_overview.json")
+        run_data = {'name': run_overview_name, 'results': []}
+        # loops through individual results
         for run_result in run_overview["results"]:
-            resultList.append(run_result)
+            evaluation_path_full = subdir + "/" + run_overview_name + "/" + result_data['evaluation_path']
+            ratings_path_full = subdir + "/" + run_overview_name + "/" + result_data['ratings_path']
+            evaluation_data = pd.read_csv(evaluation_path_full, sep='\t', header=None).to_dict(orient='records')
+            ratings_data = pd.read_csv(ratings_path_full, sep='\t', header=None).to_dict(orient='records')
+            result_data = {'name': run_result['name'], 'evaluation': evaluation_data, 'ratings': ratings_data}
+            run_data['results'].append(result_data)
 
-    print(resultList)
-    #Currently, this function only returns a list of runs, their subresults (splitted on different datasets, algorithms and filters)
-    #and finally for each of these results a path to the evaluation and ratings file
-    #TODO instead of returning a path, this function should convert the tsv files at each path to JSON, then return the JSON instead
+        data['runs'].append(run_data)
 
-    # current_result = results_df.filter(like='')
+    global current_result
+    current_result = json.dumps(data)
 
 
 def newest_result():

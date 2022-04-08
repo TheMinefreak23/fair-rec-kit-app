@@ -12,10 +12,10 @@ mock\1647818279_HelloWorld
 +---------------------------------------------------------------------------------------------------------------------------+
 each calculation subdirectory contains one subfolder per run with name:
 
-{CALCULATION_ID}_run_{RUN_INDEX}
+run_{RUN_INDEX}
 
 in the mock data the first run has path:
-mock\1647818279_HelloWorld\1647818279_run_0
+mock\1647818279_HelloWorld\run_0
 +---------------------------------------------------------------------------------------------------------------------------+
 In each of these subfolders is a JSON file describing the location of the result files:
 
