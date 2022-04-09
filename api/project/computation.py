@@ -26,6 +26,15 @@ APPROACHES = json.load(JSONapproach)
 
 METRICS = json.load(open('project/metrics.json'))
 
+# Generate parameter data
+metric_categories = METRICS['categories']
+for category in metric_categories:
+    if category['text'] == 'Accuracy':
+        metric_params = {'values': [{'text': 'k', 'default': 10, 'min': 1, 'max': 20}]}
+    else:
+        metric_params = {}
+    category['options'] = list(map(lambda metric: {'text': metric, 'params': metric_params}, category['options']))
+
 DEFAULTS = {'split': 80,
             'recCount': {'min': 0, 'max': 100, 'default': 10},
             }  # default values
@@ -69,17 +78,8 @@ computation_thread = threading.Thread(target=calculate_first)
 def params():
     options = {}
 
-    # Generate parameter data
-    metric_categories = METRICS['categories']
-    for category in metric_categories:
-        metric_params = {'params': {}}
-        if category['text'] == 'Accuracy':
-            metric_params['values'] = [{'text': 'k', 'default': 10, 'min': 1, 'max': 20}]
-        else:
-            metric_params['values'] = []
-        category['options'] = list(map(lambda metric: {'text': metric, 'params': metric_params}, category['options']))
-
-    # options['metrics'] = metrics
+    print(METRICS)
+    options['metrics'] = METRICS
     options['defaults'] = DEFAULTS
     # options['filters'] = FILTERS
 
@@ -87,9 +87,7 @@ def params():
     for dataset in DATASETS:
         dataset['params'] = {'dynamic':
                                  [{'name': 'filter', 'nested': False,
-                                   'plural': 'Filters', 'article': 'a', 'options': FILTERS},
-                                  {'name': 'metric', 'nested': True,
-                                   'plural': 'Metrics', 'article': 'a', 'options': metric_categories}]}
+                                   'plural': 'Filters', 'article': 'a', 'options': FILTERS}]}
     options['datasets'] = DATASETS
     options['approaches'] = APPROACHES
 

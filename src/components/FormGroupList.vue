@@ -108,8 +108,8 @@ function flattenOptions() {
   <div>
     <h3 class="text-center">
       <!--Capitalise the title.-->
-      <!--{{ plural.charAt(0).toUpperCase() + plural.slice(1) }}-->
-      {{ plural }}
+      {{ plural.charAt(0).toUpperCase() + plural.slice(1) }}
+      <!--{{ plural }}-->
     </h3>
     <div v-for="i in groupCount" :key="i - 1">
       <b-row class="align-items-end">

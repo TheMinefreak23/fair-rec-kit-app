@@ -12,7 +12,7 @@ const result = ref({})
 const options = ref()
 const form = ref({
   datasets: emptyFormGroup(),
-  //metrics:  emptyFormGroup(),
+  metrics: emptyFormGroup(),
   approaches: emptyFormGroup(),
   //filters: emptyFormGroup(),
   splitMethod: 'random', //The default split method.
@@ -40,7 +40,7 @@ async function getOptions() {
 async function sendToServer() {
   var sendForm = { ...form.value } // clone
   sendForm.approaches = reformat(form.value.approaches)
-  //sendForm.metrics = reformat(form.value.metrics)
+  sendForm.metrics = reformat(form.value.metrics)
   sendForm.datasets = reformat(form.value.datasets)
   //sendForm.filters = reformat(form.value.filters)
 
@@ -67,7 +67,7 @@ async function initForm() {
   form.value = {}
   metadata.value = {}
   form.value.datasets = emptyFormGroup()
-  //form.value.metrics = emptyFormGroup()
+  form.value.metrics = emptyFormGroup()
   form.value.approaches = emptyFormGroup()
   //form.value.filters = emptyFormGroup()
   form.value.recommendations = options.value.defaults.recCount.default
@@ -202,13 +202,14 @@ function reformat(property) {
 
             <!--Input for metrics, user can add infinite metrics -->
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
-              <!--<FormGroupList
+              <FormGroupList
                 v-model:data="form.metrics"
                 name="metric"
                 plural="metrics"
                 selectName="a metric"
-                :options="options.metrics"
-              />-->
+                :options="options.metrics.categories"
+                :nested="true"
+              />
 
               <!--Input for results filter -->
               <b-form-group label="Select a results filter">
