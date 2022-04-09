@@ -5,8 +5,8 @@ Utrecht University within the Software Project course.
 import Result from './Result.vue'
 import VDismissButton from './VDismissButton.vue'
 import PreviousResults from './PreviousResults.vue'
-import { ref, watch } from 'vue'
-import { store, addResult } from '../store.js'
+import { onMounted, ref, watch } from 'vue'
+import { store, addResult } from '../store'
 import { formatResult } from '../helpers/resultFormatter'
 import { API_URL } from '../api'
 
@@ -65,7 +65,7 @@ async function getCalculation() {
             <!-- Result tabs.-->
             <!--Always show JSON Mockdata result tab.-->
             <b-tab
-              v-for="result in [...store.currentResults, []]"
+              v-for="result in [...store.currentResults]"
               :key="result.name"
             >
               <template #title>

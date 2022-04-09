@@ -49,7 +49,7 @@ watch(
 async function getResults() {
   const response = await fetch(API_URL + '/all-results')
   const data = await response.json()
-  console.log(data)
+  //console.log(data)
   let allResults = data.all_results
   results.value = formatResults(allResults)
   //console.log(results.value)
