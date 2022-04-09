@@ -25,13 +25,27 @@ watch(
   () => props.result,
   async (newResult) => {
     console.log(newResult.id)
-    getUserRecs()
+    setRecs()
   }
 )
 
 onMounted(() => {
-  getUserRecs()
+  setRecs()
 })
+
+//POST request: Send result ID to the server to set current shown recommendations.
+async function setRecs() {
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      id: props.result.id,
+    }),
+  }
+  fetch(API_URL + '/all-results/set-recs', requestOptions).then(() => {
+    getUserRecs()
+  })
+}
 
 //POST request: Ask server for next part of user recommendation table.
 async function getUserRecs() {
