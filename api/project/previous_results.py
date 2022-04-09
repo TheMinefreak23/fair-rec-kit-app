@@ -52,8 +52,17 @@ def user_result():
     chunksize = int(chunksize)
 
     ##read mock dataframe
-    df = pd.read_csv('mock/1647818279_HelloWorld/1647818279_run_0/LFM-360K_0/Foo_ALS_0/ratings.tsv', sep='\t',
-                            header=None)
+    id = json.get("id") # Result timestamp TODO use to get result
+    print(id)
+    filepaths = ['mock/1647818279_HelloWorld/1647818279_run_0/LFM-360K_0/Foo_ALS_0/ratings.tsv',
+                 'mock/1649162862_HelloFRK/run_0/LFM-1B_0/Implicit_AlternatingLeastSquares_0/ratings.tsv',
+                 'mock/1649162862_HelloFRK/run_0/LFM-1B_0/LensKit_PopScore_0/ratings.tsv',
+                 'mock/1649162862_HelloFRK/run_0/LFM-360K_0/Implicit_AlternatingLeastSquares_0/ratings.tsv',
+                 'mock/1649162862_HelloFRK/run_0/LFM-360K_0/LensKit_PopScore_0/ratings.tsv']
+    import random
+    random_file = random.choice(filepaths)
+    print(random_file)
+    df = pd.read_csv(random_file, sep='\t',header=None)
 
     ##sort dataframe based on index and ascending or not
     dfSorted = df.sort_values(by=df.columns[json.get("sortindex",0)], ascending=json.get("ascending"))
@@ -71,4 +80,6 @@ def user_result():
 
     #return part of table that should be shown
     dfSubset = dfSorted[startrows:endrows]
+
+    #return {'results': dfSubset.to_json(orient='records'), 'caption': 'hellofriend'}
     return dfSubset.to_json(orient='records')

@@ -4,7 +4,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
 import Table from './Table.vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 
 import mockdata from '../../api/mock/1647818279_HelloWorld/results-table.json'
 import { API_URL } from '../api'
@@ -21,17 +21,25 @@ const index = ref(0)
 const ascending = ref(true)
 const entryAmount = ref(20)
 
+watch(
+  () => props.result,
+  async (newResult) => {
+    console.log(newResult.id)
+    getUserRecs()
+  }
+)
+
 onMounted(() => {
   getUserRecs()
 })
 
 //POST request: Ask server for next part of user recommendation table.
-async function getUserRecs(id) {
+async function getUserRecs() {
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      id: id,
+      id: props.result.id,
       start: startIndex.value,
       sortindex: index.value,
       ascending: ascending.value,
@@ -41,7 +49,6 @@ async function getUserRecs(id) {
 
   const response = await fetch(API_URL + '/all-results/result', requestOptions)
   data.value.results = await response.json()
-  data.value.caption = 'test'
 }
 
 //Loads more data in the table after user asks for more data.
@@ -122,7 +129,7 @@ function handleScroll() {
       <!--<template v-for="data in [data]" :key="data">-->
       <div class="col-6">
         <Table
-          :caption="data.caption"
+          caption=""
           :results="data.results"
           :headers="headers_rec"
           pagination

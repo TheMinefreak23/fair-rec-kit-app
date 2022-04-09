@@ -19,7 +19,7 @@ const store = reactive({ currentResults: [mockResult()], queue: [] })
 // Add a new result to the global current shown results state
 function addResult(result) {
   store.currentResults = [result, ...store.currentResults]
-  console.log(store.currentResults)
+  //console.log(store.currentResults)
 }
 
 export { store, addResult }

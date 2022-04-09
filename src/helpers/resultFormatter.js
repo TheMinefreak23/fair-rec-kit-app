@@ -27,7 +27,7 @@ function formatMultipleItems(items) {
 
 // Format a result for the result tab
 function formatResult(result) {
-  console.log(result)
+  //console.log(result)
   const formattedResult = {
     id: result.timestamp.stamp,
     name: result.metadata.name,
