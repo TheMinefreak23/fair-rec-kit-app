@@ -199,11 +199,11 @@ function flattenOptions() {
             "
           >
             <!--Nested form group list.-->
-            <b-card class="bg-danger">
-              <template
-                v-for="(option, index) in getFromIndex(i - 1).params.dynamic"
-                :key="option"
-              >
+            <template
+              v-for="(option, index) in getFromIndex(i - 1).params.dynamic"
+              :key="option"
+            >
+              <b-card>
                 <FormGroupList
                   v-model:data="form.lists[i - 1][index]"
                   :name="option.name"
@@ -212,8 +212,8 @@ function flattenOptions() {
                   :options="option.options"
                   :nested="option.nested"
                 />
-              </template>
-            </b-card>
+              </b-card>
+            </template>
           </b-row>
         </b-col>
       </b-row>
