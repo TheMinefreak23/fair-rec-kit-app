@@ -29,29 +29,62 @@ function formatMultipleItems(items) {
 function formatResult(result) {
   console.log(result)
   const formattedResult = {
+    id: result.timestamp.stamp,
     name: result.metadata.name,
     result: result.result
-      // Make all combination pairs of dataset and approach
-      .map((dataset) => ({
-        ...dataset,
-        recs: dataset.recs.map((rec) => {
-          const formatted = {
-            approach: rec.approach,
-            recommendation:
-              // Stub for the format for now
-              { user: 'User', item: rec.recommendation, score: 1 },
-          }
-          // Format evaluation: Use metric as header
-          rec.evals.map((e) => {
-            formatted[e.name] = e.evaluation
+      // Format result per dataset
+      .map((datasetResult) => {
+        datasetResult.results = datasetResult.recs.map((result) => {
+          // Use metric names as headers
+          result.evals.map((e) => {
+            result[e.name] = e.evaluation
           })
-          //console.log(formatted)
-          return formatted
-        }),
-      })),
+          // Omit recommendation
+          const { recommendation, evals, ...rest } = result
+          return rest
+        })
+        datasetResult.headers = makeHeaders(datasetResult.results[0])
+        datasetResult.caption = showDatasetInfo(datasetResult.dataset)
+        return datasetResult
+      }),
   }
+
   //console.log(formattedResult)
   return formattedResult
+}
+
+/*
+// Omit the recommendation key from the result metric table
+function omitRecommendation(arr) {
+  return arr.map(
+    // Omit recommendation
+    (r) => ({
+      ...r,
+      recs: r.recs.map((rec) => {
+        const { recommendation, ...rest } = rec
+        return rest
+      }),
+    })
+  )
+}*/
+
+// Show dataset info as formatted caption
+function showDatasetInfo(dataset) {
+  return (
+    'Dataset: ' +
+    dataset.name +
+    (dataset.parameter ? 'with parameters' + dataset.parameter : '')
+  )
+}
+
+// Make headers from a result
+function makeHeaders(result) {
+  //console.log(result)
+  const headers = Object.keys(result).map((key) => ({
+    name: key,
+  }))
+  //console.log(headers)
+  return headers
 }
 
 export { formatResults, formatResult }
