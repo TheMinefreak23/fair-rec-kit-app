@@ -24,7 +24,7 @@ const entryAmount = ref(20)
 watch(
   () => props.result,
   async (newResult) => {
-    console.log(newResult.id)
+    //console.log(newResult.id)
     setRecs()
   }
 )
@@ -119,7 +119,9 @@ function handleScroll() {
 
       <!--Show first two dataset results for now TODO-->
       <template
-        v-for="datasetResult in [result.result[0], result.result[1]]"
+        v-for="datasetResult in result.result[1]
+          ? [result.result[0], result.result[1]]
+          : [result.result[0]]"
         :key="datasetResult"
       >
         <div class="col-6">

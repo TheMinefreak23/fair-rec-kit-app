@@ -11,7 +11,7 @@ function mockResult() {
     results: mockdata.body,
     headers: mockdata.headers,
   }
-  return { name: 'computation1', result: [mock, mock] }
+  return { id: 0, name: 'computation1', result: [mock, mock] }
 }
 
 const store = reactive({ currentResults: [mockResult()], queue: [] })

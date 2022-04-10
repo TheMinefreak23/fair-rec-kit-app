@@ -35,15 +35,21 @@ function formatResult(result) {
       // Format result per dataset
       .map((datasetResult) => {
         datasetResult.results = datasetResult.recs.map((result) => {
+          const headers = [{ name: 'Approach' }]
+
           // Use metric names as headers
           result.evals.map((e) => {
-            result[e.name] = e.evaluation
+            headers.push(formatEvaluation(e, result))
+            //console.log(result)
           })
-          // Omit recommendation
+          // Omit recommendation and evals (old properties)
           const { recommendation, evals, ...rest } = result
+          datasetResult.headers = headers // TODO headers can be computed in outer loop
           return rest
         })
-        datasetResult.headers = makeHeaders(datasetResult.results[0])
+        //console.log(datasetResult.results[0])
+        //console.log(datasetResult.headers)
+        //datasetResult.headers = makeHeaders(datasetResult.results[0])
         datasetResult.caption = showDatasetInfo(datasetResult.dataset)
         return datasetResult
       }),
@@ -77,6 +83,36 @@ function showDatasetInfo(dataset) {
   )
 }
 
+// Format evaluations (including filtered ones)
+function formatEvaluation(e, result) {
+  result[e.name] = e.evaluation.global
+
+  //console.log(e.evaluation.filtered)
+  const filtered = e.evaluation.filtered
+    .map((filter) => Object.values(filter))
+    .flat()
+    .flat()
+  //console.log(filtered)
+
+  // Get filtered values and make subheaders
+  if (filtered.length == 0) {
+    return { name: e.name }
+  } else {
+    const subheaders = ['Global']
+    filtered.map((filter) => {
+      // Mock: get first entry for now
+      const [name, val] = Object.entries(filter)[0]
+      //const filterName = e.name + ' ' + name
+      const filterName = capitalise(name)
+      result[filterName] = val
+      subheaders.push(filterName)
+      //console.log(subheaders)
+    })
+
+    return { name: e.name, subheaders: subheaders }
+  }
+}
+
 // Make headers from a result
 function makeHeaders(result) {
   //console.log(result)
@@ -87,4 +123,8 @@ function makeHeaders(result) {
   return headers
 }
 
-export { formatResults, formatResult }
+function capitalise(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1)
+}
+
+export { formatResults, formatResult, capitalise }
