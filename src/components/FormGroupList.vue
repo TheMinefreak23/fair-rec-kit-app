@@ -26,13 +26,14 @@ const form = computed({
 })
 const flatOptions = props.nested ? flattenOptions() : props.options
 
-/*onMounted(() => {
-  console.log(props.name)
+onMounted(() => {
+  /*console.log(props.name)
   console.log(props.options)
   console.log(typeof props.options)
-  console.log(props.nested)
-  console.log(form.value)
-})*/
+  console.log(props.nested)*/
+  form.value.name = props.plural
+  //console.log(form.value)
+})
 
 // Set default values for the group parameters.
 function setParameter(i, val) {

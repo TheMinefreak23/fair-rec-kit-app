@@ -39,10 +39,10 @@ async function getOptions() {
 // POST request: Send form to server.
 async function sendToServer() {
   var sendForm = { ...form.value } // clone
-  sendForm.approaches = reformat(form.value.approaches)
-  sendForm.metrics = reformat(form.value.metrics)
-  sendForm.datasets = reformat(form.value.datasets)
-  //sendForm.filters = reformat(form.value.filters)
+
+  sendForm.approaches = reformat(sendForm.approaches)
+  sendForm.metrics = reformat(sendForm.metrics)
+  sendForm.datasets = reformat(sendForm.datasets)
 
   const requestOptions = {
     method: 'POST',
@@ -86,10 +86,20 @@ function reformat(property) {
   let choices = []
   for (let i in property.main) {
     let parameter = null
-    if (property.inputs[i] != null) parameter = property.inputs[i]
-    else if (property.selects[i] != null) parameter = property.selects[i]
-    choices[i] = { name: property.main[i], parameter: parameter }
-    //console.log('choices:' + choices)
+    if (property.lists[i] != null) {
+      //console.log(property.lists[i])
+      choices[i] = {
+        name: property.main[i],
+        settings: property.lists[i].map((setting) => ({
+          [setting.name]: reformat(setting),
+        })),
+      }
+    } else {
+      if (property.inputs[i] != null) parameter = property.inputs[i]
+      else if (property.selects[i] != null) parameter = property.selects[i]
+      choices[i] = { name: property.main[i], parameter: parameter }
+      //console.log('choices:' + choices)
+    }
   }
   return choices
 }

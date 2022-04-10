@@ -87,7 +87,7 @@ def params():
     for dataset in DATASETS:
         dataset['params'] = {'dynamic':
                                  [{'name': 'filter', 'nested': False,
-                                   'plural': 'Filters', 'article': 'a', 'options': FILTERS}]}
+                                   'plural': 'filters', 'article': 'a', 'options': FILTERS}]}
     options['datasets'] = DATASETS
     options['approaches'] = APPROACHES
 

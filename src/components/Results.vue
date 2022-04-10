@@ -64,10 +64,7 @@ async function getCalculation() {
           <b-tabs card content-class="mt-3">
             <!-- Result tabs.-->
             <!--Always show JSON Mockdata result tab.-->
-            <b-tab
-              v-for="result in [...store.currentResults]"
-              :key="result.name"
-            >
+            <b-tab v-for="result in [...store.currentResults]" :key="result.id">
               <template #title>
                 Result {{ result.name }}
                 <VDismissButton />
