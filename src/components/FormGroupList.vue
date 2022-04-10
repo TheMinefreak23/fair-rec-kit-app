@@ -1,5 +1,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { capitalise } from '../helpers/resultFormatter'
+
 //const emit = defineEmits(['formChange'])
 const props = defineProps({
   name: String,
@@ -109,7 +111,7 @@ function flattenOptions() {
   <div>
     <h3 class="text-center">
       <!--Capitalise the title.-->
-      {{ plural.charAt(0).toUpperCase() + plural.slice(1) }}
+      {{ capitalise(plural) }}
       <!--{{ plural }}-->
     </h3>
     <div v-for="i in groupCount" :key="i - 1">
