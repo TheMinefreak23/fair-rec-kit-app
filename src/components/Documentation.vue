@@ -29,59 +29,9 @@ Adding new <tags> should be manually added to Documentation.vue's template.
 {
 <name> FairRecKit </name>
 <definition> 
-WebApp to compare different recommender approaches. Developed by RecCoons, from Utrecht University. <br>
-dddsa dsfd <h1>fefs</h1>s
-cdscs
-<p>fsdf
-fd
-</p>
-<br>
-<h2>HTML Table</h2>
-
-<table>
-  <tr>
-    <th>Company</th>
-    <th>Contact</th>
-    <th>Country</th>
-  </tr>
-  <tr>
-    <td>Alfreds Futterkiste</td>
-    <td>Maria Anders</td>
-    <td>Germany</td>
-  </tr>
-  <tr>
-    <td>Centro comercial Moctezuma</td>
-    <td>Francisco Chang</td>
-    <td>Mexico</td>
-  </tr>
-  <tr>
-    <td>Ernst Handel</td>
-    <td>Roland Mendel</td>
-    <td>Austria</td>
-  </tr>
-  <tr>
-    <td>Island Trading</td>
-    <td>Helen Bennett</td>
-    <td>UK</td>
-  </tr>
-  <tr>
-    <td>Laughing Bacchus Winecellars</td>
-    <td>Yoshi Tannamuri</td>
-    <td>Canada</td>
-  </tr>
-  <tr>
-    <td>Magazzini Alimentari Riuniti</td>
-    <td>Giovanni Rovelli</td>
-    <td>Italy</td>
-  </tr>
-</table>
-
-
+WebApp to compare different recommender approaches. Developed by RecCoons, from Utrecht University.
 </definition>
 <link> http://fairreckit.science.uu.nl/ </link>
-
-<other1> sometext </other1>
-<other?> sometext </other?>
 }
 
 -----
