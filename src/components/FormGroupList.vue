@@ -160,7 +160,7 @@ function flattenOptions() {
                     validated="true"
                   />
                   <b-form-input
-                    v-if="value.text.includes('split')"
+                    v-if="value.text.includes('Train')"
                     type="range"
                     min="value.min"
                     max="value.max"
@@ -168,15 +168,9 @@ function flattenOptions() {
                     id="customRange"
                     v-model="form.inputs[i - 1][index].value"
                   ></b-form-input>
-                  <div v-if="value.text.includes('split')" class="text-center">
-                    <p class="px-5">
-                      <strong>Train:</strong>
-                      <i>{{' ' + form.inputs[i - 1][index].value }}</i>
-                    </p>
-                    <p class="px-5">
-                      <strong>Test:</strong>
-                      <i>{{' '}}{{100 - form.inputs[i - 1][index].value}}</i>
-                    </p>
+                  <div v-if="value.text.includes('Train')" class="text-center">
+                      <strong>Train:</strong> <i>{{' ' + form.inputs[i - 1][index].value + ' '}}</i>
+                      <strong>Test:</strong><i>{{' '}}{{100 - form.inputs[i - 1][index].value}}</i>
                   </div>
                 </b-form-group>
               </template>
