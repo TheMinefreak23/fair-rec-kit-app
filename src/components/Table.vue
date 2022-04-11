@@ -78,7 +78,7 @@ async function removeEntry() {
 }
 
 const sorted = computed(() => {
-  console.log(props.results)
+  //console.log(props.results)
 
   if (!props.pagination) return sort(sortindex.value)
   else return props.results
@@ -162,7 +162,9 @@ function setsorting(i) {
 
   <b-table-simple hover striped responsive caption-top>
     <caption>
-      {{ props.caption }}
+      {{
+        props.caption
+      }}
     </caption>
     <b-thead head-variant="dark">
       <b-tr>
@@ -204,9 +206,7 @@ function setsorting(i) {
           @click=";(editModalShow = !editModalShow), (selectedEntry = index)"
           >Edit</b-button
         >
-        <template v-if="removable">
-          &nbsp; 
-        </template>
+        <template v-if="removable"> &nbsp; </template>
         <b-button
           v-if="removable"
           variant="danger"

@@ -11,10 +11,10 @@ import { API_URL } from '../api'
 const result = ref({})
 const options = ref()
 const form = ref({
-  datasets: { main: [], inputs: [], selects: [] },
-  metrics: { main: [], inputs: [], selects: [] },
-  approaches: { main: [], inputs: [], selects: [] },
-  filters: { main: [], inputs: [], selects: [] },
+  datasets: emptyFormGroup(),
+  metrics: emptyFormGroup(),
+  approaches: emptyFormGroup(),
+  //filters: emptyFormGroup(),
   splitMethod: 'random', //The default split method.
 })
 const metadata = ref({})
@@ -33,16 +33,16 @@ async function getOptions() {
   const response = await fetch(API_URL + '/computation/options')
   const data = await response.json()
   options.value = data.options
-  console.log(options.value)
+  //console.log(options.value)
 }
 
 // POST request: Send form to server.
 async function sendToServer() {
   var sendForm = { ...form.value } // clone
-  sendForm.approaches = reformat(form.value.approaches)
-  sendForm.metrics = reformat(form.value.metrics)
-  sendForm.datasets = reformat(form.value.datasets)
-  sendForm.filters = reformat(form.value.filters)
+
+  sendForm.approaches = reformat(sendForm.approaches)
+  sendForm.metrics = reformat(sendForm.metrics)
+  sendForm.datasets = reformat(sendForm.datasets)
 
   const requestOptions = {
     method: 'POST',
@@ -69,7 +69,7 @@ async function initForm() {
   form.value.datasets = emptyFormGroup()
   form.value.metrics = emptyFormGroup()
   form.value.approaches = emptyFormGroup()
-  form.value.filters = emptyFormGroup()
+  //form.value.filters = emptyFormGroup()
   form.value.recommendations = options.value.defaults.recCount.default
   form.value.split = options.value.defaults.split
   form.value.splitMethod = 'random'
@@ -77,7 +77,7 @@ async function initForm() {
 }
 
 function emptyFormGroup() {
-  return { main: [], inputs: [], selects: [] }
+  return { main: [], inputs: [], selects: [], lists: [] }
 }
 
 // Change the form format (SoA) into a managable data format (AoS)
@@ -86,10 +86,20 @@ function reformat(property) {
   let choices = []
   for (let i in property.main) {
     let parameter = null
-    if (property.inputs[i] != null) parameter = property.inputs[i]
-    else if (property.selects[i] != null) parameter = property.selects[i]
-    choices[i] = { name: property.main[i], parameter: parameter }
-    //console.log('choices:' + choices)
+    if (property.lists[i] != null) {
+      //console.log(property.lists[i])
+      choices[i] = {
+        name: property.main[i],
+        settings: property.lists[i].map((setting) => ({
+          [setting.name]: reformat(setting),
+        })),
+      }
+    } else {
+      if (property.inputs[i] != null) parameter = property.inputs[i]
+      else if (property.selects[i] != null) parameter = property.selects[i]
+      choices[i] = { name: property.main[i], parameter: parameter }
+      //console.log('choices:' + choices)
+    }
   }
   return choices
 }
@@ -106,7 +116,7 @@ function reformat(property) {
               <!--User can select a dataset.-->
               <FormGroupList
                 v-model:data="form.datasets"
-                name="Dataset"
+                name="dataset"
                 plural="Datasets"
                 selectName="a dataset"
                 :options="options.datasets"
@@ -114,13 +124,13 @@ function reformat(property) {
               />
 
               <!--User can select optional filters-->
-              <FormGroupList
+              <!--<FormGroupList
                 v-model:data="form.filters"
                 name="filter"
                 plural="Filters"
                 selectName="a filter"
                 :options="options.filters"
-              />
+              />-->
 
               <!--User provides an optional rating conversion-->
               <b-form-group label="Select a rating conversion">
@@ -135,7 +145,7 @@ function reformat(property) {
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
               <FormGroupList
                 v-model:data="form.approaches"
-                nested="true"
+                :nested="true"
                 name="approach"
                 plural="Recommender approaches"
                 selectName="an approach"
@@ -207,7 +217,8 @@ function reformat(property) {
                 name="metric"
                 plural="metrics"
                 selectName="a metric"
-                :options="options.metrics"
+                :options="options.metrics.categories"
+                :nested="true"
               />
 
               <!--Input for results filter -->
