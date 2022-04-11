@@ -139,10 +139,7 @@ function flattenOptions() {
               "
             >
               <!--Use an input form for values.-->
-              <template
-                v-for="(value, index) in getFromIndex(i - 1).params.values"
-                :key="value"
-              >
+              <template v-for="(value, index) in getFromIndex(i - 1).params.values" :key="value">
                 <b-form-group
                   :label="
                     'Give a ' +
@@ -155,7 +152,6 @@ function flattenOptions() {
                 >
                   <b-form-input
                     v-model="form.inputs[i - 1][index].value"
-                    required
                     :state="
                       form.inputs[i - 1][index].value >= value.min &&
                       form.inputs[i - 1][index].value <= value.max
@@ -166,25 +162,33 @@ function flattenOptions() {
               </template>
 
               <!--Use a select form for options.-->
-              <template
-                v-for="(option, index) in getFromIndex(i - 1).params.options"
-                :key="option"
-              >
-                <b-form-group :label="'Choose a ' + option.text">
+              <template v-for="(option, index) in getFromIndex(i - 1).params.options" :key="option">
+                <b-form-group
+                  :label="'Choose a ' + option.text"
+                  v-if="option.options.length < 3 && typeof (option.options[0]) != 'boolean'"
+                >
                   <b-form-radio-group
-                  v-if="option.options.length < 3"
-                  v-model="form.selects[i-1][index].value"
-                  name="choices"
-                  id= "choices"
-                  :value="option.default"
-                  :options = "option.options"
-                  required
-
-                  >
-
-                  </b-form-radio-group>
+                    v-model="form.selects[i - 1][index].value"
+                    :value="option.default"
+                    :options="option.options"
+                    required
+                  ></b-form-radio-group>
+                </b-form-group>
+                <b-form-group
+                  :label="option.text + '?'"
+                  v-if="option.options[0] == true || option.options[0] == false"
+                >
+                  <b-form-checkbox
+                    v-model="form.selects[i - 1][index].value"
+                    checked="option.default"
+                    size="lg"
+                    required
+                  >{{form.selects[i - 1][index].value ? 'Yes' : 'No' }}</b-form-checkbox>
+                </b-form-group>
+                <b-form-group 
+                  v-if="option.options.length > 2"
+                  :label ="'Choose a ' + option.text">
                   <b-form-select
-                    v-if="option.options.length > 2"
                     v-model="form.selects[i - 1][index].value"
                     :options="[
                       { text: 'Choose...', value: null },
@@ -204,8 +208,7 @@ function flattenOptions() {
                   @click="removeGroup(i - 1)"
                   variant="danger"
                   class="mb-2 mr-sm-2 mb-sm-0"
-                  >X</b-button
-                >
+                >X</b-button>
               </b-form-group>
             </b-col>
           </b-row>
@@ -215,10 +218,7 @@ function flattenOptions() {
             "
           >
             <!--Nested form group list.-->
-            <template
-              v-for="(option, index) in getFromIndex(i - 1).params.dynamic"
-              :key="option"
-            >
+            <template v-for="(option, index) in getFromIndex(i - 1).params.dynamic" :key="option">
               <b-card>
                 <FormGroupList
                   v-model:data="form.lists[i - 1][index]"
@@ -235,8 +235,6 @@ function flattenOptions() {
       </b-row>
     </div>
 
-    <b-button @click="groupCount++" align-v="end" variant="primary"
-      >Add {{ name }}...</b-button
-    >
+    <b-button @click="groupCount++" align-v="end" variant="primary">Add {{ name }}...</b-button>
   </div>
 </template>
