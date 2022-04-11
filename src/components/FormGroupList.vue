@@ -154,14 +154,35 @@ function flattenOptions() {
                   "
                 >
                   <b-form-input
+                    v-if="!value.text.includes('split')"
                     v-model="form.inputs[i - 1][index].value"
-                    required
                     :state="
                       form.inputs[i - 1][index].value >= value.min &&
                       form.inputs[i - 1][index].value <= value.max
                     "
                     validated="true"
                   />
+                  <b-form-input
+                    v-if="value.text.includes('split')"
+                    type="range"
+                    min="value.min"
+                    max="value.max"
+                    step="5"
+                    id="customRange"
+                    v-model="form.inputs[i - 1][index].value"
+                  ></b-form-input>
+                  <div v-if="value.text.includes('split')" class="text-center">
+                    <p class="px-5">
+                      <strong>Train:</strong>
+                      <i>{{ ' ' + form.inputs[i - 1][index].value }}</i>
+                    </p>
+                    <p class="px-5">
+                      <strong>Test:</strong>
+                      <i
+                        >{{ ' ' }}{{ 100 - form.inputs[i - 1][index].value }}</i
+                      >
+                    </p>
+                  </div>
                 </b-form-group>
               </template>
 
@@ -170,21 +191,39 @@ function flattenOptions() {
                 v-for="(option, index) in getFromIndex(i - 1).params.options"
                 :key="option"
               >
-                <b-form-group :label="'Choose a ' + option.text">
+                <b-form-group
+                  :label="'Choose a ' + option.text"
+                  v-if="
+                    option.options.length < 3 &&
+                    typeof option.options[0] != 'boolean'
+                  "
+                >
                   <b-form-radio-group
-                  v-if="option.options.length < 3"
-                  v-model="form.selects[i-1][index].value"
-                  name="choices"
-                  id= "choices"
-                  :value="option.default"
-                  :options = "option.options"
-                  required
-
+                    v-model="form.selects[i - 1][index].value"
+                    :value="option.default"
+                    :options="option.options"
+                    required
+                  ></b-form-radio-group>
+                </b-form-group>
+                <b-form-group
+                  :label="option.text + '?'"
+                  v-if="option.options[0] == true || option.options[0] == false"
+                >
+                  <b-form-checkbox
+                    v-model="form.selects[i - 1][index].value"
+                    checked="option.default"
+                    size="lg"
+                    required
+                    >{{
+                      form.selects[i - 1][index].value ? 'Yes' : 'No'
+                    }}</b-form-checkbox
                   >
-
-                  </b-form-radio-group>
+                </b-form-group>
+                <b-form-group
+                  v-if="option.options.length > 2"
+                  :label="'Choose a ' + option.text"
+                >
                   <b-form-select
-                    v-if="option.options.length > 2"
                     v-model="form.selects[i - 1][index].value"
                     :options="[
                       { text: 'Choose...', value: null },
