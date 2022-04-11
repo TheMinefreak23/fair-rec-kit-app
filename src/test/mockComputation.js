@@ -14,6 +14,7 @@ async function getOptions() {
   const response = await fetch(API_URL + '/computation/options')
   const data = await response.json()
   options.value = data.options
+  console.log(options)
 }
 
 async function sendMockData() {
@@ -24,15 +25,20 @@ async function sendMockData() {
     splitMethod: 'timesplit',
     approaches: generateRandomApproach(),
     metrics: generateRandomMetrics(),
-    datasets: randomItems(options.value.datasets),
-    filters: randomWords(),
+    datasets: generateRandomDatasets(),
+    filters: toFormObject(randomWords()),
   }
-
+  console.log(form)
   metadata = {
     name: 'Test' + rand() + ': ' + randomWord(),
     email: randomWord() + '@' + randomWord() + '.com',
     tags: randomWords(),
   }
+
+
+  //form.approaches = reformat(form.approaches)
+  //form.metrics = reformat(form.metrics)
+  //form.datasets = reformat(form.datasets)
 
   const requestOptions = {
     method: 'POST',
@@ -77,7 +83,7 @@ function generateRandomApproach() {
 
     result[i] = {
       'name': approachName,
-      'parameter': params}
+      'params': params}
   }
   console.log(result)
   return result
@@ -86,13 +92,29 @@ function generateRandomApproach() {
 function generateRandomMetrics(){
   let result = []
   for (let i = 0; i < (1 + Math.floor(Math.random * 3)) ; i++) {
-
-    randomOption = randomItems(options.value.metrics, 1)
-    randomOptionName = randomOption.map(x => x.text)
+    console.log(options.value.metrics)
+    randomOption = randomItems(options.value.metrics.categories, 1)
+    randomOptionName = randomOption.text
 
     result[i] = {
       'name': randomOptionName,
-      'parameter': rand(20)
+      'params': rand(20)
+    }
+  }
+  console.log(result)
+  return result
+}
+
+function generateRandomDatasets() {
+  let result = []
+  for (let i = 0; i < (1 + Math.floor(Math.random * 3)); i++) {
+
+    randomDataset = randomItems(options.value.datasets, 1)
+    randomDatasetName = randomDataset.text
+
+    result[i] = {
+      'name': randomDatasetName,
+      'params': rand(20)
     }
   }
   return result
@@ -117,7 +139,7 @@ function randomWords() {
   for (let i = 0; i < 5; i++) {
     array[i] = randomWord()
   }
-  return toFormObject(array)
+  return array
 }
 
 function randomItems(list, n = Math.floor(Math.random() * list.length)) {
@@ -128,7 +150,8 @@ function randomItems(list, n = Math.floor(Math.random() * list.length)) {
   if (set.size == 0) {
     return randomItems(list)
   }
-  return toFormObject([...set])
+  console.log(...set)
+  return [...set]
 }
 
 function toFormObject(obj) {
@@ -136,6 +159,28 @@ function toFormObject(obj) {
     name: x,
     parameter: null,
   }))
+}
+
+function reformat(property) {
+  let choices = []
+  for (let i in property.main) {
+    let parameter = null
+    if (property.lists[i] != null) {
+      //console.log(property.lists[i])
+      choices[i] = {
+        name: property.main[i],
+        settings: property.lists[i].map((setting) => ({
+          [setting.name]: reformat(setting),
+        })),
+      }
+    } else {
+      if (property.inputs[i] != null) parameter = property.inputs[i]
+      else if (property.selects[i] != null) parameter = property.selects[i]
+      choices[i] = { name: property.main[i], parameter: parameter }
+      //console.log('choices:' + choices)
+    }
+  }
+  return choices
 }
 
 export { sendMockData }
