@@ -103,9 +103,9 @@ function formatEvaluation(e, result) {
       // Mock: get first entry for now
       const [name, val] = Object.entries(filter)[0]
       //const filterName = e.name + ' ' + name
-      const filterName = capitalise(name)
+      const filterName = e.name + name
       result[filterName] = val
-      subheaders.push(filterName)
+      subheaders.push(capitalise(name))
       //console.log(subheaders)
     })
 
