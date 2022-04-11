@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { capitalise } from '../helpers/resultFormatter'
+import { underscoreToSpace } from '../helpers/resultFormatter'
 
 //const emit = defineEmits(['formChange'])
 const props = defineProps({
@@ -146,7 +147,7 @@ function flattenOptions() {
                 <b-form-group
                   :label="
                     'Give a ' +
-                    value.text +
+                    underscoreToSpace(value.text) +
                     ' between ' +
                     value.min +
                     ' and ' +
@@ -172,8 +173,10 @@ function flattenOptions() {
                     v-model="form.inputs[i - 1][index].value"
                   ></b-form-input>
                   <div v-if="value.text.includes('Train')" class="text-center">
-                      <strong>Train:</strong> <i>{{' ' + form.inputs[i - 1][index].value + ' '}}</i>
-                      <strong>Test:</strong><i>{{' '}}{{100 - form.inputs[i - 1][index].value}}</i>
+                    <strong>Train:</strong>
+                    <i>{{ ' ' + form.inputs[i - 1][index].value + ' ' }}</i>
+                    <strong>Test:</strong
+                    ><i>{{ ' ' }}{{ 100 - form.inputs[i - 1][index].value }}</i>
                   </div>
                 </b-form-group>
               </template>
@@ -184,7 +187,7 @@ function flattenOptions() {
                 :key="option"
               >
                 <b-form-group
-                  :label="'Choose a ' + option.text"
+                  :label="'Choose a ' + underscoreToSpace(option.text)"
                   v-if="
                     option.options.length < 3 &&
                     typeof option.options[0] != 'boolean'
@@ -198,7 +201,7 @@ function flattenOptions() {
                   ></b-form-radio-group>
                 </b-form-group>
                 <b-form-group
-                  :label="option.text + '?'"
+                  :label="capitalise(underscoreToSpace(option.text + '?'))"
                   v-if="option.options[0] == true || option.options[0] == false"
                 >
                   <b-form-checkbox
@@ -213,7 +216,7 @@ function flattenOptions() {
                 </b-form-group>
                 <b-form-group
                   v-if="option.options.length > 2"
-                  :label="'Choose a ' + option.text"
+                  :label="'Choose a ' + underscoreToSpace(option.text)"
                 >
                   <b-form-select
                     v-model="form.selects[i - 1][index].value"
