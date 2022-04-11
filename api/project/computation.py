@@ -78,7 +78,6 @@ def params():
     options = {}
 
     print(METRICS)
-    options['metrics'] = METRICS
     options['defaults'] = DEFAULTS
     # options['filters'] = FILTERS
 
@@ -86,8 +85,15 @@ def params():
     for dataset in DATASETS:
         dataset['params']['dynamic']= [{'name': 'filter', 'nested': False,
                                    'plural': 'filters', 'article': 'a', 'options': FILTERS}]
+
+    #for metric in METRICS['categories']:
+        #print(metric)
+        #metric['options']['params']['dynamic']= [{'name': 'filter', 'nested': False,
+        #                          'plural': 'filters', 'article': 'a', 'options': FILTERS}]
     options['datasets'] = DATASETS
     options['approaches'] = APPROACHES
+    options['metrics'] = METRICS
+
 
     response = {'options': options}
     print(response)
