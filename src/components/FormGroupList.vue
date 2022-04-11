@@ -169,13 +169,13 @@ function flattenOptions() {
                     v-model="form.inputs[i - 1][index].value"
                   ></b-form-input>
                   <div v-if="value.text.includes('split')" class="text-center">
-                    <p class="d-inline px-5">
+                    <p class="px-5">
                       <strong>Train:</strong>
-                      <i>{{ form.inputs[i - 1][index].value }}</i>
+                      <i>{{' ' + form.inputs[i - 1][index].value }}</i>
                     </p>
-                    <p class="d-inline px-5">
+                    <p class="px-5">
                       <strong>Test:</strong>
-                      <i>{{ 100 - form.inputs[i - 1][index].value }}</i>
+                      <i>{{' '}}{{100 - form.inputs[i - 1][index].value}}</i>
                     </p>
                   </div>
                 </b-form-group>
