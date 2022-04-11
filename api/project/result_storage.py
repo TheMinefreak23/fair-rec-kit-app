@@ -17,6 +17,7 @@ import datetime
 # timestamp (ID), per dataset: recommendations result, per recs result: metrics evaluations
 
 current_result = {}
+current_recs = {}
 results_overview_path = 'results.json'
 mock_results_overview_path = 'mock/results_overview.json'
 mock_results_path = 'mock/results.json'

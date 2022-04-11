@@ -17,12 +17,17 @@ const done = ref(false)
 
 // Ping
 onMounted(async () => {
-  console.log(API_URL)
+  //console.log(API_URL)
   const response = await fetch(API_URL)
   const data = await response.json()
   console.log(data)
 })
 const tabIndex = ref(0)
+
+// Make result tab the active tab
+function goToResult() {
+  tabIndex.value = 3
+}
 </script>
 
 <style scoped>
@@ -54,8 +59,10 @@ b-tab.success {
         </template>
       </b-tab>
       <b-tab title="Documentation"> <Documentation /></b-tab>
-      <b-tab title="Results"> <Results @goToResult="tabIndex = 3" /></b-tab>
-      <b-tab title="All results"> <PreviousResults /></b-tab>
+      <b-tab title="Results"> <Results @goToResult="goToResult" /></b-tab>
+      <b-tab title="All results">
+        <PreviousResults @goToResult="goToResult"
+      /></b-tab>
     </b-tabs>
   </div>
 </template>
