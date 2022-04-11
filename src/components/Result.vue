@@ -4,7 +4,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
 import Table from './Table.vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 
 import mockdata from '../../api/mock/1647818279_HelloWorld/results-table.json'
 import { API_URL } from '../api'
@@ -13,7 +13,6 @@ const props = defineProps({ headers: Array, result: Object })
 
 const headers_rec = ref([{ name: 'User' }, { name: 'Item' }, { name: 'Score' }])
 
-const computation_name = ref('computation1')
 const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
 const data = ref([])
@@ -22,15 +21,30 @@ const index = ref(0)
 const ascending = ref(true)
 const entryAmount = ref(20)
 
-const testcaption = ref('Dataset: LFM-1b, Algorithm: ALS')
+watch(
+  () => props.result,
+  async (newResult) => {
+    //console.log(newResult.id)
+    setRecs()
+  }
+)
 
-function makeHeaders(result) {
-  //console.log(result)
-  const headers = Object.keys(result).map((key) => ({
-    name: key,
-  }))
-  //console.log(headers)
-  return headers
+onMounted(() => {
+  setRecs()
+})
+
+//POST request: Send result ID to the server to set current shown recommendations.
+async function setRecs() {
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      id: props.result.id,
+    }),
+  }
+  fetch(API_URL + '/all-results/set-recs', requestOptions).then(() => {
+    getUserRecs()
+  })
 }
 
 //POST request: Ask server for next part of user recommendation table.
@@ -39,6 +53,7 @@ async function getUserRecs() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
+      id: props.result.id,
       start: startIndex.value,
       sortindex: index.value,
       ascending: ascending.value,
@@ -47,7 +62,7 @@ async function getUserRecs() {
   }
 
   const response = await fetch(API_URL + '/all-results/result', requestOptions)
-  data.value = await response.json()
+  data.value.results = await response.json()
 }
 
 //Loads more data in the table after user asks for more data.
@@ -80,30 +95,6 @@ function paginationSort(indexVar) {
 function handleScroll() {
   console.log('test')
 }
-
-function omitRecommendation(arr) {
-  return arr.map(
-    // Omit recommendation
-    (r) => ({
-      ...r,
-      recs: r.recs.map((rec) => {
-        const { recommendation, ...rest } = rec
-        return rest
-      }),
-    })
-  )
-}
-
-function showDatasetInfo(dataset) {
-  return (
-    'Dataset: ' +
-    dataset.name +
-    (dataset.parameter ? 'with parameters' + dataset.parameter : '')
-  )
-}
-onMounted(() => {
-  getUserRecs()
-})
 </script>
 
 <template>
@@ -111,7 +102,7 @@ onMounted(() => {
     <h1 class="display-2">Results</h1>
     <p class="lead">
       These are the results for your computation with the following name:
-      {{ result.length == 0 ? mockdata.computation_name : result.name }}.
+      {{ result.name }}.
     </p>
 
     <div class="col">
@@ -126,31 +117,21 @@ onMounted(() => {
     <div class="row">
       <h4>Metrics</h4>
 
-      <template v-if="result.length == 0">
-        <Table
-          :results="mockdata.body"
-          :headers="mockdata.headers"
-          :removable="false"
-        />
-      </template>
-      <template v-else>
-        <!--Show first two dataset results for now TODO-->
-        <template
-          v-for="datasetResult in omitRecommendation([
-            result.result[0],
-            result.result[1],
-          ])"
-          :key="datasetResult"
-        >
-          <div class="col-6">
-            <Table
-              :caption="showDatasetInfo(datasetResult.dataset)"
-              :results="datasetResult.recs"
-              :headers="makeHeaders(datasetResult.recs[0])"
-              :removable="false"
-            />
-          </div>
-        </template>
+      <!--Show first two dataset results for now TODO-->
+      <template
+        v-for="datasetResult in result.result[1]
+          ? [result.result[0], result.result[1]]
+          : [result.result[0]]"
+        :key="datasetResult"
+      >
+        <div class="col-6">
+          <Table
+            :caption="datasetResult.caption"
+            :results="datasetResult.results"
+            :headers="datasetResult.headers"
+            :removable="false"
+          />
+        </div>
       </template>
     </div>
   </div>
@@ -161,31 +142,18 @@ onMounted(() => {
     </div>
     <div class="row">
       <!--Show recommendations for all datasets for now TODO-->
-      <template
-        v-for="datasetResult in result.length == 0
-          ? [data]
-          : [result.result[0], result.result[1]]"
-        :key="datasetResult"
-      >
-        <div class="col-6">
-          <Table
-            :caption="
-              result.length == 0
-                ? testcaption
-                : showDatasetInfo(datasetResult.dataset)
-            "
-            :results="
-              result.length == 0
-                ? datasetResult
-                : datasetResult.recs.map((rec) => rec.recommendation)
-            "
-            :headers="headers_rec"
-            pagination
-            @paginationSort="(i) => paginationSort(i)"
-            @loadMore="(increase, amount) => loadMore(increase, amount)"
-          />
-        </div>
-      </template>
+      <!--<template v-for="data in [data]" :key="data">-->
+      <div class="col-6">
+        <Table
+          caption=""
+          :results="data.results"
+          :headers="headers_rec"
+          pagination
+          @paginationSort="(i) => paginationSort(i)"
+          @loadMore="(increase, amount) => loadMore(increase, amount)"
+        />
+      </div>
+      <!--</template>-->
     </div>
   </div>
 </template>

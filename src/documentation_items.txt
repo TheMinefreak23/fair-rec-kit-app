@@ -1,41 +1,74 @@
-Item list for in documentation tab
+
+`Item list for in documentation tab
 Only lines within curly brackets in the following format are read:
 
-{
+\curlybracket-open
 <name> sometext abcdef </name>
-<definition> sometext abcdef </definition>
+<definition> Uses HTML syntax </definition>
 <link> sometext abcdef </link>
 <other1> sometext abcdef </other1>
+Some comment...
 <other?> sometext abcdef </other?>
-}
+\curlybracket-closed
 
-blabla I'm just a comment...
-Documentation items:
-{
-<name> test1 algorithm </name>
-<definition> test1 is a blablabla. </definition>
-<link> https://www.hiiii.com </link>
-<other1> extendable. </other1>
-I'm also a comment actually.
-}
-
-{
-<name> LFM2B </name>
-<definition> Last FM 2 Billion dataset is a corpus of Music Listening Events for Music Recommendation and. 
-Next. paragraph.
-
-Paragraph with extra newline.
-</definition>
-<link> Retrieval.eeeeeeee </link>
-<other1> http://www.cp.jku.at/datasets/LFM-2b/ </other1>
-}
+Adding new <tags> should be manually added to Documentation.vue's template.
 
 =================================================
 
 {
 <name> FairRecKit </name>
-<definition> WebApp to compare different recommender approaches. Developed by RecCoons, from Utrecht University. </definition>
+<definition> 
+WebApp to compare different recommender approaches. Developed by RecCoons, from Utrecht University. <br>
+dddsa dsfd <h1>fefs</h1>s
+cdscs
+<p>fsdf
+fd
+</p>
+<br>
+<h2>HTML Table</h2>
+
+<table>
+  <tr>
+    <th>Company</th>
+    <th>Contact</th>
+    <th>Country</th>
+  </tr>
+  <tr>
+    <td>Alfreds Futterkiste</td>
+    <td>Maria Anders</td>
+    <td>Germany</td>
+  </tr>
+  <tr>
+    <td>Centro comercial Moctezuma</td>
+    <td>Francisco Chang</td>
+    <td>Mexico</td>
+  </tr>
+  <tr>
+    <td>Ernst Handel</td>
+    <td>Roland Mendel</td>
+    <td>Austria</td>
+  </tr>
+  <tr>
+    <td>Island Trading</td>
+    <td>Helen Bennett</td>
+    <td>UK</td>
+  </tr>
+  <tr>
+    <td>Laughing Bacchus Winecellars</td>
+    <td>Yoshi Tannamuri</td>
+    <td>Canada</td>
+  </tr>
+  <tr>
+    <td>Magazzini Alimentari Riuniti</td>
+    <td>Giovanni Rovelli</td>
+    <td>Italy</td>
+  </tr>
+</table>
+
+
+</definition>
 <link> http://fairreckit.science.uu.nl/ </link>
+
 <other1> sometext </other1>
 <other?> sometext </other?>
 }
@@ -45,7 +78,8 @@ Tabs:
 
 {
 <name> New Computation </name>
-<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
+<definition> In the this tab you can start a new computation of your desired datasets and the recommender approach. There are a few well-known datasets built-in, but custom datasets can be uploaded as well. Apply filter </definition>
+
 <link> sometext </link>
 <other1> sometext </other1>
 <other?> sometext </other?>

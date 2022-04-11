@@ -12,7 +12,7 @@ const result = ref({})
 const options = ref()
 const form = ref({
   datasets: emptyFormGroup(),
-  //metrics:  emptyFormGroup(),
+  metrics: emptyFormGroup(),
   approaches: emptyFormGroup(),
   //filters: emptyFormGroup(),
   splitMethod: 'random', //The default split method.
@@ -33,16 +33,16 @@ async function getOptions() {
   const response = await fetch(API_URL + '/computation/options')
   const data = await response.json()
   options.value = data.options
-  console.log(options.value)
+  //console.log(options.value)
 }
 
 // POST request: Send form to server.
 async function sendToServer() {
   var sendForm = { ...form.value } // clone
-  sendForm.approaches = reformat(form.value.approaches)
-  //sendForm.metrics = reformat(form.value.metrics)
-  sendForm.datasets = reformat(form.value.datasets)
-  //sendForm.filters = reformat(form.value.filters)
+
+  sendForm.approaches = reformat(sendForm.approaches)
+  sendForm.metrics = reformat(sendForm.metrics)
+  sendForm.datasets = reformat(sendForm.datasets)
 
   const requestOptions = {
     method: 'POST',
@@ -67,7 +67,7 @@ async function initForm() {
   form.value = {}
   metadata.value = {}
   form.value.datasets = emptyFormGroup()
-  //form.value.metrics = emptyFormGroup()
+  form.value.metrics = emptyFormGroup()
   form.value.approaches = emptyFormGroup()
   //form.value.filters = emptyFormGroup()
   form.value.recommendations = options.value.defaults.recCount.default
@@ -86,10 +86,20 @@ function reformat(property) {
   let choices = []
   for (let i in property.main) {
     let parameter = null
-    if (property.inputs[i] != null) parameter = property.inputs[i]
-    else if (property.selects[i] != null) parameter = property.selects[i]
-    choices[i] = { name: property.main[i], parameter: parameter }
-    //console.log('choices:' + choices)
+    if (property.lists[i] != null) {
+      //console.log(property.lists[i])
+      choices[i] = {
+        name: property.main[i],
+        settings: property.lists[i].map((setting) => ({
+          [setting.name]: reformat(setting),
+        })),
+      }
+    } else {
+      if (property.inputs[i] != null) parameter = property.inputs[i]
+      else if (property.selects[i] != null) parameter = property.selects[i]
+      choices[i] = { name: property.main[i], parameter: parameter }
+      //console.log('choices:' + choices)
+    }
   }
   return choices
 }
@@ -202,13 +212,14 @@ function reformat(property) {
 
             <!--Input for metrics, user can add infinite metrics -->
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
-              <!--<FormGroupList
+              <FormGroupList
                 v-model:data="form.metrics"
                 name="metric"
                 plural="metrics"
                 selectName="a metric"
-                :options="options.metrics"
-              />-->
+                :options="options.metrics.categories"
+                :nested="true"
+              />
 
               <!--Input for results filter -->
               <b-form-group label="Select a results filter">

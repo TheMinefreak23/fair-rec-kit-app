@@ -24,6 +24,15 @@ DATASETS = [
 APPROACHES = json.load(open('project/approaches.json'))
 METRICS = json.load(open('project/metrics.json'))
 
+# Generate parameter data
+metric_categories = METRICS['categories']
+for category in metric_categories:
+    if category['text'] == 'Accuracy':
+        metric_params = {'values': [{'text': 'k', 'default': 10, 'min': 1, 'max': 20}]}
+    else:
+        metric_params = {}
+    category['options'] = list(map(lambda metric: {'text': metric, 'params': metric_params}, category['options']))
+
 DEFAULTS = {'split': 80,
             'recCount': {'min': 0, 'max': 100, 'default': 10},
             }  # default values
@@ -51,7 +60,8 @@ def calculate_first():
         for approach in settings['approaches']:
             recommendation = {'approach': approach['name'],'recommendation': recommend(dataset, approach), 'evals': []}
             for metric in settings['metrics']:
-                evaluation = evaluate(approach, metric)
+                evaluation = evaluate_all(dataset['settings'], approach, metric)
+
                 recommendation['evals'].append({'name': metric['name'], 'evaluation': evaluation})
             recs.append(recommendation)
         result.append({'dataset': dataset, 'recs': recs})
@@ -67,17 +77,8 @@ computation_thread = threading.Thread(target=calculate_first)
 def params():
     options = {}
 
-    # Generate parameter data
-    metric_categories = METRICS['categories']
-    for category in metric_categories:
-        metric_params = {'params': {}}
-        if category['text'] == 'Accuracy':
-            metric_params['values'] = [{'text': 'k', 'default': 10, 'min': 1, 'max': 20}]
-        else:
-            metric_params['values'] = []
-        category['options'] = list(map(lambda metric: {'text': metric, 'params': metric_params}, category['options']))
-
-    # options['metrics'] = metrics
+    print(METRICS)
+    options['metrics'] = METRICS
     options['defaults'] = DEFAULTS
     # options['filters'] = FILTERS
 
@@ -85,9 +86,7 @@ def params():
     for dataset in DATASETS:
         dataset['params'] = {'dynamic':
                                  [{'name': 'filter', 'nested': False,
-                                   'plural': 'Filters', 'article': 'a', 'options': FILTERS},
-                                  {'name': 'metric', 'nested': True,
-                                   'plural': 'Metrics', 'article': 'a', 'options': metric_categories}]}
+                                   'plural': 'filters', 'article': 'a', 'options': FILTERS}]}
     options['datasets'] = DATASETS
     options['approaches'] = APPROACHES
 
@@ -139,14 +138,41 @@ def deleteItem():
 
 
 def recommend(dataset, approach):
-    return dataset['name'] + approach['name'][::-1]  # Mock
+    return dataset['name'] + approach['name'][::-1]  # Mock recommendation
+
+
+def evaluate_all(settings, approach, metric):
+    base_eval = evaluate(approach, metric)
+    evaluation = {'global': base_eval, 'filtered': []}
+
+    print(settings)
+    for setting in settings:
+        print(setting)
+        # Evaluate per filter
+        if setting['filters']:
+            print(setting['filters'])
+            for filter in setting['filters']:
+                evals = []
+                for parameter in filter['parameter']:
+                    value = parameter['value']
+                    # Just use the value if it's a number, otherwise use the length of the word.
+                    filter_eval = value if type(value) == int else len(value)
+                    val = "%.2f" % (base_eval * len(filter['name']) / filter_eval)
+                    evals.append({parameter['name']+' '+str(value):val})
+                evaluation['filtered'].append({filter['name']: evals})
+
+    return evaluation
 
 
 def evaluate(approach, metric):
+    # Mock evaluation
     value = len(approach['name']) * len(metric['name'])
-    parameter = metric['parameter']
-    if hasattr(parameter, 'name'):
-        value *= parameter['name']  # Mock
+
+    # Do something with the metrics parameters.
+    if metric['parameter']:
+        for parameter in metric['parameter']:
+            value *= len(parameter['name'])
+
     return value
 
 
