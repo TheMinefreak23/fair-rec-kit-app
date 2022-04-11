@@ -24,8 +24,17 @@ DATASETS = [
 JSONapproach = open('project/approaches.json')
 APPROACHES = json.load(JSONapproach)
 
-K_METRICS = ['P@K', 'R@K', 'HR@K', 'RR@K', 'NDCG@K']
-OTHER_METRICS = ['DCG', 'RMSE', 'MAE', 'MRR', 'Item Coverage', 'Gini index']
+METRICS = json.load(open('project/metrics.json'))
+
+# Generate parameter data
+metric_categories = METRICS['categories']
+for category in metric_categories:
+    if category['text'] == 'Accuracy':
+        metric_params = {'values': [{'text': 'k', 'default': 10, 'min': 1, 'max': 20}]}
+    else:
+        metric_params = {}
+    category['options'] = list(map(lambda metric: {'text': metric, 'params': metric_params}, category['options']))
+
 DEFAULTS = {'split': 80,
             'recCount': {'min': 0, 'max': 100, 'default': 10},
             }  # default values
@@ -40,7 +49,7 @@ computation_queue = []
 
 
 def calculate_first():
-    time.sleep(5)  # Mock computation duration.
+    time.sleep(2.5)  # Mock computation duration.
 
     computation = computation_queue.pop()  # Get the oldest computation from the queue.
 
@@ -51,9 +60,10 @@ def calculate_first():
     for dataset in datasets:
         recs = []
         for approach in settings['approaches']:
-            recommendation = {'recommendation': recommend(dataset, approach), 'evals': []}
+            recommendation = {'approach': approach['name'],'recommendation': recommend(dataset, approach), 'evals': []}
             for metric in settings['metrics']:
-                evaluation = evaluate(approach, metric)
+                evaluation = evaluate_all(dataset['settings'], approach, metric)
+
                 recommendation['evals'].append({'name': metric['name'], 'evaluation': evaluation})
             recs.append(recommendation)
         result.append({'dataset': dataset, 'recs': recs})
@@ -68,21 +78,22 @@ computation_thread = threading.Thread(target=calculate_first)
 @compute_bp.route('/options', methods=['GET'])
 def params():
     options = {}
+
+    print(METRICS)
+    options['metrics'] = METRICS
+    options['defaults'] = DEFAULTS
+    # options['filters'] = FILTERS
+
+    # MOCK: for now use all filters/metrics per dataset
+    for dataset in DATASETS:
+        dataset['params'] = {'dynamic':
+                                 [{'name': 'filter', 'nested': False,
+                                   'plural': 'filters', 'article': 'a', 'options': FILTERS}]}
     options['datasets'] = DATASETS
     options['approaches'] = APPROACHES
 
-    # Generate parameter data
-    metrics = []
-    for metric in K_METRICS:
-        metric_params = {'values': [{'text': 'k', 'default': 10, 'min': 1, 'max': 20}]}
-        metrics.append({'text': metric, 'params': metric_params})
-    for metric in OTHER_METRICS:
-        metrics.append({'text': metric, 'params': []})
-
-    options['metrics'] = metrics
-    options['defaults'] = DEFAULTS
-    options['filters'] = FILTERS
     response = {'options': options}
+    print(response)
     return response
 
 
@@ -96,7 +107,7 @@ def calculate():
         print(data)
         append_queue(data.get('metadata'), settings)
 
-        #response = {'status': 'success'}
+        # response = {'status': 'success'}
         response = json.dumps(computation_queue)
     else:
         if computation_thread.is_alive():
@@ -120,7 +131,7 @@ def queue():
 
 
 @compute_bp.route('/queue/delete', methods=['POST'])
-#Pop the selected index from the queue
+# Pop the selected index from the queue
 def deleteItem():
     data = request.get_json()
     index = data.get('index')
@@ -129,14 +140,41 @@ def deleteItem():
 
 
 def recommend(dataset, approach):
-    return dataset['name'] + approach['name'][::-1]  # Mock
+    return dataset['name'] + approach['name'][::-1]  # Mock recommendation
+
+
+def evaluate_all(settings, approach, metric):
+    base_eval = evaluate(approach, metric)
+    evaluation = {'global': base_eval, 'filtered': []}
+
+    print(settings)
+    for setting in settings:
+        print(setting)
+        # Evaluate per filter
+        if setting['filters']:
+            print(setting['filters'])
+            for filter in setting['filters']:
+                evals = []
+                for parameter in filter['parameter']:
+                    value = parameter['value']
+                    # Just use the value if it's a number, otherwise use the length of the word.
+                    filter_eval = value if type(value) == int else len(value)
+                    val = "%.2f" % (base_eval * len(filter['name']) / filter_eval)
+                    evals.append({parameter['name']+' '+str(value):val})
+                evaluation['filtered'].append({filter['name']: evals})
+
+    return evaluation
 
 
 def evaluate(approach, metric):
+    # Mock evaluation
     value = len(approach['name']) * len(metric['name'])
-    parameter = metric['parameter']
-    if hasattr(parameter,'name'):
-        value *= parameter['name']  # Mock
+
+    # Do something with the metrics parameters.
+    if metric['parameter']:
+        for parameter in metric['parameter']:
+            value *= len(parameter['name'])
+
     return value
 
 
@@ -148,5 +186,3 @@ def append_queue(metadata, settings):
     current_request = {'timestamp': {'stamp': timestamp, 'datetime': current_dt}, 'metadata': metadata,
                        'settings': settings}
     computation_queue.append(current_request)
-
-

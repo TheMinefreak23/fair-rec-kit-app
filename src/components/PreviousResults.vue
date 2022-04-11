@@ -1,10 +1,15 @@
 <script setup>
+/*This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import Table from './Table.vue'
 import { onMounted, ref, watch } from 'vue'
 import { formatResults, formatResult } from '../helpers/resultFormatter.js'
 
-import { store } from '../store.js'
+import { addResult, store } from '../store.js'
 import { API_URL } from '../api'
+
+const emit = defineEmits(['goToResult'])
 
 const exResults = ref([
   { id: 1, age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
@@ -35,8 +40,8 @@ onMounted(() => {
 })
 
 watch(
-  () => store.currentResult,
-  (result) => {
+  () => store.currentResults,
+  () => {
     getResults()
   }
 )
@@ -44,7 +49,7 @@ watch(
 async function getResults() {
   const response = await fetch(API_URL + '/all-results')
   const data = await response.json()
-  console.log(data)
+  //console.log(data)
   let allResults = data.all_results
   results.value = formatResults(allResults)
   //console.log(results.value)
@@ -70,8 +75,8 @@ async function loadResult(resultId) {
 async function getResult() {
   const response = await fetch(url)
   const data = await response.json()
-  store.currentResult = formatResult(data.result)
-  console.log(store.currentResult)
+  addResult(formatResult(data.result))
+  emit('goToResult')
 }
 </script>
 
@@ -83,11 +88,11 @@ async function getResult() {
         @loadResult="loadResult"
         :results="results"
         :headers="headers"
-        :buttonText="'Remove'"
+        buttonText="Remove"
         :removable="true"
         :overview="true"
-        :serverFile="API_URL + '/all-results/delete'"
-        :serverFile2="API_URL + '/all-results/edit'"
+        serverFile="/all-results/delete"
+        serverFile2="/all-results/edit"
       />
       <p>{{ testMessage }}</p>
     </div>

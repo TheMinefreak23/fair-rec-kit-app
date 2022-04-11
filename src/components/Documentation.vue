@@ -8,18 +8,30 @@ Documentation tab which shows all algorithms, metrics, datasets, etc. and their 
 
 import { ref } from 'vue'
 
+// hardcoded documentation_items.txt
 let doctexthard = 
 `Item list for in documentation tab
 Only lines within curly brackets in the following format are read:
+
+\curlybracket-open
+<name> sometext abcdef </name>
+<definition> Uses HTML syntax </definition>
+<link> sometext abcdef </link>
+<other1> sometext abcdef </other1>
+Some comment...
+<other?> sometext abcdef </other?>
+\curlybracket-closed
+
+Adding new <tags> should be manually added to Documentation.vue's template.
 
 =================================================
 
 {
 <name> FairRecKit </name>
-<definition> WebApp to compare different recommender approaches. Developed by RecCoons, from Utrecht University. </definition>
+<definition> 
+WebApp to compare different recommender approaches. Developed by RecCoons, from Utrecht University.
+</definition>
 <link> http://fairreckit.science.uu.nl/ </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
 }
 
 -----
@@ -27,10 +39,20 @@ Tabs:
 
 {
 <name> New Computation </name>
-<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
+<definition>
+<p>In this tab you can start a new computation of your desired datasets and the recommender approach. There are a few well-known datasets built-in, but custom datasets can be uploaded as well. After having chosen the datasets, one or more filters can be applied wat doet dit?.</p>
+<p>Next, add the recommender approaches that you want compared and select the number of recommendation per user wat doet dit?. Then, the train-test ratio and the different metrics to compare the performance.</p>
+<p>Lastly, enter the metadata to identify your computation. After pressing Send, this data will be added to the queue in Active Computations and send to the server to be executed.</p>
+<p>For more information about each step, refer to the list below:</p>
+<ul>
+<li><a href="#LFM2B">Datasets</li>
+<li><a href="#LFM2B">Filters</li>
+<li><a href="#FunkSVD">Recommender approaches</li>
+<li><a href="###">Train/test-split</li>
+<li><a href="tabIndex=1">Metrics</li>
+<li><a href="#">Meta</li>
+</ul>
+</definition>
 }
 
 {
@@ -269,33 +291,33 @@ http://www.cp.jku.at/datasets/LFM-2b/
 <other1> sometext </other1>
 <other?> sometext </other?>
 }
-
 `;
 let itemDicts = ref();
 
-/**
- * Has to be changed to internal file selector: no user input needed.
- */
-function previewFile() {
-  const content = document.querySelector('.content');
-  const [file] = document.querySelector('input[type=file]').files;
-  const reader = new FileReader();
+// /**
+//  * Has to be changed to internal file selector: no user input needed.
+//  */
+// function previewFile() {
+//   const content = document.querySelector('.content');
+//   const [file] = document.querySelector('input[type=file]').files;
+//   const reader = new FileReader();
   
-  // Temporary Main
-  reader.addEventListener("load", () => {
-    let doctext = "";
-    // this will then display a text file
-    doctext = reader.result;
-    itemDicts.value = parse(doctext);
-    console.log(itemDicts);
-  }, false);
+//   // Temporary Main
+//   reader.addEventListener("load", () => {
+//     let doctext = "";
+//     // this will then display a text file
+//     doctext = reader.result;
+//     itemDicts.value = parse(doctext);
+//     console.log(itemDicts);
+//   }, false);
 
-  if (file) {
-    reader.readAsText(file);
-  }
-}
+//   if (file) {
+//     reader.readAsText(file);
+//   }
+// }
+
 itemDicts = parse(doctexthard);
-console.log(itemDicts);
+
 /**
  * Parses the content of documentation_items.txt into items.
  * @param {String} text - documentation_items.txt as one string.
@@ -307,6 +329,7 @@ function parse(text) {
   for (let i in stringItems) {
     items.push(parseItem(stringItems[i]));
   }
+  console.log(items);
   return items;
 }
 
@@ -323,7 +346,6 @@ function parseTextIntoItems(text) {
   // Parse into items
   for (let i in text) {
     let character = text[i];
-    // console.log(character);
     if (character == "{") {
       readItem = true;
       continue;
@@ -349,20 +371,24 @@ function parseItem(item) {
   let dict = {};
   let key = "";
   let value = "";
+  let keytagFound = false; // Prevents nested tags
   let itemWords = item.split(/\s/);
   for (let i in itemWords) {
     let word = itemWords[i];
-    if (word.match(/(?<=<).*(?=>)/)) {
-      // Ending element e.g., </name>.
-      if (word.match(/\/.*/)) {
+    if (word.match(/<.*>/)) {
+      // Ending tag e.g., </name>.
+      const endTag = new RegExp("</" + key + ">", 'g');
+      if (word.match(endTag)) {
         value = value.slice(0, -1); // Remove trailing whitespace.
         dict[key] = value;
         key = "";
         value = "";
+        keytagFound = false;
       }
-      // Starting element e.g., <name>.
-      else {
-        key = word.match(/(?<=<).*(?=>)/);
+      // Starting tag e.g., <name>.
+      else if (!keytagFound) {
+        keytagFound = true;
+        key = word.match(/(?<=<).*(?=>)/)[0];
         continue;
       }
     }
@@ -371,20 +397,69 @@ function parseItem(item) {
   return dict;
 }
 
-
 </script>
+
+<style>
+/* Can be added in custom.scss */
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+</style>
 
 <template>
   <!-- b-sidebar -->
-  <div v-for="itemDict in itemDicts" :key="itemDict">
-    <b-card>
+  <!-- <b-button v-b-toggle.sidebar-1>Toggle Sidebar</b-button>
+    <b-sidebar id="sidebar-1" title="Sidebar" shadow>
+      <div class="px-3 py-2">
+        <p>
+          Cras mattis consectetur purus sit amet fermentum. Cras justo odio, dapibus ac facilisis
+          in, egestas eget quam. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.
+        </p>
+        <b-img src="https://picsum.photos/500/500/?image=54" fluid thumbnail></b-img>
+      </div>
+    </b-sidebar> -->
+
+  <!-- <b-button v-b-toggle.toc-sidebar>fdd</b-button>
+  <b-collapse class="mt-2" id="toc-sidebar" visible>
+    <b-sidebar title="Sidebar" right shadow class="py-1 py-2">
+      <p>sdfdssssssssssssssssssssssssssssssssssssssf</p>ddd
+    </b-sidebar>
+  </b-collapse> -->
+  
+  <!-- <b-navbar toggleable="lg" type="dark" variant="info">
+    <b-navbar-toggle target="sidebar"></b-navbar-toggle>
+    <b-collapse id="sidebar" is-nav vertical visible right>
+      <b-nav-item>fdsfd</b-nav-item>
+      <b-nav-item>fdsfd</b-nav-item>
+      <b-nav-item>fdsfd</b-nav-item>
+    </b-collapse>
+  </b-navbar> -->
+  
+  
+  <div class="text-right py-1 mx-5" v-for="itemDict in itemDicts" :key="itemDict">
+    <b-card :id='itemDict["name"]'>
       <b-card-title>{{ itemDict["name"] }}</b-card-title>
-      <b-card-text>{{ itemDict["definition"] }}</b-card-text>
+      <b-card-text>
+        <!-- Uses HTML syntax -->
+        <span v-html='itemDict["definition"]'></span>
+      </b-card-text>
       <b-link :href='itemDict["link"]'>{{ itemDict["link"] }}</b-link>
-      <br>
       <b-button :href='itemDict["other?"]' v-if='itemDict["other?"]'>
+        <br>
         {{ itemDict["other?"] }}
       </b-button>
-    </b-card>
+    </b-card>    
   </div>
 </template>

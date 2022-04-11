@@ -67,9 +67,9 @@ async function cancelComputation() {
       <Table
         :results="formatResults(store.queue)"
         :headers="headers"
-        :buttonText="'Cancel'"
+        buttonText="Cancel"
         :removable="true"
-        :serverFile="API_URL + '/computation/queue/delete'"
+        serverFile="/computation/queue/delete"
       />
       <!--Temporary test buttons-->
       <b-button @click="$emit('computing')">Computing</b-button>

@@ -1,14 +1,50 @@
 <script setup>
-import Result from './Result.vue'
-import VDismissButton from './VDismissButton.vue'
-import PreviousResults from './PreviousResults.vue'
-import { ref } from 'vue'
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
+import Result from './Result.vue'
+import VDismissButton from './VDismissButton.vue'
+import PreviousResults from './PreviousResults.vue'
+import { onMounted, ref, watch } from 'vue'
+import { store, addResult } from '../store'
+import { formatResult } from '../helpers/resultFormatter'
+import { API_URL } from '../api'
+
+const emit = defineEmits(['goToResult'])
+const showResultModal = ref(false)
+
+watch(
+  () => store.queue,
+  (newQueue, oldQueue) => {
+    if (newQueue.length < oldQueue.length) getCalculation()
+  }
+)
+
+// GET request: Ask server for latest calculation
+async function getCalculation() {
+  const response = await fetch(API_URL + '/computation/calculation')
+  const data = await response.json()
+  console.log(data)
+  //if (Object.keys(data).length === 0) // not null check
+  //store.currentResult = data.calculation
+  addResult(formatResult(data.calculation))
+  showResultModal.value = true
+}
 </script>
 
 <template>
+  <!--Shows when there is a new result-->
+  <b-modal
+    id="result-modal"
+    v-model="showResultModal"
+    title="New result"
+    ok-title="View new result"
+    ok-variant="danger"
+    cancel-title="Cancel"
+    @ok="$emit('goToResult')"
+  >
+    <p>An experiment has finished.</p>
+  </b-modal>
   <b-card>
     <div class="mx-5 mt-2">
       <div class="border-top-0 p-0">
@@ -26,19 +62,15 @@ Utrecht University within the Software Project course.
         </div>
         <div class="border">
           <b-tabs card content-class="mt-3">
-            <b-tab>
+            <!-- Result tabs.-->
+            <!--Always show JSON Mockdata result tab.-->
+            <b-tab v-for="result in [...store.currentResults]" :key="result.id">
               <template #title>
-                Result 1
+                Result {{ result.name }}
                 <VDismissButton />
               </template>
-
-              <!-- Mock headers for now -->
-              <Result />
-            </b-tab>
-
-            <b-tab title="Result1"><p>I'm Result 1</p></b-tab>
-            <b-tab title="Result2"><p>I'm Result 2</p></b-tab>
-            <b-tab title="Result3"><p>I'm Result 3</p></b-tab>
+              <Result :result="result"
+            /></b-tab>
           </b-tabs>
         </div>
 
@@ -48,7 +80,7 @@ Utrecht University within the Software Project course.
           id="offcanvasRight"
           aria-labelledby="offcanvasRightLabel"
         >
-          <PreviousResults />
+          <PreviousResults @goToResult="" />
         </div>
       </div>
 
