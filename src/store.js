@@ -14,7 +14,11 @@ function mockResult() {
   return { id: 0, name: 'computation1', result: [mock, mock] }
 }
 
-const store = reactive({ currentResults: [mockResult()], queue: [] })
+const store = reactive({
+  currentResults: [mockResult()],
+  queue: [],
+  allResults: [],
+})
 
 // Add a new result to the global current shown results state
 function addResult(result) {
