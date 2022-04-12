@@ -33,7 +33,6 @@ const ex1PerPage = ref(10)
 const ex1Rows = ref(100)
 
 const testMessage = ref('')
-const results = ref([])
 
 onMounted(() => {
   getResults()
@@ -51,7 +50,7 @@ async function getResults() {
   const data = await response.json()
   //console.log(data)
   let allResults = data.all_results
-  results.value = formatResults(allResults)
+  store.allResults = formatResults(allResults)
   //console.log(results.value)
 }
 
@@ -86,7 +85,8 @@ async function getResult() {
       <h3>Previous results</h3>
       <Table
         @loadResult="loadResult"
-        :results="results"
+        @loadResults="getResults"
+        :results="store.allResults"
         :headers="headers"
         buttonText="Remove"
         :removable="true"
