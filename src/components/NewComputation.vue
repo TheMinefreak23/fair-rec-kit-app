@@ -4,7 +4,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import { onMounted, ref, watch } from 'vue'
 import FormGroupList from './FormGroupList.vue'
-import { sendMockData } from '../test/mockComputation.js'
+import { sendMockData } from '../test/mockComputationOptions.js'
 import { store } from '../store.js'
 import { API_URL } from '../api'
 
@@ -174,42 +174,6 @@ function reformat(property) {
           </b-col>
 
           <b-col class="p-0">
-            <!--Input for train/test split-->
-            <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
-              <h3 class="text-center">Train/test-split</h3>
-              <b-form-group label="Select test/train split:">
-                <b-form-input
-                  type="range"
-                  min="0"
-                  max="100"
-                  step="5"
-                  id="customRange"
-                  v-model="form.split"
-                ></b-form-input>
-                <div class="text-center">
-                  <p class="d-inline px-5">
-                    <strong>Train: </strong><i>{{ form.split }}</i>
-                  </p>
-                  <p class="d-inline px-5">
-                    <strong>Test: </strong><i>{{ 100 - form.split }}</i>
-                  </p>
-                </div>
-              </b-form-group>
-
-              <!--User can choose between a random and time-based train/testsplit-->
-              <b-form-group label="Type of split:">
-                <b-form-radio-group
-                  id="split-type"
-                  v-model="form.splitMethod"
-                  :options="splitOptions"
-                  name="split-type"
-                >
-                  <!--<b-form-radio value="random">Random (default)</b-form-radio>
-                  <b-form-radio value="timesplit">Timesplit</b-form-radio>-->
-                </b-form-radio-group>
-              </b-form-group>
-            </div>
-
             <!--Input for metrics, user can add infinite metrics -->
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
               <FormGroupList
