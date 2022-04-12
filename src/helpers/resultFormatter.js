@@ -127,4 +127,8 @@ function capitalise(string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
-export { formatResults, formatResult, capitalise }
+function underscoreToSpace(string) {
+  return string.replaceAll('_', ' ')
+}
+
+export { formatResults, formatResult, capitalise, underscoreToSpace }
