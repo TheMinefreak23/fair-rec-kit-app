@@ -42,7 +42,7 @@ onMounted(() => {
 function setParameter(i, val) {
   //console.log(flatOptions)
   //console.log(options)
-  let option = flatOptions.find((option) => option.text === val)
+  let option = findOption(val)
   let choices
   //console.log(props.name)
   //console.log(option.params)
@@ -54,7 +54,6 @@ function setParameter(i, val) {
         value: param.default,
       }))
     }
-
     if (option.params.options && option.params.options.length > 0) {
       choices = option.params.options
       form.value.selects[i] = choices.map((param) => ({
@@ -81,10 +80,14 @@ function getFromIndex(i) {
   //console.log(props.options)
   //console.log(form.value.main[i])
 
-  const option = flatOptions.find(
-    (option) => option.text === form.value.main[i]
-  )
+  const option = findOption(form.value.main[i])
   //console.log(option)
+  return option
+}
+
+function findOption(val) {
+  const option = flatOptions.find((option) => option.text === val)
+  if (!option) return { params: [] }
   return option
 }
 
@@ -247,11 +250,7 @@ function hasParams(i) {
               </b-form-group>
             </b-col>
           </b-row>
-          <b-row
-            v-if="
-              form.main[i - 1] != null && getFromIndex(i - 1).params.length != 0
-            "
-          >
+          <b-row v-if="form.main[i - 1] != null && hasParams(i - 1)">
             <!--Nested form group list.-->
             <template
               v-for="(option, index) in getFromIndex(i - 1).params.dynamic"
