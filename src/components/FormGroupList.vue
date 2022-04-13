@@ -106,6 +106,16 @@ function flattenOptions() {
     .concat()
     .flat()
 }
+
+// Check whether the choice has options
+function hasParams(i) {
+  const option = getFromIndex(i)
+  const listsNotNull =
+    (option.params.values && option.params.values.length != 0) ||
+    (option.params.options && option.params.options.length != 0) ||
+    (option.params.dynamic && option.params.dynamic.length != 0)
+  return option.params.length != 0 && listsNotNull
+}
 </script>
 
 <template>
@@ -132,13 +142,7 @@ function flattenOptions() {
             </b-col>
 
             <!--Show settings for selected option.-->
-            <b-col
-              cols="4"
-              v-if="
-                form.main[i - 1] != null &&
-                getFromIndex(i - 1).params.length != 0
-              "
-            >
+            <b-col cols="4" v-if="form.main[i - 1] != null && hasParams(i - 1)">
               <!--Use an input form for values.-->
               <template
                 v-for="(value, index) in getFromIndex(i - 1).params.values"
