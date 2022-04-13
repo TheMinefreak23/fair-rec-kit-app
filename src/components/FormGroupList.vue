@@ -42,7 +42,7 @@ onMounted(() => {
 function setParameter(i, val) {
   //console.log(flatOptions)
   //console.log(options)
-  let option = flatOptions.find((option) => option.text === val)
+  let option = findOption(val)
   let choices
   //console.log(props.name)
   //console.log(option.params)
@@ -54,7 +54,6 @@ function setParameter(i, val) {
         value: param.default,
       }))
     }
-
     if (option.params.options && option.params.options.length > 0) {
       choices = option.params.options
       form.value.selects[i] = choices.map((param) => ({
@@ -81,10 +80,14 @@ function getFromIndex(i) {
   //console.log(props.options)
   //console.log(form.value.main[i])
 
-  const option = flatOptions.find(
-    (option) => option.text === form.value.main[i]
-  )
+  const option = findOption(form.value.main[i])
   //console.log(option)
+  return option
+}
+
+function findOption(val) {
+  const option = flatOptions.find((option) => option.text === val)
+  if (!option) return { params: [] }
   return option
 }
 
@@ -105,6 +108,16 @@ function flattenOptions() {
     .map((category) => category.options)
     .concat()
     .flat()
+}
+
+// Check whether the choice has options
+function hasParams(i) {
+  const option = getFromIndex(i)
+  const listsNotNull =
+    (option.params.values && option.params.values.length != 0) ||
+    (option.params.options && option.params.options.length != 0) ||
+    (option.params.dynamic && option.params.dynamic.length != 0)
+  return option.params.length != 0 && listsNotNull
 }
 </script>
 
@@ -132,13 +145,7 @@ function flattenOptions() {
             </b-col>
 
             <!--Show settings for selected option.-->
-            <b-col
-              cols="4"
-              v-if="
-                form.main[i - 1] != null &&
-                getFromIndex(i - 1).params.length != 0
-              "
-            >
+            <b-col cols="4" v-if="form.main[i - 1] != null && hasParams(i - 1)">
               <!--Use an input form for values.-->
               <template
                 v-for="(value, index) in getFromIndex(i - 1).params.values"
@@ -243,11 +250,7 @@ function flattenOptions() {
               </b-form-group>
             </b-col>
           </b-row>
-          <b-row
-            v-if="
-              form.main[i - 1] != null && getFromIndex(i - 1).params.length != 0
-            "
-          >
+          <b-row v-if="form.main[i - 1] != null && hasParams(i - 1)">
             <!--Nested form group list.-->
             <template
               v-for="(option, index) in getFromIndex(i - 1).params.dynamic"
