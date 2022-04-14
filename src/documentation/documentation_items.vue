@@ -1,17 +1,24 @@
-# Documentation items
-Item list for in documentation tab
-Only lines within curly brackets in the following format are read:
+<script>
+/**
+ * Below are all items inside the Documentation tab.
+ * To add an item, use the standard format:
 
-\curlybracket-open
+{
 <name> sometext abcdef </name>
 <definition> Uses HTML syntax </definition>
 <link> sometext abcdef </link>
 <other1> sometext abcdef </other1>
-Some comment...
+Some comment or notes...
 <other?> sometext abcdef </other?>
-\curlybracket-closed
+}
 
-Adding new <tags> should be manually added to Documentation.vue's template.
+ * Adding new <tags>, like <other?>, should be manually added to Documentation.vue's template.
+ * 
+ */
+export const doctext = 
+`
+# Documentation items
+Item list for in documentation tab
 
 =================================================
 
@@ -280,3 +287,8 @@ http://www.cp.jku.at/datasets/LFM-2b/
 <other1> sometext </other1>
 <other?> sometext </other?>
 }
+
+`
+;
+
+</script>

@@ -7,320 +7,15 @@ Documentation tab which shows all algorithms, metrics, datasets, etc. and their 
 */
 
 import { ref } from 'vue'
+import { structure } from '../documentation/documentation_structure.vue'
+import { doctext } from '../documentation/documentation_items.vue'
 
 // hardcoded documentation_items.txt
-let doctexthard = 
-`# Documentation items
-Item list for in documentation tab
-Only lines within curly brackets in the following format are read:
-
-\curlybracket-open
-<name> sometext abcdef </name>
-<definition> Uses HTML syntax </definition>
-<link> sometext abcdef </link>
-<other1> sometext abcdef </other1>
-Some comment...
-<other?> sometext abcdef </other?>
-\curlybracket-closed
-
-Adding new <tags> should be manually added to Documentation.vue's template.
-
-=================================================
-
-{
-<name> FairRecKit </name>
-<definition> 
-WebApp to compare different recommender approaches. Developed by RecCoons, from Utrecht University.
-</definition>
-<link> http://fairreckit.science.uu.nl/ </link>
-}
-
------
-Tabs:
-
-{
-<name> New Computation </name>
-<definition>
-<p>In this tab you can start a new computation of your desired datasets and the recommender approach. There are a few well-known datasets built-in, but custom datasets can be uploaded as well. After having chosen the datasets, one or more filters can be applied wat doet dit?.</p>
-<p>Next, add the recommender approaches that you want compared and select the number of recommendation per user wat doet dit?. Then, the train-test ratio and the different metrics to compare the performance.</p>
-<p>Lastly, enter the metadata to identify your computation. After pressing Send, this data will be added to the queue in Active Computations and send to the server to be executed.</p>
-<p>For more information about each step, refer to the list below:</p>
-<ul>
-<li><a href="#LFM2B">Datasets</li>
-<li><a href="#LFM2B">Filters</li>
-<li><a href="#FunkSVD">Recommender approaches</li>
-<li><a href="###">Train/test-split</li>
-<li><a href="tabIndex=1">Metrics</li>
-<li><a href="#">Meta</li>
-</ul>
-</definition>
-}
-
-{
-<name> Active Computations </name>
-<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-{
-<name> Documentation </name>
-<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-{
-<name> Results </name>
-<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-{
-<name> All results </name>
-<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-
-Datasets:
-{
-<name> LFM2B </name>
-<definition> Last FM 2 Billion dataset is a corpus of Music Listening Events for Music Recommendation. It contains more than two billion listening events, intended to be used for various music retrieval and recommendation tasks. </definition>
-<link> http://www.cp.jku.at/datasets/LFM-2b/ </link>
-<other1> sometext </other1>
-}
-
-{
-<name> LFM1B </name>
-<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-{
-<name> LFM360K </name>
-<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-{
-<name> ML25M </name>
-<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-{
-<name> ML100K </name>
-<definition> sometext </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-------
-
-Recommender approaches:
-
-Elliot:
-{
-<name> FunkSVD </name>
-<definition> sometext </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-{
-<name> ItemKNN </name>
-<definition> sometext </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-{
-<name> MultiVAE </name>
-<definition> sometext </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-{
-<name> MostPop </name>
-<definition> sometext </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-{
-<name> PureSVD </name>
-<definition> sometext </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-{
-<name> Random </name>
-<definition> sometext </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-{
-<name> SVDpp </name>
-<definition> sometext </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-{
-<name> UserKNN </name>
-<definition> sometext </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-Implicit:
-{
-<name> AlternatingLeastSquares </name>
-<definition> sometext </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-{
-<name> BayesianPersonalizedRanking </name>
-<definition> sometext </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-{
-<name> LogisticMatrixFactorization </name>
-<definition> sometext </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-Lenskit:
-{
-<name> BiasedMF </name>
-<definition> sometext </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-{
-<name> ImplicitMF </name>
-<definition> sometext </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-{
-<name> PopScore </name>
-<definition> sometext </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-{
-<name> Ra2ndom </name>
-<definition> sometext </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
------
-
-Metrics:
-http://www.cp.jku.at/datasets/LFM-2b/
-
-{
-<name> Ran2dom </name>
-<definition> sometext </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-{
-<name> Rando2m </name>
-<definition> sometext </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-{
-<name> R2andom </name>
-<definition> sometext </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-{
-<name> Random2 </name>
-<definition> sometext </definition>
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
-}
-
-`;
 let itemDicts = ref();
 let sidenavOpened = ref();
 sidenavOpened = false;
 
-// /**
-//  * Has to be changed to internal file selector: no user input needed.
-//  */
-// function previewFile() {
-//   const content = document.querySelector('.content');
-//   const [file] = document.querySelector('input[type=file]').files;
-//   const reader = new FileReader();
-  
-//   // Temporary Main
-//   reader.addEventListener("load", () => {
-//     let doctext = "";
-//     // this will then display a text file
-//     doctext = reader.result;
-//     itemDicts.value = parse(doctext);
-//     console.log(itemDicts);
-//   }, false);
-
-//   if (file) {
-//     reader.readAsText(file);
-//   }
-// }
-
-itemDicts = parse(doctexthard);
+itemDicts = parse(doctext);
 
 /**
  * Parses the content of documentation_items.txt into items.
@@ -400,6 +95,27 @@ function parseItem(item) {
   }
   return dict;
 }
+
+
+function parseStructure(text, start_i) {
+  eval("let x=1;");
+  console.log(x);
+  // let itemName = ""
+  // for (let i = start_i; i < text.length; i++) {
+  //   let c = text[i];
+  //   if (c == "{") {
+  //     i = parseStructure(text.slice(i, text.length), i);
+  //   }
+  //   else if (c =="}") {
+  //     return i;
+  //   }
+  //   else {
+  //     itemName += c;
+  //   }
+  // }
+}
+// function 
+
 
 /**
  * Navigation sidebar toggle collapse
@@ -491,9 +207,7 @@ tr:nth-child(even) {
 <div id="main">
   <span class="position-fixed" style="font-size:30px;cursor:pointer" v-on:click="openCloseNav()">&#9776;</span>
   <div id="docSidenav" class="sidenav">
-    <a href="javascript:void(0)" class="closebtn" v-on:click="closeNav()">
-      <div class="position-fixed">&times;</div>
-    </a>
+    <!-- <a href="javascript:void(0)" class="closebtn position-fixed-left" v-on:click="closeNav()">&times;</a> -->
     <b-link class="position-relative" :href='"#"+itemDict["name"]' v-for="itemDict in itemDicts" :key="itemDict">{{itemDict["name"]}}</b-link>
   </div>
   
