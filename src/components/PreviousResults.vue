@@ -87,6 +87,7 @@ async function getResult() {
         :overview="true"
         serverFile="/all-results/delete"
         serverFile2="/all-results/edit"
+        serverFile3="/all-results/result-by-id"
       />
       <p>{{ testMessage }}</p>
     </div>

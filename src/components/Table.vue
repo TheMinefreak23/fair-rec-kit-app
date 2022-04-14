@@ -15,6 +15,7 @@ const props = defineProps({
   removable: Boolean,
   serverFile: String,
   serverFile2: String,
+  serverFile3: String,
   pagination: Boolean,
   caption: String,
 })
@@ -23,9 +24,11 @@ const caption = ref('')
 const entryAmount = ref(20)
 const deleteModalShow = ref(false)
 const editModalShow = ref(false)
+const viewModalShow = ref(false)
 const newName = ref('')
 const newTags = ref('')
 const newEmail = ref('')
+const metadataStr = ref('')
 const selectedEntry = ref(0)
 const sortindex = ref(0)
 const descending = ref(false)
@@ -75,6 +78,24 @@ async function removeEntry() {
   fetch(API_URL + props.serverFile, requestOptions).then(() => {
     console.log('Item removed succesfully')
   })
+}
+
+async function getMetadata(selectedID){
+  //request the metadata of the specified entry
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json'},
+    body: JSON.stringify({ id: selectedID}),
+  }
+  fetch(API_URL + props.serverFile3, requestOptions).then(() => {
+    console.log('Metadata succesfully requested')
+    getResult()
+  })
+}
+async function getResult() {
+  const response = await fetch(API_URL + props.serverFile3)
+  const data = await response.json()
+  metadataStr.value = data.result
 }
 
 const sorted = computed(() => {
@@ -159,6 +180,15 @@ function setsorting(i) {
     Credit card number (this doesn't do anything):
     <b-form-input type="password"></b-form-input>
   </b-modal>
+  <b-modal
+    id="view-modal"
+    v-model="viewModalShow"
+    title="Metadata"
+    ok-only
+  >
+    <h5>Here is the metadata:</h5>
+    <p>{{ metadataStr }}</p>
+  </b-modal>
 
   <b-table-simple hover striped responsive caption-top>
     <caption>
@@ -203,6 +233,12 @@ function setsorting(i) {
           pill
           @click=";(editModalShow = !editModalShow), (selectedEntry = index)"
           >Edit</b-button
+        >
+        <b-button
+          v-if="overview"
+          pill
+          @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
+          >View metadata</b-button
         >
         <template v-if="removable">
           &nbsp; 
