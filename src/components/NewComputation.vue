@@ -184,14 +184,6 @@ function reformat(property) {
                 :options="options.metrics.categories"
                 :nested="true"
               />
-
-              <!--Input for results filter -->
-              <b-form-group label="Select a results filter">
-                <b-form-select
-                  v-model="form.resFilter"
-                  :options="[{ text: 'Global (default)', value: null }]"
-                ></b-form-select>
-              </b-form-group>
             </div>
 
             <!-- Input for metadata such as:

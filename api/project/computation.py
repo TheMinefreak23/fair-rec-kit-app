@@ -89,8 +89,8 @@ def params():
 
     for metric in METRICS['categories']:
         print(metric)
-        metric['options'][0]['params']['dynamic']= [{'name': 'filter', 'nested': False,
-                                  'plural': 'filters', 'article': 'a', 'options': FILTERS}]
+        metric['options'][0]['params']['dynamic']= [{'name': 'result filter', 'nested': False,
+                                  'plural': 'Result filters', 'article': 'a', 'options': FILTERS}]
     options['datasets'] = DATASETS
     options['approaches'] = APPROACHES
     options['metrics'] = METRICS
