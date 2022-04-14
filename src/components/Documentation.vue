@@ -293,6 +293,8 @@ http://www.cp.jku.at/datasets/LFM-2b/
 }
 `;
 let itemDicts = ref();
+let sidenavOpened = ref();
+sidenavOpened = false;
 
 // /**
 //  * Has to be changed to internal file selector: no user input needed.
@@ -325,11 +327,11 @@ itemDicts = parse(doctexthard);
  */
 function parse(text) {
   let stringItems = parseTextIntoItems(text);
-  let items = [];
+  let items = {};
   for (let i in stringItems) {
-    items.push(parseItem(stringItems[i]));
+    let idict = parseItem(stringItems[i]);
+    items[idict["name"]] = idict;
   }
-  console.log(items);
   return items;
 }
 
@@ -397,6 +399,27 @@ function parseItem(item) {
   return dict;
 }
 
+/**
+ * Navigation sidebar toggle collapse
+ */
+function openCloseNav() {
+  if (sidenavOpened) {
+    closeNav();
+  }
+  else {
+    openNav();
+  }
+}
+function openNav() {
+  sidenavOpened = true;
+  document.getElementById("mySidenav").style.width = "250px";
+  document.getElementById("main").style.marginLeft = "250px";
+}
+function closeNav() {
+  sidenavOpened = false;
+  document.getElementById("mySidenav").style.width = "0";
+  document.getElementById("main").style.marginLeft= "0";
+}
 </script>
 
 <style>
@@ -416,37 +439,62 @@ td, th {
 tr:nth-child(even) {
   background-color: #dddddd;
 }
+
+.sidenav {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #111;
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 60px;
+}
+
+.sidenav a {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 25px;
+  color: #818181;
+  display: block;
+  transition: 0.3s;
+}
+
+.sidenav a:hover {
+  color: #f1f1f1;
+}
+
+.sidenav .closebtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+  margin-left: 50px;
+}
+
+#main {
+  transition: margin-left .5s;
+  padding: 16px;
+}
+
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
 </style>
 
 <template>
-  <!-- b-sidebar -->
-  <!-- <b-button v-b-toggle.sidebar-1>Toggle Sidebar</b-button>
-    <b-sidebar id="sidebar-1" title="Sidebar" shadow>
-      <div class="px-3 py-2">
-        <p>
-          Cras mattis consectetur purus sit amet fermentum. Cras justo odio, dapibus ac facilisis
-          in, egestas eget quam. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.
-        </p>
-        <b-img src="https://picsum.photos/500/500/?image=54" fluid thumbnail></b-img>
-      </div>
-    </b-sidebar> -->
+<div id="main">
+  <span class="position-fixed" style="font-size:30px;cursor:pointer" v-on:click="openCloseNav()">&#9776;</span>
 
-  <!-- <b-button v-b-toggle.toc-sidebar>fdd</b-button>
-  <b-collapse class="mt-2" id="toc-sidebar" visible>
-    <b-sidebar title="Sidebar" right shadow class="py-1 py-2">
-      <p>sdfdssssssssssssssssssssssssssssssssssssssf</p>ddd
-    </b-sidebar>
-  </b-collapse> -->
-  
-  <!-- <b-navbar toggleable="lg" type="dark" variant="info">
-    <b-navbar-toggle target="sidebar"></b-navbar-toggle>
-    <b-collapse id="sidebar" is-nav vertical visible right>
-      <b-nav-item>fdsfd</b-nav-item>
-      <b-nav-item>fdsfd</b-nav-item>
-      <b-nav-item>fdsfd</b-nav-item>
-    </b-collapse>
-  </b-navbar> -->
-  
+  <div id="mySidenav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" v-on:click="closeNav()">
+      <div class="position-fixed">&times;</div>
+    </a>
+    <b-link class="position-relative" :href='"#"+itemDict["name"]' v-for="itemDict in itemDicts" :key="itemDict">{{itemDict["name"]}}</b-link>
+  </div>
   
   <div class="text-right py-1 mx-5" v-for="itemDict in itemDicts" :key="itemDict">
     <b-card :id='itemDict["name"]'>
@@ -462,4 +510,5 @@ tr:nth-child(even) {
       </b-button>
     </b-card>    
   </div>
+</div>
 </template>
