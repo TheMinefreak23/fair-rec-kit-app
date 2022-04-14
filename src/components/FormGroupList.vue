@@ -185,6 +185,9 @@ function hasParams(i) {
                     <strong>Test:</strong
                     ><i>{{ ' ' }}{{ 100 - form.inputs[i - 1][index].value }}</i>
                   </div>
+                  <div v-if="value.text.includes('seed') && form.inputs[i-1][index].value == null" class="text-center">
+                    Seed will be randomly generated.
+                  </div>
                 </b-form-group>
               </template>
 
