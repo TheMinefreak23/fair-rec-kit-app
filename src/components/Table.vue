@@ -228,6 +228,7 @@ function setsorting(i) {
           </b-td>
         </b-td>
 
+        <b-td>
         <b-button
           v-if="overview"
           pill
@@ -238,20 +239,20 @@ function setsorting(i) {
           v-if="overview"
           pill
           @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
-          >View metadata</b-button
+          >View</b-button
         >
         <template v-if="removable">
-          &nbsp; 
+          <!-- &nbsp;  -->
         </template>
         <b-button
           v-if="removable"
           variant="danger"
-          class="text-black"
           @click="
             ;(deleteModalShow = !deleteModalShow), (selectedEntry = index)
           "
           >Delete</b-button
         >
+        </b-td>
       </b-tr>
     </b-tbody>
   </b-table-simple>
