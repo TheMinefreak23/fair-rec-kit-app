@@ -246,6 +246,7 @@ function setsorting(i) {
         <b-button
           v-if="removable"
           variant="danger"
+          class="text-black"
           @click="
             ;(deleteModalShow = !deleteModalShow), (selectedEntry = index)
           "
