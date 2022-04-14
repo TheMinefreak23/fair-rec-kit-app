@@ -10,7 +10,8 @@ import { ref } from 'vue'
 
 // hardcoded documentation_items.txt
 let doctexthard = 
-`Item list for in documentation tab
+`# Documentation items
+Item list for in documentation tab
 Only lines within curly brackets in the following format are read:
 
 \curlybracket-open
@@ -248,7 +249,7 @@ Lenskit:
 }
 
 {
-<name> Random</name>
+<name> Ra2ndom </name>
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
@@ -261,7 +262,7 @@ Metrics:
 http://www.cp.jku.at/datasets/LFM-2b/
 
 {
-<name> Random </name>
+<name> Ran2dom </name>
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
@@ -269,7 +270,7 @@ http://www.cp.jku.at/datasets/LFM-2b/
 }
 
 {
-<name> Random </name>
+<name> Rando2m </name>
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
@@ -277,7 +278,7 @@ http://www.cp.jku.at/datasets/LFM-2b/
 }
 
 {
-<name> Random</name>
+<name> R2andom </name>
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
@@ -285,12 +286,13 @@ http://www.cp.jku.at/datasets/LFM-2b/
 }
 
 {
-<name> Random</name>
+<name> Random2 </name>
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
 <other?> sometext </other?>
 }
+
 `;
 let itemDicts = ref();
 let sidenavOpened = ref();
@@ -412,12 +414,12 @@ function openCloseNav() {
 }
 function openNav() {
   sidenavOpened = true;
-  document.getElementById("mySidenav").style.width = "250px";
+  document.getElementById("docSidenav").style.width = "250px";
   document.getElementById("main").style.marginLeft = "250px";
 }
 function closeNav() {
   sidenavOpened = false;
-  document.getElementById("mySidenav").style.width = "0";
+  document.getElementById("docSidenav").style.width = "0";
   document.getElementById("main").style.marginLeft= "0";
 }
 </script>
@@ -456,7 +458,7 @@ tr:nth-child(even) {
 .sidenav a {
   padding: 8px 8px 8px 32px;
   text-decoration: none;
-  font-size: 25px;
+  font-size: 15px;
   color: #818181;
   display: block;
   transition: 0.3s;
@@ -488,8 +490,7 @@ tr:nth-child(even) {
 <template>
 <div id="main">
   <span class="position-fixed" style="font-size:30px;cursor:pointer" v-on:click="openCloseNav()">&#9776;</span>
-
-  <div id="mySidenav" class="sidenav">
+  <div id="docSidenav" class="sidenav">
     <a href="javascript:void(0)" class="closebtn" v-on:click="closeNav()">
       <div class="position-fixed">&times;</div>
     </a>
