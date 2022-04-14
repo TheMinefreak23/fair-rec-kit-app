@@ -175,7 +175,7 @@ def evaluate(approach, metric):
     value = len(approach['name']) * len(metric['name'])
 
     # Do something with the metrics parameters.
-    if metric['parameter']:
+    if hasattr(metric, 'parameter') and metric['parameter']:
         for parameter in metric['parameter']:
             value *= len(parameter['name'])
 
