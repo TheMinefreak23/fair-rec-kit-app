@@ -32,6 +32,7 @@ for category in metric_categories:
     else:
         metric_params = {}
     category['options'] = list(map(lambda metric: {'text': metric, 'params': metric_params}, category['options']))
+    print(category)
 
 DEFAULTS = {'split': 80,
             'recCount': {'min': 0, 'max': 100, 'default': 10},
@@ -86,10 +87,10 @@ def params():
         dataset['params']['dynamic']= [{'name': 'filter', 'nested': False,
                                    'plural': 'filters', 'article': 'a', 'options': FILTERS}]
 
-    #for metric in METRICS['categories']:
-        #print(metric)
-        #metric['options']['params']['dynamic']= [{'name': 'filter', 'nested': False,
-        #                          'plural': 'filters', 'article': 'a', 'options': FILTERS}]
+    for metric in METRICS['categories']:
+        print(metric)
+        metric['options'][0]['params']['dynamic']= [{'name': 'filter', 'nested': False,
+                                  'plural': 'filters', 'article': 'a', 'options': FILTERS}]
     options['datasets'] = DATASETS
     options['approaches'] = APPROACHES
     options['metrics'] = METRICS
