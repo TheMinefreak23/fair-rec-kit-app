@@ -6,7 +6,12 @@ import { API_URL } from '../api'
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
-const emit = defineEmits(['loadResult', 'loadMore', 'paginationSort'])
+const emit = defineEmits([
+  'loadResult',
+  'loadResults',
+  'loadMore',
+  'paginationSort',
+])
 const props = defineProps({
   overview: Boolean,
   results: Array,
@@ -56,6 +61,7 @@ async function editEntry() {
   }
   fetch(API_URL + props.serverFile2, requestOptions).then(() => {
     console.log('Item edited succesfully')
+    emit('loadResults')
   })
   newName.value = ''
   newTags.value = ''

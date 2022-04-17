@@ -103,9 +103,9 @@ function formatEvaluation(e, result) {
       // Mock: get first entry for now
       const [name, val] = Object.entries(filter)[0]
       //const filterName = e.name + ' ' + name
-      const filterName = capitalise(name)
+      const filterName = e.name + name
       result[filterName] = val
-      subheaders.push(filterName)
+      subheaders.push(capitalise(name))
       //console.log(subheaders)
     })
 
@@ -127,4 +127,8 @@ function capitalise(string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
-export { formatResults, formatResult, capitalise }
+function underscoreToSpace(string) {
+  return string.replaceAll('_', ' ')
+}
+
+export { formatResults, formatResult, capitalise, underscoreToSpace }

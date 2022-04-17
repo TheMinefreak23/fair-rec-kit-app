@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { capitalise } from '../helpers/resultFormatter'
+import { underscoreToSpace } from '../helpers/resultFormatter'
 
 //const emit = defineEmits(['formChange'])
 const props = defineProps({
@@ -41,7 +42,7 @@ onMounted(() => {
 function setParameter(i, val) {
   //console.log(flatOptions)
   //console.log(options)
-  let option = flatOptions.find((option) => option.text === val)
+  let option = findOption(val)
   let choices
   //console.log(props.name)
   //console.log(option.params)
@@ -53,7 +54,6 @@ function setParameter(i, val) {
         value: param.default,
       }))
     }
-
     if (option.params.options && option.params.options.length > 0) {
       choices = option.params.options
       form.value.selects[i] = choices.map((param) => ({
@@ -80,10 +80,14 @@ function getFromIndex(i) {
   //console.log(props.options)
   //console.log(form.value.main[i])
 
-  const option = flatOptions.find(
-    (option) => option.text === form.value.main[i]
-  )
+  const option = findOption(form.value.main[i])
   //console.log(option)
+  return option
+}
+
+function findOption(val) {
+  const option = flatOptions.find((option) => option.text === val)
+  if (!option) return { params: [] }
   return option
 }
 
@@ -104,6 +108,16 @@ function flattenOptions() {
     .map((category) => category.options)
     .concat()
     .flat()
+}
+
+// Check whether the choice has options
+function hasParams(i) {
+  const option = getFromIndex(i)
+  const listsNotNull =
+    (option.params.values && option.params.values.length != 0) ||
+    (option.params.options && option.params.options.length != 0) ||
+    (option.params.dynamic && option.params.dynamic.length != 0)
+  return option.params.length != 0 && listsNotNull
 }
 </script>
 
@@ -131,13 +145,7 @@ function flattenOptions() {
             </b-col>
 
             <!--Show settings for selected option.-->
-            <b-col
-              cols="4"
-              v-if="
-                form.main[i - 1] != null &&
-                getFromIndex(i - 1).params.length != 0
-              "
-            >
+            <b-col cols="4" v-if="form.main[i - 1] != null && hasParams(i - 1)">
               <!--Use an input form for values.-->
               <template
                 v-for="(value, index) in getFromIndex(i - 1).params.values"
@@ -146,7 +154,7 @@ function flattenOptions() {
                 <b-form-group
                   :label="
                     'Give a ' +
-                    value.text +
+                    underscoreToSpace(value.text) +
                     ' between ' +
                     value.min +
                     ' and ' +
@@ -154,14 +162,32 @@ function flattenOptions() {
                   "
                 >
                   <b-form-input
+                    v-if="!value.text.includes('split')"
                     v-model="form.inputs[i - 1][index].value"
-                    required
                     :state="
                       form.inputs[i - 1][index].value >= value.min &&
                       form.inputs[i - 1][index].value <= value.max
                     "
                     validated="true"
                   />
+                  <b-form-input
+                    v-if="value.text.includes('Train')"
+                    type="range"
+                    min="value.min"
+                    max="value.max"
+                    step="5"
+                    id="customRange"
+                    v-model="form.inputs[i - 1][index].value"
+                  ></b-form-input>
+                  <div v-if="value.text.includes('Train')" class="text-center">
+                    <strong>Train:</strong>
+                    <i>{{ ' ' + form.inputs[i - 1][index].value + ' ' }}</i>
+                    <strong>Test:</strong
+                    ><i>{{ ' ' }}{{ 100 - form.inputs[i - 1][index].value }}</i>
+                  </div>
+                  <div v-if="value.text.includes('seed') && form.inputs[i-1][index].value == null" class="text-center">
+                    Seed will be randomly generated.
+                  </div>
                 </b-form-group>
               </template>
 
@@ -170,7 +196,38 @@ function flattenOptions() {
                 v-for="(option, index) in getFromIndex(i - 1).params.options"
                 :key="option"
               >
-                <b-form-group :label="'Choose a ' + option.text">
+                <b-form-group
+                  :label="'Choose a ' + underscoreToSpace(option.text)"
+                  v-if="
+                    option.options.length < 3 &&
+                    typeof option.options[0] != 'boolean'
+                  "
+                >
+                  <b-form-radio-group
+                    v-model="form.selects[i - 1][index].value"
+                    :value="option.default"
+                    :options="option.options"
+                    required
+                  ></b-form-radio-group>
+                </b-form-group>
+                <b-form-group
+                  :label="capitalise(underscoreToSpace(option.text + '?'))"
+                  v-if="option.options[0] == true || option.options[0] == false"
+                >
+                  <b-form-checkbox
+                    v-model="form.selects[i - 1][index].value"
+                    checked="option.default"
+                    size="lg"
+                    required
+                    >{{
+                      form.selects[i - 1][index].value ? 'Yes' : 'No'
+                    }}</b-form-checkbox
+                  >
+                </b-form-group>
+                <b-form-group
+                  v-if="option.options.length > 2"
+                  :label="'Choose a ' + underscoreToSpace(option.text)"
+                >
                   <b-form-select
                     v-model="form.selects[i - 1][index].value"
                     :options="[
@@ -196,11 +253,7 @@ function flattenOptions() {
               </b-form-group>
             </b-col>
           </b-row>
-          <b-row
-            v-if="
-              form.main[i - 1] != null && getFromIndex(i - 1).params.length != 0
-            "
-          >
+          <b-row v-if="form.main[i - 1] != null && hasParams(i - 1)">
             <!--Nested form group list.-->
             <template
               v-for="(option, index) in getFromIndex(i - 1).params.dynamic"

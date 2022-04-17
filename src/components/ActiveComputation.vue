@@ -71,9 +71,6 @@ async function cancelComputation() {
         :removable="true"
         serverFile="/computation/queue/delete"
       />
-      <!--Temporary test buttons-->
-      <b-button @click="$emit('computing')">Computing</b-button>
-      <b-button @click="$emit('done')">Done</b-button>
     </div>
   </b-card>
 </template>

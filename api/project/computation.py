@@ -14,16 +14,14 @@ compute_bp = Blueprint('computation', __name__, url_prefix='/api/computation')
 
 # constants
 DATASETS = [
-    {'text': 'LFM2B', 'timestamp': True, 'params': {}},
-    {'text': 'LFM1B', 'timestamp': True, 'params': {}},
-    {'text': 'LFM360K', 'timestamp': False, 'params': {}},
-    {'text': 'ML25M', 'timestamp': True, 'params': {}},
-    {'text': 'ML100K', 'timestamp': True, 'params': {}},
+    {'text': 'LFM2B', 'timestamp': True, 'params': {'values' : [{'text' : 'Train/testsplit', 'default' : '80', 'min':0, 'max':100}], 'options': [{'text' : 'Type of split', 'default' : "Random", 'options' : ["Random", "Time"]}]}},
+    {'text': 'LFM1B', 'timestamp': True, 'params': {'values' : [{'text' : 'Train/testsplit', 'default' : '80', 'min':0, 'max':100}], 'options': [{'text' : 'Type of split', 'default' : "Random", 'options' : ["Random", "Time"]}]}},
+    {'text': 'LFM360K', 'timestamp': False, 'params': {'values' : [{'text' : 'Train/testsplit', 'default' : '80', 'min':0, 'max':100}]}},
+    {'text': 'ML25M', 'timestamp': True, 'params': {'values' : [{'text' : 'Train/testsplit', 'default' : '80', 'min':0, 'max':100}], 'options': [{'text' : 'Type of split', 'default' : "Random", 'options' : ["Random", "Time"]}]}},
+    {'text': 'ML100K', 'timestamp': True, 'params': {'values' : [{'text' : 'Train/testsplit', 'default' : '80', 'min':0, 'max':100}], 'options': [{'text' : 'Type of split', 'default' : "Random", 'options' : ["Random", "Time"]}]}}
 ]
 
-JSONapproach = open('project/approaches.json')
-APPROACHES = json.load(JSONapproach)
-
+APPROACHES = json.load(open('project/approaches.json'))
 METRICS = json.load(open('project/metrics.json'))
 
 # Generate parameter data
@@ -34,6 +32,7 @@ for category in metric_categories:
     else:
         metric_params = {}
     category['options'] = list(map(lambda metric: {'text': metric, 'params': metric_params}, category['options']))
+    print(category)
 
 DEFAULTS = {'split': 80,
             'recCount': {'min': 0, 'max': 100, 'default': 10},
@@ -80,17 +79,22 @@ def params():
     options = {}
 
     print(METRICS)
-    options['metrics'] = METRICS
     options['defaults'] = DEFAULTS
     # options['filters'] = FILTERS
 
     # MOCK: for now use all filters/metrics per dataset
     for dataset in DATASETS:
-        dataset['params'] = {'dynamic':
-                                 [{'name': 'filter', 'nested': False,
-                                   'plural': 'filters', 'article': 'a', 'options': FILTERS}]}
+        dataset['params']['dynamic']= [{'name': 'filter', 'nested': False,
+                                   'plural': 'filters', 'article': 'a', 'options': FILTERS}]
+
+    for metric in METRICS['categories']:
+        print(metric)
+        metric['options'][0]['params']['dynamic']= [{'name': 'result filter', 'nested': False,
+                                  'plural': 'Result filters', 'article': 'a', 'options': FILTERS}]
     options['datasets'] = DATASETS
     options['approaches'] = APPROACHES
+    options['metrics'] = METRICS
+
 
     response = {'options': options}
     print(response)
@@ -171,7 +175,7 @@ def evaluate(approach, metric):
     value = len(approach['name']) * len(metric['name'])
 
     # Do something with the metrics parameters.
-    if metric['parameter']:
+    if hasattr(metric, 'parameter') and metric['parameter']:
         for parameter in metric['parameter']:
             value *= len(parameter['name'])
 
