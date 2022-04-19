@@ -1,32 +1,46 @@
 @import 'bootstrap/scss/functions';
 
+//custom color-scheme:
+$customprimary:#3c6e71;
+$customsecondary:#eee;
+$customdark: #1c2541;
+$danger: #df4759;
+$darkdanger: shade-color($danger, 50);
+
+@function shade-color($color, $weight) {
+  @return mix(black, $color, $weight);
+}
 // Gradient list
 //$list: $blue, $green, $orange;
 $list: #0aa4ca, #111, rgb(70, 70, 70);
+$list2: $customdark, $customprimary;
+$dangergradient: $darkdanger, $danger;
 $subtle: rgb(80, 80, 80), rgb(104, 104, 104);
 
-@mixin gradient($direction, $list) {
-  background: -webkit-linear-gradient($direction, $list);
-  background: -moz-linear-gradient($direction, $list);
-  background: -o-linear-gradient($direction, $list);
-  background: linear-gradient($direction, $list);
+@mixin gradient($direction, $list2) {
+  background: -webkit-linear-gradient($direction, $list2);
+  background: -moz-linear-gradient($direction, $list2);
+  background: -o-linear-gradient($direction, $list2);
+  background: linear-gradient($direction, $list2);
 }
 
-.block {
-  @include gradient(top, $list);
+.btn-primary {
+  @include gradient(bottom, $list2);
 }
 
-.bg-secondary {
-  @include gradient(top, $subtle);
+.btn-danger {
+  color: white;
+  //@include gradient(bottom, $dangergradient);
 }
 
 // Override default variables.
-$primary: #0aa4ca;
-$secondary: #868686;
+$primary: $customprimary;
+$secondary: $customsecondary;
+$dark: $customdark;
 //$danger: #ffffff;
 
 // Default variable overrides
-$body-bg: #b3b3b3;
+$body-bg: #fff;
 $body-color: #111;
 
 @import 'bootstrap/scss/bootstrap';
