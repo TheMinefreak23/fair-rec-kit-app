@@ -23,6 +23,8 @@ const props = defineProps({
   serverFile3: String,
   pagination: Boolean,
   caption: String,
+  expandable: Boolean,
+  headerOptions: Array
 })
 
 const caption = ref('')
@@ -30,6 +32,7 @@ const entryAmount = ref(20)
 const deleteModalShow = ref(false)
 const editModalShow = ref(false)
 const viewModalShow = ref(false)
+const changeColumnsModalShow = ref(false)
 const newName = ref('')
 const newTags = ref('')
 const newEmail = ref('')
@@ -186,9 +189,35 @@ function setsorting(i) {
     Credit card number (this doesn't do anything):
     <b-form-input type="password"></b-form-input>
   </b-modal>
-  <b-modal id="view-modal" v-model="viewModalShow" title="Metadata" ok-only>
+
+  <b-modal 
+    id="view-modal" 
+    v-model="viewModalShow" 
+    title="Metadata" ok-only>
     <h5>Here is the metadata:</h5>
     <p>{{ metadataStr }}</p>
+  </b-modal>
+  
+  <b-modal 
+    id="change-columns-modal"
+    v-model="changeColumnsModalShow"
+    title="Change columns">
+    <p>Check the columns you want to be shown</p>
+    <input 
+      v-for="header in headerOptions" 
+      :key="header"
+      class="form-check-input" 
+      type="checkbox" 
+      value="" 
+      id="flexCheckDefault">
+    <label 
+      v-for="header in headerOptions"
+      :key="header"
+      class="form-check-label" 
+      for="flexCheckDefault">
+      {{header.value}}
+    </label>
+
   </b-modal>
 
   <b-table-simple hover striped responsive caption-top>
@@ -209,6 +238,12 @@ function setsorting(i) {
         >
           {{ header.name }}
         </b-th>
+        <slot v-if="expandable">
+          <b-button 
+            @click="changeColumnsModalShow = !changeColumnsModalShow">  
+            change
+          </b-button>
+        </slot>
       </b-tr>
       <b-tr>
         <b-th v-if="overview"></b-th>
