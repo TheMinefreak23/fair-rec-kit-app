@@ -231,7 +231,7 @@ function setsorting(i) {
           </b-td>
         </b-td>
 
-        <b-td>
+        <b-td v-if="overview || removable">
           <b-button
             v-if="overview"
             pill
