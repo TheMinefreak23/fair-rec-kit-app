@@ -12,7 +12,7 @@ import { API_URL } from '../api'
 const props = defineProps({ headers: Array, result: Object })
 
 const headers_rec = ref([{ name: 'User' }, { name: 'Item' }, { name: 'Score' }])
-const headers_options = ref([{ name: 'User' }, { name: 'Item' }, { name: 'Score' }])
+const headers_options = ref([{ name: 'Option1' }, { name: 'Option2' }, { name: 'Option3' }])
 
 const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 

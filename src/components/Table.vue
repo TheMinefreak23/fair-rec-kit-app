@@ -203,20 +203,21 @@ function setsorting(i) {
     v-model="changeColumnsModalShow"
     title="Change columns">
     <p>Check the columns you want to be shown</p>
-    <input 
-      v-for="header in headerOptions" 
+    <div 
+      v-for="(header, index) in headerOptions"
       :key="header"
+      >
+    <input 
       class="form-check-input" 
       type="checkbox" 
       value="" 
       id="flexCheckDefault">
     <label 
-      v-for="header in headerOptions"
-      :key="header"
       class="form-check-label" 
       for="flexCheckDefault">
-      {{header.value}}
+      {{ header.name }}
     </label>
+    </div>
 
   </b-modal>
 
