@@ -1,0 +1,28 @@
+{
+    "overview": [
+        {
+            "name": "ML-100K_0_Implicit_AlternatingLeastSquares_0",
+            "evaluation_path": "results\\1650539935_Recommenders_MultiSet\\run_0\\ML-100K_0\\Implicit_AlternatingLeastSquares_0\\evaluations.json",
+            "ratings_path": "results\\1650539935_Recommenders_MultiSet\\run_0\\ML-100K_0\\Implicit_AlternatingLeastSquares_0\\ratings.tsv",
+            "ratings_settings_path": "results\\1650539935_Recommenders_MultiSet\\run_0\\ML-100K_0\\Implicit_AlternatingLeastSquares_0\\settings.json"
+        },
+        {
+            "name": "ML-100K_0_Elliot_Random_0",
+            "evaluation_path": "results\\1650539935_Recommenders_MultiSet\\run_0\\ML-100K_0\\Elliot_Random_0\\evaluations.json",
+            "ratings_path": "results\\1650539935_Recommenders_MultiSet\\run_0\\ML-100K_0\\Elliot_Random_0\\ratings.tsv",
+            "ratings_settings_path": "results\\1650539935_Recommenders_MultiSet\\run_0\\ML-100K_0\\Elliot_Random_0\\settings.json"
+        },
+        {
+            "name": "ML-100K_1_Implicit_AlternatingLeastSquares_0",
+            "evaluation_path": "results\\1650539935_Recommenders_MultiSet\\run_0\\ML-100K_1\\Implicit_AlternatingLeastSquares_0\\evaluations.json",
+            "ratings_path": "results\\1650539935_Recommenders_MultiSet\\run_0\\ML-100K_1\\Implicit_AlternatingLeastSquares_0\\ratings.tsv",
+            "ratings_settings_path": "results\\1650539935_Recommenders_MultiSet\\run_0\\ML-100K_1\\Implicit_AlternatingLeastSquares_0\\settings.json"
+        },
+        {
+            "name": "ML-100K_1_Elliot_Random_0",
+            "evaluation_path": "results\\1650539935_Recommenders_MultiSet\\run_0\\ML-100K_1\\Elliot_Random_0\\evaluations.json",
+            "ratings_path": "results\\1650539935_Recommenders_MultiSet\\run_0\\ML-100K_1\\Elliot_Random_0\\ratings.tsv",
+            "ratings_settings_path": "results\\1650539935_Recommenders_MultiSet\\run_0\\ML-100K_1\\Elliot_Random_0\\settings.json"
+        }
+    ]
+}
