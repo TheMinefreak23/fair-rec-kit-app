@@ -142,7 +142,7 @@ function copyItem(i) {
     )
   }
 }
-
+//Not fully functional yet
 function update() {
   console.log(form.value.main)
   for (let i = 0; i < form.value.main.length; i++) {
@@ -311,9 +311,6 @@ function update() {
 
     <b-button @click="groupCount++" align-v="end" variant="primary"
       >Add {{ name }}...</b-button
-    >
-    <b-button @click="update()"  variant="danger"
-      >Update</b-button
     >
   </div>
 </template>
