@@ -8,10 +8,26 @@ import Results from './components/Results.vue'
 import PreviousResults from './components/PreviousResults.vue'
 import ActiveComputation from './components/ActiveComputation.vue'
 import NewComputation from './components/NewComputation.vue'
-import { ref } from 'vue'
+import TestForm from './test/TestForm.vue'
+import { onMounted, ref } from 'vue'
+import { API_URL } from './api'
 
 const activeComputations = ref(false)
 const done = ref(false)
+
+// Ping
+onMounted(async () => {
+  //console.log(API_URL)
+  const response = await fetch(API_URL)
+  const data = await response.json()
+  console.log(data)
+})
+const tabIndex = ref(0)
+
+// Make result tab the active tab
+function goToResult() {
+  tabIndex.value = 3
+}
 </script>
 
 <style scoped>
@@ -22,27 +38,31 @@ b-tab.success {
 
 <template>
   <div class="bg-dark nav justify-content-center py-2">
-    <img src="/RecCoonLogo.png" class="" style="height: 50px" />
+    <img src="/RecCoonLogo.png" style="height: 50px" />
     <h1 class="text-white my-0 p-0">FairRecKit</h1>
   </div>
   <div class="nav-center">
-    <b-tabs class="m-0 pt-2" align="center">
+    <b-tabs v-model="tabIndex" class="m-0 pt-2" align="center">
       <b-tab title="New Computation"> <NewComputation /></b-tab>
-      <b-tab :class="[done ? success : '']">
+      <b-tab :class="{ success: done }">
         <ActiveComputation
-          @computing=";(activeComputations = true), (done = false)"
+          @computing="
+            ;(activeComputations = true), (done = false), (tabIndex = 1)
+          "
           @done=";(activeComputations = false), (done = true)"
           @stop=";(activeComputations = false), (done = false)"
         />
-        <template v-slot:title :class="[done ? success : '']">
+        <template v-slot:title :class="{ success: done }">
           <b-spinner v-if="activeComputations" small align="center"></b-spinner>
           <b-icon v-if="done" align="center" icon="check">√</b-icon>
           Active Computations
         </template>
       </b-tab>
       <b-tab title="Documentation"> <Documentation /></b-tab>
-      <b-tab title="Results" :results="results"> <Results /></b-tab>
-      <b-tab title="All results"> <PreviousResults /></b-tab>
+      <b-tab title="Results"> <Results @goToResult="goToResult" /></b-tab>
+      <b-tab title="All results">
+        <PreviousResults @goToResult="goToResult"
+      /></b-tab>
     </b-tabs>
   </div>
 </template>

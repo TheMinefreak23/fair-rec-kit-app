@@ -1,149 +1,93 @@
 <script setup>
-import Result from './Result.vue'
-import VDismissButton from './VDismissButton.vue'
-import PreviousResults from './PreviousResults.vue'
-import { ref } from 'vue'
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
+import Result from './Result.vue'
+import VDismissButton from './VDismissButton.vue'
+import PreviousResults from './PreviousResults.vue'
+import { onMounted, ref, watch } from 'vue'
+import { store, addResult } from '../store'
+import { formatResult } from '../helpers/resultFormatter'
+import { API_URL } from '../api'
 
-const results = ref([])
+const emit = defineEmits(['goToResult'])
+const showResultModal = ref(false)
 
-const url = 'http://localhost:5000/all-results/result-by-id'
-
-// Request full result from result ID (timestamp)
-async function loadResult(resultId) {
-  console.log('Result ID:' + resultId)
-
-  const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: resultId }),
+watch(
+  () => store.queue,
+  (newQueue, oldQueue) => {
+    if (newQueue.length < oldQueue.length) getCalculation()
   }
-  fetch(url, requestOptions).then(() => {
-    getResult()
-  })
-}
+)
 
-// Get result back from result ID request
-async function getResult() {
-  const response = await fetch(url)
+// GET request: Ask server for latest calculation
+async function getCalculation() {
+  const response = await fetch(API_URL + '/computation/calculation')
   const data = await response.json()
-  results.value = [data]
-  console.log(results.value)
+  console.log(data)
+  //if (Object.keys(data).length === 0) // not null check
+  //store.currentResult = data.calculation
+  addResult(formatResult(data.calculation))
+  showResultModal.value = true
 }
 </script>
 
 <template>
-  <div class="row">
-    <div class="col-md-8 border-top-0 p-0">
-      <h3 class="py-2 border-bottom text-center m-0">Results</h3>
-      <div>
-        <b-tabs card content-class="mt-3">
-          <b-tab>
-            <template #title>
-              Result 1
-              <VDismissButton />
-            </template>
+  <!--Shows when there is a new result-->
+  <b-modal
+    id="result-modal"
+    v-model="showResultModal"
+    title="New result"
+    ok-title="View new result"
+    ok-variant="danger"
+    cancel-title="Cancel"
+    @ok="$emit('goToResult')"
+  >
+    <p>An experiment has finished.</p>
+  </b-modal>
+  <b-card>
+    <div class="mx-5 mt-2">
+      <div class="border-top-0 p-0">
+        <div class="p-3 m-0 container-fluid">
+          <h3 class="d-inline">Results</h3>
+          <button
+            class="d-inline btn btn-primary float-end"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#offcanvasRight"
+            aria-controls="offcanvasRight"
+          >
+            Previous Results
+          </button>
+        </div>
+        <div class="border">
+          <b-tabs card content-class="mt-3">
+            <!-- Result tabs.-->
+            <!--Always show JSON Mockdata result tab.-->
+            <b-tab v-for="result in [...store.currentResults]" :key="result.id">
+              <template #title>
+                Result {{ result.name }}
+                <VDismissButton />
+              </template>
+              <Result :result="result"
+            /></b-tab>
+          </b-tabs>
+        </div>
 
-            // Mock headers for now
-            <Result
-              :results="results"
-              :headers="[{ name: 'id' }, { name: 'value' }]"
-            />
-          </b-tab>
-
-          <b-tab title="Result1"><p>I'm Result 1</p></b-tab>
-          <b-tab title="Result2"><p>I'm Result 2</p></b-tab>
-          <b-tab title="Result3"><p>I'm Result 3</p></b-tab>
-        </b-tabs>
+        <div
+          class="offcanvas offcanvas-end"
+          tabindex="-1"
+          id="offcanvasRight"
+          aria-labelledby="offcanvasRightLabel"
+        >
+          <PreviousResults @goToResult="" />
+        </div>
       </div>
-    </div>
-    <div class="col-md-4 border-top-0 p-0">
+
+      <!--<div class="col-md-4 border-top-0 p-0">
       <h3 class="text-center py-2 m-0 border-bottom">Previous Results</h3>
-      <!--<ul class="list-group overflow-auto" style="max-height: 500px">
-        <a
-          href="#"
-          class="list-group-item list-group-item-action flex-column align-items-start border-0 border-bottom"
-        >
-          <p class="m-0"><strong>Example Title</strong></p>
-          <p class="m-0">description text</p>
-          <p class="m-0"><em>01-01-22</em></p>
-        </a>
-        <a
-          href="#"
-          class="list-group-item list-group-item-action flex-column align-items-start border-0 border-bottom"
-        >
-          <p class="m-0"><strong>Example Title</strong></p>
-          <p class="m-0">description text</p>
-          <p class="m-0"><em>01-01-22</em></p>
-        </a>
-        <a
-          href="#"
-          class="list-group-item list-group-item-action flex-column align-items-start border-0 border-bottom"
-        >
-          <p class="m-0"><strong>Example Title</strong></p>
-          <p class="m-0">description text</p>
-          <p class="m-0"><em>01-01-22</em></p>
-        </a>
-        <a
-          href="#"
-          class="list-group-item list-group-item-action flex-column align-items-start border-0 border-bottom"
-        >
-          <p class="m-0"><strong>Example Title</strong></p>
-          <p class="m-0">description text</p>
-          <p class="m-0"><em>01-01-22</em></p>
-        </a>
-        <a
-          href="#"
-          class="list-group-item list-group-item-action flex-column align-items-start border-0 border-bottom"
-        >
-          <p class="m-0"><strong>Example Title</strong></p>
-          <p class="m-0">description text</p>
-          <p class="m-0"><em>01-01-22</em></p>
-        </a>
-        <a
-          href="#"
-          class="list-group-item list-group-item-action flex-column align-items-start border-0 border-bottom"
-        >
-          <p class="m-0"><strong>Example Title</strong></p>
-          <p class="m-0">description text</p>
-          <p class="m-0"><em>01-01-22</em></p>
-        </a>
-        <a
-          href="#"
-          class="list-group-item list-group-item-action flex-column align-items-start border-0 border-bottom"
-        >
-          <p class="m-0"><strong>Example Title</strong></p>
-          <p class="m-0">description text</p>
-          <p class="m-0"><em>01-01-22</em></p>
-        </a>
-        <a
-          href="#"
-          class="list-group-item list-group-item-action flex-column align-items-start border-0 border-bottom"
-        >
-          <p class="m-0"><strong>Example Title</strong></p>
-          <p class="m-0">description text</p>
-          <p class="m-0"><em>01-01-22</em></p>
-        </a>
-        <a
-          href="#"
-          class="list-group-item list-group-item-action flex-column align-items-start border-0 border-bottom"
-        >
-          <p class="m-0"><strong>Example Title</strong></p>
-          <p class="m-0">description text</p>
-          <p class="m-0"><em>01-01-22</em></p>
-        </a>
-        <a
-          href="#"
-          class="list-group-item list-group-item-action flex-column align-items-start border-0 border-bottom"
-        >
-          <p class="m-0"><strong>Example Title</strong></p>
-          <p class="m-0">description text</p>
-          <p class="m-0"><em>01-01-22</em></p>
-        </a>
-      </ul>-->
-      <PreviousResults @loadResult="(resultId) => loadResult(resultId)" />
+      <PreviousResults />
+    </div>-->
     </div>
-  </div>
+  </b-card>
 </template>

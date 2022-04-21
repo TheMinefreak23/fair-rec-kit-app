@@ -2,17 +2,27 @@
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import FormGroupList from './FormGroupList.vue'
-import ActiveComputation from './ActiveComputation.vue'
+import { sendMockData } from '../test/mockComputationOptions.js'
+import { store } from '../store.js'
+import { API_URL } from '../api'
 
 const result = ref({})
 const options = ref()
 const form = ref({
-  datasets: [],
+  datasets: emptyFormGroup(),
+  metrics: emptyFormGroup(),
+  approaches: emptyFormGroup(),
+  //filters: emptyFormGroup(),
   splitMethod: 'random', //The default split method.
+  computationMethod: 'recommendation',
 })
 const metadata = ref({})
+const splitOptions = [
+  { text: 'Random', value: 'random' },
+  { text: 'Time', value: 'time' },
+]
 
 onMounted(async () => {
   await getOptions()
@@ -21,27 +31,55 @@ onMounted(async () => {
 
 // GET request: Get available options for selection from server
 async function getOptions() {
-  const response = await fetch('http://localhost:5000/computation/options')
+  const response = await fetch(API_URL + '/computation/options')
   const data = await response.json()
   options.value = data.options
-  console.log(options.value)
+  //console.log(options.value)
 }
 
 // POST request: Send form to server.
-function sendToServer() {
-  form.value.approaches = reformat(form.value.approaches)
-  form.value.metrics = reformat(form.value.metrics)
+async function sendToServer() {
+  var sendForm = { ...form.value } // clone
+
+  sendForm.approaches = reformat(sendForm.approaches)
+  sendForm.metrics = reformat(sendForm.metrics)
+  sendForm.datasets = reformat(sendForm.datasets)
+
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ metadata: metadata.value, settings: form.value }),
+    body: JSON.stringify({ metadata: metadata.value, settings: sendForm }),
   }
-  console.log(form.value)
-  fetch('http://localhost:5000/computation/calculation', requestOptions).then(
-    () => {
-      getCalculation()
-    }
+  console.log(sendForm)
+  const response = await fetch(
+    API_URL + '/computation/calculation',
+    requestOptions
   )
+
+  // Update queue
+  const data = response.json()
+  //if (data.status == 'success') getComputations()
+  store.queue = data
+}
+
+async function initForm() {
+  //console.log(options.value)
+  //console.log(options.value.defaults)
+  form.value = {}
+  metadata.value = {}
+  form.value.datasets = emptyFormGroup()
+  form.value.metrics = emptyFormGroup()
+  form.value.approaches = emptyFormGroup()
+  //form.value.filters = emptyFormGroup()
+  form.value.recommendations = options.value.defaults.recCount.default
+  form.value.split = options.value.defaults.split
+  form.value.splitMethod = 'random'
+  form.value.computationMethod = 'recommendation'
+  //form.value.result.value = {}
+}
+
+function emptyFormGroup() {
+  return { main: [], inputs: [], selects: [], lists: [] }
 }
 
 // Change the form format (SoA) into a managable data format (AoS)
@@ -50,209 +88,150 @@ function reformat(property) {
   let choices = []
   for (let i in property.main) {
     let parameter = null
-    if (property.inputs[i] != null) parameter = property.inputs[i]
-    else if (property.selects[i] != null) parameter = property.selects[i]
-    choices[i] = { name: property.main[i], parameter: parameter }
-    console.log('choices:' + choices.value)
+    if (property.lists[i] != null) {
+      //console.log(property.lists[i])
+      choices[i] = {
+        name: property.main[i],
+        settings: property.lists[i].map((setting) => ({
+          [setting.name]: reformat(setting),
+        })),
+      }
+    } else {
+      if (property.inputs[i] != null) parameter = property.inputs[i]
+      else if (property.selects[i] != null) parameter = property.selects[i]
+      choices[i] = { name: property.main[i], parameter: parameter }
+      //console.log('choices:' + choices)
+    }
   }
   return choices
-}
-
-// GET request: Ask server for latest calculation
-async function getCalculation() {
-  const response = await fetch('http://localhost:5000/computation/calculation')
-  const data = await response.json()
-  result.value = data.calculation
-  console.log(result.value)
-}
-
-async function initForm() {
-  //console.log(options.value)
-  //console.log(options.value.defaults)
-  form.value = {}
-  metadata.value = {}
-  form.value.datasets = []
-  form.value.recommendations = options.value.defaults.recCount.default
-  form.value.split = options.value.defaults.split
-  form.value.splitMethod = 'random'
-  //form.value.result.value = {}
 }
 </script>
 
 <template>
-  <b-card>
-    <!--This form contains all the necessary parameters for a user to submit a request for a computation-->
-    <b-form v-if="options" @submit="sendToServer" @reset="initForm">
-      <b-row>
-        <b-col>
-          <!--User can select a dataset. TODO: Multiple Datasets-->
-          <h2>Dataset</h2>
-          <b-form-group label="Select a dataset">
-            <!-- Select a dataset from the options received from the server -->
-            <b-form-select
-              v-model="form.datasets[0]"
-              :options="[
-                { text: 'Choose...', value: null },
-                ...options.datasets,
-              ]"
-              required
-            ></b-form-select>
-          </b-form-group>
+  <div class="py-2 mx-5 bg-primary">
+    <b-card>
+      <!--This form contains all the necessary parameters for a user to submit a request for a computation-->
+      <b-form v-if="options" @submit="sendToServer" @reset="initForm">
+        <b-row>
+          <b-col>
+            <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
+              <h3>Computation type</h3>
+              <b-form-radio-group v-model="form.computationMethod">
+                <b-form-radio value="recommendation">Recommendation (default)</b-form-radio>
+                <b-form-radio value="prediction">Prediction</b-form-radio>
+              </b-form-radio-group>
+              <!--User can select a dataset.-->
+              <FormGroupList
+                v-model:data="form.datasets"
+                name="dataset"
+                plural="Datasets"
+                selectName="a dataset"
+                :options="options.datasets"
+                required
+              />
 
-          <!--User can select an optional filter-->
-          <b-form-group label="Select a filter">
-            <!-- Select a dataset filter from the options received from the server -->
-            <b-form-select
-              v-model="form.filter"
-              :options="[{ text: 'None (default)', value: null }]"
-            ></b-form-select>
-          </b-form-group>
+              <!--User can select optional filters-->
+              <!--<FormGroupList
+                v-model:data="form.filters"
+                name="filter"
+                plural="Filters"
+                selectName="a filter"
+                :options="options.filters"
+              />-->
 
-          <!--User provides an optional rating conversion-->
-          <b-form-group label="Select a rating conversion">
-            <!-- Select a rating conversion from the options received from the server -->
-            <b-form-select
-              v-model="form.conversion"
-              :options="[{ text: 'None (default)', value: null }]"
-            ></b-form-select>
-          </b-form-group>
+              <!--User provides an optional rating conversion-->
+              <b-form-group label="Select a rating conversion">
+                <!-- Select a rating conversion from the options received from the server -->
+                <b-form-select
+                  v-model:data="form.conversion"
+                  :options="[{ text: 'None (default)', value: null }]"
+                ></b-form-select>
+              </b-form-group>
+            </div>
 
-          <!--
-      <!-User can select which recommender approaches they want->
-      <h2>Recommenders</h2>
-      <b-form-group>
-        <p>Select recommender approaches:</p>
-        <b-form-checkbox-group
-          v-model="form.recommenders"
-          :options="options.approaches"
-          buttons
-          button-variant="outline-primary"
-          size="lg"
-          name="buttons-2"
-          stacked
-          required
-        ></b-form-checkbox-group>
-      </b-form-group>-->
+            <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
+              <FormGroupList
+                v-model:data="form.approaches"
+                :nested="true"
+                name="approach"
+                plural="Recommender approaches"
+                selectName="an approach"
+                :options="form.computationMethod == 'recommendation' ? options.approaches.libraries.recommendation : options.approaches.libraries.prediction"
+      
+              />
 
-          <b-form-group label="Select recommender approaches:"> </b-form-group>
-          <FormGroupList
-            @formChange="(x) => (form.approaches = x)"
-            name="approach"
-            plural="Recommender approaches"
-            selectName="an approach"
-            :options="options.approaches"
-          />
-          <!--
-        User gets additional options for the selected recommender approaches
-        <b-form-group
-          label="ALS Features value:"
-          v-if="form.recommenders != null && form.recommenders.includes('ALS')">
-          ALS Feature value needs to be a number higher than 1
-          <b-form-input
-            :state = "form.alsFeatures >= 1"
-            placeholder=">= 1"
-            v-model="form.alsFeatures"
-          ></b-form-input>
-        </b-form-group>
-        <b-form-group
-          label="POP Method:"
-          v-if="form.recommenders != null && form.recommenders.includes('POP')">
-          POP has three modes to choose from-
-          <b-form-select
-            v-model="form.popSettings"
-            :options="[{ text:'quantile (default)', value:'quantile'}, 'rank', 'count']"
-          ></b-form-select>
-        </b-form-group>
-      </b-form-group>
-      -->
-
-          <!--User can select the amount of recommendations per user -->
-          <b-form-group label="Select number of recommendations per user:">
-            <b-form-input
-              type="range"
-              :min="options.defaults.recCount.min"
-              :max="options.defaults.recCount.max"
-              v-model="form.recommendations"
-            ></b-form-input>
-            <p>{{ form.recommendations }}</p>
-            <b-form-checkbox
+              <!--User can select the amount of recommendations per user -->
+              <b-form-group v-if="form.computationMethod == 'recommendation'" label="Select number of recommendations per user:">
+                <b-form-input
+                  type="range"
+                  :min="options.defaults.recCount.min"
+                  :max="options.defaults.recCount.max"
+                  v-model="form.recommendations"
+                />
+                <p>{{ form.recommendations }}</p>
+                <!--  No longer feasible from a back-end perspective -Bug V22H-194
+              <b-form-checkbox
               v-model="form.includeRatedItems"
               buttons
               button-variant="outline-primary"
               required
               >Include already rated items in recommendations</b-form-checkbox
-            >
-          </b-form-group>
-        </b-col>
-        <b-col>
-          <!--Input for train/test split-->
-          <h2>Train/test-split</h2>
-          <b-form-group label="Select test/train split:">
-            <b-form-input
-              type="range"
-              min="0"
-              max="100"
-              step="5"
-              id="customRange"
-              v-model="form.split"
-            ></b-form-input>
-            <p>Train: {{ form.split }}</p>
-            <p>Test: {{ 100 - form.split }}</p>
-          </b-form-group>
+            >-->
+              </b-form-group>
+            </div>
+          </b-col>
 
-          <!--User can choose between a random and time-based train/testsplit-->
-          <b-form-group>
-            <b-form-radio-group v-model="form.splitMethod">
-              <b-form-radio value="random">Random (default)</b-form-radio>
-              <b-form-radio value="timesplit">Timesplit</b-form-radio>
-            </b-form-radio-group>
-          </b-form-group>
+          <b-col class="p-0">
+            <!--Input for metrics, user can add infinite metrics -->
+            <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
+              <FormGroupList
+                v-model:data="form.metrics"
+                name="metric"
+                plural="metrics"
+                selectName="a metric"
+                :options="form.computationMethod == 'recommendation' ? options.metrics.categories : options.metrics.categories.slice(1)"
+                :nested="true"
+              />
+            </div>
 
-          <!--Input for metrics, user can add infinite metrics -->
-          <FormGroupList
-            @formChange="(x) => (form.metrics = x)"
-            name="metric"
-            plural="metrics"
-            selectName="a metric"
-            :options="options.metrics"
-          />
-
-          <!--Input for results filter -->
-          <b-form-group label="Select a results filter">
-            <b-form-select
-              v-model="form.resFilter"
-              :options="[{ text: 'Global (default)', value: null }]"
-            ></b-form-select>
-          </b-form-group>
-
-          <!-- Input for metadata such as:
+            <!-- Input for metadata such as:
      Computation Name
      Optional Tags
      Optional Email for notification -->
-          <h2>Meta</h2>
-          <b-form-group label="Enter name for computation">
-            <b-form-input
-              placeholder="New Computation"
-              v-model="metadata.name"
-              required
-            ></b-form-input>
-          </b-form-group>
-          <b-form-group label="Enter tags (optional)">
-            <b-form-input v-model="metadata.tags"></b-form-input>
-          </b-form-group>
-          <b-form-group label="Enter e-mail (optional)">
-            
-            <b-form-input
-              type="email"
-              placeholder="example@mail.com"
-              v-model="metadata.email"
-            ></b-form-input>
-          </b-form-group>
-
-          <b-button type="submit" variant="primary">Send</b-button>
-          <b-button type="reset" variant="danger">Reset</b-button>
-        </b-col>
-      </b-row>
-    </b-form>
-  </b-card>
+            <div class="p-2 m-1 rounded-3 bg-secondary">
+              <h3 class="text-center">Meta</h3>
+              <b-form-group label="Enter name for computation">
+                <b-form-input
+                  placeholder="New Computation"
+                  v-model="metadata.name"
+                  required
+                ></b-form-input>
+              </b-form-group>
+              <b-form-group label="Enter tags (optional)">
+                <b-form-input v-model="metadata.tags"></b-form-input>
+              </b-form-group>
+              <b-form-group label="Enter e-mail (optional)">
+                <b-form-input
+                  type="email"
+                  placeholder="example@mail.com"
+                  v-model="metadata.email"
+                ></b-form-input>
+              </b-form-group>
+            </div>
+          </b-col>
+          <div class="d-flex justify-content-center">
+            <b-button class="mx-1" type="reset" variant="danger"
+              >Reset</b-button
+            >
+            <b-button class="mx-1" type="submit" variant="primary"
+              >Send</b-button
+            >
+          </div>
+        </b-row>
+      </b-form>
+      <b-button type="test" variant="warning" @click="sendMockData"
+        >Mock</b-button
+      >
+    </b-card>
+  </div>
 </template>

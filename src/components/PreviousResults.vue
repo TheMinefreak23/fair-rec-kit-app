@@ -1,8 +1,15 @@
 <script setup>
+/*This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import Table from './Table.vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
+import { formatResults, formatResult } from '../helpers/resultFormatter.js'
 
-const emit = defineEmits(['loadResult'])
+import { addResult, store } from '../store.js'
+import { API_URL } from '../api'
+
+const emit = defineEmits(['goToResult'])
 
 const exResults = ref([
   { id: 1, age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
@@ -18,74 +25,77 @@ const headers = ref([
   { name: 'Datasets' },
   { name: 'Approaches' },
   { name: 'Metrics' },
+  { name: '' },
 ])
 
 const ex1CurrentPage = ref(1)
 const ex1PerPage = ref(10)
 const ex1Rows = ref(100)
 
-//const returnMessage = ref('')
-const results = ref([])
+const testMessage = ref('')
 
 onMounted(() => {
   getResults()
 })
 
-async function getResults() {
-  const response = await fetch('http://localhost:5000/all-results')
-  const data = await response.json()
-  //returnMessage.value = 'the results have been gotten'
-  console.log(data)
-  let allResults = data.all_results
-  for (let i in allResults) {
-    const result = allResults[i]
-    let approach = result.settings.approaches[0]
-    let apprName = approach ? approach.name : 'NULL'
-    let metric = result.settings.metrics[0]
-    let metricName = metric ? metric.name : 'NULL'
-
-    results.value[i] = {
-      id: result.timestamp.stamp,
-      datetime: result.timestamp.datetime,
-      name: result.metadata.name,
-      dataset: result.settings.datasets[0],
-      approach: apprName,
-      metric: metricName,
-    }
+watch(
+  () => store.currentResults,
+  () => {
+    getResults()
   }
-  console.log(results.value)
+)
+
+async function getResults() {
+  const response = await fetch(API_URL + '/all-results')
+  const data = await response.json()
+  //console.log(data)
+  let allResults = data.all_results
+  store.allResults = formatResults(allResults)
+  //console.log(results.value)
+}
+
+const url = API_URL + '/all-results/result-by-id'
+
+// Request full result from result ID (timestamp)
+async function loadResult(resultId) {
+  console.log('Result ID:' + resultId)
+
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: resultId }),
+  }
+  fetch(url, requestOptions).then(() => {
+    getResult()
+  })
+}
+
+// Get result back from result ID request
+async function getResult() {
+  const response = await fetch(url)
+  const data = await response.json()
+  addResult(formatResult(data.result))
+  emit('goToResult')
 }
 </script>
 
 <template>
-  <div>
-    <Table
-      @loadResult="(id) => $emit('loadResult', id)"
-      :overview="true"
-      :results="results"
-      :headers="headers"
-      :buttonText="'Remove'"
-      :removable="true"
-    />
-    <!--<form @submit.prevent="getResults">
-      <input v-model="toRequest" />
-      <button>request data</button>
-    </form>-->
-    <b-button @click="getResults">Request results</b-button>
-    <p>{{ returnMessage }}</p>
-    <!--<b-card>
-      <div class="overflow-auto py-2">
-        <h1>Previous results</h1>
-        <b-pagination
-          v-model="ex1CurrentPage"
-          :total-rows="ex1Rows"
-          :per-page="ex1PerPage"
-          first-text="First"
-          prev-text="Prev"
-          next-text="Next"
-          last-text="Last"
-        ></b-pagination>
-      </div>
-    </b-card>-->
-  </div>
+  <b-card>
+    <div class="text-center py-2 mx-5">
+      <h3>Previous results</h3>
+      <Table
+        @loadResult="loadResult"
+        @loadResults="getResults"
+        :results="store.allResults"
+        :headers="headers"
+        buttonText="Remove"
+        :removable="true"
+        :overview="true"
+        serverFile="/all-results/delete"
+        serverFile2="/all-results/edit"
+        serverFile3="/all-results/result-by-id"
+      />
+      <p>{{ testMessage }}</p>
+    </div>
+  </b-card>
 </template>

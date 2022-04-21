@@ -7,12 +7,12 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig({
   plugins: [
     vue({
-      template: {
+      options: {
         compilerOptions: {
-          //isCustomElement: (tag) => tag.startsWith('b-'),
+          isCustomElement: (tag) => tag.startsWith('b-'),
         },
       },
-    }), 
+    }),
   ],
   resolve: {
     alias: {
@@ -27,14 +27,12 @@ export default defineConfig({
     environment: 'happy-dom',
   },
 
-  /* TODO Why doesn't this work..?
-  server: {
+  /*  server: {
     proxy: {
       '/api': {
-        target: 'https://localhost:5000',
+        target: 'http://localhost:5000/api',
+        ws: true,
         changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },*/

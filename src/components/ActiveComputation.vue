@@ -1,75 +1,76 @@
 <script setup>
-    /*This program has been developed by students from the bachelor Computer Science at
+/*This program has been developed by students from the bachelor Computer Science at
     Utrecht University within the Software Project course.
     © Copyright Utrecht University (Department of Information and Computing Sciences)*/
+import { API_URL } from '../api.js'
 import Table from './Table.vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
+import { formatResults } from '../helpers/resultFormatter.js'
+import { store } from '../store.js'
 
 const emit = defineEmits(['computing', 'done', 'stop'])
 const props = defineProps({
   names: [String],
+  computations: [],
 })
 
-const computations = ref([])
+//const computations = ref([])
 const headers = ref([
+  { name: 'ID' },
   { name: 'Date Time' },
   { name: 'Name' },
   { name: 'Datasets' },
   { name: 'Approaches' },
   { name: 'Metrics' },
+  { name: '' },
 ])
 
-
+//Retrieve the queue when the page is loaded
 onMounted(() => {
   getComputations()
 })
 
+//Reload the queue when a new computation is added
+watch(
+  () => store.queue,
+  (data, oldQueue) => {
+    // queue got bigger
+    //console.log(data)
+    if (data.length != 0) {
+      getComputations()
+      emit('computing')
+      //console.log(computations.value)
+    } else {
+      emit('done')
+      //alert('computations done!!!!')
+    }
+  }
+)
+
+async function getComputations() {
+  const response = await fetch(API_URL + '/computation/queue')
+  const data = await response.json()
+  //store.queue = formatResults(data).map(x=>x.omit(x,'ID'))
+  //store.queue = formatResults(data)
+  store.queue = data
+}
 
 async function cancelComputation() {
-
   emit('stop')
 }
-
-async function getComputations(){
-  const response = await fetch('http://localhost:5000/computation/queue')
-  const data = await response.json()
-
-  console.log(data)
-  let allResults = data
-  for (let i in allResults) {
-    let approach = allResults[i].settings.approaches[0]
-    let apprName = approach ? approach.name : 'NULL'
-    let metric = allResults[i].settings.metrics[0]
-    let metricName = metric ? metric.name : 'NULL'
-
-    computations.value[i] = {
-      datetime: allResults[i].timestamp.datetime,
-      name: allResults[i].metadata.name,
-      dataset: allResults[i].settings.datasets[0],
-      approach: apprName,
-      metric: metricName,
-    }}
-  if(data != [])
-  {
-      emit('computing')
-      console.log(computations.value)
-  }
-  else
-  {
-      emit('done')
-      alert('computations done!!!!')
-  }
-}
-
-var done;
-
 </script>
 
 <template>
-    <div>
-      <Table :results="computations" :headers="headers" :buttonText="'Cancel'" :removable="true" />
-
-      <b-button @click="$emit('computing')">Computing</b-button>
-      <b-button @click="$emit('done')">Done</b-button>
+  <b-card>
+    <div class="text-center py-2 mx-5">
+      <h3>Queue</h3>
+      <Table
+        :results="formatResults(store.queue)"
+        :headers="headers"
+        buttonText="Cancel"
+        :removable="true"
+        serverFile="/computation/queue/delete"
+      />
     </div>
+  </b-card>
 </template>

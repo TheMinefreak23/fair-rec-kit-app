@@ -19,6 +19,7 @@ import pandas as pd
 # timestamp (ID), per dataset: recommendations result, per recs result: metrics evaluations
 
 current_result = {}
+current_recs = {}
 results_overview_path = 'results.json'
 mock_results_overview_path = 'mock/results_overview.json'
 mock_results_path = 'mock/results.json'
@@ -27,16 +28,12 @@ recommendations_path = 'recs.json'
 evaluations_path = 'evals.json'
 
 
-def save_result(metadata, settings, result):
-    timestamp = time.time()
-    now = datetime.datetime.now()
-    currentDt = now.strftime('%Y-%m-%dT%H:%M:%S') + ('-%02d' % (now.microsecond / 10000))
-
-    global current_result  # TODO use class instead of global?
-    # current_result = {'timestamp': {'stamp': timestamp, 'datetime': currentDt}, 'metadata': metadata,
-    #                  'settings': settings, 'result': result}
-    current_result = {'id': 0, 'value': 0}
+def save_result(computation, result):
+    global current_result
+    computation['result'] = result
+    current_result = computation
     update_results_overview(current_result)
+    print(current_result)
 
 
 def result_by_id(resultid):
@@ -81,18 +78,55 @@ def load_json(path):
 
 
 def load_results_overview():
-    return load_json(mock_results_overview_path)
+    create_results_overview()
+    return load_json(results_overview_path)
 
 
 def update_results_overview(new_result):
     create_results_overview()
     file_data = load_json(results_overview_path)
     file_data['all_results'].append(new_result)
-    with open(results_path, 'w') as file:  # Open the file in write mode.
+    with open(results_overview_path, 'w') as file:  # Open the file in write mode.
         # Rewind file pointer's position.
         file.seek(0)
         # Store it as json data.
         json.dump(file_data, file, indent=4)
+
+
+def delete_result(index):
+    create_results_overview()
+    file_data = load_results_overview()
+    file_data['all_results'].pop(index)
+    with open(results_overview_path, 'w') as file:  # Open the file in write mode.
+        # Rewind file pointer's position.
+        file.seek(0)
+        # Store it as json data.
+        json.dump(file_data, file)
+
+
+def edit_result(index, new_name, new_tags, new_email):
+    create_results_overview()
+    file_data = load_results_overview()
+    to_edit_result = file_data['all_results'].pop(index)
+
+    if new_name != '':  # Don't change the name if the input field has been left empty
+        to_edit_result['metadata']['name'] = new_name
+        print(to_edit_result['metadata']['name'])
+    if new_tags != '':  # Don't change the tags if the input field has been left empty
+        to_edit_result['metadata']['tags'] = new_tags
+        print(to_edit_result['metadata']['tags'])
+    if new_email != '':  # Don't change the e-mail if the input field has been left empty
+        to_edit_result['metadata']['email'] = new_email
+        print(to_edit_result['metadata']['email'])
+
+    # TODO Add more editable values
+    file_data['all_results'].insert(index, to_edit_result)
+
+    with open(results_overview_path, 'w') as file:  # Open the file in write mode.
+        # Rewind file pointer's position.
+        file.seek(0)
+        # Store it as json data.
+        json.dump(file_data, file)
 
 
 # Create results file if it doesn't exist yet or is empty
