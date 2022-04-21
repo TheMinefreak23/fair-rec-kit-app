@@ -27,22 +27,15 @@ const form = computed({
     //console.log('local form change')
   },
 })
-const flatOptions = props.nested ? flattenOptions() : props.options
+//const flatOptions = props.nested ? flattenOptions() : props.options
 
 onMounted(() => {
-  /*console.log(props.name)
-  console.log(props.options)
-  console.log(typeof props.options)
-  console.log(props.nested)*/
   form.value.name = props.plural
-  //console.log(form.value)
 })
 
 // Set default values for the group parameters.
 function setParameter(i, val) {
-  console.log(i)
   let option = findOption(val)
-  console.log(option)
   let choices
   if (option.params) {
     if (option.params.values && option.params.values.length > 0) {
@@ -84,6 +77,7 @@ function getFromIndex(i) {
 }
 
 function findOption(val) {
+  let flatOptions = props.nested ? flattenOptions() : props.options
   const option = flatOptions.find((option) => option.text === val)
   if (!option) return { params: [] }
   return option
@@ -120,9 +114,10 @@ function hasParams(i) {
 
 // Copies the selected item and puts it at the end of the list
 function copyItem(i) {
-  groupCount.value++
-  form.value.main[groupCount.value - 1] = form.value.main[i]
-  if (form.value.inputs[i]) {
+  groupCount.value++ //Add a new item
+  form.value.main[groupCount.value - 1] = form.value.main[i] //Copy the selected value to the new item
+  
+  if (form.value.inputs[i]) { //Copy textfield options (if applicable)
     form.value.inputs[groupCount.value - 1] = form.value.inputs[i].map(
       (param) => ({
         name: param.name,
@@ -130,7 +125,7 @@ function copyItem(i) {
       })
     )
   }
-  if (form.value.selects[i]) {
+  if (form.value.selects[i]) { //Copy select options (if applicable)
     form.value.selects[groupCount.value - 1] = form.value.selects[i].map(
       (param) => ({
         name: param.name,
@@ -138,7 +133,7 @@ function copyItem(i) {
       })
     )
   }
-  if (form.value.lists[i]) {
+  if (form.value.lists[i]) { //Copy nested option list (if applicable)
     form.value.lists[groupCount.value - 1] = form.value.lists[i].map(
       (param) => ({
         name: param.name,
@@ -146,6 +141,18 @@ function copyItem(i) {
       })
     )
   }
+}
+
+function update() {
+  console.log(form.value.main)
+  for (let i = 0; i < form.value.main.length; i++) {
+    console.log(findOption(form.value.main[i]))
+    if (findOption(form.value.main[i]) == '{ "params": [] }') {
+      console.log(form.value.main[i])
+      form.value.main.splice(i, 1, null)
+    }
+  }
+  console.log(form.value.main)
 }
 </script>
 
@@ -168,7 +175,7 @@ function copyItem(i) {
                   @change="setParameter(i - 1, $event)"
                   :required="props.required"
                 />
-                <b-button @click="copyItem(i - 1)" variant="primary"
+                <b-button v-if="form.main[i - 1]" @click="copyItem(i - 1)" variant="primary"
                   >Copy {{ name }}...</b-button
                 >
                 <!--TODO use placeholder-->
@@ -304,6 +311,9 @@ function copyItem(i) {
 
     <b-button @click="groupCount++" align-v="end" variant="primary"
       >Add {{ name }}...</b-button
+    >
+    <b-button @click="update()"  variant="danger"
+      >Update</b-button
     >
   </div>
 </template>
