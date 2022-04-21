@@ -25,7 +25,7 @@ itemDicts = parse(doctext);
 function parse(text) {
   let stringItems = parseTextIntoItems(text);
   let items = {};
-  for (let i in stringItems) {
+  for (let i = 0; i< stringItems.length; i++) {
     let idict = parseItem(stringItems[i]);
     items[idict["name"]] = idict;
   }
@@ -38,26 +38,34 @@ function parse(text) {
  * @return {[String]} An array of strings of items: ["<name>...</name>\n<description>...</description>", "..."].
  */
 function parseTextIntoItems(text) {
-  // An item is defined as anything between {} as defined in documents_items.txt
+  // An item is defined as anything between -{...}- as defined in documents_items.txt
   let items = [];
   let item = "";
   let readItem = false;
-  // Parse into items
-  for (let i in text) {
-    let character = text[i];
-    if (character == "{") {
-      readItem = true;
-      continue;
+  let textLines = text.split("\n");
+
+  for (let j = 0;  j < textLines.length; j++) {
+    // Parse each sentence
+    let line = textLines[j];
+    for (let i = 0; i < line.length; i++) {
+      let character = line[i];
+      if (character + line[i+1] == "-{") {
+        readItem = true;
+        i += 1;
+        continue;
+      }
+      if (character + line[i+1] == "}-") {
+        readItem = false;
+        items.push(item);
+        item = ""
+      }
+      if (readItem) {
+        item += character;
+      }
     }
-    if (character == "}") {
-      readItem = false;
-      items.push(item);
-      item = ""
-    }
-    if (readItem) {
-      item += character;
-    }
+    item += "\n";
   }
+  console.log(items);
   return items
 }
 
@@ -70,33 +78,43 @@ function parseItem(item) {
   let dict = {};
   let key = "";
   let value = "";
-  let keytagFound = false; // Prevents nested tags
-  let itemWords = item.split(/\s/);
-  for (let i in itemWords) {
-    let word = itemWords[i];
-    if (word.match(/<.*>/)) {
-      // Ending tag e.g., </name>.
-      const endTag = new RegExp("</" + key + ">", 'g');
-      if (word.match(endTag)) {
-        value = value.slice(0, -1); // Remove trailing whitespace.
-        dict[key] = value;
-        key = "";
-        value = "";
-        keytagFound = false;
+  let keytagFound = false; // Prevents nested tags.
+  let itemLines = item.split("\n");
+  for (let j = 0; j < itemLines.length; j++) {
+    let words = itemLines[j].split(" ");
+    for (let i = 0; i < words.length; i++) {
+      let word = words[i];
+      if (word.match(/<.*>/)) {
+        const endTag = new RegExp("</" + key + ">", 'g'); // Ending tag e.g., </name>.
+        if (word.match(endTag)) {
+          value = value.slice(0, -1); // Remove trailing whitespace.
+          dict[key] = value;
+          key = "";
+          value = "";
+          keytagFound = false;
+          i -= 1;
+        }
+        // Starting tag e.g., <name>.
+        else if (!keytagFound && word.match(/<[^\/].*>/)) {
+          keytagFound = true;
+          key = word.match(/(?<=<).*(?=>)/)[0];
+          value = "";
+          continue;
+        }
       }
-      // Starting tag e.g., <name>.
-      else if (!keytagFound) {
-        keytagFound = true;
-        key = word.match(/(?<=<).*(?=>)/)[0];
-        continue;
-      }
+      if (key) { value += word + " "; }
     }
-    if (key) { value += word + " "; }
+    value += "\n";
   }
+  console.log(dict);
   return dict;
 }
 
-
+/**
+ * Recursive .
+ * @param {} text 
+ * @param {*} start_i 
+ */
 function parseStructure(text, start_i) {
   eval("let x=1;");
   console.log(x);
@@ -201,6 +219,27 @@ tr:nth-child(even) {
   .sidenav {padding-top: 15px;}
   .sidenav a {font-size: 18px;}
 }
+
+pre {
+  background-color: #eee;
+  border: 1px solid #999;
+  display: block;
+  padding: 5px;
+  margin: 5px;
+}
+pre {
+  counter-reset: line;
+}
+code {
+  counter-increment: line;
+}
+code:before {
+  content: counter(line);
+  margin-right: 30px;
+  -webkit-user-select: none;
+  color: gray;
+}
+
 </style>
 
 <template>
