@@ -1,0 +1,69 @@
+[
+  {
+    "text": "Artist Gender",
+    "params": {
+      "options": [
+        {
+          "text": "Gender",
+          "options": [
+            "Male",
+            "Female"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "text": "User Gender",
+    "params": {
+      "options": [
+        {
+          "text": "Gender",
+          "options": [
+            "Male",
+            "Female"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "text": "Country user threshold",
+    "params": {
+      "values": [
+        {
+          "text": "threshold",
+          "min": 1,
+          "max": 1000,
+          "default": 10
+        }
+      ]
+    }
+  },
+  {
+    "text": "Minimum age",
+    "params": {
+      "values": [
+        {
+          "text": "threshold",
+          "min": 1,
+          "max": 1000,
+          "default": 18
+        }
+      ]
+    }
+  },
+  {
+    "text": "Maximum age",
+    "params": {
+      "values": [
+        {
+          "text": "threshold",
+          "min": 1,
+          "max": 1000,
+          "default": 18
+        }
+      ]
+    }
+  }
+]

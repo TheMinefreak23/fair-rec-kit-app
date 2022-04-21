@@ -13,16 +13,11 @@ from . import result_storage
 compute_bp = Blueprint('computation', __name__, url_prefix='/api/computation')
 
 # constants
-DATASETS = [
-    {'text': 'LFM2B', 'timestamp': True, 'params': {'values' : [{'text' : 'Train/testsplit', 'default' : '80', 'min':0, 'max':100}], 'options': [{'text' : 'Type of split', 'default' : "Random", 'options' : ["Random", "Time"]}]}},
-    {'text': 'LFM1B', 'timestamp': True, 'params': {'values' : [{'text' : 'Train/testsplit', 'default' : '80', 'min':0, 'max':100}], 'options': [{'text' : 'Type of split', 'default' : "Random", 'options' : ["Random", "Time"]}]}},
-    {'text': 'LFM360K', 'timestamp': False, 'params': {'values' : [{'text' : 'Train/testsplit', 'default' : '80', 'min':0, 'max':100}]}},
-    {'text': 'ML25M', 'timestamp': True, 'params': {'values' : [{'text' : 'Train/testsplit', 'default' : '80', 'min':0, 'max':100}], 'options': [{'text' : 'Type of split', 'default' : "Random", 'options' : ["Random", "Time"]}]}},
-    {'text': 'ML100K', 'timestamp': True, 'params': {'values' : [{'text' : 'Train/testsplit', 'default' : '80', 'min':0, 'max':100}], 'options': [{'text' : 'Type of split', 'default' : "Random", 'options' : ["Random", "Time"]}]}}
-]
-
+DATASETS = json.load(open('project/datasets.json'))
 APPROACHES = json.load(open('project/approaches.json'))
 METRICS = json.load(open('project/metrics.json'))
+FILTERS = json.load(open('project/filters.json'))
+
 
 # Generate parameter data
 metric_categories = METRICS['categories']
@@ -37,12 +32,6 @@ for category in metric_categories:
 DEFAULTS = {'split': 80,
             'recCount': {'min': 0, 'max': 100, 'default': 10},
             }  # default values
-FILTERS = [{'text': 'Artist Gender', 'params': {'options': [{'text': 'Gender', 'options': ['Male', 'Female']}]}},
-           {'text': 'User Gender', 'params': {'options': [{'text': 'Gender', 'options': ['Male', 'Female']}]}},
-           {'text': 'Country user threshold',
-            'params': {'values': [{'text': 'threshold', 'min': 1, 'max': 1000, 'default': 10}]}},
-           {'text': 'Minimum age', 'params': {'values': [{'text': 'threshold', 'min': 1, 'max': 1000, 'default': 18}]}},
-           {'text': 'Maximum age', 'params': {'values': [{'text': 'threshold', 'min': 1, 'max': 1000, 'default': 18}]}}]
 
 computation_queue = []
 

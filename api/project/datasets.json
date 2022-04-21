@@ -1,0 +1,112 @@
+[
+  {
+    "text": "LFM2B",
+    "timestamp": true,
+    "params": {
+      "values": [
+        {
+          "text": "Train/testsplit",
+          "default": "80",
+          "min": 0,
+          "max": 100
+        }
+      ],
+      "options": [
+        {
+          "text": "Type of split",
+          "default": "Random",
+          "options": [
+            "Random",
+            "Time"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "text": "LFM1B",
+    "timestamp": true,
+    "params": {
+      "values": [
+        {
+          "text": "Train/testsplit",
+          "default": "80",
+          "min": 0,
+          "max": 100
+        }
+      ],
+      "options": [
+        {
+          "text": "Type of split",
+          "default": "Random",
+          "options": [
+            "Random",
+            "Time"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "text": "LFM360K",
+    "timestamp": false,
+    "params": {
+      "values": [
+        {
+          "text": "Train/testsplit",
+          "default": "80",
+          "min": 0,
+          "max": 100
+        }
+      ]
+    }
+  },
+  {
+    "text": "ML25M",
+    "timestamp": true,
+    "params": {
+      "values": [
+        {
+          "text": "Train/testsplit",
+          "default": "80",
+          "min": 0,
+          "max": 100
+        }
+      ],
+      "options": [
+        {
+          "text": "Type of split",
+          "default": "Random",
+          "options": [
+            "Random",
+            "Time"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "text": "ML100K",
+    "timestamp": true,
+    "params": {
+      "values": [
+        {
+          "text": "Train/testsplit",
+          "default": "80",
+          "min": 0,
+          "max": 100
+        }
+      ],
+      "options": [
+        {
+          "text": "Type of split",
+          "default": "Random",
+          "options": [
+            "Random",
+            "Time"
+          ]
+        }
+      ]
+    }
+  }
+]
