@@ -1,76 +1,33 @@
+<script>
+/**
+ * Below are all items inside the Documentation tab.
+ * To add an item, use the standard format:
 
-`Item list for in documentation tab
-Only lines within curly brackets in the following format are read:
-
-\curlybracket-open
+{
 <name> sometext abcdef </name>
 <definition> Uses HTML syntax </definition>
 <link> sometext abcdef </link>
 <other1> sometext abcdef </other1>
-Some comment...
+Some comment or notes...
 <other?> sometext abcdef </other?>
-\curlybracket-closed
+}
 
-Adding new <tags> should be manually added to Documentation.vue's template.
+ * Adding new <tags>, like <other?>, should be manually added to Documentation.vue's template.
+ * 
+ */
+export const doctext = 
+`
+# Documentation items
+Item list for in documentation tab
 
 =================================================
 
 {
 <name> FairRecKit </name>
 <definition> 
-WebApp to compare different recommender approaches. Developed by RecCoons, from Utrecht University. <br>
-dddsa dsfd <h1>fefs</h1>s
-cdscs
-<p>fsdf
-fd
-</p>
-<br>
-<h2>HTML Table</h2>
-
-<table>
-  <tr>
-    <th>Company</th>
-    <th>Contact</th>
-    <th>Country</th>
-  </tr>
-  <tr>
-    <td>Alfreds Futterkiste</td>
-    <td>Maria Anders</td>
-    <td>Germany</td>
-  </tr>
-  <tr>
-    <td>Centro comercial Moctezuma</td>
-    <td>Francisco Chang</td>
-    <td>Mexico</td>
-  </tr>
-  <tr>
-    <td>Ernst Handel</td>
-    <td>Roland Mendel</td>
-    <td>Austria</td>
-  </tr>
-  <tr>
-    <td>Island Trading</td>
-    <td>Helen Bennett</td>
-    <td>UK</td>
-  </tr>
-  <tr>
-    <td>Laughing Bacchus Winecellars</td>
-    <td>Yoshi Tannamuri</td>
-    <td>Canada</td>
-  </tr>
-  <tr>
-    <td>Magazzini Alimentari Riuniti</td>
-    <td>Giovanni Rovelli</td>
-    <td>Italy</td>
-  </tr>
-</table>
-
-
+WebApp to compare different recommender approaches. Developed by RecCoons, from Utrecht University.
 </definition>
 <link> http://fairreckit.science.uu.nl/ </link>
-
-<other1> sometext </other1>
-<other?> sometext </other?>
 }
 
 -----
@@ -78,11 +35,20 @@ Tabs:
 
 {
 <name> New Computation </name>
-<definition> In the this tab you can start a new computation of your desired datasets and the recommender approach. There are a few well-known datasets built-in, but custom datasets can be uploaded as well. Apply filter </definition>
-
-<link> sometext </link>
-<other1> sometext </other1>
-<other?> sometext </other?>
+<definition>
+<p>In this tab you can start a new computation of your desired datasets and the recommender approach. There are a few well-known datasets built-in, but custom datasets can be uploaded as well. After having chosen the datasets, one or more filters can be applied wat doet dit?.</p>
+<p>Next, add the recommender approaches that you want compared and select the number of recommendation per user wat doet dit?. Then, the train-test ratio and the different metrics to compare the performance.</p>
+<p>Lastly, enter the metadata to identify your computation. After pressing Send, this data will be added to the queue in Active Computations and send to the server to be executed.</p>
+<p>For more information about each step, refer to the list below:</p>
+<ul>
+<li><a href="#LFM2B">Datasets</li>
+<li><a href="#LFM2B">Filters</li>
+<li><a href="#FunkSVD">Recommender approaches</li>
+<li><a href="###">Train/test-split</li>
+<li><a href="tabIndex=1">Metrics</li>
+<li><a href="#">Meta</li>
+</ul>
+</definition>
 }
 
 {
@@ -278,7 +244,7 @@ Lenskit:
 }
 
 {
-<name> Random</name>
+<name> Ra2ndom </name>
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
@@ -291,7 +257,7 @@ Metrics:
 http://www.cp.jku.at/datasets/LFM-2b/
 
 {
-<name> Random </name>
+<name> Ran2dom </name>
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
@@ -299,7 +265,7 @@ http://www.cp.jku.at/datasets/LFM-2b/
 }
 
 {
-<name> Random </name>
+<name> Rando2m </name>
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
@@ -307,7 +273,7 @@ http://www.cp.jku.at/datasets/LFM-2b/
 }
 
 {
-<name> Random</name>
+<name> R2andom </name>
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
@@ -315,11 +281,14 @@ http://www.cp.jku.at/datasets/LFM-2b/
 }
 
 {
-<name> Random</name>
+<name> Random2 </name>
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
 <other?> sometext </other?>
 }
 
+`
+;
 
+</script>

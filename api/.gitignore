@@ -1,5 +1,6 @@
 # Data
 /results.json
+/results_backup.json
 
 # Byte-compiled files
 __pycache__

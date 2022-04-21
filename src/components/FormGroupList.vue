@@ -14,7 +14,8 @@ const props = defineProps({
   data: { type: Object, required: true },
 })
 
-const groupCount = ref(1) //The minimum amount of group items is 1.
+const groupCount = ref(0)
+
 const form = computed({
   // getter
   get() {
@@ -30,6 +31,7 @@ const form = computed({
 const flatOptions = props.nested ? flattenOptions() : props.options
 
 onMounted(() => {
+  groupCount.value = props.required ? 1 : 0 // For required lists the minimum amount of group items is 1.
   /*console.log(props.name)
   console.log(props.options)
   console.log(typeof props.options)
@@ -93,9 +95,8 @@ function findOption(val) {
 
 // Splice groups array to remove a group
 function removeGroup(i) {
-  if (groupCount.value != 1) {
-    groupCount.value--
-  }
+  if (props.required && groupCount.value == 1) return
+  groupCount.value--
   form.value.main.splice(i, 1)
   form.value.inputs.splice(i, 1)
   form.value.selects.splice(i, 1)
@@ -128,6 +129,7 @@ function hasParams(i) {
       {{ capitalise(plural) }}
       <!--{{ plural }}-->
     </h3>
+    <h3>{{form.main[i-1]}}</h3>
     <div v-for="i in groupCount" :key="i - 1">
       <b-row class="align-items-end">
         <b-col>
@@ -153,7 +155,6 @@ function hasParams(i) {
               >
                 <b-form-group
                   :label="
-                    'Give a ' +
                     underscoreToSpace(value.text) +
                     ' between ' +
                     value.min +
@@ -185,7 +186,13 @@ function hasParams(i) {
                     <strong>Test:</strong
                     ><i>{{ ' ' }}{{ 100 - form.inputs[i - 1][index].value }}</i>
                   </div>
-                  <div v-if="value.text.includes('seed') && form.inputs[i-1][index].value == null" class="text-center">
+                  <div
+                    v-if="
+                      value.text.includes('seed') &&
+                      form.inputs[i - 1][index].value == null
+                    "
+                    class="text-center"
+                  >
                     Seed will be randomly generated.
                   </div>
                 </b-form-group>
@@ -244,7 +251,7 @@ function hasParams(i) {
             <b-col cols="4">
               <b-form-group>
                 <b-button
-                  v-if="i != 1"
+                  v-if="!(i == 1 && required)"
                   @click="removeGroup(i - 1)"
                   variant="danger"
                   class="mb-2 mr-sm-2 mb-sm-0"
@@ -267,6 +274,7 @@ function hasParams(i) {
                   :selectName="option.article + ' ' + option.name"
                   :options="option.options"
                   :nested="option.nested"
+                  :required="false"
                 />
               </b-card>
             </template>
