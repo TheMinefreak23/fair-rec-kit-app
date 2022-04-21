@@ -16,6 +16,7 @@ const form = ref({
   approaches: emptyFormGroup(),
   //filters: emptyFormGroup(),
   splitMethod: 'random', //The default split method.
+  computationMethod: 'recommendation',
 })
 const metadata = ref({})
 const splitOptions = [
@@ -73,6 +74,7 @@ async function initForm() {
   form.value.recommendations = options.value.defaults.recCount.default
   form.value.split = options.value.defaults.split
   form.value.splitMethod = 'random'
+  form.value.computationMethod = 'recommendation'
   //form.value.result.value = {}
 }
 
@@ -113,6 +115,11 @@ function reformat(property) {
         <b-row>
           <b-col>
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
+              <h3>Computation type</h3>
+              <b-form-radio-group v-model="form.computationMethod">
+                <b-form-radio value="recommendation">Recommendation (default)</b-form-radio>
+                <b-form-radio value="prediction">Prediction</b-form-radio>
+              </b-form-radio-group>
               <!--User can select a dataset.-->
               <FormGroupList
                 v-model:data="form.datasets"
@@ -149,11 +156,12 @@ function reformat(property) {
                 name="approach"
                 plural="Recommender approaches"
                 selectName="an approach"
-                :options="options.approaches.libraries"
+                :options="form.computationMethod == 'recommendation' ? options.approaches.libraries.recommendation : options.approaches.libraries.prediction"
+      
               />
 
               <!--User can select the amount of recommendations per user -->
-              <b-form-group label="Select number of recommendations per user:">
+              <b-form-group v-if="form.computationMethod == 'recommendation'" label="Select number of recommendations per user:">
                 <b-form-input
                   type="range"
                   :min="options.defaults.recCount.min"
@@ -181,7 +189,7 @@ function reformat(property) {
                 name="metric"
                 plural="metrics"
                 selectName="a metric"
-                :options="options.metrics.categories"
+                :options="form.computationMethod == 'recommendation' ? options.metrics.categories : options.metrics.categories.slice(1)"
                 :nested="true"
               />
             </div>

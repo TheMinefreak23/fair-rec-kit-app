@@ -128,6 +128,7 @@ function hasParams(i) {
       {{ capitalise(plural) }}
       <!--{{ plural }}-->
     </h3>
+    <h3>{{form.main[i-1]}}</h3>
     <div v-for="i in groupCount" :key="i - 1">
       <b-row class="align-items-end">
         <b-col>
@@ -153,7 +154,6 @@ function hasParams(i) {
               >
                 <b-form-group
                   :label="
-                    'Give a ' +
                     underscoreToSpace(value.text) +
                     ' between ' +
                     value.min +
