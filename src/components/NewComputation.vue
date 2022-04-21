@@ -150,6 +150,7 @@ function reformat(property) {
                 plural="Recommender approaches"
                 selectName="an approach"
                 :options="options.approaches.libraries"
+                :required="true"
               />
 
               <!--User can select the amount of recommendations per user -->
