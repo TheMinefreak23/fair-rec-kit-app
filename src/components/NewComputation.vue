@@ -157,7 +157,7 @@ function reformat(property) {
                 plural="Recommender approaches"
                 selectName="an approach"
                 :options="form.computationMethod == 'recommendation' ? options.approaches.libraries.recommendation : options.approaches.libraries.prediction"
-      
+                :required="true"
               />
 
               <!--User can select the amount of recommendations per user -->
