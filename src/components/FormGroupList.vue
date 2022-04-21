@@ -12,6 +12,7 @@ const props = defineProps({
   required: Boolean,
   nested: false,
   data: { type: Object, required: true },
+  removable: Boolean,
 })
 
 const groupCount = ref(1) //The minimum amount of group items is 1.
@@ -93,9 +94,8 @@ function findOption(val) {
 
 // Splice groups array to remove a group
 function removeGroup(i) {
-  if (groupCount.value != 1) {
-    groupCount.value--
-  }
+  if (!props.removable && groupCount.value == 1) return
+  groupCount.value--
   form.value.main.splice(i, 1)
   form.value.inputs.splice(i, 1)
   form.value.selects.splice(i, 1)
@@ -185,7 +185,13 @@ function hasParams(i) {
                     <strong>Test:</strong
                     ><i>{{ ' ' }}{{ 100 - form.inputs[i - 1][index].value }}</i>
                   </div>
-                  <div v-if="value.text.includes('seed') && form.inputs[i-1][index].value == null" class="text-center">
+                  <div
+                    v-if="
+                      value.text.includes('seed') &&
+                      form.inputs[i - 1][index].value == null
+                    "
+                    class="text-center"
+                  >
                     Seed will be randomly generated.
                   </div>
                 </b-form-group>
@@ -244,7 +250,7 @@ function hasParams(i) {
             <b-col cols="4">
               <b-form-group>
                 <b-button
-                  v-if="i != 1"
+                  v-if="i != 1 || removable"
                   @click="removeGroup(i - 1)"
                   variant="danger"
                   class="mb-2 mr-sm-2 mb-sm-0"
@@ -267,6 +273,7 @@ function hasParams(i) {
                   :selectName="option.article + ' ' + option.name"
                   :options="option.options"
                   :nested="option.nested"
+                  :removable="true"
                 />
               </b-card>
             </template>
