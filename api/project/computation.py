@@ -13,10 +13,10 @@ from . import result_storage
 compute_bp = Blueprint('computation', __name__, url_prefix='/api/computation')
 
 # constants
-DATASETS = json.load(open('project/datasets.json'))
-APPROACHES = json.load(open('project/approaches.json'))
-METRICS = json.load(open('project/metrics.json'))
-FILTERS = json.load(open('project/filters.json'))
+DATASETS = json.load(open('project/parameters/datasets.json'))
+APPROACHES = json.load(open('project/parameters/approaches.json'))
+METRICS = json.load(open('project/parameters/metrics.json'))
+FILTERS = json.load(open('project/parameters/filters.json'))
 
 
 # Generate parameter data
