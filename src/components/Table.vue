@@ -11,6 +11,7 @@ const emit = defineEmits([
   'loadResults',
   'loadMore',
   'paginationSort',
+  'changeColumns'
 ])
 const props = defineProps({
   overview: Boolean,
@@ -24,7 +25,9 @@ const props = defineProps({
   pagination: Boolean,
   caption: String,
   expandable: Boolean,
-  headerOptions: Array
+  headerOptions: Array,
+  userOptions: Array,
+  itemOptions: Array
 })
 
 const caption = ref('')
@@ -33,6 +36,9 @@ const deleteModalShow = ref(false)
 const editModalShow = ref(false)
 const viewModalShow = ref(false)
 const changeColumnsModalShow = ref(false)
+const checkedColumns = ref([])
+const itemColumns = ref([])
+const userColumns = ref([])
 const newName = ref('')
 const newTags = ref('')
 const newEmail = ref('')
@@ -101,6 +107,7 @@ async function getMetadata(selectedID) {
     getResult()
   })
 }
+
 async function getResult() {
   const response = await fetch(API_URL + props.serverFile3)
   const data = await response.json()
@@ -198,25 +205,67 @@ function setsorting(i) {
     <p>{{ metadataStr }}</p>
   </b-modal>
   
+  <!-- Modal used for changing the headers of the user recommendations table -->
   <b-modal 
     id="change-columns-modal"
     v-model="changeColumnsModalShow"
-    title="Change columns">
-    <p>Check the columns you want to be shown</p>
-    <div 
+    title="Change columns"
+    @ok="$emit('changeColumns', checkedColumns, userColumns, itemColumns)"
+    >
+    <p>Check the extra columns you want to be shown</p>
+    
+    <p>General:</p>
+    <div class="form-check form-switch"
       v-for="(header, index) in headerOptions"
       :key="header"
-      >
-    <input 
-      class="form-check-input" 
-      type="checkbox" 
-      value="" 
-      id="flexCheckDefault">
-    <label 
-      class="form-check-label" 
-      for="flexCheckDefault">
-      {{ header.name }}
-    </label>
+    >
+      <input 
+        v-model="checkedColumns"
+        class="form-check-input" 
+        type="checkbox" 
+        v-bind:value="header.name" 
+        v-bind:id="header.name">
+      <label 
+        class="form-check-label" 
+        v-bind:id="header.name">
+        {{ header.name }}
+      </label>
+    </div>
+
+    <p>User specific: </p>
+    <div class="form-check form-switch"
+      v-for="(header, index) in userOptions"
+      :key="header"
+    >
+      <input 
+        v-model="userColumns"
+        class="form-check-input" 
+        type="checkbox" 
+        v-bind:value="header.name" 
+        v-bind:id="header.name">
+      <label 
+        class="form-check-label" 
+        v-bind:id="header.name">
+        {{ header.name }}
+      </label>
+    </div>
+
+    <p>Item specific: </p>
+    <div class="form-check form-switch"
+      v-for="(header, index) in itemOptions"
+      :key="header"
+    >
+      <input 
+        v-model="itemColumns"
+        class="form-check-input" 
+        type="checkbox" 
+        v-bind:value="header.name" 
+        v-bind:id="header.name">
+      <label 
+        class="form-check-label" 
+        v-bind:id="header.name">
+        {{ header.name }}
+      </label>
     </div>
 
   </b-modal>

@@ -12,7 +12,11 @@ import { API_URL } from '../api'
 const props = defineProps({ headers: Array, result: Object })
 
 const headers_rec = ref([{ name: 'User' }, { name: 'Item' }, { name: 'Score' }])
+
+//this needs to come from the server
 const headers_options = ref([{ name: 'Option1' }, { name: 'Option2' }, { name: 'Option3' }])
+const user_header_options = ref([{name: 'OptionA' }])
+const item_header_options = ref([{name: 'OptionB'}])
 
 const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
@@ -93,6 +97,10 @@ function paginationSort(indexVar) {
   getUserRecs()
 }
 
+function changeColumns(generalHeader, userHeader, itemHeader){
+  
+}
+
 function handleScroll() {
   console.log('test')
 }
@@ -150,10 +158,13 @@ function handleScroll() {
           :results="data.results"
           :headers="headers_rec"
           :headerOptions = "headers_options"
+          :userOptions = "user_header_options"
+          :itemOptions = "item_header_options"
           pagination
           expandable
           @paginationSort="(i) => paginationSort(i)"
           @loadMore="(increase, amount) => loadMore(increase, amount)"
+          @changeColumns="(general, user, item) => changeColumns(general, user, item)"
         />
       </div>
       <!--</template>-->
