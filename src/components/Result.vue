@@ -25,6 +25,9 @@ const startIndex = ref(0)
 const index = ref(0)
 const ascending = ref(true)
 const entryAmount = ref(20)
+const userHeaders = ref([])
+const itemHeaders = ref([])
+const headers = ref([])
 
 watch(
   () => props.result,
@@ -63,6 +66,9 @@ async function getUserRecs() {
       sortindex: index.value,
       ascending: ascending.value,
       amount: entryAmount.value,
+      headers: headers.value,
+      itemheaders: itemHeaders.value,
+      userHeaders: userHeaders.value
     }),
   }
 
@@ -97,8 +103,13 @@ function paginationSort(indexVar) {
   getUserRecs()
 }
 
+//Update headers shown in user recommendations
 function changeColumns(generalHeader, userHeader, itemHeader){
-  
+  headers.value = generalHeader,
+  userHeaders.value = userHeader,
+  itemHeaders.value = itemHeader
+
+  getUserRecs()
 }
 
 function handleScroll() {
@@ -154,7 +165,7 @@ function handleScroll() {
       <!--<template v-for="data in [data]" :key="data">-->
       <div class="col-6">
         <Table
-          caption=""
+          caption="Testcaption"
           :results="data.results"
           :headers="headers_rec"
           :headerOptions = "headers_options"

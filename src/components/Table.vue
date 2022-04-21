@@ -270,11 +270,19 @@ function setsorting(i) {
 
   </b-modal>
 
+  
+
   <b-table-simple hover striped responsive caption-top>
     <caption>
       {{
         props.caption
       }}
+       <template v-if="expandable">
+      <b-button 
+        @click="changeColumnsModalShow = !changeColumnsModalShow">  
+        change headers 
+      </b-button>
+    </template>
     </caption>
     <b-thead head-variant="dark">
       <b-tr>
@@ -288,12 +296,6 @@ function setsorting(i) {
         >
           {{ header.name }}
         </b-th>
-        <slot v-if="expandable">
-          <b-button 
-            @click="changeColumnsModalShow = !changeColumnsModalShow">  
-            change
-          </b-button>
-        </slot>
       </b-tr>
       <b-tr>
         <b-th v-if="overview"></b-th>
