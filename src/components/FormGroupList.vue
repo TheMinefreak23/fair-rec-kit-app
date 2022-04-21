@@ -40,12 +40,10 @@ onMounted(() => {
 
 // Set default values for the group parameters.
 function setParameter(i, val) {
-  //console.log(flatOptions)
-  //console.log(options)
+  console.log(i)
   let option = findOption(val)
+  console.log(option)
   let choices
-  //console.log(props.name)
-  //console.log(option.params)
   if (option.params) {
     if (option.params.values && option.params.values.length > 0) {
       choices = option.params.values
@@ -119,6 +117,36 @@ function hasParams(i) {
     (option.params.dynamic && option.params.dynamic.length != 0)
   return option.params.length != 0 && listsNotNull
 }
+
+// Copies the selected item and puts it at the end of the list
+function copyItem(i) {
+  groupCount.value++
+  form.value.main[groupCount.value - 1] = form.value.main[i]
+  if (form.value.inputs[i]) {
+    form.value.inputs[groupCount.value - 1] = form.value.inputs[i].map(
+      (param) => ({
+        name: param.name,
+        value: param.value,
+      })
+    )
+  }
+  if (form.value.selects[i]) {
+    form.value.selects[groupCount.value - 1] = form.value.selects[i].map(
+      (param) => ({
+        name: param.name,
+        value: param.value,
+      })
+    )
+  }
+  if (form.value.lists[i]) {
+    form.value.lists[groupCount.value - 1] = form.value.lists[i].map(
+      (param) => ({
+        name: param.name,
+        value: param.value,
+      })
+    )
+  }
+}
 </script>
 
 <template>
@@ -128,7 +156,6 @@ function hasParams(i) {
       {{ capitalise(plural) }}
       <!--{{ plural }}-->
     </h3>
-    <h3>{{form.main[i-1]}}</h3>
     <div v-for="i in groupCount" :key="i - 1">
       <b-row class="align-items-end">
         <b-col>
@@ -141,6 +168,9 @@ function hasParams(i) {
                   @change="setParameter(i - 1, $event)"
                   :required="props.required"
                 />
+                <b-button @click="copyItem(i - 1)" variant="primary"
+                  >Copy {{ name }}...</b-button
+                >
                 <!--TODO use placeholder-->
               </b-form-group>
             </b-col>
