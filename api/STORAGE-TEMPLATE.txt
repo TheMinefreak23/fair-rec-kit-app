@@ -19,7 +19,7 @@ mock\1647818279_HelloWorld\run_0
 +---------------------------------------------------------------------------------------------------------------------------+
 In each of these subfolders is a JSON file describing the location of the result files:
 
-{CALCULATION_ID}_run_{RUN_INDEX}_overview.json
+overview.json
 
 Each pair of dataset-algorithm, plus any results that were created using filters, has an individual entry in the JSON
 
@@ -29,13 +29,15 @@ Each pair of dataset-algorithm, plus any results that were created using filters
     "overview": [
         {
             "name":"LMF-360K - Elliot, n=50",
-            "evaluation_path": "LFM-360K_0\\Elliot_UserKnn_0\\evaluation.tsv",
-            "ratings_path": "LFM-360K_0\\Elliot_UserKnn_0\\ratings_n=50.tsv"
+            "evaluation_path": "LFM-360K_0\\Elliot_UserKnn_0\\evaluation.json",
+            "ratings_path": "LFM-360K_0\\Elliot_UserKnn_0\\ratings_n=50.tsv",
+            "ratings_settings_path": "LFM-360K_0\\Elliot_UserKnn_0\\settings.json"
         },
         {
             "name": "LFM-360K - Foo_ALS",
-            "evaluation_path": "LFM-360K_0\\Foo_ALS_0\\evaluation.tsv",
-            "ratings.tsv": "LFM-360K_0\\Foo_ALS_0\\ratings.tsv"
+            "evaluation_path": "LFM-360K_0\\Foo_ALS_0\\evaluation.json",
+            "ratings_path": "LFM-360K_0\\Foo_ALS_0\\ratings.tsv"
+            "ratings_settings_path": "LFM-360K_0\\Elliot_UserKnn_0\\settings.json"
         }
     ]
 }
