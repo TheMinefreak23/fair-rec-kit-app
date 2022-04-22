@@ -1,4 +1,4 @@
-  # This program has been developed by students from the bachelor Computer Science at
+# This program has been developed by students from the bachelor Computer Science at
 # Utrecht University within the Software Project course.
 # © Copyright Utrecht University (Department of Information and Computing Sciences)
 import csv  # TODO fix this import
@@ -52,14 +52,23 @@ def result_by_id(resultid):
     for subdir in [f.path for f in os.scandir(relative_path) if f.is_dir()]:
         run_overview_name = os.path.basename(os.path.normpath(subdir))
         run_overview = load_json(subdir + "/" + run_overview_name + "_overview.json")
-        run_data = {'name': run_overview_name, 'results': []}
+        run_data = {'index': run_overview_name, 'results': []}
         # loops through individual results
         for run_result in run_overview["results"]:
             evaluation_path_full = subdir + "/" + run_overview_name + "/" + result_data['evaluation_path']
-            ratings_path_full = subdir + "/" + run_overview_name + "/" + result_data['ratings_path']
-            evaluation_data = pd.read_csv(evaluation_path_full, sep='\t', header=None).to_dict(orient='records')
-            ratings_data = pd.read_csv(ratings_path_full, sep='\t', header=None).to_dict(orient='records')
-            result_data = {'name': run_result['name'], 'evaluation': evaluation_data, 'ratings': ratings_data}
+            ratings_settings_path_full = subdir + "/" + run_overview_name + "/" + result_data['ratings_settings_path']
+            evaluation_data = pd.read_csv(
+                evaluation_path_full,
+                sep='\t',
+                header=None).to_dict(orient='records')
+            ratings_settings_data = pd.read_csv(
+                ratings_settings_path_full,
+                sep='\t',
+                header=None).to_dict(orient='records')
+            result_data = {
+                'name': run_result['name'],
+                'evaluations': evaluation_data['evaluations'],
+                'ratings_settings': ratings_settings_data}
             run_data['results'].append(result_data)
 
         data['runs'].append(run_data)

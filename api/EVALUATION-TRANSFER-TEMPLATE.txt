@@ -1,0 +1,36 @@
+{
+id,
+name,
+runs:
+[
+    {
+        index,
+        results:
+        [
+            {
+                name,
+                evaluations:
+                [
+                    {
+                    evaluation1
+                    },
+                    {
+                    evaluation2
+                    }
+                ]
+                settings:
+                {
+                    factors,
+                    iterations,
+                    random_seed,
+                    regularization,
+                    use_cg,
+                    calculate_training_loss,
+                    etc..
+                }
+
+            }
+        ]
+    }
+]
+}
