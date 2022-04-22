@@ -5,14 +5,21 @@
 
 -{
 <name> sometext abcdef </name>
-<definition> Uses HTML syntax </definition>
+<definition> 
+Uses HTML syntax 
+For code snippets use:
+<pre>
+  <code> p { color: red } </code>
+  <code> p { color: blue } </code>
+</pre>
+</definition>
 <link> sometext abcdef </link>
 <other1> sometext abcdef </other1>
 Some comment or notes...
-<other?> sometext abcdef </other?>
+<other_> sometext abcdef </other_>
 }-
 
- * Adding new <tags>, like <other?>, should be manually added to Documentation.vue's template.
+ * Adding new <tags>, like <other_>, should be manually added to Documentation.vue's template.
  * 
  */
 export const doctext = 
@@ -64,7 +71,7 @@ nlmlmloloo
 </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 -{
@@ -77,7 +84,7 @@ t. Quae rerum qui
  m quis placeat necessitatibus ea. </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 -{
@@ -85,7 +92,7 @@ t. Quae rerum qui
 <definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 -{
@@ -93,7 +100,7 @@ t. Quae rerum qui
 <definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 
@@ -110,7 +117,7 @@ Datasets:
 <definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 -{
@@ -118,7 +125,7 @@ Datasets:
 <definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 -{
@@ -126,7 +133,7 @@ Datasets:
 <definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 -{
@@ -134,7 +141,7 @@ Datasets:
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 ------
@@ -147,7 +154,7 @@ Elliot:
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 -{
@@ -155,7 +162,7 @@ Elliot:
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 -{
@@ -163,7 +170,7 @@ Elliot:
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 -{
@@ -171,7 +178,7 @@ Elliot:
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 -{
@@ -179,7 +186,7 @@ Elliot:
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 -{
@@ -187,7 +194,7 @@ Elliot:
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 -{
@@ -195,7 +202,7 @@ Elliot:
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 -{
@@ -203,7 +210,7 @@ Elliot:
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 Implicit:
@@ -212,7 +219,7 @@ Implicit:
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 -{
@@ -220,7 +227,7 @@ Implicit:
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 -{
@@ -228,7 +235,7 @@ Implicit:
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 Lenskit:
@@ -237,7 +244,7 @@ Lenskit:
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 -{
@@ -245,7 +252,7 @@ Lenskit:
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 -{
@@ -253,7 +260,7 @@ Lenskit:
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 -{
@@ -261,7 +268,7 @@ Lenskit:
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 -----
@@ -274,7 +281,7 @@ http://www.cp.jku.at/datasets/LFM-2b/
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 -{
@@ -282,7 +289,7 @@ http://www.cp.jku.at/datasets/LFM-2b/
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 -{
@@ -290,7 +297,7 @@ http://www.cp.jku.at/datasets/LFM-2b/
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 -{
@@ -298,7 +305,7 @@ http://www.cp.jku.at/datasets/LFM-2b/
 <definition> sometext </definition>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
+<other_> sometext </other_>
 }-
 
 `

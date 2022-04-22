@@ -101,6 +101,8 @@ function parseItem(item) {
           value = "";
           continue;
         }
+        console.log(words);
+        console.log(word, key, word.match(endTag));
       }
       if (key) { value += word + " "; }
     }
@@ -246,7 +248,7 @@ code:before {
 <div id="main">
   <span class="position-fixed" style="font-size:30px;cursor:pointer" v-on:click="openCloseNav()">&#9776;</span>
   <div id="docSidenav" class="sidenav">
-    <!-- <a href="javascript:void(0)" class="closebtn position-fixed-left" v-on:click="closeNav()">&times;</a> -->
+    <a href="javascript:void(0)" class="closebtn position-fixed-left" v-on:click="closeNav()">&times;</a>
     <b-link class="position-relative" :href='"#"+itemDict["name"]' v-for="itemDict in itemDicts" :key="itemDict">{{itemDict["name"]}}</b-link>
   </div>
   
@@ -254,13 +256,12 @@ code:before {
     <b-card :id='itemDict["name"]'>
       <b-card-title>{{ itemDict["name"] }}</b-card-title>
       <b-card-text>
-        <!-- Uses HTML syntax -->
         <span v-html='itemDict["definition"]'></span>
       </b-card-text>
       <b-link :href='itemDict["link"]'>{{ itemDict["link"] }}</b-link>
-      <b-button :href='itemDict["other?"]' v-if='itemDict["other?"]'>
-        <br>
-        {{ itemDict["other?"] }}
+      <br>
+      <b-button pill variant="dark" :href='itemDict["other_"]' v-if='itemDict["other_"]'>
+        {{ itemDict["other_"] }}
       </b-button>
     </b-card>    
   </div>
