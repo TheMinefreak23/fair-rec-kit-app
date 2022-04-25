@@ -1,0 +1,104 @@
+# This program has been developed by students from the bachelor Computer Science at
+# Utrecht University within the Software Project course.
+# © Copyright Utrecht University (Department of Information and Computing Sciences)
+import json
+
+# constants
+DATASETS = [
+    {'name': 'LFM2B', 'timestamp': True,
+     'params': {'values': [{'name': 'Train/testsplit', 'default': '80', 'min': 0, 'max': 100}],
+                'options': [{'name': 'Type of split', 'default': "Random", 'options': ["Random", "Time"]}]}},
+    {'name': 'LFM1B', 'timestamp': True,
+     'params': {'values': [{'name': 'Train/testsplit', 'default': '80', 'min': 0, 'max': 100}],
+                'options': [{'name': 'Type of split', 'default': "Random", 'options': ["Random", "Time"]}]}},
+    {'name': 'LFM360K', 'timestamp': False,
+     'params': {'values': [{'name': 'Train/testsplit', 'default': '80', 'min': 0, 'max': 100}]}},
+    {'name': 'ML25M', 'timestamp': True,
+     'params': {'values': [{'name': 'Train/testsplit', 'default': '80', 'min': 0, 'max': 100}],
+                'options': [{'name': 'Type of split', 'default': "Random", 'options': ["Random", "Time"]}]}},
+    {'name': 'ML100K', 'timestamp': True,
+     'params': {'values': [{'name': 'Train/testsplit', 'default': '80', 'min': 0, 'max': 100}],
+                'options': [{'name': 'Type of split', 'default': "Random", 'options': ["Random", "Time"]}]}}
+]
+# APPROACHES = json.load(open('project/approaches.json'))
+# METRICS = json.load(open('project/metrics.json'))
+DEFAULTS = {'split': 80,
+            'recCount': {'min': 0, 'max': 100, 'default': 10},
+            }  # default values
+FILTERS = [{'name': 'Artist Gender', 'params': {'options': [{'name': 'Gender', 'options': ['Male', 'Female']}]}},
+           {'name': 'User Gender', 'params': {'options': [{'name': 'Gender', 'options': ['Male', 'Female']}]}},
+           {'name': 'Country user threshold',
+            'params': {'values': [{'name': 'threshold', 'min': 1, 'max': 1000, 'default': 10}]}},
+           {'name': 'Minimum age', 'params': {'values': [{'name': 'threshold', 'min': 1, 'max': 1000, 'default': 18}]}},
+           {'name': 'Maximum age', 'params': {'values': [{'name': 'threshold', 'min': 1, 'max': 1000, 'default': 18}]}}]
+
+
+def create_available_options(recommender_system):
+    options = {}
+
+    frk_datasets = recommender_system.get_available_datasets()
+    frk_predictors = recommender_system.get_available_predictors()
+    frk_recommenders = recommender_system.get_available_recommenders()
+    frk_metrics = recommender_system.get_available_metrics()
+    # print(frk_datasets)
+    # print(frk_predictors)
+    # print(frk_recommenders)
+    print(frk_metrics)
+
+    """
+    def name_to_text(settings):
+        return {'text': settings[key] for key in settings if key == 'name'}
+    
+    
+    # TODO lower-case now it's not a constant
+    #DATASETS = name_to_text(frk_datasets)
+    approaches = name_to_text(frk_recommenders)
+    metrics = name_to_text(frk_metrics)"""
+
+    # TODO: DO THIS IN BACKEND?
+    def format_nested(settings):
+        formatted_settings = []
+        for (header, options) in settings.items():
+            formatted_settings.append({'name': header, 'options': options})
+        # print(formatted_settings)
+        return formatted_settings
+
+    recommenders = format_nested(frk_recommenders)
+    predictors = format_nested(frk_predictors)
+    metrics = format_nested(frk_metrics)
+    # recommenders = frk_recommenders
+    # predictors = frk_predictors
+    # metrics = frk_metrics
+
+    # Generate metrics parameter data
+    # metric_categories = metrics['categories']
+    for category in metrics:
+        if category['name'] == 'Accuracy':
+            metric_params = {'values': [{'name': 'k', 'default': 10, 'min': 1, 'max': 20}]}
+        else:
+            metric_params = {}
+        category['options'] = list(map(lambda metric: {'name': metric, 'params': metric_params}, category['options']))
+
+    # print(METRICS)
+    options['defaults'] = DEFAULTS
+    # options['filters'] = FILTERS
+
+    # MOCK: for now use all filters/metrics per dataset
+    filter_list = [{'name': 'filter', 'nested': False,
+                    'plural': 'filters', 'article': 'a', 'options': FILTERS}]
+
+    for dataset in DATASETS:
+        dataset['params']['dynamic'] = filter_list
+
+    for metric in metrics:
+        for option in metric['options']:
+            option['params']['dynamic'] = filter_list
+
+    options['datasets'] = DATASETS
+    options['recommenders'] = recommenders
+    options['predictors'] = predictors
+    options['metrics'] = metrics
+
+    print(options)
+
+    return options
