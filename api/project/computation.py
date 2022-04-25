@@ -8,11 +8,12 @@ from datetime import datetime
 
 from fairreckitlib.experiment.parsing.run import parse_experiment_config_from_yml
 from fairreckitlib.recommender_system import RecommenderSystem
+from fairreckitlib.experiment.config import *
 
 from flask import (Blueprint, request)
 
 from . import result_storage
-from .options_formatter import create_available_options
+from .options_formatter import create_available_options, config_dict_from_settings
 
 compute_bp = Blueprint('computation', __name__, url_prefix='/api/computation')
 
@@ -22,37 +23,35 @@ options = create_available_options(recommender_system)
 
 
 def calculate_first():
-    time.sleep(2.5)  # Mock computation duration.
-
     computation = computation_queue.pop()  # Get the oldest computation from the queue.
 
     run_experiment(computation)
-    #mock_computation(computation)
+    # mock_computation(computation)
+
+
+computation_thread = threading.Thread(target=calculate_first)
 
 
 def run_experiment(computation):
-    settings = computation['settings']
-    print(settings)
+    print(computation)
+    config_dict, id = config_dict_from_settings(computation)
 
-    file_name = 'test'
-    config_file_path = 'config_files/' + file_name
-    # recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)
+    config_file_path = 'config_files/' + id
+    with open(config_file_path + '.yml', 'w+') as config_file:
+        yaml.dump(config_dict, config_file)
 
-    config_name = 'test'
-    config = parse_experiment_config_from_yml(config_file_path, recommender_system)
-
-    stamp = str(int(datetime.timestamp(datetime.now())))
-    config.name = stamp + '_' + config_name
-    # config.datasets = [{'name': 'ML-100K', 'splitting': {'test_ratio': 0.2}, 'type': 'random'}]
-    # config.models = [{'Implicit': [{'name': 'AlternatingLeastSquares'}]}]
-    config.evaluation = {'metrics': ['P@K', 'R@K'], 'filters': []}
-    recommender_system.run_experiment(config, num_threads=4)
+    recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)
+    result_storage.save_result(computation, mock_result(computation['settings']))  # TODO get real recs&eval result
 
 
 def mock_computation(computation):
-    # Mocks result computation. TODO compute result with libs here
+    time.sleep(2.5)  # Mock computation duration.
+    result_storage.save_result(computation, mock_result(computation['settings']))
+
+
+def mock_result(settings):
+    # Mocks result computation.
     result = []
-    settings = computation['settings']
     datasets = settings['datasets']
     for dataset in datasets:
         recs = []
@@ -64,18 +63,14 @@ def mock_computation(computation):
                 recommendation['evals'].append({'name': metric['name'], 'evaluation': evaluation})
             recs.append(recommendation)
         result.append({'dataset': dataset, 'recs': recs})
-
-    result_storage.save_result(computation, result)
-
-
-computation_thread = threading.Thread(target=calculate_first)
+    return result
 
 
 # Route: Send selection options.
 @compute_bp.route('/options', methods=['GET'])
 def params():
     response = {'options': options}
-    print(response)
+    # print(response)
     return response
 
 
@@ -86,7 +81,7 @@ def calculate():
     if request.method == 'POST':
         data = request.get_json()
         settings = data.get('settings')
-        print(data)
+        # print(data)
         append_queue(data.get('metadata'), settings)
 
         # response = {'status': 'success'}
@@ -129,12 +124,9 @@ def evaluate_all(settings, approach, metric):
     base_eval = evaluate(approach, metric)
     evaluation = {'global': base_eval, 'filtered': []}
 
-    print(settings)
     for setting in settings:
-        print(setting)
         # Evaluate per filter
         if setting['filters']:
-            print(setting['filters'])
             for filter in setting['filters']:
                 evals = []
                 for parameter in filter['parameter']:
@@ -142,7 +134,7 @@ def evaluate_all(settings, approach, metric):
                     # Just use the value if it's a number, otherwise use the length of the word.
                     filter_eval = value if type(value) == int else len(value)
                     val = "%.2f" % (base_eval * len(filter['name']) / filter_eval)
-                    evals.append({parameter['name']+' '+ str(value):val})
+                    evals.append({parameter['name'] + ' ' + str(value): val})
                 evaluation['filtered'].append({filter['name']: evals})
 
     return evaluation
@@ -165,6 +157,6 @@ def append_queue(metadata, settings):
     timestamp = time.time()
     now = datetime.now()
     current_dt = now.strftime('%Y-%m-%dT%H:%M:%S') + ('-%02d' % (now.microsecond / 10000))
-    current_request = {'timestamp': {'stamp': timestamp, 'datetime': current_dt}, 'metadata': metadata,
+    current_request = {'timestamp': {'stamp': str(int(timestamp)), 'datetime': current_dt}, 'metadata': metadata,
                        'settings': settings}
     computation_queue.append(current_request)

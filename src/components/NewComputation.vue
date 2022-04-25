@@ -87,7 +87,7 @@ function emptyFormGroup() {
 function reformat(property) {
   let choices = []
   for (let i in property.main) {
-    let parameter = null
+    let params = null
     if (property.lists[i] != null) {
       //console.log(property.lists[i])
       choices[i] = {
@@ -97,9 +97,9 @@ function reformat(property) {
         })),
       }
     } else {
-      if (property.inputs[i] != null) parameter = property.inputs[i]
-      else if (property.selects[i] != null) parameter = property.selects[i]
-      choices[i] = { name: property.main[i], parameter: parameter }
+      if (property.inputs[i] != null) params = property.inputs[i]
+      else if (property.selects[i] != null) params = property.selects[i]
+      choices[i] = { name: property.main[i], params: params }
       //console.log('choices:' + choices)
     }
   }

@@ -3,6 +3,8 @@
 # © Copyright Utrecht University (Department of Information and Computing Sciences)
 import json
 
+model_API_dict = {}
+
 # constants
 DATASETS = [
     {'name': 'LFM2B', 'timestamp': True,
@@ -33,6 +35,17 @@ FILTERS = [{'name': 'Artist Gender', 'params': {'options': [{'name': 'Gender', '
            {'name': 'Maximum age', 'params': {'values': [{'name': 'threshold', 'min': 1, 'max': 1000, 'default': 18}]}}]
 
 
+# TODO do this in another way
+def create_model_API_dict(predictors, recommenders):
+    approaches = list(predictors.items()) + list(recommenders.items())
+    dict = {}
+    for (header, options) in approaches:
+        for option in options:
+            dict[option['name']] = header
+    #print(dict)
+    return dict
+
+
 def create_available_options(recommender_system):
     options = {}
 
@@ -40,10 +53,13 @@ def create_available_options(recommender_system):
     frk_predictors = recommender_system.get_available_predictors()
     frk_recommenders = recommender_system.get_available_recommenders()
     frk_metrics = recommender_system.get_available_metrics()
-    # print(frk_datasets)
+    #print('DATASETS:\n', frk_datasets)
     # print(frk_predictors)
     # print(frk_recommenders)
-    print(frk_metrics)
+    # print(frk_metrics)
+
+    global model_API_dict
+    model_API_dict = create_model_API_dict(frk_predictors, frk_recommenders)
 
     """
     def name_to_text(settings):
@@ -56,19 +72,20 @@ def create_available_options(recommender_system):
     metrics = name_to_text(frk_metrics)"""
 
     # TODO: DO THIS IN BACKEND?
-    def format_nested(settings):
+    def format_categorised(settings):
         formatted_settings = []
         for (header, options) in settings.items():
+            # print(settings[header])
+            # options['header'] = header TODO handle categories/APIs differently
             formatted_settings.append({'name': header, 'options': options})
         # print(formatted_settings)
         return formatted_settings
 
-    recommenders = format_nested(frk_recommenders)
-    predictors = format_nested(frk_predictors)
-    metrics = format_nested(frk_metrics)
-    # recommenders = frk_recommenders
-    # predictors = frk_predictors
-    # metrics = frk_metrics
+    # Format categorised settings
+    datasets = format_categorised(frk_datasets)
+    recommenders = format_categorised(frk_recommenders)
+    predictors = format_categorised(frk_predictors)
+    metrics = format_categorised(frk_metrics)
 
     # Generate metrics parameter data
     # metric_categories = metrics['categories']
@@ -83,22 +100,85 @@ def create_available_options(recommender_system):
     options['defaults'] = DEFAULTS
     # options['filters'] = FILTERS
 
+    # Format datasets
+    # TODO do this in backend
+    for dataset in datasets:
+        # TODO this is stupid because we just created the options key
+        dataset['params'] = dataset['options']
+        del dataset['options']
+
+        # Reformat and add parameters
+        params = dataset['params']
+        params['values'] = [{'name': 'Train/testsplit', 'default': '80', 'min': 0, 'max': 100}]
+        splits = ['Random'] + (['Time'] if params['timestamp'] else [])
+        params['options'] = [{'name': 'Type of split', 'default': "Random", 'options': splits}]
+
+        dataset['params'] = params
+
+
+    # Add dynamic (nested settings) settings
     # MOCK: for now use all filters/metrics per dataset
     filter_list = [{'name': 'filter', 'nested': False,
                     'plural': 'filters', 'article': 'a', 'options': FILTERS}]
 
-    for dataset in DATASETS:
+    for dataset in datasets:
         dataset['params']['dynamic'] = filter_list
 
     for metric in metrics:
         for option in metric['options']:
             option['params']['dynamic'] = filter_list
 
-    options['datasets'] = DATASETS
+    options['datasets'] = datasets
     options['recommenders'] = recommenders
     options['predictors'] = predictors
     options['metrics'] = metrics
 
-    print(options)
+    # print(options)
 
     return options
+
+
+def config_dict_from_settings(computation):
+    settings = computation['settings']
+
+    name = computation['metadata']['name']
+    id = computation['timestamp']['stamp'] + '_' + name
+    datasets = list(
+        map(lambda dataset: {
+            'name': dataset['name'],
+            'splitting': {'test_ratio': (100 - settings['split']) / 100,
+                          'type': settings['splitMethod']}},
+            settings['datasets']))
+
+    models = {}
+    for approach in settings['approaches']:
+        model_name = approach['name']
+        if approach['params'] is None:  # handle params null
+            model_setting = {'name': model_name}  # TODO handle params null in frontend?
+        else:
+            model_setting = approach
+        models.setdefault(model_API_dict[model_name], []).append(model_setting)
+
+    evaluation = {'metrics': list(map(lambda metric: metric['name'], settings['metrics'])), 'filters': []}
+    # evaluation = list(map(lambda metric: {'name': metric['name']}, settings['metrics']))  # TODO filters
+
+    """
+    if settings['computationMethod'] == 'recommendation':
+        config = RecommenderExperimentConfig(datasets, models, evaluation, id,
+                                             settings['computationMethod'], settings['recommendations'])
+    else:
+        config = PredictorExperimentConfig(datasets, models, evaluation, id,
+                                           settings['computationMethod'])
+
+    print(config)"""
+
+    print(name)
+    config_dict = {'datasets': datasets,
+                   'models': models,
+                   'evaluation': evaluation,
+                   'name': id,
+                   'top_K': settings['recommendations'],
+                   'type': settings['computationMethod']}
+
+    print(config_dict)
+    return config_dict, id
