@@ -12,6 +12,9 @@ export const structure =
       "Filters",
       "Recommender approaches",
       "Metrics",
+      [
+        "P@K"
+      ],
       "Meta"
     ]
   ],

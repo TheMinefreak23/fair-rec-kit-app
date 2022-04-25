@@ -10,12 +10,15 @@ import { ref } from 'vue'
 import { structure } from '../documentation/documentation_structure.vue'
 import { doctext } from '../documentation/documentation_items.vue'
 
-// hardcoded documentation_items.txt
 let itemDicts = ref();
 let sidenavOpened = ref();
 sidenavOpened = false;
+let structure1D = ref();
 
 itemDicts = parse(doctext);
+structure1D = parseStructure(structure);
+
+console.log(itemDicts);
 
 /**
  * Parses the content of documentation_items.txt into items.
@@ -65,7 +68,6 @@ function parseTextIntoItems(text) {
     }
     item += "\n";
   }
-  console.log(items);
   return items
 }
 
@@ -101,41 +103,41 @@ function parseItem(item) {
           value = "";
           continue;
         }
-        console.log(words);
-        console.log(word, key, word.match(endTag));
       }
       if (key) { value += word + " "; }
     }
     value += "\n";
   }
-  console.log(dict);
   return dict;
 }
 
 /**
- * Recursive .
- * @param {} text 
- * @param {*} start_i 
+ * Parses documentation_structure.vue into a 1D array of {String, Int}.
+ * @param {[String]} struct Mulitdimensional array of different lengths.
+ * @return {[{String, Int}]} 1-dimensional array of headers.
  */
-function parseStructure(text, start_i) {
-  eval("let x=1;");
-  console.log(x);
-  // let itemName = ""
-  // for (let i = start_i; i < text.length; i++) {
-  //   let c = text[i];
-  //   if (c == "{") {
-  //     i = parseStructure(text.slice(i, text.length), i);
-  //   }
-  //   else if (c =="}") {
-  //     return i;
-  //   }
-  //   else {
-  //     itemName += c;
-  //   }
-  // }
+function parseStructure(struct) {
+  let res = [];
+  parsePartialStructure(struct, -1);
+  
+  /**
+   * Recursive function to flatten a jagged array.
+   * @param {[String]} struct 
+   * @param {Int} start_depth 
+   */
+  function parsePartialStructure(struct, start_depth) {
+    for (let j = 0; j < struct.length; j++) {
+      let item = struct[j];
+      if (item instanceof Array) { // List of subheaders
+        parsePartialStructure(item, start_depth + 1);
+      }
+      else { // Regular header
+        res.push({name: item, depth: start_depth});
+      }
+    }
+  }
+  return res;
 }
-// function 
-
 
 /**
  * Navigation sidebar toggle collapse
@@ -249,9 +251,11 @@ code:before {
   <span class="position-fixed" style="font-size:30px;cursor:pointer" v-on:click="openCloseNav()">&#9776;</span>
   <div id="docSidenav" class="sidenav">
     <a href="javascript:void(0)" class="closebtn position-fixed-left" v-on:click="closeNav()">&times;</a>
-    <b-link class="position-relative" :href='"#"+itemDict["name"]' v-for="itemDict in itemDicts" :key="itemDict">{{itemDict["name"]}}</b-link>
+    <b-link class="position-relative" :href='"#"+header.name' v-for="header in structure1D" :key="header">
+      <span style="-webkit-user-select: none">{{"&nbsp;&nbsp;&nbsp;&nbsp;".repeat(header.depth)}}</span>{{header.name}}
+    </b-link>
   </div>
-  
+
   <div class="text-right py-1 mx-5" v-for="itemDict in itemDicts" :key="itemDict">
     <b-card :id='itemDict["name"]'>
       <b-card-title>{{ itemDict["name"] }}</b-card-title>
