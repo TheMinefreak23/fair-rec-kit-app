@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { capitalise } from '../helpers/resultFormatter'
 import { underscoreToSpace } from '../helpers/resultFormatter'
+import { emptyOption, selectionOptions } from '../helpers/optionsFormatter'
 
 //const emit = defineEmits(['formChange'])
 const props = defineProps({
@@ -24,30 +25,29 @@ const form = computed({
   },
   // setter
   set(localValue) {
+    console.log('local form change to', localValue)
     emit('input', localValue)
-    //console.log('local form change')
   },
 })
-const flatOptions = props.nested ? flattenOptions() : props.options
+//const flatOptions = props.nested ? flattenOptions() : props.options
 
 onMounted(() => {
   groupCount.value = props.required ? 1 : 0 // For required lists the minimum amount of group items is 1.
-  /*console.log(props.name)
-  console.log(props.options)
-  console.log(typeof props.options)
-  console.log(props.nested)*/
   form.value.name = props.plural
-  //console.log(form.value)
+  console.log(props.name, 'options', props.options)
+  /*console.log('type of options', typeof props.options)
+  console.log('nested', props.nested)
+  console.log(form.value)*/
 })
 
 // Set default values for the group parameters.
-function setParameter(i, val) {
+function setParameter(i, option) {
   //console.log(flatOptions)
-  //console.log(options)
-  let option = findOption(val)
+  console.log(props.name, props.options, form.value.main)
+  //let option = form.value.main[i]
   let choices
-  //console.log(props.name)
-  //console.log(option.params)
+  console.log(option)
+  console.log(option.params)
   if (option.params) {
     if (option.params.values && option.params.values.length > 0) {
       choices = option.params.values
@@ -77,22 +77,6 @@ function setParameter(i, val) {
   }
 }
 
-// Get options from group index
-function getFromIndex(i) {
-  //console.log(props.options)
-  //console.log(form.value.main[i])
-
-  const option = findOption(form.value.main[i])
-  //console.log(option)
-  return option
-}
-
-function findOption(val) {
-  const option = flatOptions.find((option) => option.text === val)
-  if (!option) return { params: [] }
-  return option
-}
-
 // Splice groups array to remove a group
 function removeGroup(i) {
   if (props.required && groupCount.value == 1) return
@@ -103,22 +87,27 @@ function removeGroup(i) {
   form.value.lists.splice(i, 1)
 }
 
-// Flatten options API structure
+/*// Flatten options API structure
 function flattenOptions() {
   return props.options
     .map((category) => category.options)
     .concat()
     .flat()
-}
+}*/
 
 // Check whether the choice has options
-function hasParams(i) {
-  const option = getFromIndex(i)
-  const listsNotNull =
-    (option.params.values && option.params.values.length != 0) ||
-    (option.params.options && option.params.options.length != 0) ||
-    (option.params.dynamic && option.params.dynamic.length != 0)
-  return option.params.length != 0 && listsNotNull
+function hasParams(index) {
+  console.log(form.value.main)
+  const option = form.value.main[index]
+  console.log('hasParams option at', index, ':', option)
+  return (
+    option &&
+    option.params &&
+    option.params.length != 0 &&
+    ((option.params.values && option.params.values.length != 0) ||
+      (option.params.options && option.params.options.length != 0) ||
+      (option.params.dynamic && option.params.dynamic.length != 0))
+  )
 }
 </script>
 
@@ -129,30 +118,45 @@ function hasParams(i) {
       {{ capitalise(plural) }}
       <!--{{ plural }}-->
     </h3>
-    <h3>{{form.main[i-1]}}</h3>
     <div v-for="i in groupCount" :key="i - 1">
       <b-row class="align-items-end">
         <b-col>
           <b-row>
             <b-col cols="4">
               <b-form-group :label="'Select ' + selectName">
+                <!--TODO use form bind instead of emit?-->
                 <b-form-select
+                  :form="name"
                   v-model="form.main[i - 1]"
-                  :options="[{ text: 'Choose...', value: null }, ...options]"
+                  :options="options"
+                  value-field="value"
+                  text-field="text"
                   @change="setParameter(i - 1, $event)"
-                  :required="props.required"
-                />
+                  :required="required"
+                >
+                  <template #first>
+                    <b-form-select-option value="" disabled
+                      >Choose..</b-form-select-option
+                    >
+                  </template>
+                </b-form-select>
                 <!--TODO use placeholder-->
               </b-form-group>
+              <h3>i: {{ i }}</h3>
+              <h3>main: {{ form.main[i - 1] && form.main[i - 1].text }}</h3>
+              <h3>input: {{ form.inputs[i - 1] && form.inputs[i - 1] }}</h3>
+              <h3>select: {{ form.selects[i - 1] && form.selects[i - 1] }}</h3>
+              <!--<h4>main params values: {{ form.main[i - 1].params.values }}</h4>-->
             </b-col>
 
             <!--Show settings for selected option.-->
-            <b-col cols="4" v-if="form.main[i - 1] != null && hasParams(i - 1)">
+            <b-col cols="4" v-if="hasParams(i - 1)">
               <!--Use an input form for values.-->
               <template
-                v-for="(value, index) in getFromIndex(i - 1).params.values"
+                v-for="(value, index) in form.main[i - 1].params.values"
                 :key="value"
               >
+                <h2>value</h2>
                 <b-form-group
                   :label="
                     underscoreToSpace(value.text) +
@@ -200,7 +204,7 @@ function hasParams(i) {
 
               <!--Use a select form for options.-->
               <template
-                v-for="(option, index) in getFromIndex(i - 1).params.options"
+                v-for="(option, index) in form.main[i - 1].params.options"
                 :key="option"
               >
                 <b-form-group
@@ -237,10 +241,7 @@ function hasParams(i) {
                 >
                   <b-form-select
                     v-model="form.selects[i - 1][index].value"
-                    :options="[
-                      { text: 'Choose...', value: null },
-                      ...option.options,
-                    ]"
+                    :options="selectionOptions(option.options)"
                     required
                   >
                     <!--TODO use placeholder-->
@@ -260,10 +261,10 @@ function hasParams(i) {
               </b-form-group>
             </b-col>
           </b-row>
-          <b-row v-if="form.main[i - 1] != null && hasParams(i - 1)">
+          <b-row v-if="hasParams(i - 1)">
             <!--Nested form group list.-->
             <template
-              v-for="(option, index) in getFromIndex(i - 1).params.dynamic"
+              v-for="(option, index) in form.main[i - 1].params.dynamic"
               :key="option"
             >
               <b-card>

@@ -9,42 +9,13 @@ import datetime
 from flask import (Blueprint, request)
 
 from . import result_storage
+from .options_formatter import *
 
 compute_bp = Blueprint('computation', __name__, url_prefix='/api/computation')
 
-# constants
-DATASETS = [
-    {'text': 'LFM2B', 'timestamp': True, 'params': {'values' : [{'text' : 'Train/testsplit', 'default' : '80', 'min':0, 'max':100}], 'options': [{'text' : 'Type of split', 'default' : "Random", 'options' : ["Random", "Time"]}]}},
-    {'text': 'LFM1B', 'timestamp': True, 'params': {'values' : [{'text' : 'Train/testsplit', 'default' : '80', 'min':0, 'max':100}], 'options': [{'text' : 'Type of split', 'default' : "Random", 'options' : ["Random", "Time"]}]}},
-    {'text': 'LFM360K', 'timestamp': False, 'params': {'values' : [{'text' : 'Train/testsplit', 'default' : '80', 'min':0, 'max':100}]}},
-    {'text': 'ML25M', 'timestamp': True, 'params': {'values' : [{'text' : 'Train/testsplit', 'default' : '80', 'min':0, 'max':100}], 'options': [{'text' : 'Type of split', 'default' : "Random", 'options' : ["Random", "Time"]}]}},
-    {'text': 'ML100K', 'timestamp': True, 'params': {'values' : [{'text' : 'Train/testsplit', 'default' : '80', 'min':0, 'max':100}], 'options': [{'text' : 'Type of split', 'default' : "Random", 'options' : ["Random", "Time"]}]}}
-]
-
-APPROACHES = json.load(open('project/approaches.json'))
-METRICS = json.load(open('project/metrics.json'))
-
-# Generate parameter data
-metric_categories = METRICS['categories']
-for category in metric_categories:
-    if category['text'] == 'Accuracy':
-        metric_params = {'values': [{'text': 'k', 'default': 10, 'min': 1, 'max': 20}]}
-    else:
-        metric_params = {}
-    category['options'] = list(map(lambda metric: {'text': metric, 'params': metric_params}, category['options']))
-    print(category)
-
-DEFAULTS = {'split': 80,
-            'recCount': {'min': 0, 'max': 100, 'default': 10},
-            }  # default values
-FILTERS = [{'text': 'Artist Gender', 'params': {'options': [{'text': 'Gender', 'options': ['Male', 'Female']}]}},
-           {'text': 'User Gender', 'params': {'options': [{'text': 'Gender', 'options': ['Male', 'Female']}]}},
-           {'text': 'Country user threshold',
-            'params': {'values': [{'text': 'threshold', 'min': 1, 'max': 1000, 'default': 10}]}},
-           {'text': 'Minimum age', 'params': {'values': [{'text': 'threshold', 'min': 1, 'max': 1000, 'default': 18}]}},
-           {'text': 'Maximum age', 'params': {'values': [{'text': 'threshold', 'min': 1, 'max': 1000, 'default': 18}]}}]
-
 computation_queue = []
+
+options = create_options()
 
 
 def calculate_first():
@@ -59,7 +30,7 @@ def calculate_first():
     for dataset in datasets:
         recs = []
         for approach in settings['approaches']:
-            recommendation = {'approach': approach['name'],'recommendation': recommend(dataset, approach), 'evals': []}
+            recommendation = {'approach': approach['name'], 'recommendation': recommend(dataset, approach), 'evals': []}
             for metric in settings['metrics']:
                 evaluation = evaluate_all(dataset['settings'], approach, metric)
 
@@ -76,28 +47,8 @@ computation_thread = threading.Thread(target=calculate_first)
 # Route: Send selection options.
 @compute_bp.route('/options', methods=['GET'])
 def params():
-    options = {}
-
-    print(METRICS)
-    options['defaults'] = DEFAULTS
-    # options['filters'] = FILTERS
-
-    # MOCK: for now use all filters/metrics per dataset
-    for dataset in DATASETS:
-        dataset['params']['dynamic']= [{'name': 'filter', 'nested': False,
-                                   'plural': 'filters', 'article': 'a', 'options': FILTERS}]
-
-    for metric in METRICS['categories']:
-        print(metric)
-        metric['options'][0]['params']['dynamic']= [{'name': 'result filter', 'nested': False,
-                                  'plural': 'Result filters', 'article': 'a', 'options': FILTERS}]
-    options['datasets'] = DATASETS
-    options['approaches'] = APPROACHES
-    options['metrics'] = METRICS
-
-
     response = {'options': options}
-    print(response)
+    #print(response)
     return response
 
 
@@ -164,7 +115,7 @@ def evaluate_all(settings, approach, metric):
                     # Just use the value if it's a number, otherwise use the length of the word.
                     filter_eval = value if type(value) == int else len(value)
                     val = "%.2f" % (base_eval * len(filter['name']) / filter_eval)
-                    evals.append({parameter['name']+' '+str(value):val})
+                    evals.append({parameter['name'] + ' ' + str(value): val})
                 evaluation['filtered'].append({filter['name']: evals})
 
     return evaluation

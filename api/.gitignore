@@ -1,4 +1,5 @@
 # Data
+config_files/
 /results.json
 /results_backup.json
 

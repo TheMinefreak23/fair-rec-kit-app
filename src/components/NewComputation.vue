@@ -34,7 +34,7 @@ async function getOptions() {
   const response = await fetch(API_URL + '/computation/options')
   const data = await response.json()
   options.value = data.options
-  //console.log(options.value)
+  console.log(options.value)
 }
 
 // POST request: Send form to server.
@@ -117,7 +117,9 @@ function reformat(property) {
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
               <h3>Computation type</h3>
               <b-form-radio-group v-model="form.computationMethod">
-                <b-form-radio value="recommendation">Recommendation (default)</b-form-radio>
+                <b-form-radio value="recommendation"
+                  >Recommendation (default)</b-form-radio
+                >
                 <b-form-radio value="prediction">Prediction</b-form-radio>
               </b-form-radio-group>
               <!--User can select a dataset.-->
@@ -156,12 +158,19 @@ function reformat(property) {
                 name="approach"
                 plural="Recommender approaches"
                 selectName="an approach"
-                :options="form.computationMethod == 'recommendation' ? options.approaches.libraries.recommendation : options.approaches.libraries.prediction"
+                :options="
+                  form.computationMethod == 'recommendation'
+                    ? options.recommenders
+                    : options.predictors
+                "
                 :required="true"
               />
 
               <!--User can select the amount of recommendations per user -->
-              <b-form-group v-if="form.computationMethod == 'recommendation'" label="Select number of recommendations per user:">
+              <b-form-group
+                v-if="form.computationMethod == 'recommendation'"
+                label="Select number of recommendations per user:"
+              >
                 <b-form-input
                   type="range"
                   :min="options.defaults.recCount.min"
@@ -189,7 +198,11 @@ function reformat(property) {
                 name="metric"
                 plural="metrics"
                 selectName="a metric"
-                :options="form.computationMethod == 'recommendation' ? options.metrics.categories : options.metrics.categories.slice(1)"
+                :options="
+                  form.computationMethod == 'recommendation'
+                    ? options.metrics.categories
+                    : options.metrics.categories.slice(1)
+                "
                 :nested="true"
               />
             </div>

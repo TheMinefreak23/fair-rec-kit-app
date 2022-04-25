@@ -43,7 +43,7 @@ b-tab.success {
   </div>
   <div class="nav-center">
     <b-tabs v-model="tabIndex" class="m-0 pt-2" align="center">
-      <b-tab title="New Computation"> <NewComputation /></b-tab>
+      <b-tab title="New Computation"><TestForm /><NewComputation /></b-tab>
       <b-tab :class="{ success: done }">
         <ActiveComputation
           @computing="
