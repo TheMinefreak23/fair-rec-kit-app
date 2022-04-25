@@ -58,7 +58,8 @@ async function cancelComputation() {
 </script>
 
 <template>
-  <div>
+  <div class="text-center py-2 mx-5">
+    <h3>Active Computations</h3>
     <Table
       :results="store.queue"
       :headers="headers"

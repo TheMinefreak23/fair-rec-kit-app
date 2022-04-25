@@ -6,6 +6,7 @@ $customsecondary:#eee;
 $customdark: #1c2541;
 $danger: #df4759;
 $darkdanger: shade-color($danger, 50);
+$secondary: #121212;
 
 @function shade-color($color, $weight) {
   @return mix(black, $color, $weight);
@@ -29,8 +30,8 @@ $subtle: rgb(80, 80, 80), rgb(104, 104, 104);
 }
 
 .btn-danger {
-  color: white;
   //@include gradient(bottom, $dangergradient);
+  color: white;
 }
 
 // Override default variables.
