@@ -30,7 +30,11 @@ $subtle: rgb(80, 80, 80), rgb(104, 104, 104);
 }
 
 .btn-danger {
-  //@include gradient(bottom, $dangergradient);
+  @include gradient(bottom, $dangergradient);
+  color: #fff;
+}
+
+.btn {
   color: white;
 }
 
@@ -43,5 +47,10 @@ $dark: $customdark;
 // Default variable overrides
 $body-bg: #fff;
 $body-color: #111;
+
+
+// -- Darkmode Overrides -- //
+
+
 
 @import 'bootstrap/scss/bootstrap';
