@@ -1,6 +1,9 @@
-# This program has been developed by students from the bachelor Computer Science at
-# Utrecht University within the Software Project course.
-# © Copyright Utrecht University (Department of Information and Computing Sciences)
+"""
+This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)
+"""
+
 import json
 import threading
 import time
@@ -24,21 +27,30 @@ computation_queue = []
 
 
 def calculate_first():
+    """
+    Takes the oldest settings in the queue and performs an experiment with them
+    """
     # TODO We need this delay for the queue to work fsr
     time.sleep(0.1)
-    run_experiment()
-    #mock_computation()
+    # Get the oldest computation from the queue.
+    computation = computation_queue.pop()
+
+    run_experiment(computation)
+    #mock_computation(computation)
 
 
 computation_thread = threading.Thread(target=calculate_first)
 
 
-def run_experiment():
-    # Get the oldest computation from the queue.
-    computation = computation_queue.pop()
+def run_experiment(computation):
+    """
+    Runs an experiment and saves the result
+    """
     print(computation)
-    config_dict, id = config_dict_from_settings(computation)
 
+    # Create configuration dictionary
+    config_dict, id = config_dict_from_settings(computation)
+    # Save configuration to yaml file
     config_file_path = 'config_files/' + id
     with open(config_file_path + '.yml', 'w+') as config_file:
         yaml.dump(config_dict, config_file)
@@ -47,16 +59,19 @@ def run_experiment():
     result_storage.save_result(computation, mock_result(computation['settings']))  # TODO get real recs&eval result
 
 
-def mock_computation():
-    # Get the oldest computation from the queue.
-    computation = computation_queue.pop() # TODO double code, refactor
+def mock_computation(computation):
+    """
+    Mocks running an experiment and saves the mock result
+    """
     # Mock computation duration
     time.sleep(2.5)
     result_storage.save_result(computation, mock_result(computation['settings']))
 
 
 def mock_result(settings):
-    # Mocks result computation.
+    """
+    Mocks result computation.
+    """
     result = []
     datasets = settings['datasets']
     for dataset in datasets:

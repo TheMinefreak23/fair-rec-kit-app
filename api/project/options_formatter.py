@@ -1,29 +1,12 @@
-# This program has been developed by students from the bachelor Computer Science at
-# Utrecht University within the Software Project course.
-# © Copyright Utrecht University (Department of Information and Computing Sciences)
-import json
+"""
+This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)
+"""
 
 model_API_dict = {}
 
 # constants
-DATASETS = [
-    {'name': 'LFM2B', 'timestamp': True,
-     'params': {'values': [{'name': 'Train/testsplit', 'default': '80', 'min': 0, 'max': 100}],
-                'options': [{'name': 'Type of split', 'default': "Random", 'options': ["Random", "Time"]}]}},
-    {'name': 'LFM1B', 'timestamp': True,
-     'params': {'values': [{'name': 'Train/testsplit', 'default': '80', 'min': 0, 'max': 100}],
-                'options': [{'name': 'Type of split', 'default': "Random", 'options': ["Random", "Time"]}]}},
-    {'name': 'LFM360K', 'timestamp': False,
-     'params': {'values': [{'name': 'Train/testsplit', 'default': '80', 'min': 0, 'max': 100}]}},
-    {'name': 'ML25M', 'timestamp': True,
-     'params': {'values': [{'name': 'Train/testsplit', 'default': '80', 'min': 0, 'max': 100}],
-                'options': [{'name': 'Type of split', 'default': "Random", 'options': ["Random", "Time"]}]}},
-    {'name': 'ML100K', 'timestamp': True,
-     'params': {'values': [{'name': 'Train/testsplit', 'default': '80', 'min': 0, 'max': 100}],
-                'options': [{'name': 'Type of split', 'default': "Random", 'options': ["Random", "Time"]}]}}
-]
-# APPROACHES = json.load(open('project/approaches.json'))
-# METRICS = json.load(open('project/metrics.json'))
 DEFAULTS = {'split': 80,
             'recCount': {'min': 0, 'max': 100, 'default': 10},
             }  # default values
@@ -47,6 +30,12 @@ def create_model_API_dict(predictors, recommenders):
 
 
 def create_available_options(recommender_system):
+    """
+    Gets options from FairRecKitLib and formats them for usage on the client side
+
+    :param recommender_system: the recomender system to get the options from
+    :return: the formatted options
+    """
     options = {}
 
     frk_datasets = recommender_system.get_available_datasets()
@@ -60,16 +49,6 @@ def create_available_options(recommender_system):
 
     global model_API_dict
     model_API_dict = create_model_API_dict(frk_predictors, frk_recommenders)
-
-    """
-    def name_to_text(settings):
-        return {'text': settings[key] for key in settings if key == 'name'}
-    
-    
-    # TODO lower-case now it's not a constant
-    #DATASETS = name_to_text(frk_datasets)
-    approaches = name_to_text(frk_recommenders)
-    metrics = name_to_text(frk_metrics)"""
 
     # TODO: DO THIS IN BACKEND?
     def format_categorised(settings):
@@ -139,10 +118,18 @@ def create_available_options(recommender_system):
 
 
 def config_dict_from_settings(computation):
+    """
+    Create a configuration dictionary from client settings
+
+    :param computation: the computation settings sent from the client
+    :return: the configuration dictionary
+    """
     settings = computation['settings']
 
     name = computation['metadata']['name']
     id = computation['timestamp']['stamp'] + '_' + name
+
+    # Format datasets
     datasets = list(
         map(lambda dataset: {
             'name': dataset['name'],
@@ -150,6 +137,7 @@ def config_dict_from_settings(computation):
                           'type': settings['splitMethod']}},
             settings['datasets']))
 
+    # Format models
     models = {}
     for approach in settings['approaches']:
         model_name = approach['name']
