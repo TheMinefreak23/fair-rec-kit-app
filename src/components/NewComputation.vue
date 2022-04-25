@@ -58,8 +58,9 @@ async function sendToServer() {
 
   // Update queue
   const data = response.json()
-  //if (data.status == 'success') getComputations()
+  //console.log('calculation route response:', data)
   store.queue = data
+  //console.log('queue:', store.queue)
 }
 
 async function initForm() {

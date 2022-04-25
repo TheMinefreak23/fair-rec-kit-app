@@ -18,21 +18,24 @@ from .options_formatter import create_available_options, config_dict_from_settin
 compute_bp = Blueprint('computation', __name__, url_prefix='/api/computation')
 
 recommender_system = RecommenderSystem('../../../datasets', 'results')
-computation_queue = []
 options = create_available_options(recommender_system)
+
+computation_queue = []
 
 
 def calculate_first():
-    computation = computation_queue.pop()  # Get the oldest computation from the queue.
-
-    run_experiment(computation)
-    # mock_computation(computation)
+    # TODO We need this delay for the queue to work fsr
+    time.sleep(0.1)
+    run_experiment()
+    #mock_computation()
 
 
 computation_thread = threading.Thread(target=calculate_first)
 
 
-def run_experiment(computation):
+def run_experiment():
+    # Get the oldest computation from the queue.
+    computation = computation_queue.pop()
     print(computation)
     config_dict, id = config_dict_from_settings(computation)
 
@@ -44,8 +47,11 @@ def run_experiment(computation):
     result_storage.save_result(computation, mock_result(computation['settings']))  # TODO get real recs&eval result
 
 
-def mock_computation(computation):
-    time.sleep(2.5)  # Mock computation duration.
+def mock_computation():
+    # Get the oldest computation from the queue.
+    computation = computation_queue.pop() # TODO double code, refactor
+    # Mock computation duration
+    time.sleep(2.5)
     result_storage.save_result(computation, mock_result(computation['settings']))
 
 
@@ -87,10 +93,12 @@ def calculate():
         # response = {'status': 'success'}
         response = json.dumps(computation_queue)
     else:
+        # Wait until the current computation is done
+        global computation_thread
         if computation_thread.is_alive():
             computation_thread.join()
         response['calculation'] = result_storage.newest_result()
-        print(response)
+    print('/calculation response:',response)
     return response
 
 
@@ -98,12 +106,18 @@ def calculate():
 def queue():
     # Handle computation thread.
     global computation_thread
+    # If the thread is running, wait until it's done.
     if computation_thread.is_alive():
         computation_thread.join()
+    # Else, if the queue isn't empty, start a thread to compute the oldest entry.
     elif computation_queue:
         print('Starting computation thread')
         computation_thread = threading.Thread(target=calculate_first)
         computation_thread.start()
+    else:
+        print('error')
+
+    print('queue:',computation_queue)
     return json.dumps(computation_queue)
 
 
