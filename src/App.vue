@@ -23,6 +23,7 @@ onMounted(async () => {
   console.log(data)
 })
 const tabIndex = ref(0)
+
 </script>
 
 <style scoped>
