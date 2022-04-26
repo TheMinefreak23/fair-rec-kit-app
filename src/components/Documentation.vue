@@ -12,13 +12,11 @@ import { doctext } from '../documentation/documentation_items.vue'
 
 let itemDicts = ref();
 let sidenavOpened = ref();
-sidenavOpened = false;
 let structure1D = ref();
 
 itemDicts = parse(doctext);
+sidenavOpened = false;
 structure1D = parseStructure(structure);
-
-console.log(itemDicts);
 
 /**
  * Parses the content of documentation_items.txt into items.
@@ -72,7 +70,7 @@ function parseTextIntoItems(text) {
 }
 
 /**
- * Parses an item into a dictionary so that it can be referred to as e.g., dict["name"], dict["definition"].
+ * Parses an item into a dictionary so that it can be referred to as e.g., dict["name"], dict["description"].
  * @param {String} item - An item as a string: "<name>...</name>\n<description>...</description>".
  * @return {Dict} Dictionary of an item as key, value: dict["name"] = "Algorithm 123".
  */
@@ -248,26 +246,32 @@ code:before {
 
 <template>
 <div id="main">
+  <!-- Open-close button -->
   <span class="position-fixed" style="font-size:30px;cursor:pointer" v-on:click="openCloseNav()">&#9776;</span>
+  <!-- Navigation sidebar -->
   <div id="docSidenav" class="sidenav">
+    <!-- Close button -->
     <a href="javascript:void(0)" class="closebtn position-fixed-left" v-on:click="closeNav()">&times;</a>
     <b-link class="position-relative" :href='"#"+header.name' v-for="header in structure1D" :key="header">
-      <span style="-webkit-user-select: none">{{"&nbsp;&nbsp;&nbsp;&nbsp;".repeat(header.depth)}}</span>{{header.name}}
+      <!-- Indentation to indicate items and subitems -->
+      <span style="-webkit-user-select: none">{{"&nbsp;&nbsp;&nbsp;".repeat(header.depth)}}</span>{{header.name}}
     </b-link>
   </div>
 
-  <div class="text-right py-1 mx-5" v-for="itemDict in itemDicts" :key="itemDict">
-    <b-card :id='itemDict["name"]'>
-      <b-card-title>{{ itemDict["name"] }}</b-card-title>
-      <b-card-text>
-        <span v-html='itemDict["definition"]'></span>
+  <!-- B-card items -->
+  <div class="text-right py-1 mx-5" v-for="header in structure1D" :key="header">
+    <b-card :id='itemDicts[header.name]["name"]' :style='"margin-left: "+10*header.depth+"px"'>
+      <b-card-title>{{itemDicts[header.name]["name"]}}</b-card-title>      
+      <b-card-text v-if='itemDicts[header.name]["description"]'>
+        <span v-html='itemDicts[header.name]["description"]'></span>
       </b-card-text>
-      <b-link :href='itemDict["link"]'>{{ itemDict["link"] }}</b-link>
-      <br>
-      <b-button pill variant="dark" :href='itemDict["other_"]' v-if='itemDict["other_"]'>
-        {{ itemDict["other_"] }}
-      </b-button>
-    </b-card>    
+      <b-link :href='itemDicts[header.name]["link"]' v-if='itemDicts[header.name]["link"]'>{{ itemDicts[header.name]["link"] }}</b-link>
+      <span v-if='itemDicts[header.name]["button"]'>
+        <b-button pill variant="dark" :href='itemDicts[header.name]["button"]' v-if='itemDicts[header.name]["other_"]'>
+          {{ itemDicts[header.name]["button"] }}
+        </b-button>
+      </span>
+    </b-card> 
   </div>
 </div>
 </template>
