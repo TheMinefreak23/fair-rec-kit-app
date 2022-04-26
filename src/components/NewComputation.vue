@@ -16,6 +16,7 @@ const form = ref({
   approaches: emptyFormGroup(),
   //filters: emptyFormGroup(),
   splitMethod: 'random', //The default split method.
+  computationMethod: 'recommendation',
 })
 const metadata = ref({})
 const splitOptions = [
@@ -57,8 +58,9 @@ async function sendToServer() {
 
   // Update queue
   const data = response.json()
-  //if (data.status == 'success') getComputations()
+  //console.log('calculation route response:', data)
   store.queue = data
+  //console.log('queue:', store.queue)
 }
 
 async function initForm() {
@@ -73,6 +75,7 @@ async function initForm() {
   form.value.recommendations = options.value.defaults.recCount.default
   form.value.split = options.value.defaults.split
   form.value.splitMethod = 'random'
+  form.value.computationMethod = 'recommendation'
   //form.value.result.value = {}
 }
 
@@ -85,7 +88,7 @@ function emptyFormGroup() {
 function reformat(property) {
   let choices = []
   for (let i in property.main) {
-    let parameter = null
+    let params = null
     if (property.lists[i] != null) {
       //console.log(property.lists[i])
       choices[i] = {
@@ -95,9 +98,9 @@ function reformat(property) {
         })),
       }
     } else {
-      if (property.inputs[i] != null) parameter = property.inputs[i]
-      else if (property.selects[i] != null) parameter = property.selects[i]
-      choices[i] = { name: property.main[i], parameter: parameter }
+      if (property.inputs[i] != null) params = property.inputs[i]
+      else if (property.selects[i] != null) params = property.selects[i]
+      choices[i] = { name: property.main[i], params: params }
       //console.log('choices:' + choices)
     }
   }
@@ -113,6 +116,13 @@ function reformat(property) {
         <b-row>
           <b-col>
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
+              <h3>Computation type</h3>
+              <b-form-radio-group v-model="form.computationMethod">
+                <b-form-radio value="recommendation"
+                  >Recommendation (default)</b-form-radio
+                >
+                <b-form-radio value="prediction">Prediction</b-form-radio>
+              </b-form-radio-group>
               <!--User can select a dataset.-->
               <FormGroupList
                 v-model:data="form.datasets"
@@ -149,11 +159,19 @@ function reformat(property) {
                 name="approach"
                 plural="Recommender approaches"
                 selectName="an approach"
-                :options="options.approaches.libraries"
+                :options="
+                  form.computationMethod == 'recommendation'
+                    ? options.recommenders
+                    : options.predictors
+                "
+                :required="true"
               />
 
               <!--User can select the amount of recommendations per user -->
-              <b-form-group label="Select number of recommendations per user:">
+              <b-form-group
+                v-if="form.computationMethod == 'recommendation'"
+                label="Select number of recommendations per user:"
+              >
                 <b-form-input
                   type="range"
                   :min="options.defaults.recCount.min"
@@ -181,7 +199,11 @@ function reformat(property) {
                 name="metric"
                 plural="metrics"
                 selectName="a metric"
-                :options="options.metrics.categories"
+                :options="
+                  form.computationMethod == 'recommendation'
+                    ? options.metrics
+                    : options.metrics.slice(1)
+                "
                 :nested="true"
               />
             </div>
