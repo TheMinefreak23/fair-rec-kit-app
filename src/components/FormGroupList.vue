@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { capitalise } from '../helpers/resultFormatter'
 import { underscoreToSpace } from '../helpers/resultFormatter'
 
@@ -27,11 +27,23 @@ const form = computed({
     //console.log('local form change')
   },
 })
-//const flatOptions = props.nested ? flattenOptions() : props.options
 
 onMounted(() => {
   form.value.name = props.plural
 })
+
+watch(
+  () => {
+    return props.options
+  },
+  () => {
+    update()
+  },
+  {
+    immediate: false,
+    deep: true
+  }
+)
 
 // Set default values for the group parameters.
 function setParameter(i, val) {
@@ -142,17 +154,19 @@ function copyItem(i) {
     )
   }
 }
-//Not fully functional yet
+//Update the options that cannot be be submitted due to changing experiment type (
 function update() {
-  console.log(form.value.main)
+  let entries = flattenOptions().map((entry) => entry.text)
   for (let i = 0; i < form.value.main.length; i++) {
-    console.log(findOption(form.value.main[i]))
-    if (findOption(form.value.main[i]) == '{ "params": [] }') {
-      console.log(form.value.main[i])
+    if (!entries.includes(form.value.main[i])) {
+      //every entry that does not exist in the list of option should be removed
+      //Non-existing entries are replaced with a null entry
       form.value.main.splice(i, 1, null)
+      form.value.selects.splice(i, 1, null)
+      form.value.inputs.splice(i, 1, null)
+      form.value.lists.splice(i, 1, null)
     }
   }
-  console.log(form.value.main)
 }
 </script>
 

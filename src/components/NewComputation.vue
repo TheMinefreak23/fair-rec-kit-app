@@ -105,17 +105,6 @@ function reformat(property) {
   }
   return choices
 }
-function update() {
-  console.log(form.value.main)
-  for (let i = 0; i < form.value.main.length; i++) {
-    console.log(findOption(form.value.main[i]))
-    if (findOption(form.value.main[i]) == '{ "params": [] }') {
-      console.log(form.value.main[i])
-      form.value.main.splice(i, 1, null)
-    }
-  }
-  console.log(form.value.main)
-}
 </script>
 
 <template>
