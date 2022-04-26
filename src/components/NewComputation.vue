@@ -37,6 +37,10 @@ async function getOptions() {
   //console.log(options.value)
 }
 
+/*async function mock(){
+  await sendMockData()
+}*/
+
 // POST request: Send form to server.
 async function sendToServer() {
   var sendForm = { ...form.value } // clone
@@ -229,7 +233,7 @@ function reformat(property) {
           </div>
         </b-row>
       </b-form>
-      <b-button type="test" variant="warning" @click="sendMockData"
+      <b-button type="test" variant="warning" @click="sendMockData(options)"
         >Mock</b-button
       >
     </b-card>

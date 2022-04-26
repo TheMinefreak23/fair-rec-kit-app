@@ -1,31 +1,21 @@
 import words from 'an-array-of-english-words'
 import { API_URL } from '../api'
 import { store } from '../store'
-import {ref} from 'vue'
+import {ref, onMounted} from 'vue'
 
 var metadata = {}
 var form = {}
 
-const options = ref()
 
-
-// GET request: Get available options for selection from server
-async function getOptions() {
-  const response = await fetch(API_URL + '/computation/options')
-  const data = await response.json()
-  options.value = data.options
+ async function sendMockData(options) {
   console.log(options)
-}
-
-async function sendMockData() {
-  await getOptions()
   form = {
     recommendations: rand(100),
     split: rand(100),
     splitMethod: 'timesplit',
-    approaches: generateRandomApproach(),
-    metrics: generateRandomMetrics(),
-    datasets: generateRandomDatasets(),
+    approaches: generateRandomApproach(options),
+    metrics: generateRandomMetrics(options),
+    datasets: generateRandomDatasets(options),
     filters: toFormObject(randomWords()),
   }
   console.log(form)
@@ -54,32 +44,53 @@ async function sendMockData() {
   store.queue = data
 }
 
-function generateRandomApproach() {
-  let libraries = options.value.approaches.libraries
+function generateRandomApproach(options) {
+  console.log(options)
+  let libraries = options.approaches.libraries.prediction
   let result = []
-  for (let i = 0; i < (1 + Math.floor(Math.random * 3)); i++) {
-    approaches = randomItems(randomItems(libraries, 1).options, 1)
-    approachName = approaches.name
-    choices = approaches.params.options
+  var n = (1 + Math.floor(Math.random() * 3))
+  console.log(n)
+  for (let i = 0; i < n; i++) {
+    console.log(libraries)
+    var ops = randomItems(libraries, 1)[0].options
+    console.log(" xd")
+    console.log(ops)
+    var approach = randomItems(ops, 1)[0]
+    console.log(" alsjlfjalsfj")
+    console.log(approach)
+    var approachName = approach.text
+    var choices = approach.params.options
 
-    randomOption = randomItems(choices, 1)
-    randomOptionName = randomOption.map(x => x.text)
-    randomOptionValue = randomOption.map(x => randomItems(x.options, 1))
+    var randomOptionName = randomWord()
+    var randomOptionValue = randomWord()
+    console.log("xdsfasf")
+    console.log(choices)
+    if(choices != (undefined || [])){
+      var randomOption = randomItems(choices, 1)[0]
+      randomOptionName = randomOption.text
+      randomOptionValue = randomItems(randomOption.options, 1)
+    }
 
-    values = approaches.params.values
+    var values = approach.params.values
 
-    randomValue = randomItems(values, 1)
-    randomValuesName = randomValue.map(x => x.text)
-    randomValuesValue = randomValue.map(x => (getRandomInt(x.min, x.max)))
+    var randomValuesName = randomWord()
+    var randomValuesValue = rand()
+    if (values != (undefined || []))
+    {
+      var randomValue = randomItems(values, 1)[0]
+      randomValuesName = randomValue.text
+      randomValuesValue = (getRandomInt(randomValue.min, randomValue.max))
+    }
 
-    params = [{
+
+    var params = [{
       'name': randomOptionName,
       'value': randomOptionValue
     },
     {
-      'name': randomValueName,
-      'value': randomValueValue
-    }]=
+      'name': randomValuesName,
+      'value': randomValuesValue
+    }]
 
     result[i] = {
       'name': approachName,
@@ -89,11 +100,12 @@ function generateRandomApproach() {
   return result
 }
 
-function generateRandomMetrics(){
+function generateRandomMetrics(options){
   let result = []
-  for (let i = 0; i < (1 + Math.floor(Math.random * 3)) ; i++) {
-    console.log(options.value.metrics)
-    randomOption = randomItems(options.value.metrics.categories, 1)
+  var n = (1 + Math.floor(Math.random() * 3))
+  for (let i = 0; i < n ; i++) {
+    console.log(options.metrics)
+    randomOption = randomItems(options.metrics.categories, 1)
     randomOptionName = randomOption.text
 
     result[i] = {
@@ -105,11 +117,14 @@ function generateRandomMetrics(){
   return result
 }
 
-function generateRandomDatasets() {
+function generateRandomDatasets(options) {
   let result = []
-  for (let i = 0; i < (1 + Math.floor(Math.random * 3)); i++) {
-
-    randomDataset = randomItems(options.value.datasets, 1)
+  var n = (1 + Math.floor(Math.random() * 3))
+  for (let i = 0; i < n; i++) {
+    console.log(options)
+    console.log("test1")
+    randomDataset = randomItems(options.datasets, 1)
+    console.log(randomDataset)
     randomDatasetName = randomDataset.text
 
     result[i] = {
@@ -143,6 +158,11 @@ function randomWords() {
 }
 
 function randomItems(list, n = Math.floor(Math.random() * list.length)) {
+  console.log('bingus')
+  console.log(list)
+  if (list.length == 0){
+    return randomWord()
+  }
   let set = new Set()
   for (let i = 0; i < n; i++) {
     set.add(list[Math.floor(Math.random() * list.length)])
