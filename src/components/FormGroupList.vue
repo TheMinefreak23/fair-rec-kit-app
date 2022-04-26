@@ -33,13 +33,13 @@ onMounted(() => {
 })
 
 watch(
-  () => {
+  () => { // Watch for the changing of options
     return props.options
   },
-  () => {
+  () => { // Update form if this changes
     update()
   },
-  {
+  { // Make sure this does not trigger on initialization
     immediate: false,
     deep: true
   }
@@ -80,11 +80,7 @@ function setParameter(i, val) {
 
 // Get options from group index
 function getFromIndex(i) {
-  //console.log(props.options)
-  //console.log(form.value.main[i])
-
   const option = findOption(form.value.main[i])
-  //console.log(option)
   return option
 }
 
