@@ -5,6 +5,7 @@ import {
   capitalise,
   underscoreToSpace,
 } from '../helpers/resultFormatter'
+//import { selectionOptions } from '../helpers/optionsFormatter'
 
 //const emit = defineEmits(['formChange'])
 const props = defineProps({
@@ -167,16 +168,34 @@ function copyItem(i) {
 }
 //Update the options that cannot be be submitted due to changing experiment type (
 function update() {
+  let entries = flattenOptions().map((entry) => entry.name)
+  //console.log(entries)
+  const deleteEntry = 'NULL'
   for (let i = 0; i < form.value.main.length; i++) {
-    if (!props.options.includes(form.value.main[i])) {
+    if (!entries.includes(form.value.main[i].name)) {
       //every entry that does not exist in the list of option should be removed
       //Non-existing entries are replaced with a null entry
-      form.value.main.splice(i, 1, null)
-      form.value.selects.splice(i, 1, null)
-      form.value.inputs.splice(i, 1, null)
-      form.value.lists.splice(i, 1, null)
+      form.value.main[i] = deleteEntry
+      form.value.selects[i] = deleteEntry
+      form.value.inputs[i] = deleteEntry
+      form.value.lists[i] = deleteEntry
+      if (props.required && groupCount.value > 1) groupCount.value--
     }
   }
+  console.log(form.value.main)
+  // Filter null values
+  form.value.main = form.value.main.filter((x) => x != deleteEntry)
+  form.value.selects = form.value.selects.filter((x) => x != deleteEntry)
+  form.value.inputs = form.value.inputs.filter((x) => x != deleteEntry)
+  form.value.lists = form.value.lists.filter((x) => x != deleteEntry)
+  console.log(form.value.main)
+}
+// Flatten options API structure
+function flattenOptions() {
+  return props.options
+    .map((category) => category.options)
+    .concat()
+    .flat()
 }
 </script>
 
@@ -203,7 +222,7 @@ function update() {
                   :required="required"
                 >
                   <template #first>
-                    <b-form-select-option value="" disabled
+                    <b-form-select-option :value="null" disabled
                       >Choose..</b-form-select-option
                     >
                   </template>
@@ -309,7 +328,7 @@ function update() {
                     required
                   >
                     <template #first>
-                      <b-form-select-option value="" disabled
+                      <b-form-select-option :value="null" disabled
                         >Choose..</b-form-select-option
                       >
                     </template>
