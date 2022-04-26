@@ -13,7 +13,6 @@ const props = defineProps({
   selectName: String,
   options: Array,
   required: Boolean,
-  nested: false,
   data: { type: Object, required: true },
 })
 
@@ -22,31 +21,30 @@ const groupCount = ref(0)
 const form = computed({
   // getter
   get() {
-    //console.log(props.data)
+    //console.log(props.name, props.data)
     return props.data
   },
   // setter
   set(localValue) {
+    console.log('local form change to', localValue)
     emit('input', localValue)
-    //console.log('local form change')
   },
 })
-const flatOptions = props.nested ? flattenOptions() : props.options
+//const flatOptions = props.nested ? flattenOptions() : props.options
 
 onMounted(() => {
   groupCount.value = props.required ? 1 : 0 // For required lists the minimum amount of group items is 1.
   console.log(props.name, props.nested, props.options)
   form.value.name = props.plural
-  //console.log(form.value)
+  //console.log(props.name, 'options', props.options)
 })
 
 // Set default values for the group parameters.
-function setParameter(i, val) {
-  //console.log(flatOptions)
-  //console.log(options)
-  let option = findOption(val)
+function setParameter(i, option) {
+  //console.log(props.name, props.options, form.value.main)
+  //let option = form.value.main[i]
   let choices
-  //console.log(props.name)
+  //console.log(option)
   //console.log(option.params)
   if (option.params) {
     if (option.params.values && option.params.values.length > 0) {
@@ -72,25 +70,9 @@ function setParameter(i, val) {
         selects: [],
         lists: [],
       }))
-      console.log(form.value.lists)
+      //console.log(form.value.lists)
     }
   }
-}
-
-// Get options from group index
-function getFromIndex(i) {
-  //console.log(props.options)
-  //console.log(form.value.main[i])
-
-  const option = findOption(form.value.main[i])
-  //console.log(option)
-  return option
-}
-
-function findOption(val) {
-  const option = flatOptions.find((option) => option.name === val)
-  if (!option) return { params: [] }
-  return option
 }
 
 // Splice groups array to remove a group
@@ -103,23 +85,31 @@ function removeGroup(i) {
   form.value.lists.splice(i, 1)
 }
 
-// Flatten options API structure
-function flattenOptions() {
-  console.log(props.name, props.options)
-  return props.options
-    .map((category) => category.options)
-    .concat()
-    .flat()
+// Check whether the option has values/options params (not dynamic params)
+function hasParams(index) {
+  //console.log(form.value.main)
+  const option = form.value.main[index]
+  //console.log('hasParams option at', index, ':', option)
+  return (
+    option &&
+    option.params &&
+    option.params.length != 0 &&
+    ((option.params.values && option.params.values.length != 0) ||
+      (option.params.options && option.params.options.length != 0))
+  )
 }
 
-// Check whether the choice has options
-function hasParams(i) {
-  const option = getFromIndex(i)
-  const listsNotNull =
-    (option.params.values && option.params.values.length != 0) ||
-    (option.params.options && option.params.options.length != 0) ||
-    (option.params.dynamic && option.params.dynamic.length != 0)
-  return option.params.length != 0 && listsNotNull
+// Check whether the option has dynamic params
+function hasDynamic(index) {
+  // TODO refactor with hasParams
+  const option = form.value.main[index]
+  return (
+    option &&
+    option.params &&
+    option.params.length != 0 &&
+    option.params.dynamic &&
+    option.params.dynamic.length != 0
+  )
 }
 
 function chooseLabel(name) {
@@ -140,22 +130,29 @@ function chooseLabel(name) {
           <b-row>
             <b-col cols="4">
               <b-form-group :label="'Select ' + selectName">
+                <!--TODO use form bind instead of emit?-->
                 <b-form-select
+                  :form="name"
                   v-model="form.main[i - 1]"
+                  :options="options"
                   text-field="name"
-                  :options="[{ name: 'Choose...', value: null }, ...options]"
                   @change="setParameter(i - 1, $event)"
-                  :required="props.required"
-                />
-                <!--TODO use placeholder-->
+                  :required="required"
+                >
+                  <template #first>
+                    <b-form-select-option value="" disabled
+                      >Choose..</b-form-select-option
+                    >
+                  </template>
+                </b-form-select>
               </b-form-group>
             </b-col>
 
             <!--Show settings for selected option.-->
-            <b-col cols="4" v-if="form.main[i - 1] != null && hasParams(i - 1)">
+            <b-col cols="4" v-if="hasParams(i - 1)">
               <!--Use an input form for values.-->
               <template
-                v-for="(value, index) in getFromIndex(i - 1).params.values"
+                v-for="(value, index) in form.main[i - 1].params.values"
                 :key="value"
               >
                 <b-form-group
@@ -200,7 +197,7 @@ function chooseLabel(name) {
 
               <!--Use a select form for options.-->
               <template
-                v-for="(option, index) in getFromIndex(i - 1).params.options"
+                v-for="(option, index) in form.main[i - 1].params.options"
                 :key="option"
               >
                 <b-form-group
@@ -238,14 +235,15 @@ function chooseLabel(name) {
                 >
                   <b-form-select
                     v-model="form.selects[i - 1][index].value"
-                    :options="[
-                      { name: 'Choose...', value: null },
-                      ...option.options,
-                    ]"
+                    :options="option.options"
                     text-field="name"
                     required
                   >
-                    <!--TODO use placeholder-->
+                    <template #first>
+                      <b-form-select-option value="" disabled
+                        >Choose..</b-form-select-option
+                      >
+                    </template>
                   </b-form-select>
                 </b-form-group>
               </template>
@@ -262,10 +260,10 @@ function chooseLabel(name) {
               </b-form-group>
             </b-col>
           </b-row>
-          <b-row v-if="form.main[i - 1] != null && hasParams(i - 1)">
+          <b-row v-if="hasDynamic(i - 1)">
             <!--Nested form group list.-->
             <template
-              v-for="(option, index) in getFromIndex(i - 1).params.dynamic"
+              v-for="(option, index) in form.main[i - 1].params.dynamic"
               :key="option"
             >
               <b-card>
@@ -275,7 +273,6 @@ function chooseLabel(name) {
                   :plural="option.plural"
                   :selectName="option.article + ' ' + option.name"
                   :options="option.options"
-                  :nested="option.nested"
                   :required="false"
                 />
               </b-card>

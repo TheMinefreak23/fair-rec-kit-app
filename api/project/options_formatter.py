@@ -25,7 +25,7 @@ def create_model_API_dict(predictors, recommenders):
     for (header, options) in approaches:
         for option in options:
             dict[option['name']] = header
-    #print(dict)
+    # print(dict)
     return dict
 
 
@@ -42,7 +42,7 @@ def create_available_options(recommender_system):
     frk_predictors = recommender_system.get_available_predictors()
     frk_recommenders = recommender_system.get_available_recommenders()
     frk_metrics = recommender_system.get_available_metrics()
-    #print('DATASETS:\n', frk_datasets)
+    # print('DATASETS:\n', frk_datasets)
     # print(frk_predictors)
     # print(frk_recommenders)
     # print(frk_metrics)
@@ -50,7 +50,6 @@ def create_available_options(recommender_system):
     global model_API_dict
     model_API_dict = create_model_API_dict(frk_predictors, frk_recommenders)
 
-    # TODO: DO THIS IN BACKEND?
     def format_categorised(settings):
         formatted_settings = []
         for (header, options) in settings.items():
@@ -94,7 +93,6 @@ def create_available_options(recommender_system):
 
         dataset['params'] = params
 
-
     # Add dynamic (nested settings) settings
     # MOCK: for now use all filters/metrics per dataset
     filter_list = [{'name': 'filter', 'nested': False,
@@ -107,13 +105,34 @@ def create_available_options(recommender_system):
         for option in metric['options']:
             option['params']['dynamic'] = filter_list
 
-    options['datasets'] = datasets
-    options['recommenders'] = recommenders
-    options['predictors'] = predictors
-    options['metrics'] = metrics
-
+    print(options)
+    options = reformat_all(options, datasets, recommenders, predictors, metrics)
     # print(options)
 
+    return options
+
+
+def reformat_all(options, datasets, recommenders, predictors, metrics):
+    # Reformat an options list
+    def reformat_options(options):
+        # Add text and value fields
+        return list(map(lambda option: {'name': option['name'], 'value': option}, options))
+
+    # Reformat options for form usage
+    def reformat(options, nested):
+        if nested:
+            for option in options:
+                option['options'] = reformat_options(option['options'])
+        else:
+            options = reformat_options(options)
+
+        return options
+
+    options['datasets'] = reformat(datasets, False)
+    # options['approaches'] = APPROACHES
+    options['predictors'] = reformat(predictors, True)
+    options['recommenders'] = reformat(recommenders, True)
+    options['metrics'] = reformat(metrics, True)
     return options
 
 
