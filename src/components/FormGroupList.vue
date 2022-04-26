@@ -1,7 +1,10 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { capitalise } from '../helpers/resultFormatter'
-import { underscoreToSpace } from '../helpers/resultFormatter'
+import {
+  article,
+  capitalise,
+  underscoreToSpace,
+} from '../helpers/resultFormatter'
 
 //const emit = defineEmits(['formChange'])
 const props = defineProps({
@@ -32,10 +35,7 @@ const flatOptions = props.nested ? flattenOptions() : props.options
 
 onMounted(() => {
   groupCount.value = props.required ? 1 : 0 // For required lists the minimum amount of group items is 1.
-  /*console.log(props.name)
-  console.log(props.options)
-  console.log(typeof props.options)
-  console.log(props.nested)*/
+  console.log(props.name, props.nested, props.options)
   form.value.name = props.plural
   //console.log(form.value)
 })
@@ -52,14 +52,14 @@ function setParameter(i, val) {
     if (option.params.values && option.params.values.length > 0) {
       choices = option.params.values
       form.value.inputs[i] = choices.map((param) => ({
-        name: param.text,
+        name: param.name,
         value: param.default,
       }))
     }
     if (option.params.options && option.params.options.length > 0) {
       choices = option.params.options
       form.value.selects[i] = choices.map((param) => ({
-        name: param.text,
+        name: capitalise(param.name),
         value: param.default,
       }))
     }
@@ -88,7 +88,7 @@ function getFromIndex(i) {
 }
 
 function findOption(val) {
-  const option = flatOptions.find((option) => option.text === val)
+  const option = flatOptions.find((option) => option.name === val)
   if (!option) return { params: [] }
   return option
 }
@@ -105,6 +105,7 @@ function removeGroup(i) {
 
 // Flatten options API structure
 function flattenOptions() {
+  console.log(props.name, props.options)
   return props.options
     .map((category) => category.options)
     .concat()
@@ -120,6 +121,10 @@ function hasParams(i) {
     (option.params.dynamic && option.params.dynamic.length != 0)
   return option.params.length != 0 && listsNotNull
 }
+
+function chooseLabel(name) {
+  return 'Choose ' + article(name) + ' ' + underscoreToSpace(name)
+}
 </script>
 
 <template>
@@ -129,7 +134,6 @@ function hasParams(i) {
       {{ capitalise(plural) }}
       <!--{{ plural }}-->
     </h3>
-    <h3>{{form.main[i-1]}}</h3>
     <div v-for="i in groupCount" :key="i - 1">
       <b-row class="align-items-end">
         <b-col>
@@ -138,7 +142,8 @@ function hasParams(i) {
               <b-form-group :label="'Select ' + selectName">
                 <b-form-select
                   v-model="form.main[i - 1]"
-                  :options="[{ text: 'Choose...', value: null }, ...options]"
+                  text-field="name"
+                  :options="[{ name: 'Choose...', value: null }, ...options]"
                   @change="setParameter(i - 1, $event)"
                   :required="props.required"
                 />
@@ -154,16 +159,11 @@ function hasParams(i) {
                 :key="value"
               >
                 <b-form-group
-                  :label="
-                    underscoreToSpace(value.text) +
-                    ' between ' +
-                    value.min +
-                    ' and ' +
-                    value.max
-                  "
+                  :label="capitalise(underscoreToSpace(value.name))"
+                  :description="'Between ' + value.min + ' and ' + value.max"
                 >
                   <b-form-input
-                    v-if="!value.text.includes('split')"
+                    v-if="!value.name.includes('split')"
                     v-model="form.inputs[i - 1][index].value"
                     :state="
                       form.inputs[i - 1][index].value >= value.min &&
@@ -172,7 +172,7 @@ function hasParams(i) {
                     validated="true"
                   />
                   <b-form-input
-                    v-if="value.text.includes('Train')"
+                    v-if="value.name.includes('Train')"
                     type="range"
                     min="value.min"
                     max="value.max"
@@ -180,7 +180,7 @@ function hasParams(i) {
                     id="customRange"
                     v-model="form.inputs[i - 1][index].value"
                   ></b-form-input>
-                  <div v-if="value.text.includes('Train')" class="text-center">
+                  <div v-if="value.name.includes('Train')" class="text-center">
                     <strong>Train:</strong>
                     <i>{{ ' ' + form.inputs[i - 1][index].value + ' ' }}</i>
                     <strong>Test:</strong
@@ -188,7 +188,7 @@ function hasParams(i) {
                   </div>
                   <div
                     v-if="
-                      value.text.includes('seed') &&
+                      value.name.includes('seed') &&
                       form.inputs[i - 1][index].value == null
                     "
                     class="text-center"
@@ -204,7 +204,7 @@ function hasParams(i) {
                 :key="option"
               >
                 <b-form-group
-                  :label="'Choose a ' + underscoreToSpace(option.text)"
+                  :label="chooseLabel(option.name)"
                   v-if="
                     option.options.length < 3 &&
                     typeof option.options[0] != 'boolean'
@@ -212,13 +212,14 @@ function hasParams(i) {
                 >
                   <b-form-radio-group
                     v-model="form.selects[i - 1][index].value"
+                    text-field="name"
                     :value="option.default"
                     :options="option.options"
                     required
                   ></b-form-radio-group>
                 </b-form-group>
                 <b-form-group
-                  :label="capitalise(underscoreToSpace(option.text + '?'))"
+                  :label="capitalise(underscoreToSpace(option.name + '?'))"
                   v-if="option.options[0] == true || option.options[0] == false"
                 >
                   <b-form-checkbox
@@ -233,14 +234,15 @@ function hasParams(i) {
                 </b-form-group>
                 <b-form-group
                   v-if="option.options.length > 2"
-                  :label="'Choose a ' + underscoreToSpace(option.text)"
+                  :label="chooseLabel(option.name)"
                 >
                   <b-form-select
                     v-model="form.selects[i - 1][index].value"
                     :options="[
-                      { text: 'Choose...', value: null },
+                      { name: 'Choose...', value: null },
                       ...option.options,
                     ]"
+                    text-field="name"
                     required
                   >
                     <!--TODO use placeholder-->
