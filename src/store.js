@@ -27,7 +27,6 @@ function addResult(result) {
   //console.log(store.currentResults)
 }
 
-/** */
 //Remove result from global current shown results state
 function removeResult(result) {
 

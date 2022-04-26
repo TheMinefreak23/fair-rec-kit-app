@@ -33,7 +33,7 @@ async function getCalculation() {
 
 function closeResult(id) {
   console.log(id)
-  //removeResult(id)
+  removeResult(id)
 }
 </script>
 
@@ -66,7 +66,7 @@ function closeResult(id) {
           </button>
         </div>
         <div class="border">
-          <!--<template v-if="[...store.currentResults].length > 0">-->
+          <template v-if="[...store.currentResults].length > 0">
             <b-tabs card content-class="mt-3">
               <!-- Result tabs.-->
               <!--Always show JSON Mockdata result tab.-->
@@ -78,8 +78,8 @@ function closeResult(id) {
                 <Result :result="result"
               /></b-tab>
             </b-tabs>
-          <!--</template>
-          <h1 v-else> No results to show, start a new computation or choose a previously calculated result</h1>-->
+          </template>
+          <p v-else> No results to show, start a new experiment or choose a previous experiment</p>
         </div>
 
         <div
