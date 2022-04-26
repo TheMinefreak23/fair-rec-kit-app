@@ -34,7 +34,7 @@ async function getOptions() {
   const response = await fetch(API_URL + '/computation/options')
   const data = await response.json()
   options.value = data.options
-  //console.log(options.value)
+  console.log(options.value)
 }
 
 // POST request: Send form to server.
@@ -50,7 +50,7 @@ async function sendToServer() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ metadata: metadata.value, settings: sendForm }),
   }
-  console.log(sendForm)
+  console.log('sendForm', sendForm)
   const response = await fetch(
     API_URL + '/computation/calculation',
     requestOptions
@@ -58,8 +58,9 @@ async function sendToServer() {
 
   // Update queue
   const data = response.json()
-  //if (data.status == 'success') getComputations()
+  //console.log('calculation route response:', data)
   store.queue = data
+  //console.log('queue:', store.queue)
 }
 
 async function initForm() {
@@ -87,22 +88,23 @@ function emptyFormGroup() {
 function reformat(property) {
   let choices = []
   for (let i in property.main) {
-    let parameter = null
+    let params = null
     if (property.lists[i] != null) {
-      //console.log(property.lists[i])
       choices[i] = {
-        name: property.main[i],
+        name: property.main[i].name,
         settings: property.lists[i].map((setting) => ({
           [setting.name]: reformat(setting),
         })),
       }
     } else {
-      if (property.inputs[i] != null) parameter = property.inputs[i]
-      else if (property.selects[i] != null) parameter = property.selects[i]
-      choices[i] = { name: property.main[i], parameter: parameter }
+      if (property.inputs[i] != null) params = property.inputs[i]
+      else if (property.selects[i] != null) params = property.selects[i]
+      choices[i] = { name: property.main[i].name, params: params }
       //console.log('choices:' + choices)
     }
+    //console.log(choices[i])
   }
+
   return choices
 }
 </script>
@@ -154,15 +156,15 @@ function reformat(property) {
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
               <FormGroupList
                 v-model:data="form.approaches"
-                :nested="true"
                 name="approach"
                 plural="Recommender approaches"
                 selectName="an approach"
                 :options="
                   form.computationMethod == 'recommendation'
-                    ? options.approaches.libraries.recommendation
-                    : options.approaches.libraries.prediction
+                    ? options.recommenders
+                    : options.predictors
                 "
+                :required="true"
               />
 
               <!--User can select the amount of recommendations per user -->
@@ -199,19 +201,10 @@ function reformat(property) {
                 selectName="a metric"
                 :options="
                   form.computationMethod == 'recommendation'
-                    ? options.metrics.categories
-                    : options.metrics.categories.slice(1)
+                    ? options.metrics
+                    : options.metrics.slice(1)
                 "
-                :nested="true"
               />
-
-              <!--Input for results filter -->
-              <b-form-group label="Select a results filter">
-                <b-form-select
-                  v-model="form.resFilter"
-                  :options="[{ text: 'Global (default)', value: null }]"
-                ></b-form-select>
-              </b-form-group>
             </div>
 
             <!-- Input for metadata such as:
