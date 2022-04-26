@@ -1,24 +1,28 @@
 <script>
 /**
- * Below are all items inside the Documentation tab.
+ * Below are all items -unordered- inside the Documentation tab.
  * To add an item, use the standard format:
 
 -{
-<name> sometext abcdef </name>
+<name> Sometext abcdef </name>
+I'm a comment!
+Description uses HTML syntax
 <description> 
-Uses HTML syntax 
-For code snippets use:
+<!-- For code snippets use: -->
 <pre>
   <code> p { color: red } </code>
   <code> p { color: blue } </code>
 </pre>
 </description>
-<link> sometext abcdef </link>
+<link> http://www.sometext.abcdef </link>
 <other1> sometext abcdef </other1>
 Some comment or notes...
 <button> sometext abcdef </button>
 }-
 
+ *
+ * Adding new items -{...}- should be added to documentation_structure.vue to make it visible.
+ * 
  * Adding new <tags>, like <button>, should be manually added to Documentation.vue's template.
  * 
  */

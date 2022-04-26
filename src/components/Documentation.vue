@@ -267,8 +267,9 @@ code:before {
       </b-card-text>
       <b-link :href='itemDicts[header.name]["link"]' v-if='itemDicts[header.name]["link"]'>{{ itemDicts[header.name]["link"] }}</b-link>
       <span v-if='itemDicts[header.name]["button"]'>
-        <b-button pill variant="dark" :href='itemDicts[header.name]["button"]' v-if='itemDicts[header.name]["other_"]'>
-          {{ itemDicts[header.name]["button"] }}
+        <br>
+        <b-button pill variant="dark" :href='itemDicts[header.name]["button"]' v-if='itemDicts[header.name]["button"]'>
+          {{ itemDicts[header.name]["name"] }}
         </b-button>
       </span>
     </b-card> 
