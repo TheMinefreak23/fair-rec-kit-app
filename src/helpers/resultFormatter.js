@@ -127,12 +127,16 @@ function makeHeaders(result) {
   return headers
 }
 
+function article(word) {
+  return ['a', 'i', 'u', 'e', 'o'].includes(word[0]) ? 'an' : 'a'
+}
+
 function capitalise(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1)
+  return string[0].toUpperCase() + string.slice(1)
 }
 
 function underscoreToSpace(string) {
   return string.replaceAll('_', ' ')
 }
 
-export { formatResults, formatResult, capitalise, underscoreToSpace }
+export { formatResults, formatResult, capitalise, article, underscoreToSpace }

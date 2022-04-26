@@ -58,8 +58,9 @@ async function sendToServer() {
 
   // Update queue
   const data = response.json()
-  //if (data.status == 'success') getComputations()
+  //console.log('calculation route response:', data)
   store.queue = data
+  //console.log('queue:', store.queue)
 }
 
 async function initForm() {
@@ -87,19 +88,19 @@ function emptyFormGroup() {
 function reformat(property) {
   let choices = []
   for (let i in property.main) {
-    //console.log(property.main[i])
-    let parameter = null
+    let params = null
     if (property.lists[i] != null) {
       choices[i] = {
-        name: property.main[i].text,
+        name: property.main[i].name,
         settings: property.lists[i].map((setting) => ({
           [setting.name]: reformat(setting),
         })),
       }
     } else {
-      if (property.inputs[i] != null) parameter = property.inputs[i]
-      else if (property.selects[i] != null) parameter = property.selects[i]
-      choices[i] = { name: property.main[i].text, parameter: parameter }
+      if (property.inputs[i] != null) params = property.inputs[i]
+      else if (property.selects[i] != null) params = property.selects[i]
+      choices[i] = { name: property.main[i].name, params: params }
+      //console.log('choices:' + choices)
     }
     //console.log(choices[i])
   }
