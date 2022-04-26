@@ -8,7 +8,6 @@ var form = {}
 
 
  async function sendMockData(options) {
-  console.log(options)
   form = {
     recommendations: rand(100),
     split: rand(100),
@@ -18,17 +17,12 @@ var form = {}
     datasets: generateRandomDatasets(options),
     filters: toFormObject(randomWords()),
   }
-  console.log(form)
+
   metadata = {
     name: 'Test' + rand() + ': ' + randomWord(),
     email: randomWord() + '@' + randomWord() + '.com',
     tags: randomWords(),
   }
-
-
-  //form.approaches = reformat(form.approaches)
-  //form.metrics = reformat(form.metrics)
-  //form.datasets = reformat(form.datasets)
 
   const requestOptions = {
     method: 'POST',
@@ -45,26 +39,20 @@ var form = {}
 }
 
 function generateRandomApproach(options) {
-  console.log(options)
   let libraries = options.approaches.libraries.prediction
   let result = []
   var n = (1 + Math.floor(Math.random() * 3))
-  console.log(n)
+
   for (let i = 0; i < n; i++) {
-    console.log(libraries)
     var ops = randomItems(libraries, 1)[0].options
-    console.log(" xd")
-    console.log(ops)
+
     var approach = randomItems(ops, 1)[0]
-    console.log(" alsjlfjalsfj")
-    console.log(approach)
+
     var approachName = approach.text
     var choices = approach.params.options
 
     var randomOptionName = randomWord()
     var randomOptionValue = randomWord()
-    console.log("xdsfasf")
-    console.log(choices)
     if(choices != (undefined || [])){
       var randomOption = randomItems(choices, 1)[0]
       randomOptionName = randomOption.text
@@ -94,9 +82,9 @@ function generateRandomApproach(options) {
 
     result[i] = {
       'name': approachName,
-      'params': params}
+      'settings': params}
   }
-  console.log(result)
+
   return result
 }
 
@@ -105,15 +93,16 @@ function generateRandomMetrics(options){
   var n = (1 + Math.floor(Math.random() * 3))
   for (let i = 0; i < n ; i++) {
     console.log(options.metrics)
-    randomOption = randomItems(options.metrics.categories, 1)
-    randomOptionName = randomOption.text
+    var randomOption = randomItems(options.metrics.categories, 1)[0]
+    var randomOptionOptions = randomOption.options
+    var randomOptionName = randomItems(randomOptionOptions,1)[0].text
 
     result[i] = {
       'name': randomOptionName,
-      'params': rand(20)
+      'settings': rand(20)
     }
   }
-  console.log(result)
+
   return result
 }
 
@@ -121,16 +110,18 @@ function generateRandomDatasets(options) {
   let result = []
   var n = (1 + Math.floor(Math.random() * 3))
   for (let i = 0; i < n; i++) {
-    console.log(options)
-    console.log("test1")
-    randomDataset = randomItems(options.datasets, 1)
-    console.log(randomDataset)
-    randomDatasetName = randomDataset.text
+    console.log(options.datasets)
+    var randomDataset = randomItems(options.datasets, 1)[0]
+
+    var randomDatasetName = randomDataset.text
+    var randomDatasetParams = {'name' : randomDataset.params.values[0].text,
+      'value': randomDataset.params.values[0].default}
 
     result[i] = {
       'name': randomDatasetName,
-      'params': rand(20)
+      'settings': randomDatasetParams
     }
+    console.log(result)
   }
   return result
 }
@@ -157,9 +148,8 @@ function randomWords() {
   return array
 }
 
-function randomItems(list, n = Math.floor(Math.random() * list.length)) {
-  console.log('bingus')
-  console.log(list)
+function randomItems(list = [], n = Math.floor(Math.random() * list.length)) {
+
   if (list.length == 0){
     return randomWord()
   }
@@ -170,7 +160,6 @@ function randomItems(list, n = Math.floor(Math.random() * list.length)) {
   if (set.size == 0) {
     return randomItems(list)
   }
-  console.log(...set)
   return [...set]
 }
 
@@ -186,7 +175,7 @@ function reformat(property) {
   for (let i in property.main) {
     let parameter = null
     if (property.lists[i] != null) {
-      //console.log(property.lists[i])
+
       choices[i] = {
         name: property.main[i],
         settings: property.lists[i].map((setting) => ({
@@ -197,7 +186,6 @@ function reformat(property) {
       if (property.inputs[i] != null) parameter = property.inputs[i]
       else if (property.selects[i] != null) parameter = property.selects[i]
       choices[i] = { name: property.main[i], parameter: parameter }
-      //console.log('choices:' + choices)
     }
   }
   return choices
