@@ -39,6 +39,7 @@ var form = {}
 }
 
 function generateRandomApproach(options) {
+  //generate random settings for the Approaches part of a computation
   let libraries = options.approaches.libraries.prediction
   let result = []
   var n = (1 + Math.floor(Math.random() * 3))
@@ -89,6 +90,7 @@ function generateRandomApproach(options) {
 }
 
 function generateRandomMetrics(options){
+  //generate random settings for the Metrics part of a computation
   let result = []
   var n = (1 + Math.floor(Math.random() * 3))
   for (let i = 0; i < n ; i++) {
@@ -107,6 +109,7 @@ function generateRandomMetrics(options){
 }
 
 function generateRandomDatasets(options) {
+  //generate random settings for the Datasets part of a computation
   let result = []
   var n = (1 + Math.floor(Math.random() * 3))
   for (let i = 0; i < n; i++) {
@@ -149,6 +152,7 @@ function randomWords() {
 }
 
 function randomItems(list = [], n = Math.floor(Math.random() * list.length)) {
+  //takes a list and a number, selects a random amount of item in that list.
 
   if (list.length == 0){
     return randomWord()

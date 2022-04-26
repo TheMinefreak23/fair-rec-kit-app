@@ -10,11 +10,12 @@ import { API_URL } from '../api'
 
 const result = ref({})
 const options = ref()
+
+//Store the settings of the form in a reference
 const form = ref({
   datasets: emptyFormGroup(),
   metrics: emptyFormGroup(),
   approaches: emptyFormGroup(),
-  //filters: emptyFormGroup(),
   splitMethod: 'random', //The default split method.
   computationMethod: 'recommendation',
 })
@@ -34,12 +35,7 @@ async function getOptions() {
   const response = await fetch(API_URL + '/computation/options')
   const data = await response.json()
   options.value = data.options
-  //console.log(options.value)
 }
-
-/*async function mock(){
-  await sendMockData()
-}*/
 
 // POST request: Send form to server.
 async function sendToServer() {
@@ -74,12 +70,11 @@ async function initForm() {
   form.value.datasets = emptyFormGroup()
   form.value.metrics = emptyFormGroup()
   form.value.approaches = emptyFormGroup()
-  //form.value.filters = emptyFormGroup()
+
   form.value.recommendations = options.value.defaults.recCount.default
   form.value.split = options.value.defaults.split
   form.value.splitMethod = 'random'
   form.value.computationMethod = 'recommendation'
-  //form.value.result.value = {}
 }
 
 function emptyFormGroup() {
@@ -93,7 +88,7 @@ function reformat(property) {
   for (let i in property.main) {
     let parameter = null
     if (property.lists[i] != null) {
-      //console.log(property.lists[i])
+
       choices[i] = {
         name: property.main[i],
         settings: property.lists[i].map((setting) => ({
@@ -104,7 +99,7 @@ function reformat(property) {
       if (property.inputs[i] != null) parameter = property.inputs[i]
       else if (property.selects[i] != null) parameter = property.selects[i]
       choices[i] = { name: property.main[i], parameter: parameter }
-      //console.log('choices:' + choices)
+
     }
   }
   return choices
@@ -133,15 +128,6 @@ function reformat(property) {
                 :options="options.datasets"
                 required
               />
-
-              <!--User can select optional filters-->
-              <!--<FormGroupList
-                v-model:data="form.filters"
-                name="filter"
-                plural="Filters"
-                selectName="a filter"
-                :options="options.filters"
-              />-->
 
               <!--User provides an optional rating conversion-->
               <b-form-group label="Select a rating conversion">
@@ -173,14 +159,6 @@ function reformat(property) {
                   v-model="form.recommendations"
                 />
                 <p>{{ form.recommendations }}</p>
-                <!--  No longer feasible from a back-end perspective -Bug V22H-194
-              <b-form-checkbox
-              v-model="form.includeRatedItems"
-              buttons
-              button-variant="outline-primary"
-              required
-              >Include already rated items in recommendations</b-form-checkbox
-            >-->
               </b-form-group>
             </div>
           </b-col>
@@ -233,6 +211,7 @@ function reformat(property) {
           </div>
         </b-row>
       </b-form>
+      <!--Send a plethora of mock data to the queue-->
       <b-button type="test" variant="warning" @click="sendMockData(options)"
         >Mock</b-button
       >
