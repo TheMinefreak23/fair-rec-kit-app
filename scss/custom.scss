@@ -25,17 +25,16 @@ $subtle: rgb(80, 80, 80), rgb(104, 104, 104);
   background: linear-gradient($direction, $list2);
 }
 
+//give main button gradient color
 .btn-primary {
   @include gradient(bottom, $list2);
 }
-
+//give danger button gradient color
 .btn-danger {
   @include gradient(bottom, $dangergradient);
-  color: #fff;
 }
-
-.btn {
-  color: white;
+.btn-danger {
+  color: #fff;
 }
 
 // Override default variables.
