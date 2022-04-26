@@ -27,6 +27,7 @@ function addResult(result) {
   //console.log(store.currentResults)
 }
 
+/** */
 //Remove result from global current shown results state
 function removeResult(result) {
 
@@ -34,11 +35,12 @@ function removeResult(result) {
     
     if(store.currentResults[i].id === result) {
       store.currentResults.splice(i,1);
+      //ensures that the next item is not skipped
       i--;
 
     }
     
   }
-}
+} 
 
 export { store, addResult, removeResult }
