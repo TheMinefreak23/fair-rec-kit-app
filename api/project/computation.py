@@ -20,7 +20,7 @@ from .options_formatter import create_available_options, config_dict_from_settin
 
 compute_bp = Blueprint('computation', __name__, url_prefix='/api/computation')
 
-recommender_system = RecommenderSystem('../../../datasets', 'results')
+recommender_system = RecommenderSystem('datasets', 'results')
 options = create_available_options(recommender_system)
 
 computation_queue = []
