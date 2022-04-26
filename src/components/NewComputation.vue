@@ -50,7 +50,7 @@ async function sendToServer() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ metadata: metadata.value, settings: sendForm }),
   }
-  console.log(sendForm)
+  console.log('sendForm', sendForm)
   const response = await fetch(
     API_URL + '/computation/calculation',
     requestOptions
@@ -87,11 +87,11 @@ function emptyFormGroup() {
 function reformat(property) {
   let choices = []
   for (let i in property.main) {
+    //console.log(property.main[i])
     let parameter = null
     if (property.lists[i] != null) {
-      //console.log(property.lists[i])
       choices[i] = {
-        name: property.main[i],
+        name: property.main[i].text,
         settings: property.lists[i].map((setting) => ({
           [setting.name]: reformat(setting),
         })),
@@ -99,10 +99,11 @@ function reformat(property) {
     } else {
       if (property.inputs[i] != null) parameter = property.inputs[i]
       else if (property.selects[i] != null) parameter = property.selects[i]
-      choices[i] = { name: property.main[i], parameter: parameter }
-      //console.log('choices:' + choices)
+      choices[i] = { name: property.main[i].text, parameter: parameter }
     }
+    //console.log(choices[i])
   }
+
   return choices
 }
 </script>
@@ -154,7 +155,6 @@ function reformat(property) {
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
               <FormGroupList
                 v-model:data="form.approaches"
-                :nested="true"
                 name="approach"
                 plural="Recommender approaches"
                 selectName="an approach"
@@ -200,10 +200,9 @@ function reformat(property) {
                 selectName="a metric"
                 :options="
                   form.computationMethod == 'recommendation'
-                    ? options.metrics.categories
-                    : options.metrics.categories.slice(1)
+                    ? options.metrics
+                    : options.metrics.slice(1)
                 "
-                :nested="true"
               />
             </div>
 

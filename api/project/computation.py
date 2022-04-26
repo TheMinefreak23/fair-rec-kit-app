@@ -33,7 +33,6 @@ def calculate_first():
             recommendation = {'approach': approach['name'], 'recommendation': recommend(dataset, approach), 'evals': []}
             for metric in settings['metrics']:
                 evaluation = evaluate_all(dataset['settings'], approach, metric)
-
                 recommendation['evals'].append({'name': metric['name'], 'evaluation': evaluation})
             recs.append(recommendation)
         result.append({'dataset': dataset, 'recs': recs})
