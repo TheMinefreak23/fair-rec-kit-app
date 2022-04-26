@@ -13,7 +13,9 @@ from . import result_storage
 
 compute_bp = Blueprint('computation', __name__, url_prefix='/api/computation')
 
-# constants
+# Available settings from backend in json format, right now stored locally
+# TODO: retrieve settings from fairreckitlib
+
 DATASETS = json.load(open('project/parameters/datasets.json'))
 APPROACHES = json.load(open('project/parameters/approaches.json'))
 METRICS = json.load(open('project/parameters/metrics.json'))

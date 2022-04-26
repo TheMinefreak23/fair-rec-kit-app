@@ -127,6 +127,7 @@ function reformat(property) {
                 selectName="a dataset"
                 :options="options.datasets"
                 required
+                id = "datasets"
               />
 
               <!--User provides an optional rating conversion-->
@@ -147,7 +148,6 @@ function reformat(property) {
                 plural="Recommender approaches"
                 selectName="an approach"
                 :options="form.computationMethod == 'recommendation' ? options.approaches.libraries.recommendation : options.approaches.libraries.prediction"
-                :required="true"
               />
 
               <!--User can select the amount of recommendations per user -->
@@ -186,7 +186,6 @@ function reformat(property) {
                 <b-form-input
                   placeholder="New Computation"
                   v-model="metadata.name"
-                  required
                 ></b-form-input>
               </b-form-group>
               <b-form-group label="Enter tags (optional)">
