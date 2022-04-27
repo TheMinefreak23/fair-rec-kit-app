@@ -47,6 +47,21 @@ async function setRecs() {
   })
 }
 
+//POST request: Ask server to load the evaluations of the current result
+async function loadEvaluations() {
+  const requestOptions = {
+    method: 'POST',
+    headers: {'Content-type': 'application/json' },
+    body: JSON.stringify({id: props.result.id })
+  }
+  const response = await fetch(API_URL + '/all-results/result-by-id', requestOptions)
+}
+
+//GET request: Ask server for currently loaded evaluations
+async function getEvaluations() {
+    const evaluation_data = await fetch(API_URL + 'all-results/result-by-id')
+}
+
 //POST request: Ask server for next part of user recommendation table.
 async function getUserRecs() {
   const requestOptions = {

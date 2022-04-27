@@ -16,7 +16,7 @@ def results():
 
 @results_bp.route('/result-by-id', methods=['POST', 'GET'])
 def result_by_id():
-    if request.method == 'POST':
+    if request.method == 'POST':    
         data = request.get_json()
         result_storage.result_by_id(data['id'])
         print(data)
