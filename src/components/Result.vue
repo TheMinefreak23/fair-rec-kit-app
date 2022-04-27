@@ -31,6 +31,7 @@ watch(
 
 onMounted(() => {
   setRecs()
+  loadEvaluations()
 })
 
 //POST request: Send result ID to the server to set current shown recommendations.
@@ -54,12 +55,17 @@ async function loadEvaluations() {
     headers: {'Content-type': 'application/json' },
     body: JSON.stringify({id: props.result.id })
   }
-  const response = await fetch(API_URL + '/all-results/result-by-id', requestOptions)
+  const response = await fetch(API_URL + '/all-results/result-by-id', requestOptions).then(() => {
+    console.log("succesful POST request to API to retrieve evaluation data")
+    getEvaluations()
+    })
 }
 
 //GET request: Ask server for currently loaded evaluations
 async function getEvaluations() {
     const evaluation_data = await fetch(API_URL + 'all-results/result-by-id')
+    console.log("succesfully retrieved evaluation data.")
+    console.log(evaluation_data)
 }
 
 //POST request: Ask server for next part of user recommendation table.
