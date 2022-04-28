@@ -188,7 +188,12 @@ function update() {
                 <b-button v-if="form.main[i - 1]" @click="copyItem(i - 1)" variant="primary"
                   >Copy {{ name }}...</b-button
                 >
-                <!--TODO use placeholder-->
+                  <template #first>
+                    <b-form-select-option value="" disabled
+                      >Choose..</b-form-select-option
+                    >
+                  </template>
+                
               </b-form-group>
             </b-col>
 
