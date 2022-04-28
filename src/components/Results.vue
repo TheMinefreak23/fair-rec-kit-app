@@ -73,7 +73,7 @@ function closeResult(id) {
               <b-tab v-for="result in [...store.currentResults]" :key="result.id">
                 <template #title>
                   Result {{ result.name }}
-                  <VDismissButton @click="closeResult(result.id)"/>
+                  <VDismissButton @click.stop="closeResult(result.id)"/>
                 </template>
                 <Result :result="result"
               /></b-tab>

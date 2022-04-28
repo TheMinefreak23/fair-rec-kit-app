@@ -67,9 +67,9 @@ async function getUserRecs() {
       sortindex: index.value,
       ascending: ascending.value,
       amount: entryAmount.value,
-      headers: headers.value,
-      itemheaders: itemHeaders.value,
-      userHeaders: userHeaders.value
+      //headers: headers.value,
+      //itemheaders: itemHeaders.value,
+      //userheaders: userHeaders.value
     }),
   }
 

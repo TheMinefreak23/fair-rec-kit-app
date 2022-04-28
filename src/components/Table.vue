@@ -346,6 +346,7 @@ function setsorting(i) {
       </b-tr>
     </b-tbody>
   </b-table-simple>
+
   <b-button
     v-if="pagination"
     @click="$emit('loadMore', false, entryAmount)"
@@ -369,4 +370,6 @@ function setsorting(i) {
     type="number"
     >20</b-form-input
   >
+
+  
 </template>
