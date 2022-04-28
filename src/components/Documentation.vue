@@ -3,7 +3,7 @@
 Utrecht University within the Software Poject course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 /*
-Documentation tab which shows all algorithms, metrics, datasets, etc. and their meaning.
+Documentation tab which shows all algorithms, metrics, datasets, etc. and their description.
 */
 
 import { ref } from 'vue'
@@ -260,8 +260,11 @@ code:before {
 
   <!-- B-card items -->
   <div class="text-right py-1 mx-5" v-for="header in structure1D" :key="header">
+    <!-- Subitems have more margin than its parent. -->
     <b-card :id='itemDicts[header.name]["name"]' :style='"margin-left: "+10*header.depth+"px"'>
-      <b-card-title>{{itemDicts[header.name]["name"]}}</b-card-title>      
+      <!-- Subitems are smaller as well. -->
+      <b-card-title :style='"font-size: "+(25-header.depth*2)+"px"'>{{itemDicts[header.name]["name"]}}</b-card-title>
+      <!-- v-if because if there is no description -> undefined, which takes space. -->
       <b-card-text v-if='itemDicts[header.name]["description"]'>
         <span v-html='itemDicts[header.name]["description"]'></span>
       </b-card-text>
