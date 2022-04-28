@@ -55,6 +55,7 @@ async function setRecs() {
   })
 }
 
+
 //POST request: Ask server for next part of user recommendation table.
 async function getUserRecs() {
   const requestOptions = {
@@ -76,7 +77,11 @@ async function getUserRecs() {
   data.value.results = await response.json()
 }
 
-//Loads more data in the table after user asks for more data.
+/**
+ * Loads more data in the table after user asks for more data.
+ * @param {Bool}   increase  - Determines whether the next or previous data is required.
+ * @param {Int}    amount    - Number of items that the user has requested.
+ */
 function loadMore(increase, amount) {
   amount = parseInt(amount)
 
@@ -91,6 +96,10 @@ function loadMore(increase, amount) {
   getUserRecs()
 }
 
+/**
+ * Handles sorting for tables that have pagination.
+ * @param {int}   indexVar  - Index of the column on which is sorted.
+ */
 function paginationSort(indexVar) {
   //When sorting on the same column twice in a row, switch to descending.
   if (index.value === indexVar) {

@@ -59,6 +59,13 @@ const subheaders = computed(() => {
   return result
 })
 
+const sorted = computed(() => {
+  //console.log(props.results)
+
+  if (!props.pagination) return sort(sortindex.value)
+  else return props.results
+})
+
 async function editEntry() {
   //Inform the server of the new values at the selected index
   const requestOptions = {
@@ -113,13 +120,6 @@ async function getResult() {
   const data = await response.json()
   metadataStr.value = data.result
 }
-
-const sorted = computed(() => {
-  //console.log(props.results)
-
-  if (!props.pagination) return sort(sortindex.value)
-  else return props.results
-})
 
 /**
  * Sorts data based on index.
