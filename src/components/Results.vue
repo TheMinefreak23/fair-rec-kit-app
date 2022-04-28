@@ -6,7 +6,7 @@ import Result from './Result.vue'
 import VDismissButton from './VDismissButton.vue'
 import PreviousResults from './PreviousResults.vue'
 import { onMounted, ref, watch } from 'vue'
-import { store, addResult } from '../store'
+import { store, addResult, removeResult } from '../store'
 import { formatResult } from '../helpers/resultFormatter'
 import { API_URL } from '../api'
 
@@ -29,6 +29,11 @@ async function getCalculation() {
   //store.currentResult = data.calculation
   addResult(formatResult(data.calculation))
   showResultModal.value = true
+}
+
+function closeResult(id) {
+  console.log(id)
+  removeResult(id)
 }
 </script>
 
@@ -61,17 +66,26 @@ async function getCalculation() {
           </button>
         </div>
         <div class="border">
-          <b-tabs card content-class="mt-3">
-            <!-- Result tabs.-->
-            <!--Always show JSON Mockdata result tab.-->
-            <b-tab v-for="result in [...store.currentResults]" :key="result.id">
-              <template #title>
-                Result {{ result.name }}
-                <VDismissButton />
-              </template>
-              <Result :result="result"
-            /></b-tab>
-          </b-tabs>
+          <template v-if="[...store.currentResults].length > 0">
+            <b-tabs card content-class="mt-3">
+              <!-- Result tabs.-->
+              <!--Always show JSON Mockdata result tab.-->
+              <b-tab
+                v-for="(result, index) in [...store.currentResults]"
+                :key="result.id"
+              >
+                <template #title>
+                  Result {{ result.name }}
+                  <VDismissButton @click.stop="closeResult(index)" />
+                </template>
+                <Result :result="result"
+              /></b-tab>
+            </b-tabs>
+          </template>
+          <p v-else>
+            No results to show, start a new experiment or choose a previous
+            experiment
+          </p>
         </div>
 
         <div

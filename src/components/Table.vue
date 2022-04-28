@@ -11,6 +11,7 @@ const emit = defineEmits([
   'loadResults',
   'loadMore',
   'paginationSort',
+  'changeColumns'
 ])
 const props = defineProps({
   overview: Boolean,
@@ -23,6 +24,10 @@ const props = defineProps({
   serverFile3: String,
   pagination: Boolean,
   caption: String,
+  expandable: Boolean,
+  headerOptions: Array,
+  userOptions: Array,
+  itemOptions: Array
 })
 
 const caption = ref('')
@@ -30,6 +35,10 @@ const entryAmount = ref(20)
 const deleteModalShow = ref(false)
 const editModalShow = ref(false)
 const viewModalShow = ref(false)
+const changeColumnsModalShow = ref(false)
+const checkedColumns = ref([])
+const itemColumns = ref([])
+const userColumns = ref([])
 const newName = ref('')
 const newTags = ref('')
 const newEmail = ref('')
@@ -48,6 +57,13 @@ const subheaders = computed(() => {
     }
   }
   return result
+})
+
+const sorted = computed(() => {
+  //console.log(props.results)
+
+  if (!props.pagination) return sort(sortindex.value)
+  else return props.results
 })
 
 async function editEntry() {
@@ -104,11 +120,6 @@ async function getResult() {
   const data = await response.json()
   metadataStr.value = data.result
 }
-
-const sorted = computed(() => {
-  if (!props.pagination) return sort(sortindex.value)
-  else return props.results
-})
 
 /**
  * Sorts data based on index.
@@ -192,12 +203,85 @@ function setsorting(i) {
     <h5>Here is the metadata:</h5>
     <p>{{ metadataStr }}</p>
   </b-modal>
+  
+  <!-- Modal used for changing the headers of the user recommendations table -->
+  <b-modal 
+    id="change-columns-modal"
+    v-model="changeColumnsModalShow"
+    title="Change columns"
+    @ok="$emit('changeColumns', checkedColumns, userColumns, itemColumns)"
+    >
+    <p>Check the extra columns you want to be shown</p>
+    
+    <p>General:</p>
+    <div class="form-check form-switch"
+      v-for="(header, index) in headerOptions"
+      :key="header"
+    >
+      <input 
+        v-model="checkedColumns"
+        class="form-check-input" 
+        type="checkbox" 
+        v-bind:value="header.name" 
+        v-bind:id="header.name">
+      <label 
+        class="form-check-label" 
+        v-bind:id="header.name">
+        {{ header.name }}
+      </label>
+    </div>
+
+    <p>User specific: </p>
+    <div class="form-check form-switch"
+      v-for="(header, index) in userOptions"
+      :key="header"
+    >
+      <input 
+        v-model="userColumns"
+        class="form-check-input" 
+        type="checkbox" 
+        v-bind:value="header.name" 
+        v-bind:id="header.name">
+      <label 
+        class="form-check-label" 
+        v-bind:id="header.name">
+        {{ header.name }}
+      </label>
+    </div>
+
+    <p>Item specific: </p>
+    <div class="form-check form-switch"
+      v-for="(header, index) in itemOptions"
+      :key="header"
+    >
+      <input 
+        v-model="itemColumns"
+        class="form-check-input" 
+        type="checkbox" 
+        v-bind:value="header.name" 
+        v-bind:id="header.name">
+      <label 
+        class="form-check-label" 
+        v-bind:id="header.name">
+        {{ header.name }}
+      </label>
+    </div>
+
+  </b-modal>
+
+  
 
   <b-table-simple hover striped responsive caption-top>
     <caption>
       {{
         props.caption
       }}
+       <template v-if="expandable">
+      <b-button 
+        @click="changeColumnsModalShow = !changeColumnsModalShow">  
+        change headers 
+      </b-button>
+    </template>
     </caption>
     <b-thead head-variant="dark">
       <b-tr>
@@ -233,7 +317,7 @@ function setsorting(i) {
           </b-td>
         </b-td>
 
-        <b-td>
+        <b-td v-if="overview || removable">
           <b-button
             v-if="overview"
             pill
@@ -259,6 +343,7 @@ function setsorting(i) {
       </b-tr>
     </b-tbody>
   </b-table-simple>
+
   <b-button
     v-if="pagination"
     @click="$emit('loadMore', false, entryAmount)"
@@ -282,4 +367,6 @@ function setsorting(i) {
     type="number"
     >20</b-form-input
   >
+
+  
 </template>

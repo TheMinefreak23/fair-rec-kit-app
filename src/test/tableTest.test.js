@@ -41,6 +41,26 @@ test('editTableItem', async () => {
   getByTitle('Editing results')
 })
 
+// test('pagination', async () => {
+//   const {getByText} = render(Table, {
+//     props: {
+//       caption: 'testcaption',
+//       results: [{foo: 2, bar: 2}],
+//       headers: [{ name: 'hello'}, { name: 'world'}],
+//       headerOptions: [{ name: 'hello'}, { name: 'world'}],
+//       userOptions: [{ name: 'hello'}, { name: 'world'}],
+//       itemOptions: [{ name: 'hello'}, { name: 'world'}],
+//       pagination: true,
+//       expandable: true
+//     },
+//   })
+
+//   getByText((content, button) => content.startsWith('Show'))
+
+//   await fireEvent.click(button)
+  
+// })
+
 // test('viewResult', async () => {
 //   const {getByText, getByTitle} = render(Table, {
 //     props: {
