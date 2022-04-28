@@ -1,4 +1,3 @@
-//import { log } from 'console'
 import { reactive } from 'vue'
 import mockdata from '../api/mock/1647818279_HelloWorld/results-table.json'
 
@@ -28,18 +27,8 @@ function addResult(result) {
 }
 
 //Remove result from global current shown results state
-function removeResult(result) {
-
-  for(var i=0; i<store.currentResults.length; i++){
-    
-    if(store.currentResults[i].id === result) {
-      store.currentResults.splice(i,1);
-      //ensures that the next item is not skipped
-      i--;
-
-    }
-    
-  }
-} 
+function removeResult(index) {
+  store.currentResults.splice(index, 1)
+}
 
 export { store, addResult, removeResult }

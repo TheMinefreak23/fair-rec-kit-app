@@ -6,7 +6,7 @@ import Result from './Result.vue'
 import VDismissButton from './VDismissButton.vue'
 import PreviousResults from './PreviousResults.vue'
 import { onMounted, ref, watch } from 'vue'
-import { store, addResult, removeResult} from '../store'
+import { store, addResult, removeResult } from '../store'
 import { formatResult } from '../helpers/resultFormatter'
 import { API_URL } from '../api'
 
@@ -70,16 +70,22 @@ function closeResult(id) {
             <b-tabs card content-class="mt-3">
               <!-- Result tabs.-->
               <!--Always show JSON Mockdata result tab.-->
-              <b-tab v-for="result in [...store.currentResults]" :key="result.id">
+              <b-tab
+                v-for="(result, index) in [...store.currentResults]"
+                :key="result.id"
+              >
                 <template #title>
                   Result {{ result.name }}
-                  <VDismissButton @click.stop="closeResult(result.id)"/>
+                  <VDismissButton @click.stop="closeResult(index)" />
                 </template>
                 <Result :result="result"
               /></b-tab>
             </b-tabs>
           </template>
-          <p v-else> No results to show, start a new experiment or choose a previous experiment</p>
+          <p v-else>
+            No results to show, start a new experiment or choose a previous
+            experiment
+          </p>
         </div>
 
         <div
