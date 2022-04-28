@@ -164,16 +164,10 @@ function setsorting(i) {
   >
     <h6>Please type in the new values. Blank fields will be left unchanged.</h6>
     Name:
-    <b-form-input 
-      v-model="newName" 
-      placeholder="New name"
-    ></b-form-input>
+    <b-form-input v-model="newName" placeholder="New name"></b-form-input>
     <br />
     Tags:
-    <b-form-input 
-      v-model="newTags" 
-      placeholder="New tags"
-    ></b-form-input>
+    <b-form-input v-model="newTags" placeholder="New tags"></b-form-input>
     <br />
     E-mail:
     <b-form-input
@@ -193,7 +187,7 @@ function setsorting(i) {
     <b-form-input type="password"></b-form-input>
   </b-modal>
 
-<!-- Shows the metadata of the designated entry -->s
+  <!-- Shows the metadata of the designated entry -->
   <b-modal id="view-modal" v-model="viewModalShow" title="Metadata" ok-only>
     <h5>Here is the metadata:</h5>
     <p>{{ metadataStr }}</p>
@@ -220,7 +214,7 @@ function setsorting(i) {
       </b-tr>
       <b-tr>
         <b-th v-if="overview"></b-th>
-        <b-th v-for="subheader in subheaders" :key="subheader">
+        <b-th v-for="(subheader, index) in subheaders" :key="subheader">
           {{ subheader }}
         </b-th>
       </b-tr>
@@ -252,8 +246,7 @@ function setsorting(i) {
             @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
             >View</b-button
           >
-          <template v-if="removable">
-          </template>
+          <template v-if="removable"> </template>
           <b-button
             v-if="removable"
             variant="danger"
