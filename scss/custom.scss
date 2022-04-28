@@ -6,7 +6,7 @@ $customsecondary:#eee;
 $customdark: #1c2541;
 $danger: #df4759;
 $darkdanger: shade-color($danger, 50);
-$secondary: #121212;
+//$secondary: #121212;
 
 @function shade-color($color, $weight) {
   @return mix(black, $color, $weight);
@@ -31,29 +31,58 @@ $subtle: rgb(80, 80, 80), rgb(104, 104, 104);
 }
 //give danger button gradient color
 .btn-danger {
-  @include gradient(bottom, $dangergradient);
-}
-.btn-danger {
   color: #fff;
+  @include gradient(bottom, $dangergradient);
 }
 
 // Override default variables.
 $primary: $customprimary;
 $secondary: $customsecondary;
 $dark: $customdark;
+$btn-danger-color: #fff;
 //$danger: #ffffff;
+
 
 // Default variable overrides
 $body-bg: #fff;
 $body-color: #111;
 
 
-// -- Darkmode Overrides -- //
 
-[data-theme="dark"] .someClass {
-  background-color: rgb(0,0,0);
-  border: 1px solid #6c757d;
-  color: #dee2e6;
-}
+// -- Themes -- //
+
+// Dark Mode Variables //
+$bg-dark: #121212;
+$text-dark: #fff;
+$secondary-dark: #313131;
+$card-dark: #212121;
+$form-dark: #414141;
+
+// Darkmode test
+$secondary: $secondary-dark;
+$body-color: $text-dark;
+$body-bg: $bg-dark;
+$card-bg: $card-dark;
+$input-bg: $form-dark;
+$input-border-color: $form-dark;
+$input-color: $text-dark;
+$nav-tabs-link-active-color: $text-dark;
+$nav-tabs-link-active-bg: $card-dark;
+$nav-tabs-border-color: $card-dark;
+$nav-tabs-link-active-border-color: $card-dark;
+$dropdown-bg: $card-dark;
+
+$themes: (
+  default: (
+
+  ),
+  dark: (
+    bg: $bg-dark,
+    text: $text-dark,
+    
+  ),
+);
+
+
 
 @import 'bootstrap/scss/bootstrap';

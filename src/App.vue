@@ -45,8 +45,8 @@ b-tab.success {
       </button>
       <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
         <li>
-          <div class="form-check form-switch p-2">
-             <p class="d-inline p-2">Dark Mode</p>
+          <div class="form-check form-switch px-2">
+             <p class="d-inline ps-2">Dark Mode</p>
             <input class="form-check-input mx-auto" type="checkbox" id="lightSwitch"/>
           </div>
         </li>
