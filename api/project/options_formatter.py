@@ -95,8 +95,8 @@ def create_available_options(recommender_system):
 
     # Add dynamic (nested settings) settings
     # MOCK: for now use all filters/metrics per dataset
-    filter_list = [{'name': 'filter', 'nested': False,
-                    'plural': 'filters', 'article': 'a', 'options': FILTERS}]
+    filter_list = [{'name': 'filter',
+                    'plural': 'filters', 'article': 'a', 'options': reformat(FILTERS, False)}]
 
     for dataset in datasets:
         dataset['params']['dynamic'] = filter_list
@@ -113,20 +113,6 @@ def create_available_options(recommender_system):
 
 
 def reformat_all(options, datasets, recommenders, predictors, metrics):
-    # Reformat an options list
-    def reformat_options(options):
-        # Add text and value fields
-        return list(map(lambda option: {'name': option['name'], 'value': option}, options))
-
-    # Reformat options for form usage
-    def reformat(options, nested):
-        if nested:
-            for option in options:
-                option['options'] = reformat_options(option['options'])
-        else:
-            options = reformat_options(options)
-
-        return options
 
     options['datasets'] = reformat(datasets, False)
     # options['approaches'] = APPROACHES
@@ -166,7 +152,11 @@ def config_dict_from_settings(computation):
             model_setting = approach
         models.setdefault(model_API_dict[model_name], []).append(model_setting)
 
-    evaluation = {'metrics': list(map(lambda metric: metric['name'], settings['metrics'])), 'filters': []}
+    #evaluation = {'metrics': list(map(lambda metric: metric['name'], settings['metrics'])), 'filters': []}
+
+    # TODO for now leave out the metrics
+    evaluation = {'metrics': [], 'filters': []}
+
     # evaluation = list(map(lambda metric: {'name': metric['name']}, settings['metrics']))  # TODO filters
 
     """
@@ -189,3 +179,20 @@ def config_dict_from_settings(computation):
 
     print(config_dict)
     return config_dict, id
+
+
+# Reformat an options list
+def reformat_options(options):
+    # Add text and value fields
+    return list(map(lambda option: {'name': option['name'], 'value': option}, options))
+
+
+# Reformat options for form usage
+def reformat(options, nested):
+    if nested:
+        for option in options:
+            option['options'] = reformat_options(option['options'])
+    else:
+        options = reformat_options(options)
+
+    return options

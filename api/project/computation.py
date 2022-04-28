@@ -50,6 +50,7 @@ def run_experiment(computation):
 
     # Create configuration dictionary
     config_dict, id = config_dict_from_settings(computation)
+
     # Save configuration to yaml file
     config_file_path = 'config_files/' + id
     with open(config_file_path + '.yml', 'w+') as config_file:
@@ -157,7 +158,7 @@ def evaluate_all(settings, approach, metric):
         if setting['filters']:
             for filter in setting['filters']:
                 evals = []
-                for parameter in filter['parameter']:
+                for parameter in filter['params']:
                     value = parameter['value']
                     # Just use the value if it's a number, otherwise use the length of the word.
                     filter_eval = value if type(value) == int else len(value)
@@ -173,8 +174,8 @@ def evaluate(approach, metric):
     value = len(approach['name']) * len(metric['name'])
 
     # Do something with the metrics parameters.
-    if hasattr(metric, 'parameter') and metric['parameter']:
-        for parameter in metric['parameter']:
+    if hasattr(metric, 'parameter') and metric['params']:
+        for parameter in metric['params']:
             value *= len(parameter['name'])
 
     return value
