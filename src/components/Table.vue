@@ -164,6 +164,7 @@ function setsorting(i) {
   >
     <p>Are you sure you want to remove this entry from the list?</p>
   </b-modal>
+
   <!--Shows when the user wants to edit an entry-->
   <b-modal
     id="edit-modal"
@@ -197,10 +198,8 @@ function setsorting(i) {
     <b-form-input type="password"></b-form-input>
   </b-modal>
 
-  <b-modal 
-    id="view-modal" 
-    v-model="viewModalShow" 
-    title="Metadata" ok-only>
+  <!-- Shows the metadata of the designated entry -->
+  <b-modal id="view-modal" v-model="viewModalShow" title="Metadata" ok-only>
     <h5>Here is the metadata:</h5>
     <p>{{ metadataStr }}</p>
   </b-modal>
@@ -331,9 +330,7 @@ function setsorting(i) {
             @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
             >View</b-button
           >
-          <template v-if="removable">
-            <!-- &nbsp;  -->
-          </template>
+          <template v-if="removable"> </template>
           <b-button
             v-if="removable"
             variant="danger"
