@@ -193,7 +193,7 @@ function setsorting(i) {
     <b-form-input type="password"></b-form-input>
   </b-modal>
 
-<!-- Shows the metadata of the designated entry -->s
+<!-- Shows the metadata of the designated entry -->
   <b-modal id="view-modal" v-model="viewModalShow" title="Metadata" ok-only>
     <h5>Here is the metadata:</h5>
     <p>{{ metadataStr }}</p>
