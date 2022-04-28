@@ -1,6 +1,9 @@
-# This program has been developed by students from the bachelor Computer Science at
-# Utrecht University within the Software Project course.
-# © Copyright Utrecht University (Department of Information and Computing Sciences)
+"""
+This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)
+"""
+
 from flask import (Blueprint, request)
 import pandas as pd
 
@@ -20,7 +23,10 @@ def result_by_id():
         data = request.get_json()
         result_storage.result_by_id(data['id'])
         print(data)
-        response = {'status': 'success'}
+        if result_storage.current_result:
+            response = {'status': 'success'}
+        else:
+            response = {'status': 'result not found'}
 
     else:  # GET request
         response = {'result': result_storage.current_result}
