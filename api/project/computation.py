@@ -1,95 +1,96 @@
-# This program has been developed by students from the bachelor Computer Science at
-# Utrecht University within the Software Project course.
-# © Copyright Utrecht University (Department of Information and Computing Sciences)
+"""
+This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)
+"""
+
 import json
 import threading
 import time
-import datetime
-import fairreckitlib
+from datetime import datetime
+
+from fairreckitlib.experiment.parsing.run import parse_experiment_config_from_yml
+from fairreckitlib.recommender_system import RecommenderSystem
+from fairreckitlib.experiment.config import *
 
 from flask import (Blueprint, request)
 
 from . import result_storage
+from .options_formatter import create_available_options, config_dict_from_settings
 
 compute_bp = Blueprint('computation', __name__, url_prefix='/api/computation')
 
-# Available settings from backend in json format, right now stored locally
-# TODO: retrieve settings from fairreckitlib
-
-DATASETS = json.load(open('project/parameters/datasets.json'))
-APPROACHES = json.load(open('project/parameters/approaches.json'))
-METRICS = json.load(open('project/parameters/metrics.json'))
-FILTERS = json.load(open('project/parameters/filters.json'))
-
-
-# Generate parameter data
-metric_categories = METRICS['categories']
-for category in metric_categories:
-    if category['text'] == 'Accuracy':
-        metric_params = {'values': [{'text': 'k', 'default': 10, 'min': 1, 'max': 20}]}
-    else:
-        metric_params = {}
-    category['options'] = list(map(lambda metric: {'text': metric, 'params': metric_params}, category['options']))
-    print(category)
-
-DEFAULTS = {'split': 80,
-            'recCount': {'min': 0, 'max': 100, 'default': 10},
-            }  # default values
+recommender_system = RecommenderSystem('datasets', 'results')
+options = create_available_options(recommender_system)
 
 computation_queue = []
 
 
 def calculate_first():
-    time.sleep(2.5)  # Mock computation duration.
+    """
+    Takes the oldest settings in the queue and performs an experiment with them
+    """
+    # TODO We need this delay for the queue to work fsr
+    time.sleep(0.1)
+    # Get the oldest computation from the queue.
+    computation = computation_queue.pop()
 
-    computation = computation_queue.pop()  # Get the oldest computation from the queue.
-
-    settings = computation['settings']
-    # Mocks result computation. TODO compute result with libs here
-    result = []
-    datasets = settings['datasets']
-    for dataset in datasets:
-        recs = []
-        for approach in settings['approaches']:
-            recommendation = {'approach': approach['name'],'recommendation': recommend(dataset, approach), 'evals': []}
-            for metric in settings['metrics']:
-                evaluation = evaluate_all(dataset['settings'], approach, metric)
-
-                recommendation['evals'].append({'name': metric['name'], 'evaluation': evaluation})
-            recs.append(recommendation)
-        result.append({'dataset': dataset, 'recs': recs})
-
-    result_storage.save_result(computation, result)
+    run_experiment(computation)
+    #mock_computation(computation)
 
 
 computation_thread = threading.Thread(target=calculate_first)
 
 
+def run_experiment(computation):
+    """
+    Runs an experiment and saves the result
+    """
+    print(computation)
+
+    # Create configuration dictionary
+    config_dict, id = config_dict_from_settings(computation)
+    # Save configuration to yaml file
+    config_file_path = 'config_files/' + id
+    with open(config_file_path + '.yml', 'w+') as config_file:
+        yaml.dump(config_dict, config_file)
+
+    recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)
+    result_storage.save_result(computation, mock_result(computation['settings']))  # TODO get real recs&eval result
+
+
+def mock_computation(computation):
+    """
+    Mocks running an experiment and saves the mock result
+    """
+    # Mock computation duration
+    time.sleep(2.5)
+    result_storage.save_result(computation, mock_result(computation['settings']))
+
+
+def mock_result(settings):
+    """
+    Mocks result computation.
+    """
+    result = []
+    datasets = settings['datasets']
+    for dataset in datasets:
+        recs = []
+        for approach in settings['approaches']:
+            recommendation = {'approach': approach['name'], 'recommendation': recommend(dataset, approach), 'evals': []}
+            for metric in settings['metrics']:
+                evaluation = evaluate_all(dataset['settings'], approach, metric)
+                recommendation['evals'].append({'name': metric['name'], 'evaluation': evaluation})
+            recs.append(recommendation)
+        result.append({'dataset': dataset, 'recs': recs})
+    return result
+
+
 # Route: Send selection options.
 @compute_bp.route('/options', methods=['GET'])
 def params():
-    options = {}
-
-    print(METRICS)
-    options['defaults'] = DEFAULTS
-    # options['filters'] = FILTERS
-
-    # MOCK: for now use all filters/metrics per dataset
-    for dataset in DATASETS:
-        dataset['params']['dynamic']= [{'name': 'filter', 'nested': False,
-                                   'plural': 'filters', 'article': 'a', 'options': FILTERS}]
-
-    for metric in METRICS['categories']:
-        print(metric)
-        metric['options'][0]['params']['dynamic']= [{'name': 'result filter', 'nested': False,
-                                  'plural': 'Result filters', 'article': 'a', 'options': FILTERS}]
-    options['datasets'] = DATASETS
-    options['approaches'] = APPROACHES
-    options['metrics'] = METRICS
-
-
     response = {'options': options}
-    print(response)
+    # print(response)
     return response
 
 
@@ -100,16 +101,18 @@ def calculate():
     if request.method == 'POST':
         data = request.get_json()
         settings = data.get('settings')
-        print(data)
+        # print(data)
         append_queue(data.get('metadata'), settings)
 
         # response = {'status': 'success'}
         response = json.dumps(computation_queue)
     else:
+        # Wait until the current computation is done
+        global computation_thread
         if computation_thread.is_alive():
             computation_thread.join()
         response['calculation'] = result_storage.newest_result()
-        print(response)
+    print('/calculation response:',response)
     return response
 
 
@@ -117,12 +120,18 @@ def calculate():
 def queue():
     # Handle computation thread.
     global computation_thread
+    # If the thread is running, wait until it's done.
     if computation_thread.is_alive():
         computation_thread.join()
+    # Else, if the queue isn't empty, start a thread to compute the oldest entry.
     elif computation_queue:
         print('Starting computation thread')
         computation_thread = threading.Thread(target=calculate_first)
         computation_thread.start()
+    else:
+        print('error')
+
+    print('queue:',computation_queue)
     return json.dumps(computation_queue)
 
 
@@ -143,12 +152,9 @@ def evaluate_all(settings, approach, metric):
     base_eval = evaluate(approach, metric)
     evaluation = {'global': base_eval, 'filtered': []}
 
-    print(settings)
     for setting in settings:
-        print(setting)
         # Evaluate per filter
         if setting['filters']:
-            print(setting['filters'])
             for filter in setting['filters']:
                 evals = []
                 for parameter in filter['parameter']:
@@ -156,7 +162,7 @@ def evaluate_all(settings, approach, metric):
                     # Just use the value if it's a number, otherwise use the length of the word.
                     filter_eval = value if type(value) == int else len(value)
                     val = "%.2f" % (base_eval * len(filter['name']) / filter_eval)
-                    evals.append({parameter['name']+' '+str(value):val})
+                    evals.append({parameter['name'] + ' ' + str(value): val})
                 evaluation['filtered'].append({filter['name']: evals})
 
     return evaluation
@@ -177,8 +183,8 @@ def evaluate(approach, metric):
 # add a computation request to the queue
 def append_queue(metadata, settings):
     timestamp = time.time()
-    now = datetime.datetime.now()
+    now = datetime.now()
     current_dt = now.strftime('%Y-%m-%dT%H:%M:%S') + ('-%02d' % (now.microsecond / 10000))
-    current_request = {'timestamp': {'stamp': timestamp, 'datetime': current_dt}, 'metadata': metadata,
+    current_request = {'timestamp': {'stamp': str(int(timestamp)), 'datetime': current_dt}, 'metadata': metadata,
                        'settings': settings}
     computation_queue.append(current_request)

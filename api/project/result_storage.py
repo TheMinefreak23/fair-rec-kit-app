@@ -1,12 +1,10 @@
-# This program has been developed by students from the bachelor Computer Science at
-# Utrecht University within the Software Project course.
-# © Copyright Utrecht University (Department of Information and Computing Sciences)
-import csv  # TODO fix this import
+"""
+This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)
+"""
 import json
 import os
-from csv import writer
-import time
-import datetime
 
 # Results overview format
 # timestamp (ID)
