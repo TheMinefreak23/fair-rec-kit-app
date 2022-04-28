@@ -192,7 +192,7 @@ tr:nth-child(even) {
 }
 
 .sidenav a {
-  padding: 8px 8px 8px 32px;
+  padding: 2px 2px 8px 15px;
   text-decoration: none;
   font-size: 15px;
   color: #818181;
