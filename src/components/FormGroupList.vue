@@ -5,6 +5,7 @@ import {
   capitalise,
   underscoreToSpace,
 } from '../helpers/resultFormatter'
+//import { selectionOptions } from '../helpers/optionsFormatter'
 
 //const emit = defineEmits(['formChange'])
 const props = defineProps({
@@ -40,15 +41,18 @@ onMounted(() => {
 })
 
 watch(
-  () => { // Watch for the changing of options
+  () => {
+    // Watch for the changing of options
     return props.options
   },
-  () => { // Update form if this changes
+  () => {
+    // Update form if this changes
     update()
   },
-  { // Make sure this does not trigger on initialization
+  {
+    // Make sure this does not trigger on initialization
     immediate: false,
-    deep: true
+    deep: true,
   }
 )
 
@@ -133,8 +137,9 @@ function chooseLabel(name) {
 function copyItem(i) {
   groupCount.value++ //Add a new item
   form.value.main[groupCount.value - 1] = form.value.main[i] //Copy the selected value to the new item
-  
-  if (form.value.inputs[i]) { //Copy textfield options (if applicable)
+
+  if (form.value.inputs[i]) {
+    //Copy textfield options (if applicable)
     form.value.inputs[groupCount.value - 1] = form.value.inputs[i].map(
       (param) => ({
         name: param.name,
@@ -142,7 +147,8 @@ function copyItem(i) {
       })
     )
   }
-  if (form.value.selects[i]) { //Copy select options (if applicable)
+  if (form.value.selects[i]) {
+    //Copy select options (if applicable)
     form.value.selects[groupCount.value - 1] = form.value.selects[i].map(
       (param) => ({
         name: param.name,
@@ -150,7 +156,8 @@ function copyItem(i) {
       })
     )
   }
-  if (form.value.lists[i]) { //Copy nested option list (if applicable)
+  if (form.value.lists[i]) {
+    //Copy nested option list (if applicable)
     form.value.lists[groupCount.value - 1] = form.value.lists[i].map(
       (param) => ({
         name: param.name,
@@ -161,17 +168,34 @@ function copyItem(i) {
 }
 //Update the options that cannot be be submitted due to changing experiment type (
 function update() {
-  let entries = flattenOptions().map((entry) => entry.text)
+  let entries = flattenOptions().map((entry) => entry.name)
+  //console.log(entries)
+  const deleteEntry = 'NULL'
   for (let i = 0; i < form.value.main.length; i++) {
-    if (!entries.includes(form.value.main[i])) {
+    if (!entries.includes(form.value.main[i].name)) {
       //every entry that does not exist in the list of option should be removed
       //Non-existing entries are replaced with a null entry
-      form.value.main.splice(i, 1, null)
-      form.value.selects.splice(i, 1, null)
-      form.value.inputs.splice(i, 1, null)
-      form.value.lists.splice(i, 1, null)
+      form.value.main[i] = deleteEntry
+      form.value.selects[i] = deleteEntry
+      form.value.inputs[i] = deleteEntry
+      form.value.lists[i] = deleteEntry
+      if (props.required && groupCount.value > 1) groupCount.value--
     }
   }
+  console.log(form.value.main)
+  // Filter null values
+  form.value.main = form.value.main.filter((x) => x != deleteEntry)
+  form.value.selects = form.value.selects.filter((x) => x != deleteEntry)
+  form.value.inputs = form.value.inputs.filter((x) => x != deleteEntry)
+  form.value.lists = form.value.lists.filter((x) => x != deleteEntry)
+  console.log(form.value.main)
+}
+// Flatten options API structure
+function flattenOptions() {
+  return props.options
+    .map((category) => category.options)
+    .concat()
+    .flat()
 }
 // Flatten options API structure
 function flattenOptions() {
@@ -205,11 +229,23 @@ function flattenOptions() {
                   :required="required"
                 >
                   <template #first>
-                    <b-form-select-option value="" disabled
+                    <b-form-select-option :value="null" disabled
                       >Choose..</b-form-select-option
                     >
                   </template>
                 </b-form-select>
+                <b-button
+                  v-if="form.main[i - 1]"
+                  @click="copyItem(i - 1)"
+                  variant="primary"
+                  >Copy {{ name }}...</b-button
+                >
+                  <template #first>
+                    <b-form-select-option value="" disabled
+                      >Choose..</b-form-select-option
+                    >
+                  </template>
+                
               </b-form-group>
             </b-col>
 
@@ -305,7 +341,7 @@ function flattenOptions() {
                     required
                   >
                     <template #first>
-                      <b-form-select-option value="" disabled
+                      <b-form-select-option :value="null" disabled
                         >Choose..</b-form-select-option
                       >
                     </template>
