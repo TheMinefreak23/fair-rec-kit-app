@@ -84,7 +84,7 @@ def user_result():
     recs = result_storage.current_recs
 
     ##sort dataframe based on index and ascending or not
-    dfSorted = recs.sort_values(by=recs.columns[json.get("sortindex", 0)], ascending=json.get("ascending"))
+    df_sorted = recs.sort_values(by=recs.columns[json.get("sortindex", 0)], ascending=json.get("ascending"))
 
     # getting only chunk of data
     startrows = json.get("start", 0)
@@ -93,12 +93,14 @@ def user_result():
     endrows = int(endrows)
 
     # determine if at the end of the dataset
-    columns_number = len(dfSorted)
-    if (endrows > columns_number):
+    columns_number = len(df_sorted)
+    if endrows > columns_number:
         endrows = columns_number
 
     # return part of table that should be shown
-    dfSubset = dfSorted[startrows:endrows]
+    df_subset = df_sorted[startrows:endrows]
 
     # return {'results': dfSubset.to_json(orient='records'), 'caption': 'hellofriend'}
-    return dfSubset.to_json(orient='records')
+    return df_subset.to_json(orient='records')
+
+

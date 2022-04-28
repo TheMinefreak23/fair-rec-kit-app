@@ -121,9 +121,6 @@ function changeColumns(generalHeader, userHeader, itemHeader){
   getUserRecs()
 }
 
-function handleScroll() {
-  console.log('test')
-}
 </script>
 
 <template>
