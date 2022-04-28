@@ -1,10 +1,11 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import {
   article,
   capitalise,
   underscoreToSpace,
 } from '../helpers/resultFormatter'
+//import { selectionOptions } from '../helpers/optionsFormatter'
 
 //const emit = defineEmits(['formChange'])
 const props = defineProps({
@@ -38,6 +39,22 @@ onMounted(() => {
   form.value.name = props.plural
   //console.log(props.name, 'options', props.options)
 })
+
+watch(
+  () => {
+    // Watch for the changing of options
+    return props.options
+  },
+  () => {
+    // Update form if this changes
+    update()
+  },
+  {
+    // Make sure this does not trigger on initialization
+    immediate: false,
+    deep: true,
+  }
+)
 
 // Set default values for the group parameters.
 function setParameter(i, option) {
@@ -115,6 +132,71 @@ function hasDynamic(index) {
 function chooseLabel(name) {
   return 'Choose ' + article(name) + ' ' + underscoreToSpace(name)
 }
+
+// Copies the selected item and puts it at the end of the list
+function copyItem(i) {
+  groupCount.value++ //Add a new item
+  form.value.main[groupCount.value - 1] = form.value.main[i] //Copy the selected value to the new item
+
+  if (form.value.inputs[i]) {
+    //Copy textfield options (if applicable)
+    form.value.inputs[groupCount.value - 1] = form.value.inputs[i].map(
+      (param) => ({
+        name: param.name,
+        value: param.value,
+      })
+    )
+  }
+  if (form.value.selects[i]) {
+    //Copy select options (if applicable)
+    form.value.selects[groupCount.value - 1] = form.value.selects[i].map(
+      (param) => ({
+        name: param.name,
+        value: param.value,
+      })
+    )
+  }
+  if (form.value.lists[i]) {
+    //Copy nested option list (if applicable)
+    form.value.lists[groupCount.value - 1] = form.value.lists[i].map(
+      (param) => ({
+        name: param.name,
+        value: param.value,
+      })
+    )
+  }
+}
+//Update the options that cannot be be submitted due to changing experiment type (
+function update() {
+  let entries = flattenOptions().map((entry) => entry.name)
+  //console.log(entries)
+  const deleteEntry = 'NULL'
+  for (let i = 0; i < form.value.main.length; i++) {
+    if (!entries.includes(form.value.main[i].name)) {
+      //every entry that does not exist in the list of option should be removed
+      //Non-existing entries are replaced with a null entry
+      form.value.main[i] = deleteEntry
+      form.value.selects[i] = deleteEntry
+      form.value.inputs[i] = deleteEntry
+      form.value.lists[i] = deleteEntry
+      if (props.required && groupCount.value > 1) groupCount.value--
+    }
+  }
+  console.log(form.value.main)
+  // Filter null values
+  form.value.main = form.value.main.filter((x) => x != deleteEntry)
+  form.value.selects = form.value.selects.filter((x) => x != deleteEntry)
+  form.value.inputs = form.value.inputs.filter((x) => x != deleteEntry)
+  form.value.lists = form.value.lists.filter((x) => x != deleteEntry)
+  console.log(form.value.main)
+}
+// Flatten options API structure
+function flattenOptions() {
+  return props.options
+    .map((category) => category.options)
+    .concat()
+    .flat()
+}
 </script>
 
 <template>
@@ -140,11 +222,23 @@ function chooseLabel(name) {
                   :required="required"
                 >
                   <template #first>
-                    <b-form-select-option value="" disabled
+                    <b-form-select-option :value="null" disabled
                       >Choose..</b-form-select-option
                     >
                   </template>
                 </b-form-select>
+                <b-button
+                  v-if="form.main[i - 1]"
+                  @click="copyItem(i - 1)"
+                  variant="primary"
+                  >Copy {{ name }}...</b-button
+                >
+                  <template #first>
+                    <b-form-select-option value="" disabled
+                      >Choose..</b-form-select-option
+                    >
+                  </template>
+                
               </b-form-group>
             </b-col>
 
@@ -240,7 +334,7 @@ function chooseLabel(name) {
                     required
                   >
                     <template #first>
-                      <b-form-select-option value="" disabled
+                      <b-form-select-option :value="null" disabled
                         >Choose..</b-form-select-option
                       >
                     </template>
