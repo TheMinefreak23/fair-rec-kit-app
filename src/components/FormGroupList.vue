@@ -173,6 +173,13 @@ function update() {
     }
   }
 }
+// Flatten options API structure
+function flattenOptions() {
+  return props.options
+    .map((category) => category.options)
+    .concat()
+    .flat()
+}
 </script>
 
 <template>
