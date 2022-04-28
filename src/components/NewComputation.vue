@@ -34,7 +34,7 @@ async function getOptions() {
   const response = await fetch(API_URL + '/computation/options')
   const data = await response.json()
   options.value = data.options
-  //console.log(options.value)
+  console.log(options.value)
 }
 
 // POST request: Send form to server.
@@ -50,7 +50,7 @@ async function sendToServer() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ metadata: metadata.value, settings: sendForm }),
   }
-  console.log(sendForm)
+  console.log('sendForm', sendForm)
   const response = await fetch(
     API_URL + '/computation/calculation',
     requestOptions
@@ -90,9 +90,8 @@ function reformat(property) {
   for (let i in property.main) {
     let params = null
     if (property.lists[i] != null) {
-      //console.log(property.lists[i])
       choices[i] = {
-        name: property.main[i],
+        name: property.main[i].name,
         settings: property.lists[i].map((setting) => ({
           [setting.name]: reformat(setting),
         })),
@@ -100,10 +99,12 @@ function reformat(property) {
     } else {
       if (property.inputs[i] != null) params = property.inputs[i]
       else if (property.selects[i] != null) params = property.selects[i]
-      choices[i] = { name: property.main[i], params: params }
+      choices[i] = { name: property.main[i].name, params: params }
       //console.log('choices:' + choices)
     }
+    //console.log(choices[i])
   }
+
   return choices
 }
 </script>
@@ -155,7 +156,6 @@ function reformat(property) {
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
               <FormGroupList
                 v-model:data="form.approaches"
-                :nested="true"
                 name="approach"
                 plural="Recommender approaches"
                 selectName="an approach"
@@ -204,7 +204,6 @@ function reformat(property) {
                     ? options.metrics
                     : options.metrics.slice(1)
                 "
-                :nested="true"
               />
             </div>
 

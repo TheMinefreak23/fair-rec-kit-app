@@ -20,7 +20,7 @@ from .options_formatter import create_available_options, config_dict_from_settin
 
 compute_bp = Blueprint('computation', __name__, url_prefix='/api/computation')
 
-recommender_system = RecommenderSystem('../../../datasets', 'results')
+recommender_system = RecommenderSystem('datasets', 'results')
 options = create_available_options(recommender_system)
 
 computation_queue = []
@@ -80,7 +80,6 @@ def mock_result(settings):
             recommendation = {'approach': approach['name'], 'recommendation': recommend(dataset, approach), 'evals': []}
             for metric in settings['metrics']:
                 evaluation = evaluate_all(dataset['settings'], approach, metric)
-
                 recommendation['evals'].append({'name': metric['name'], 'evaluation': evaluation})
             recs.append(recommendation)
         result.append({'dataset': dataset, 'recs': recs})
