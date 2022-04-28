@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import {
   article,
   capitalise,
@@ -38,6 +38,19 @@ onMounted(() => {
   form.value.name = props.plural
   //console.log(props.name, 'options', props.options)
 })
+
+watch(
+  () => { // Watch for the changing of options
+    return props.options
+  },
+  () => { // Update form if this changes
+    update()
+  },
+  { // Make sure this does not trigger on initialization
+    immediate: false,
+    deep: true
+  }
+)
 
 // Set default values for the group parameters.
 function setParameter(i, option) {
@@ -114,6 +127,51 @@ function hasDynamic(index) {
 
 function chooseLabel(name) {
   return 'Choose ' + article(name) + ' ' + underscoreToSpace(name)
+}
+
+// Copies the selected item and puts it at the end of the list
+function copyItem(i) {
+  groupCount.value++ //Add a new item
+  form.value.main[groupCount.value - 1] = form.value.main[i] //Copy the selected value to the new item
+  
+  if (form.value.inputs[i]) { //Copy textfield options (if applicable)
+    form.value.inputs[groupCount.value - 1] = form.value.inputs[i].map(
+      (param) => ({
+        name: param.name,
+        value: param.value,
+      })
+    )
+  }
+  if (form.value.selects[i]) { //Copy select options (if applicable)
+    form.value.selects[groupCount.value - 1] = form.value.selects[i].map(
+      (param) => ({
+        name: param.name,
+        value: param.value,
+      })
+    )
+  }
+  if (form.value.lists[i]) { //Copy nested option list (if applicable)
+    form.value.lists[groupCount.value - 1] = form.value.lists[i].map(
+      (param) => ({
+        name: param.name,
+        value: param.value,
+      })
+    )
+  }
+}
+//Update the options that cannot be be submitted due to changing experiment type (
+function update() {
+  let entries = flattenOptions().map((entry) => entry.text)
+  for (let i = 0; i < form.value.main.length; i++) {
+    if (!entries.includes(form.value.main[i])) {
+      //every entry that does not exist in the list of option should be removed
+      //Non-existing entries are replaced with a null entry
+      form.value.main.splice(i, 1, null)
+      form.value.selects.splice(i, 1, null)
+      form.value.inputs.splice(i, 1, null)
+      form.value.lists.splice(i, 1, null)
+    }
+  }
 }
 </script>
 

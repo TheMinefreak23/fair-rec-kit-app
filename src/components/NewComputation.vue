@@ -179,14 +179,14 @@ function reformat(property) {
                   v-model="form.recommendations"
                 />
                 <p>{{ form.recommendations }}</p>
-                <!--  No longer feasible from a back-end perspective -Bug V22H-194
-              <b-form-checkbox
-              v-model="form.includeRatedItems"
-              buttons
-              button-variant="outline-primary"
-              required
-              >Include already rated items in recommendations</b-form-checkbox
-            >-->
+                <b-form-checkbox
+                  v-model="form.includeRatedItems"
+                  buttons
+                  button-variant="outline-primary"
+                  required
+                  >Include already rated items in
+                  recommendations</b-form-checkbox
+                >
               </b-form-group>
             </div>
           </b-col>
