@@ -16,11 +16,13 @@ const props = defineProps({
 
 //const computations = ref([])
 const headers = ref([
+  { name: 'ID' },
   { name: 'Date Time' },
   { name: 'Name' },
   { name: 'Datasets' },
   { name: 'Approaches' },
   { name: 'Metrics' },
+  { name: '' },
 ])
 
 //Retrieve the queue when the page is loaded
@@ -32,9 +34,8 @@ onMounted(() => {
 watch(
   () => store.queue,
   (data, oldQueue) => {
-    // queue got bigger
-    //console.log(data)
-    //if (data.length > oldQueue.length) getComputations()
+    console.log('queue watch new queue:', data)
+    //console.log('queue watch old queue:', oldQueue)
     if (data.length != 0) {
       getComputations()
       emit('computing')
@@ -49,6 +50,9 @@ watch(
 async function getComputations() {
   const response = await fetch(API_URL + '/computation/queue')
   const data = await response.json()
+  //store.queue = formatResults(data).map(x=>x.omit(x,'ID'))
+  //store.queue = formatResults(data)
+  //console.log(data)
   store.queue = data
 }
 
@@ -58,17 +62,16 @@ async function cancelComputation() {
 </script>
 
 <template>
-  <div class="text-center py-2 mx-5">
-    <h3>Active Computations</h3>
-    <Table
-      :results="store.queue"
-      :headers="headers"
-      :buttonText="'Cancel'"
-      :removable="true"
-      :serverFile="API_URL + '/computation/queue/delete'"
-    />
-    <!--Temporary test buttons-->
-    <b-button @click="$emit('computing')">Computing</b-button>
-    <b-button @click="$emit('done')">Done</b-button>
-  </div>
+  <b-card>
+    <div class="text-center py-2 mx-5">
+      <h3>Queue</h3>
+      <Table
+        :results="formatResults(store.queue)"
+        :headers="headers"
+        buttonText="Cancel"
+        :removable="true"
+        serverFile="/computation/queue/delete"
+      />
+    </div>
+  </b-card>
 </template>

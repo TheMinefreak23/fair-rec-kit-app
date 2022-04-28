@@ -1,10 +1,15 @@
 <script setup>
+/*This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import Table from './Table.vue'
 import { onMounted, ref, watch } from 'vue'
 import { formatResults, formatResult } from '../helpers/resultFormatter.js'
 
-import { store } from '../store.js'
+import { addResult, store } from '../store.js'
 import { API_URL } from '../api'
+
+const emit = defineEmits(['goToResult'])
 
 const exResults = ref([
   { id: 1, age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
@@ -27,16 +32,13 @@ const ex1CurrentPage = ref(1)
 const ex1PerPage = ref(10)
 const ex1Rows = ref(100)
 
-const testMessage = ref('')
-const results = ref([])
-
 onMounted(() => {
   getResults()
 })
 
 watch(
-  () => store.currentResult,
-  (result) => {
+  () => store.currentResults,
+  () => {
     getResults()
   }
 )
@@ -44,10 +46,8 @@ watch(
 async function getResults() {
   const response = await fetch(API_URL + '/all-results')
   const data = await response.json()
-  console.log(data)
   let allResults = data.all_results
-  results.value = formatResults(allResults)
-  //console.log(results.value)
+  store.allResults = formatResults(allResults)
 }
 
 const url = API_URL + '/all-results/result-by-id'
@@ -70,24 +70,27 @@ async function loadResult(resultId) {
 async function getResult() {
   const response = await fetch(url)
   const data = await response.json()
-  store.currentResult = formatResult(data.result)
-  console.log(store.currentResult)
+  addResult(formatResult(data.result))
+  emit('goToResult')
 }
 </script>
 
 <template>
-  <div class="text-center py-2 mx-5">
-    <h3>Previous results</h3>
-    <Table
-      @loadResult="loadResult"
-      :results="results"
-      :headers="headers"
-      :buttonText="'Remove'"
-      :removable="true"
-      :overview="true"
-      :serverFile="API_URL + '/all-results/delete'"
-      :serverFile2="API_URL + '/all-results/edit'"
-    />
-    <p>{{ testMessage }}</p>
-  </div>
+  <b-card>
+    <div class="text-center py-2 mx-5">
+      <h3>Previous results</h3>
+      <Table
+        @loadResult="loadResult"
+        @loadResults="getResults"
+        :results="store.allResults"
+        :headers="headers"
+        buttonText="Remove"
+        :removable="true"
+        :overview="true"
+        serverFile="/all-results/delete"
+        serverFile2="/all-results/edit"
+        serverFile3="/all-results/result-by-id"
+      />
+    </div>
+  </b-card>
 </template>

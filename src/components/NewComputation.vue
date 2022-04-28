@@ -4,21 +4,25 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import { onMounted, ref, watch } from 'vue'
 import FormGroupList from './FormGroupList.vue'
-import { sendMockData } from '../test/mockComputation.js'
+import { sendMockData } from '../test/mockComputationOptions.js'
 import { store } from '../store.js'
-import { formatResult } from '../helpers/resultFormatter.js'
 import { API_URL } from '../api'
 
 const result = ref({})
 const options = ref()
 const form = ref({
-  datasets: { main: [], inputs: [], selects: [] },
-  metrics: { main: [], inputs: [], selects: [] },
-  approaches: { main: [], inputs: [], selects: [] },
-  filters: { main: [], inputs: [], selects: [] },
+  datasets: emptyFormGroup(),
+  metrics: emptyFormGroup(),
+  approaches: emptyFormGroup(),
+  //filters: emptyFormGroup(),
   splitMethod: 'random', //The default split method.
+  computationMethod: 'recommendation',
 })
 const metadata = ref({})
+const splitOptions = [
+  { text: 'Random', value: 'random' },
+  { text: 'Time', value: 'time' },
+]
 
 onMounted(async () => {
   await getOptions()
@@ -36,17 +40,17 @@ async function getOptions() {
 // POST request: Send form to server.
 async function sendToServer() {
   var sendForm = { ...form.value } // clone
-  sendForm.approaches = reformat(form.value.approaches)
-  sendForm.metrics = reformat(form.value.metrics)
-  sendForm.datasets = reformat(form.value.datasets)
-  sendForm.filters = reformat(form.value.filters)
+
+  sendForm.approaches = reformat(sendForm.approaches)
+  sendForm.metrics = reformat(sendForm.metrics)
+  sendForm.datasets = reformat(sendForm.datasets)
 
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ metadata: metadata.value, settings: sendForm }),
   }
-  console.log(sendForm)
+  console.log('sendForm', sendForm)
   const response = await fetch(
     API_URL + '/computation/calculation',
     requestOptions
@@ -54,8 +58,9 @@ async function sendToServer() {
 
   // Update queue
   const data = response.json()
-  //if (data.status == 'success') getComputations()
+  //console.log('calculation route response:', data)
   store.queue = data
+  //console.log('queue:', store.queue)
 }
 
 async function initForm() {
@@ -66,15 +71,16 @@ async function initForm() {
   form.value.datasets = emptyFormGroup()
   form.value.metrics = emptyFormGroup()
   form.value.approaches = emptyFormGroup()
-  form.value.filters = emptyFormGroup()
+  //form.value.filters = emptyFormGroup()
   form.value.recommendations = options.value.defaults.recCount.default
   form.value.split = options.value.defaults.split
   form.value.splitMethod = 'random'
+  form.value.computationMethod = 'recommendation'
   //form.value.result.value = {}
 }
 
 function emptyFormGroup() {
-  return { main: [], inputs: [], selects: [] }
+  return { main: [], inputs: [], selects: [], lists: [] }
 }
 
 // Change the form format (SoA) into a managable data format (AoS)
@@ -82,12 +88,23 @@ function emptyFormGroup() {
 function reformat(property) {
   let choices = []
   for (let i in property.main) {
-    let parameter = null
-    if (property.inputs[i] != null) parameter = property.inputs[i]
-    else if (property.selects[i] != null) parameter = property.selects[i]
-    choices[i] = { name: property.main[i], parameter: parameter }
-    //console.log('choices:' + choices)
+    let params = null
+    if (property.lists[i] != null) {
+      choices[i] = {
+        name: property.main[i].name,
+        settings: property.lists[i].map((setting) => ({
+          [setting.name]: reformat(setting),
+        })),
+      }
+    } else {
+      if (property.inputs[i] != null) params = property.inputs[i]
+      else if (property.selects[i] != null) params = property.selects[i]
+      choices[i] = { name: property.main[i].name, params: params }
+      //console.log('choices:' + choices)
+    }
+    //console.log(choices[i])
   }
+
   return choices
 }
 </script>
@@ -100,10 +117,17 @@ function reformat(property) {
         <b-row>
           <b-col class="g-0">
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
+              <h3>Computation type</h3>
+              <b-form-radio-group v-model="form.computationMethod">
+                <b-form-radio value="recommendation"
+                  >Recommendation (default)</b-form-radio
+                >
+                <b-form-radio value="prediction">Prediction</b-form-radio>
+              </b-form-radio-group>
               <!--User can select a dataset.-->
               <FormGroupList
                 v-model:data="form.datasets"
-                name="Dataset"
+                name="dataset"
                 plural="Datasets"
                 selectName="a dataset"
                 :options="options.datasets"
@@ -111,13 +135,13 @@ function reformat(property) {
               />
 
               <!--User can select optional filters-->
-              <FormGroupList
+              <!--<FormGroupList
                 v-model:data="form.filters"
                 name="filter"
                 plural="Filters"
                 selectName="a filter"
                 :options="options.filters"
-              />
+              />-->
 
               <!--User provides an optional rating conversion-->
               <b-form-group label="Select a rating conversion">
@@ -132,15 +156,22 @@ function reformat(property) {
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
               <FormGroupList
                 v-model:data="form.approaches"
-                nested="true"
                 name="approach"
                 plural="Recommender approaches"
                 selectName="an approach"
-                :options="options.approaches.libraries"
+                :options="
+                  form.computationMethod == 'recommendation'
+                    ? options.recommenders
+                    : options.predictors
+                "
+                :required="true"
               />
 
               <!--User can select the amount of recommendations per user -->
-              <b-form-group label="Select number of recommendations per user:">
+              <b-form-group
+                v-if="form.computationMethod == 'recommendation'"
+                label="Select number of recommendations per user:"
+              >
                 <b-form-input
                   type="range"
                   :min="options.defaults.recCount.min"
@@ -148,50 +179,19 @@ function reformat(property) {
                   v-model="form.recommendations"
                 />
                 <p>{{ form.recommendations }}</p>
-                <!--  No longer feasible from a back-end perspective -Bug V22H-194
-              <b-form-checkbox
-              v-model="form.includeRatedItems"
-              buttons
-              button-variant="outline-primary"
-              required
-              >Include already rated items in recommendations</b-form-checkbox
-            >-->
+                <b-form-checkbox
+                  v-model="form.includeRatedItems"
+                  buttons
+                  button-variant="outline-primary"
+                  required
+                  >Include already rated items in
+                  recommendations</b-form-checkbox
+                >
               </b-form-group>
             </div>
           </b-col>
 
-          <b-col class="g-0">
-            <!--Input for train/test split-->
-            <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
-              <h3 class="text-center">Train/test-split</h3>
-              <b-form-group label="Select test/train split:">
-                <b-form-input
-                  type="range"
-                  min="0"
-                  max="100"
-                  step="5"
-                  id="customRange"
-                  v-model="form.split"
-                ></b-form-input>
-                <div class="text-center">
-                  <p class="d-inline px-5">
-                    <strong>Train: </strong><i>{{ form.split }}</i>
-                  </p>
-                  <p class="d-inline px-5">
-                    <strong>Test: </strong><i>{{ 100 - form.split }}</i>
-                  </p>
-                </div>
-              </b-form-group>
-
-              <!--User can choose between a random and time-based train/testsplit-->
-              <b-form-group>
-                <b-form-radio-group v-model="form.splitMethod">
-                  <b-form-radio value="random">Random (default)</b-form-radio>
-                  <b-form-radio value="timesplit">Timesplit</b-form-radio>
-                </b-form-radio-group>
-              </b-form-group>
-            </div>
-
+          <b-col class="p-0">
             <!--Input for metrics, user can add infinite metrics -->
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
               <FormGroupList
@@ -199,16 +199,12 @@ function reformat(property) {
                 name="metric"
                 plural="metrics"
                 selectName="a metric"
-                :options="options.metrics"
+                :options="
+                  form.computationMethod == 'recommendation'
+                    ? options.metrics
+                    : options.metrics.slice(1)
+                "
               />
-
-              <!--Input for results filter -->
-              <b-form-group label="Select a results filter">
-                <b-form-select
-                  v-model="form.resFilter"
-                  :options="[{ text: 'Global (default)', value: null }]"
-                ></b-form-select>
-              </b-form-group>
             </div>
 
             <!-- Input for metadata such as:

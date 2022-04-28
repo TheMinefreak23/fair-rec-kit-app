@@ -6,7 +6,12 @@ import { API_URL } from '../api'
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
-const emit = defineEmits(['loadResult', 'loadMore', 'paginationSort'])
+const emit = defineEmits([
+  'loadResult',
+  'loadResults',
+  'loadMore',
+  'paginationSort',
+])
 const props = defineProps({
   overview: Boolean,
   results: Array,
@@ -15,15 +20,20 @@ const props = defineProps({
   removable: Boolean,
   serverFile: String,
   serverFile2: String,
+  serverFile3: String,
   pagination: Boolean,
+  caption: String,
 })
 
+const caption = ref('')
 const entryAmount = ref(20)
 const deleteModalShow = ref(false)
 const editModalShow = ref(false)
+const viewModalShow = ref(false)
 const newName = ref('')
 const newTags = ref('')
 const newEmail = ref('')
+const metadataStr = ref('')
 const selectedEntry = ref(0)
 const sortindex = ref(0)
 const descending = ref(false)
@@ -54,6 +64,7 @@ async function editEntry() {
   }
   fetch(API_URL + props.serverFile2, requestOptions).then(() => {
     console.log('Item edited succesfully')
+    emit('loadResults')
   })
   newName.value = ''
   newTags.value = ''
@@ -75,9 +86,26 @@ async function removeEntry() {
   })
 }
 
-const sorted = computed(() => {
-  console.log(props.results)
+async function getMetadata(selectedID) {
+  //request the metadata of the specified entry
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: selectedID }),
+  }
+  fetch(API_URL + props.serverFile3, requestOptions).then(() => {
+    console.log('Metadata succesfully requested')
+    getResult()
+  })
+}
 
+async function getResult() {
+  const response = await fetch(API_URL + props.serverFile3)
+  const data = await response.json()
+  metadataStr.value = data.result
+}
+
+const sorted = computed(() => {
   if (!props.pagination) return sort(sortindex.value)
   else return props.results
 })
@@ -125,6 +153,7 @@ function setsorting(i) {
   >
     <p>Are you sure you want to remove this entry from the list?</p>
   </b-modal>
+
   <!--Shows when the user wants to edit an entry-->
   <b-modal
     id="edit-modal"
@@ -135,10 +164,16 @@ function setsorting(i) {
   >
     <h6>Please type in the new values. Blank fields will be left unchanged.</h6>
     Name:
-    <b-form-input v-model="newName" placeholder="New name"></b-form-input>
+    <b-form-input 
+      v-model="newName" 
+      placeholder="New name"
+    ></b-form-input>
     <br />
     Tags:
-    <b-form-input v-model="newTags" placeholder="New tags"></b-form-input>
+    <b-form-input 
+      v-model="newTags" 
+      placeholder="New tags"
+    ></b-form-input>
     <br />
     E-mail:
     <b-form-input
@@ -158,7 +193,18 @@ function setsorting(i) {
     <b-form-input type="password"></b-form-input>
   </b-modal>
 
-  <b-table-simple hover striped responsive>
+<!-- Shows the metadata of the designated entry -->s
+  <b-modal id="view-modal" v-model="viewModalShow" title="Metadata" ok-only>
+    <h5>Here is the metadata:</h5>
+    <p>{{ metadataStr }}</p>
+  </b-modal>
+
+  <b-table-simple hover striped responsive caption-top>
+    <caption>
+      {{
+        props.caption
+      }}
+    </caption>
     <b-thead head-variant="dark">
       <b-tr>
         <b-th v-if="overview"></b-th>
@@ -174,7 +220,7 @@ function setsorting(i) {
       </b-tr>
       <b-tr>
         <b-th v-if="overview"></b-th>
-        <b-th v-for="(subheader, index) in subheaders" :key="subheader">
+        <b-th v-for="subheader in subheaders" :key="subheader">
           {{ subheader }}
         </b-th>
       </b-tr>
@@ -193,21 +239,30 @@ function setsorting(i) {
           </b-td>
         </b-td>
 
-        <b-button
-          v-if="overview"
-          pill
-          @click=";(editModalShow = !editModalShow), (selectedEntry = index)"
-          >Edit</b-button
-        >
-        &nbsp;
-        <b-button
-          v-if="removable"
-          variant="danger"
-          @click="
-            ;(deleteModalShow = !deleteModalShow), (selectedEntry = index)
-          "
-          >Delete</b-button
-        >
+        <b-td>
+          <b-button
+            v-if="overview"
+            pill
+            @click=";(editModalShow = !editModalShow), (selectedEntry = index)"
+            >Edit</b-button
+          >
+          <b-button
+            v-if="overview"
+            pill
+            @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
+            >View</b-button
+          >
+          <template v-if="removable">
+          </template>
+          <b-button
+            v-if="removable"
+            variant="danger"
+            @click="
+              ;(deleteModalShow = !deleteModalShow), (selectedEntry = index)
+            "
+            >Delete</b-button
+          >
+        </b-td>
       </b-tr>
     </b-tbody>
   </b-table-simple>

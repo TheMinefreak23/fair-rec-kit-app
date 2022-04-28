@@ -1,3 +1,8 @@
+/*This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+
+// Format data for a results overview
 function formatResults(allResults) {
   const results = []
   for (let i in allResults) {
@@ -13,6 +18,7 @@ function formatResults(allResults) {
   return results
 }
 
+// Format an array of named objects into a comma separated string
 function formatMultipleItems(items) {
   var string = ''
   if (items == null) {
@@ -23,20 +29,114 @@ function formatMultipleItems(items) {
   return string
 }
 
+// Format a result for the result tab
 function formatResult(result) {
-  console.log(result)
-  return {
+  //console.log(result)
+  const formattedResult = {
+    id: result.timestamp.stamp,
     name: result.metadata.name,
     result: result.result
-      .map((combo) =>
-        combo.recs.map((rec) => ({
-          dataset: combo.dataset.name,
-          recommendation: rec.recommendation,
-          evaluation: formatMultipleItems(rec.evals), // mock
-        }))
-      )
-      .flat(),
+      // Format result per dataset
+      .map((datasetResult) => {
+        datasetResult.results = datasetResult.recs.map((result) => {
+          const headers = [{ name: 'Approach' }]
+
+          // Use metric names as headers
+          result.evals.map((e) => {
+            headers.push(formatEvaluation(e, result))
+            //console.log(result)
+          })
+          // Omit recommendation and evals (old properties)
+          const { recommendation, evals, ...rest } = result
+          datasetResult.headers = headers // TODO headers can be computed in outer loop
+          return rest
+        })
+        //console.log(datasetResult.results[0])
+        //console.log(datasetResult.headers)
+        //datasetResult.headers = makeHeaders(datasetResult.results[0])
+        datasetResult.caption = showDatasetInfo(datasetResult.dataset)
+        return datasetResult
+      }),
+  }
+
+  //console.log(formattedResult)
+  return formattedResult
+}
+
+/*
+// Omit the recommendation key from the result metric table
+function omitRecommendation(arr) {
+  return arr.map(
+    // Omit recommendation
+    (r) => ({
+      ...r,
+      recs: r.recs.map((rec) => {
+        const { recommendation, ...rest } = rec
+        return rest
+      }),
+    })
+  )
+}*/
+
+// Show dataset info as formatted caption
+function showDatasetInfo(dataset) {
+  return (
+    'Dataset: ' +
+    dataset.name +
+    (dataset.parameter ? 'with parameters' + dataset.parameter : '')
+  )
+}
+
+// Format evaluations (including filtered ones)
+function formatEvaluation(e, result) {
+  result[e.name] = e.evaluation.global
+
+  //console.log(e.evaluation.filtered)
+  const filtered = e.evaluation.filtered
+    .map((filter) => Object.values(filter))
+    .flat()
+    .flat()
+  //console.log(filtered)
+
+  // Get filtered values and make subheaders
+  if (filtered.length == 0) {
+    return { name: e.name }
+  } else {
+    const subheaders = ['Global']
+    filtered.map((filter) => {
+      // Mock: get first entry for now
+      const [name, val] = Object.entries(filter)[0]
+      //const filterName = e.name + ' ' + name
+      const filterName = e.name + name
+      result[filterName] = val
+      subheaders.push(capitalise(name))
+      //console.log(subheaders)
+    })
+
+    return { name: e.name, subheaders: subheaders }
   }
 }
 
-export { formatResults, formatResult }
+// Make headers from a result
+function makeHeaders(result) {
+  //console.log(result)
+  const headers = Object.keys(result).map((key) => ({
+    name: key,
+  }))
+  //console.log(headers)
+  return headers
+}
+
+function article(word) {
+  return ['a', 'i', 'u', 'e', 'o'].includes(word[0]) ? 'an' : 'a'
+}
+
+function capitalise(string) {
+  return string[0].toUpperCase() + string.slice(1)
+}
+
+function underscoreToSpace(string) {
+  return string.replaceAll('_', ' ')
+}
+
+export { formatResults, formatResult, capitalise, article, underscoreToSpace }
