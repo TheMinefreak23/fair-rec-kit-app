@@ -111,11 +111,11 @@ function reformat(property) {
 
 <template>
   <div class="py-2 mx-5 bg-primary">
-    <b-card>
+    <b-card class="block">
       <!--This form contains all the necessary parameters for a user to submit a request for a computation-->
       <b-form v-if="options" @submit="sendToServer" @reset="initForm">
         <b-row>
-          <b-col>
+          <b-col class="g-0">
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
               <h3>Computation type</h3>
               <b-form-radio-group v-model="form.computationMethod">
