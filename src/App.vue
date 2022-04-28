@@ -24,6 +24,8 @@ onMounted(async () => {
 })
 const tabIndex = ref(0)
 
+
+
 </script>
 
 <style scoped>
@@ -47,7 +49,7 @@ b-tab.success {
         <li>
           <div class="form-check form-switch px-2">
              <p class="d-inline ps-2">Dark Mode</p>
-            <input class="form-check-input mx-auto" type="checkbox" id="lightSwitch"/>
+            <input class="form-check-input mx-auto" type="checkbox" id="changeTheme"/>
           </div>
         </li>
       </ul>
