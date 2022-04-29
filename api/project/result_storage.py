@@ -1,12 +1,10 @@
-# This program has been developed by students from the bachelor Computer Science at
-# Utrecht University within the Software Project course.
-# © Copyright Utrecht University (Department of Information and Computing Sciences)
-import csv  # TODO fix this import
+"""
+This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)
+"""
 import json
 import os
-from csv import writer
-import time
-import datetime
 
 # Results overview format
 # timestamp (ID)
@@ -30,6 +28,7 @@ def save_result(computation, result):
     computation['result'] = result
     current_result = computation
     update_results_overview(current_result)
+    print(current_result)
 
 
 def result_by_id(id):
@@ -37,12 +36,15 @@ def result_by_id(id):
 
     # Filter: Loop through all results and find the one with the matching ID.
     for result in results['all_results']:
-        if result['timestamp']['stamp'] == id:
-            print(result)
-            global current_result
-            current_result = result
+        global current_result
+        if 'timestamp' in result:
+            if result['timestamp']['stamp'] == id:
+                print('result', result)
+                current_result = result
+        else:
+            current_result = None # If there is an incorrectly formatted result, return nothing
 
-    print(current_result)
+    print('current result',current_result)
 
     # current_result = results_df.filter(like='')
 

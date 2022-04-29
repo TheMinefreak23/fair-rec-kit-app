@@ -1,6 +1,12 @@
+# Linux
+home/ 
+
 # Data
+config_files/
+results/
 /results.json
 /frkenv/bin/
+/results_backup.json
 
 # Byte-compiled files
 __pycache__

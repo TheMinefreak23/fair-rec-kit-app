@@ -32,8 +32,6 @@ const ex1CurrentPage = ref(1)
 const ex1PerPage = ref(10)
 const ex1Rows = ref(100)
 
-const testMessage = ref('')
-
 onMounted(() => {
   getResults()
 })
@@ -48,10 +46,8 @@ watch(
 async function getResults() {
   const response = await fetch(API_URL + '/all-results')
   const data = await response.json()
-  //console.log(data)
   let allResults = data.all_results
   store.allResults = formatResults(allResults)
-  //console.log(results.value)
 }
 
 const url = API_URL + '/all-results/result-by-id'
@@ -93,8 +89,8 @@ async function getResult() {
         :overview="true"
         serverFile="/all-results/delete"
         serverFile2="/all-results/edit"
+        serverFile3="/all-results/result-by-id"
       />
-      <p>{{ testMessage }}</p>
     </div>
   </b-card>
 </template>

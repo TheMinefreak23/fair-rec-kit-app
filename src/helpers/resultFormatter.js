@@ -1,3 +1,7 @@
+/*This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+
 // Format data for a results overview
 function formatResults(allResults) {
   const results = []
@@ -123,12 +127,16 @@ function makeHeaders(result) {
   return headers
 }
 
+function article(word) {
+  return ['a', 'i', 'u', 'e', 'o'].includes(word[0]) ? 'an' : 'a'
+}
+
 function capitalise(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1)
+  return string[0].toUpperCase() + string.slice(1)
 }
 
 function underscoreToSpace(string) {
   return string.replaceAll('_', ' ')
 }
 
-export { formatResults, formatResult, capitalise, underscoreToSpace }
+export { formatResults, formatResult, capitalise, article, underscoreToSpace }

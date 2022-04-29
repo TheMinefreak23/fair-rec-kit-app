@@ -34,8 +34,8 @@ onMounted(() => {
 watch(
   () => store.queue,
   (data, oldQueue) => {
-    // queue got bigger
-    //console.log(data)
+    console.log('queue watch new queue:', data)
+    //console.log('queue watch old queue:', oldQueue)
     if (data.length != 0) {
       getComputations()
       emit('computing')
@@ -52,6 +52,7 @@ async function getComputations() {
   const data = await response.json()
   //store.queue = formatResults(data).map(x=>x.omit(x,'ID'))
   //store.queue = formatResults(data)
+  //console.log(data)
   store.queue = data
 }
 
@@ -71,9 +72,6 @@ async function cancelComputation() {
         :removable="true"
         serverFile="/computation/queue/delete"
       />
-      <!--Temporary test buttons-->
-      <b-button @click="$emit('computing')">Computing</b-button>
-      <b-button @click="$emit('done')">Done</b-button>
     </div>
   </b-card>
 </template>

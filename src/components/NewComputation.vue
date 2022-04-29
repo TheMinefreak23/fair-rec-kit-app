@@ -16,6 +16,7 @@ const form = ref({
   approaches: emptyFormGroup(),
   //filters: emptyFormGroup(),
   splitMethod: 'random', //The default split method.
+  computationMethod: 'recommendation',
 })
 const metadata = ref({})
 const splitOptions = [
@@ -33,7 +34,7 @@ async function getOptions() {
   const response = await fetch(API_URL + '/computation/options')
   const data = await response.json()
   options.value = data.options
-  //console.log(options.value)
+  console.log(options.value)
 }
 
 // POST request: Send form to server.
@@ -49,7 +50,7 @@ async function sendToServer() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ metadata: metadata.value, settings: sendForm }),
   }
-  console.log(sendForm)
+  console.log('sendForm', sendForm)
   const response = await fetch(
     API_URL + '/computation/calculation',
     requestOptions
@@ -57,8 +58,9 @@ async function sendToServer() {
 
   // Update queue
   const data = response.json()
-  //if (data.status == 'success') getComputations()
+  //console.log('calculation route response:', data)
   store.queue = data
+  //console.log('queue:', store.queue)
 }
 
 async function initForm() {
@@ -73,6 +75,7 @@ async function initForm() {
   form.value.recommendations = options.value.defaults.recCount.default
   form.value.split = options.value.defaults.split
   form.value.splitMethod = 'random'
+  form.value.computationMethod = 'recommendation'
   //form.value.result.value = {}
 }
 
@@ -85,34 +88,42 @@ function emptyFormGroup() {
 function reformat(property) {
   let choices = []
   for (let i in property.main) {
-    let parameter = null
+    let params = null
     if (property.lists[i] != null) {
-      //console.log(property.lists[i])
       choices[i] = {
-        name: property.main[i],
+        name: property.main[i].name,
         settings: property.lists[i].map((setting) => ({
           [setting.name]: reformat(setting),
         })),
       }
     } else {
-      if (property.inputs[i] != null) parameter = property.inputs[i]
-      else if (property.selects[i] != null) parameter = property.selects[i]
-      choices[i] = { name: property.main[i], parameter: parameter }
+      if (property.inputs[i] != null) params = property.inputs[i]
+      else if (property.selects[i] != null) params = property.selects[i]
+      choices[i] = { name: property.main[i].name, params: params }
       //console.log('choices:' + choices)
     }
+    //console.log(choices[i])
   }
+
   return choices
 }
 </script>
 
 <template>
   <div class="py-2 mx-5 bg-primary">
-    <b-card>
+    <b-card class="block">
       <!--This form contains all the necessary parameters for a user to submit a request for a computation-->
       <b-form v-if="options" @submit="sendToServer" @reset="initForm">
         <b-row>
-          <b-col>
+          <b-col class="g-0">
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
+              <h3>Computation type</h3>
+              <b-form-radio-group v-model="form.computationMethod">
+                <b-form-radio value="recommendation"
+                  >Recommendation (default)</b-form-radio
+                >
+                <b-form-radio value="prediction">Prediction</b-form-radio>
+              </b-form-radio-group>
               <!--User can select a dataset.-->
               <FormGroupList
                 v-model:data="form.datasets"
@@ -145,15 +156,22 @@ function reformat(property) {
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
               <FormGroupList
                 v-model:data="form.approaches"
-                :nested="true"
                 name="approach"
                 plural="Recommender approaches"
                 selectName="an approach"
-                :options="options.approaches.libraries"
+                :options="
+                  form.computationMethod == 'recommendation'
+                    ? options.recommenders
+                    : options.predictors
+                "
+                :required="true"
               />
 
               <!--User can select the amount of recommendations per user -->
-              <b-form-group label="Select number of recommendations per user:">
+              <b-form-group
+                v-if="form.computationMethod == 'recommendation'"
+                label="Select number of recommendations per user:"
+              >
                 <b-form-input
                   type="range"
                   :min="options.defaults.recCount.min"
@@ -161,14 +179,14 @@ function reformat(property) {
                   v-model="form.recommendations"
                 />
                 <p>{{ form.recommendations }}</p>
-                <!--  No longer feasible from a back-end perspective -Bug V22H-194
-              <b-form-checkbox
-              v-model="form.includeRatedItems"
-              buttons
-              button-variant="outline-primary"
-              required
-              >Include already rated items in recommendations</b-form-checkbox
-            >-->
+                <b-form-checkbox
+                  v-model="form.includeRatedItems"
+                  buttons
+                  button-variant="outline-primary"
+                  required
+                  >Include already rated items in
+                  recommendations</b-form-checkbox
+                >
               </b-form-group>
             </div>
           </b-col>
@@ -181,17 +199,12 @@ function reformat(property) {
                 name="metric"
                 plural="metrics"
                 selectName="a metric"
-                :options="options.metrics.categories"
-                :nested="true"
+                :options="
+                  form.computationMethod == 'recommendation'
+                    ? options.metrics
+                    : options.metrics.slice(1)
+                "
               />
-
-              <!--Input for results filter -->
-              <b-form-group label="Select a results filter">
-                <b-form-select
-                  v-model="form.resFilter"
-                  :options="[{ text: 'Global (default)', value: null }]"
-                ></b-form-select>
-              </b-form-group>
             </div>
 
             <!-- Input for metadata such as:
