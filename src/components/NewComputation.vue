@@ -8,7 +8,6 @@ import { sendMockData } from '../test/mockComputationOptions.js'
 import { store } from '../store.js'
 import { API_URL } from '../api'
 
-const result = ref({})
 const options = ref()
 const form = ref({
   datasets: emptyFormGroup(),
@@ -16,10 +15,6 @@ const form = ref({
   approaches: emptyFormGroup(),
 })
 const metadata = ref({})
-const splitOptions = [
-  { text: 'Random', value: 'random' },
-  { text: 'Time', value: 'time' },
-]
 
 onMounted(async () => {
   await getOptions()
@@ -31,7 +26,6 @@ async function getOptions() {
   const response = await fetch(API_URL + '/computation/options')
   const data = await response.json()
   options.value = data.options
-  console.log(options.value)
 }
 
 // POST request: Send form to server.
@@ -70,7 +64,6 @@ async function initForm() {
   form.value.split = options.value.defaults.split //The default train-test ratio
   form.value.splitMethod = 'random' //The default method of splitting datasets
   form.value.computationMethod = 'recommendation' //The default experiment type
-  //form.value.result.value = {}
 }
 
 function emptyFormGroup() {
@@ -218,6 +211,7 @@ function reformat(property) {
               </b-form-group>
             </div>
           </b-col>
+          <!-- Buttons to submit or reset an experiment-->
           <div class="d-flex justify-content-center">
             <b-button class="mx-1" type="reset" variant="danger"
               >Reset</b-button
