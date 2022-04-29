@@ -247,17 +247,17 @@ function update() {
                 v-for="(value, index) in form.main[i - 1].params.values"
                 :key="value"
               >
+                <!--The max k value is based on the amount of recommendations.
+                Because of this we use a seperate setting to cover for it.-->
                 <b-form-group
                   :label="capitalise(underscoreToSpace(value.name))"
-                  :description="'Between ' + value.min + ' and ' + value.max"
+                  :description ="'Between ' + value.min + ' and ' + (value.name == 'k' ? props.maxK : value.max)"
                 >
                   <b-form-input
                     v-if="!value.name.includes('split')"
                     v-model="form.inputs[i - 1][index].value"
-                    :state="
-                      form.inputs[i - 1][index].value >= value.min &&
-                      form.inputs[i - 1][index].value <= value.max
-                    "
+                    :state ="form.inputs[i - 1][index].value >= value.min &&
+                    form.inputs[i - 1][index].value <= (value.name == 'k' ? props.maxK : value.max)"
                     validated="true"
                   />
                   <b-form-input
