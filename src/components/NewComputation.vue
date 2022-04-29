@@ -43,6 +43,7 @@ async function sendToServer() {
 
   sendForm.approaches = reformat(sendForm.approaches)
   sendForm.metrics = reformat(sendForm.metrics)
+  console.log(form.value.metrics, sendForm.metrics)
   sendForm.datasets = reformat(sendForm.datasets)
 
   const requestOptions = {
@@ -89,19 +90,23 @@ function reformat(property) {
   let choices = []
   for (let i in property.main) {
     let params = null
+    console.log(
+      'reformat',
+      property.main[i],
+      property.inputs[i],
+      property.selects[i]
+    )
+
+    if (property.inputs[i] != null) params = property.inputs[i]
+    else if (property.selects[i] != null) params = property.selects[i]
+    choices[i] = { name: property.main[i].name, params: params }
+
     if (property.lists[i] != null) {
-      choices[i] = {
-        name: property.main[i].name,
-        settings: property.lists[i].map((setting) => ({
-          [setting.name]: reformat(setting),
-        })),
-      }
-    } else {
-      if (property.inputs[i] != null) params = property.inputs[i]
-      else if (property.selects[i] != null) params = property.selects[i]
-      choices[i] = { name: property.main[i].name, params: params }
-      //console.log('choices:' + choices)
+      choices[i].settings = property.lists[i].map((setting) => ({
+        [setting.name]: reformat(setting),
+      }))
     }
+    //console.log('choices:' + choices)
     //console.log(choices[i])
   }
 
