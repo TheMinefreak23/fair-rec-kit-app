@@ -14,7 +14,6 @@ const props = defineProps({
   computations: [],
 })
 
-//const computations = ref([])
 const headers = ref([
   { name: 'ID' },
   { name: 'Date Time' },
@@ -39,10 +38,8 @@ watch(
     if (data.length != 0) {
       getComputations()
       emit('computing')
-      //console.log(computations.value)
     } else {
       emit('done')
-      //alert('computations done!!!!')
     }
   }
 )
@@ -52,7 +49,6 @@ async function getComputations() {
   const data = await response.json()
   //store.queue = formatResults(data).map(x=>x.omit(x,'ID'))
   //store.queue = formatResults(data)
-  //console.log(data)
   store.queue = data
 }
 

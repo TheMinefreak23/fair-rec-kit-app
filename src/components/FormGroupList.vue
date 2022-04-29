@@ -14,6 +14,7 @@ const props = defineProps({
   selectName: String,
   options: Array,
   required: Boolean,
+  maxK: Number,
   data: { type: Object, required: true },
 })
 
@@ -170,8 +171,11 @@ function copyItem(i) {
 }
 //Update the options that cannot be be submitted due to changing experiment type (
 function update() {
-  let entries = flattenOptions().map((entry) => entry.name)
-  //console.log(entries)
+  let entries = props.options
+    .map((category) => category.options)
+    .concat()
+    .flat()
+    .map((entry) => entry.name)
   const deleteEntry = 'NULL'
   for (let i = 0; i < form.value.main.length; i++) {
     if (!entries.includes(form.value.main[i].name)) {
@@ -191,13 +195,6 @@ function update() {
   form.value.inputs = form.value.inputs.filter((x) => x != deleteEntry)
   form.value.lists = form.value.lists.filter((x) => x != deleteEntry)
   console.log(form.value.main)
-}
-// Flatten options API structure
-function flattenOptions() {
-  return props.options
-    .map((category) => category.options)
-    .concat()
-    .flat()
 }
 </script>
 
