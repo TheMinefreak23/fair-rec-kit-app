@@ -80,8 +80,10 @@ def mock_result(settings):
         for approach in settings['approaches']:
             recommendation = {'approach': approach['name'], 'recommendation': recommend(dataset, approach), 'evals': []}
             for metric in settings['metrics']:
-                evaluation = evaluate_all(dataset['settings'], approach, metric)
-                recommendation['evals'].append({'name': metric['name'], 'evaluation': evaluation})
+                evaluation = evaluate_all(metric['settings'], approach, metric)
+                recommendation['evals'].append(
+                    {'name': metric['name'], 'evaluation': evaluation, 'params': metric['params']})
+                print(metric)
             recs.append(recommendation)
         result.append({'dataset': dataset, 'recs': recs})
     return result
@@ -113,7 +115,7 @@ def calculate():
         if computation_thread.is_alive():
             computation_thread.join()
         response['calculation'] = result_storage.newest_result()
-    print('/calculation response:',response)
+    print('/calculation response:', response)
     return response
 
 
@@ -132,7 +134,7 @@ def queue():
     else:
         print('error')
 
-    print('queue:',computation_queue)
+    print('queue:', computation_queue)
     return json.dumps(computation_queue)
 
 
@@ -151,7 +153,7 @@ def recommend(dataset, approach):
 
 def evaluate_all(settings, approach, metric):
     base_eval = evaluate(approach, metric)
-    evaluation = {'global': base_eval, 'filtered': []}
+    evaluation = {'global': round(base_eval, 2), 'filtered': []}
 
     for setting in settings:
         # Evaluate per filter
@@ -162,7 +164,7 @@ def evaluate_all(settings, approach, metric):
                     value = parameter['value']
                     # Just use the value if it's a number, otherwise use the length of the word.
                     filter_eval = value if type(value) == int else len(value)
-                    val = "%.2f" % (base_eval * len(filter['name']) / filter_eval)
+                    val = round((base_eval * len(filter['name']) / filter_eval), 2)
                     evals.append({parameter['name'] + ' ' + str(value): val})
                 evaluation['filtered'].append({filter['name']: evals})
 
@@ -172,13 +174,14 @@ def evaluate_all(settings, approach, metric):
 def evaluate(approach, metric):
     # Mock evaluation
     value = len(approach['name']) * len(metric['name'])
-
+    print('metric:', metric)
     # Do something with the metrics parameters.
-    if hasattr(metric, 'parameter') and metric['params']:
+    if metric['params']:
+        print(metric['name'], 'has params', metric['params'])
         for parameter in metric['params']:
-            value *= len(parameter['name'])
+            value *= len(parameter['name']) * int(parameter['value'])
 
-    return value
+    return value / 100
 
 
 # add a computation request to the queue
