@@ -5,6 +5,7 @@ Utrecht University within the Software Project course.
 """
 
 import json
+import os
 import threading
 import time
 from datetime import datetime
@@ -18,12 +19,19 @@ from flask import (Blueprint, request)
 from . import result_storage
 from .options_formatter import create_available_options, config_dict_from_settings
 
+# Constants
+CONFIG_DIR = 'config_files'
+
 compute_bp = Blueprint('computation', __name__, url_prefix='/api/computation')
 
 recommender_system = RecommenderSystem('datasets', 'results')
 options = create_available_options(recommender_system)
 
 computation_queue = []
+
+# Create config files directory if it doesn't exist yet
+if not os.path.isdir(CONFIG_DIR):
+    os.mkdir(CONFIG_DIR)
 
 
 def calculate_first():
@@ -52,7 +60,7 @@ def run_experiment(computation):
     config_dict, id = config_dict_from_settings(computation)
 
     # Save configuration to yaml file
-    config_file_path = 'config_files/' + id
+    config_file_path = 'CONFIG_DIR' + id
     with open(config_file_path + '.yml', 'w+') as config_file:
         yaml.dump(config_dict, config_file)
 
