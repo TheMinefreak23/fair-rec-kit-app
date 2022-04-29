@@ -14,6 +14,7 @@ const props = defineProps({
   computations: [],
 })
 
+//Declare the info about the experiments that will be shown to the user
 const headers = ref([
   { name: 'ID' },
   { name: 'Date Time' },
@@ -50,10 +51,6 @@ async function getComputations() {
   //store.queue = formatResults(data).map(x=>x.omit(x,'ID'))
   //store.queue = formatResults(data)
   store.queue = data
-}
-
-async function cancelComputation() {
-  emit('stop')
 }
 </script>
 
