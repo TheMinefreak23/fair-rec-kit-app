@@ -7,9 +7,12 @@ import FormGroupList from './FormGroupList.vue'
 import { sendMockData } from '../test/mockComputationOptions.js'
 import { store } from '../store.js'
 import { API_URL } from '../api'
+//import { getSongInfo } from '../composables/songInfo'
 
 const result = ref({})
+const token = ref()
 const options = ref()
+const iFrameSrc = ref()
 const form = ref({
   datasets: emptyFormGroup(),
   metrics: emptyFormGroup(),
@@ -24,10 +27,68 @@ const splitOptions = [
   { text: 'Time', value: 'time' },
 ]
 
+const SPOTIFY_API = 'https://api.spotify.com/v1/'
+const SPOTIFY_ClientID = '7e49545dfb45473cbe595d8bb1e22071'
+const SPOTIFY_ClientSecret = 'd5a9e8febef2468b94a5edabe2c5ddeb'
+
 onMounted(async () => {
   await getOptions()
+  console.log('wack')
+  //await spotifyAuthenticate()
+  await getSpotifyID('BQB7hEVOPzFSUgESW0AHPgjb3RW20_MfWHwhtjEx_BL-ty6PM31CIm1q5De3bXHhJPcTAxuK5oQfFezzoIU', 'orion', 'metallica')
   initForm()
 })
+
+async function spotifyAuthenticate() {
+
+  // POST request using fetch with async/await
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title: 'Fetch POST Request Example' })
+  };
+  const resp = await fetch('https://reqres.in/api/articles', requestOptions);
+  console.log(await resp.json())
+
+  console.log('hi')
+  const authOptions = {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Content-Type': "application/x-www-form-urlencoded; charset=UTF-8",
+      'Authorization': "Basic N2U0OTU0NWRmYjQ1NDczY2JlNTk1ZDhiYjFlMjIwNzE6ZDVhOWU4ZmViZWYyNDY4Yjk0YTVlZGFiZTJjNWRkZWI="
+    },
+    form: {
+      grant_type: 'client_credentials'
+    },
+    json: true
+  };
+  console.log(authOptions)
+  const response = await fetch('https://accounts.spotify.com/api/token', authOptions)
+  const data = await response.data
+  console.log(data)
+  token.value = data.access_token
+}
+
+async function getSpotifyID(token, track, artist) {
+  const requestOptions = {
+    withCredentials: true,
+    credentials: 'include',
+    method: 'GET',
+    headers: {
+      'Authorization': ("Bearer " + token),
+      'Access-Control-Allow-Origin': '*'
+    }
+  }
+  console.log(requestOptions)
+  const response = await fetch(SPOTIFY_API + "search/q=" + artist + "+" + track + "&type=track", requestOptions)
+  console.log(response)
+  const data = await response.data
+  const songID = data.tracks.items[0].id
+  iFrameSrc.value = "https://open.spotify.com/embed/track/" + songID + "?utm_source=generator&amp;theme=0"
+  return songID;
+}
 
 // GET request: Get available options for selection from server
 async function getOptions() {
@@ -112,6 +173,8 @@ function reformat(property) {
 <template>
   <div class="py-2 mx-5 bg-primary">
     <b-card>
+      <!--<iframe style="border-radius: 12px;" src={{iframeSrc}}>
+      </iframe>-->
       <!--This form contains all the necessary parameters for a user to submit a request for a computation-->
       <b-form v-if="options" @submit="sendToServer" @reset="initForm">
         <b-row>
@@ -119,20 +182,12 @@ function reformat(property) {
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
               <h3>Computation type</h3>
               <b-form-radio-group v-model="form.computationMethod">
-                <b-form-radio value="recommendation"
-                  >Recommendation (default)</b-form-radio
-                >
+                <b-form-radio value="recommendation">Recommendation (default)</b-form-radio>
                 <b-form-radio value="prediction">Prediction</b-form-radio>
               </b-form-radio-group>
               <!--User can select a dataset.-->
-              <FormGroupList
-                v-model:data="form.datasets"
-                name="dataset"
-                plural="Datasets"
-                selectName="a dataset"
-                :options="options.datasets"
-                required
-              />
+              <FormGroupList v-model:data="form.datasets" name="dataset" plural="Datasets" selectName="a dataset"
+                :options="options.datasets" required />
 
               <!--User can select optional filters-->
               <!--<FormGroupList
@@ -146,38 +201,24 @@ function reformat(property) {
               <!--User provides an optional rating conversion-->
               <b-form-group label="Select a rating conversion">
                 <!-- Select a rating conversion from the options received from the server -->
-                <b-form-select
-                  v-model:data="form.conversion"
-                  :options="[{ text: 'None (default)', value: null }]"
-                ></b-form-select>
+                <b-form-select v-model:data="form.conversion" :options="[{ text: 'None (default)', value: null }]">
+                </b-form-select>
               </b-form-group>
             </div>
 
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
-              <FormGroupList
-                v-model:data="form.approaches"
-                name="approach"
-                plural="Recommender approaches"
-                selectName="an approach"
-                :options="
+              <FormGroupList v-model:data="form.approaches" name="approach" plural="Recommender approaches"
+                selectName="an approach" :options="
                   form.computationMethod == 'recommendation'
                     ? options.recommenders
                     : options.predictors
-                "
-                :required="true"
-              />
+                " :required="true" />
 
               <!--User can select the amount of recommendations per user -->
-              <b-form-group
-                v-if="form.computationMethod == 'recommendation'"
-                label="Select number of recommendations per user:"
-              >
-                <b-form-input
-                  type="range"
-                  :min="options.defaults.recCount.min"
-                  :max="options.defaults.recCount.max"
-                  v-model="form.recommendations"
-                />
+              <b-form-group v-if="form.computationMethod == 'recommendation'"
+                label="Select number of recommendations per user:">
+                <b-form-input type="range" :min="options.defaults.recCount.min" :max="options.defaults.recCount.max"
+                  v-model="form.recommendations" />
                 <p>{{ form.recommendations }}</p>
                 <!--  No longer feasible from a back-end perspective -Bug V22H-194
               <b-form-checkbox
@@ -194,17 +235,11 @@ function reformat(property) {
           <b-col class="p-0">
             <!--Input for metrics, user can add infinite metrics -->
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
-              <FormGroupList
-                v-model:data="form.metrics"
-                name="metric"
-                plural="metrics"
-                selectName="a metric"
-                :options="
-                  form.computationMethod == 'recommendation'
-                    ? options.metrics
-                    : options.metrics.slice(1)
-                "
-              />
+              <FormGroupList v-model:data="form.metrics" name="metric" plural="metrics" selectName="a metric" :options="
+                form.computationMethod == 'recommendation'
+                  ? options.metrics
+                  : options.metrics.slice(1)
+              " />
             </div>
 
             <!-- Input for metadata such as:
@@ -214,37 +249,23 @@ function reformat(property) {
             <div class="p-2 m-1 rounded-3 bg-secondary">
               <h3 class="text-center">Meta</h3>
               <b-form-group label="Enter name for computation">
-                <b-form-input
-                  placeholder="New Computation"
-                  v-model="metadata.name"
-                  required
-                ></b-form-input>
+                <b-form-input placeholder="New Computation" v-model="metadata.name" required></b-form-input>
               </b-form-group>
               <b-form-group label="Enter tags (optional)">
                 <b-form-input v-model="metadata.tags"></b-form-input>
               </b-form-group>
               <b-form-group label="Enter e-mail (optional)">
-                <b-form-input
-                  type="email"
-                  placeholder="example@mail.com"
-                  v-model="metadata.email"
-                ></b-form-input>
+                <b-form-input type="email" placeholder="example@mail.com" v-model="metadata.email"></b-form-input>
               </b-form-group>
             </div>
           </b-col>
           <div class="d-flex justify-content-center">
-            <b-button class="mx-1" type="reset" variant="danger"
-              >Reset</b-button
-            >
-            <b-button class="mx-1" type="submit" variant="primary"
-              >Send</b-button
-            >
+            <b-button class="mx-1" type="reset" variant="danger">Reset</b-button>
+            <b-button class="mx-1" type="submit" variant="primary">Send</b-button>
           </div>
         </b-row>
       </b-form>
-      <b-button type="test" variant="warning" @click="sendMockData"
-        >Mock</b-button
-      >
+      <b-button type="test" variant="warning" @click="sendMockData">Mock</b-button>
     </b-card>
   </div>
 </template>
