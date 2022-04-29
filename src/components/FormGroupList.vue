@@ -35,7 +35,9 @@ const form = computed({
 
 onMounted(() => {
   groupCount.value = props.required ? 1 : 0 // For required lists the minimum amount of group items is 1.
-  console.log(props.name, props.nested, props.options)
+  console.log(props.name)
+  if (props.name == 'filter' || props.name == 'dataset')
+    console.log(props.name, props.options)
   form.value.name = props.plural
   //console.log(props.name, 'options', props.options)
 })
@@ -233,12 +235,11 @@ function flattenOptions() {
                   variant="primary"
                   >Copy {{ name }}...</b-button
                 >
-                  <template #first>
-                    <b-form-select-option value="" disabled
-                      >Choose..</b-form-select-option
-                    >
-                  </template>
-                
+                <template #first>
+                  <b-form-select-option value="" disabled
+                    >Choose..</b-form-select-option
+                  >
+                </template>
               </b-form-group>
             </b-col>
 
