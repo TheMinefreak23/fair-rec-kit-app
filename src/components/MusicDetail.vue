@@ -6,6 +6,7 @@ import { getSpotifyToken, getSongInfo } from '../helpers/songInfo'
 const token = ref('test')
 const tracks = ref([])
 const track = ref({})
+const trackModalShow = ref(false)
 
 onMounted(async () => {
   token.value = await getSpotifyToken()
@@ -26,28 +27,66 @@ onMounted(async () => {
 
   <template v-if="track">
     <p>{{ track }}</p>
-    <h1>Best track:</h1>
-    <h3>track: {{ track.name }}</h3>
-    <h3>id: {{ track.id }}</h3>
-    <template v-if="track.album">
-      <h3>album: {{ track.album.name }}</h3>
-      <h3>images:</h3>
-      <div v-for="(image, index) in track.album.images">
-        <img :src="image.url" /></div
-    ></template>
-    <iframe
-      style="border-radius: 12px"
-      :src="
-        'https://open.spotify.com/embed/track/' +
-        track.id +
-        '?utm_source=generator'
-      "
-      width="100%"
-      height="80"
-      frameBorder="0"
-      allowfullscreen=""
-      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-    />
-    <h3>preview url: {{ track.preview_url }}</h3>
+    <b-button
+      style="width: 20vw; display: block"
+      class="mx-auto"
+      variant="primary"
+      @click="trackModalShow = !trackModalShow"
+      >Show track</b-button
+    >
+    <b-modal
+      :style="{
+        backgroundColor: 'black',
+        color: 'black',
+      }"
+      v-if="track.artists"
+      v-model="trackModalShow"
+      :title="track.name + ' by ' + track.artists[0].name"
+      size="lg"
+    >
+      <b-container class="p-3">
+        <b-row v-if="track.album">
+          <b-row class="p-3">
+            <b-col>
+              <p>
+                <!--TODO refactor into component with dynamic formatting-->
+                Artist(s):
+                <template v-for="(artist, index) in track.artists">{{
+                  artist.name
+                }}</template>
+              </p>
+              <p>Album: {{ track.album.name }}</p>
+              <p>Attributes (graph of danceability etc): TODO</p>
+
+              <p>..:</p>
+            </b-col>
+            <b-col>
+              <!--Using medium sized image-->
+              <img :src="track.album.images[1].url" />
+            </b-col>
+          </b-row>
+        </b-row>
+        <b-row class="p-3">
+          <iframe
+            style="border-radius: 12px"
+            :src="
+              'https://open.spotify.com/embed/track/' +
+              track.id +
+              '?utm_source=generator'
+            "
+            width="100%"
+            height="80"
+            frameBorder="0"
+            allowfullscreen=""
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          />
+          <p>
+            debug | id: {{ track.id }} | preview url: {{ track.preview_url }}
+          </p>
+        </b-row>
+      </b-container>
+    </b-modal>
   </template>
 </template>
+
+<style></style>
