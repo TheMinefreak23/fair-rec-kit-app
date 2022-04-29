@@ -26,4 +26,9 @@ function addResult(result) {
   //console.log(store.currentResults)
 }
 
-export { store, addResult }
+//Remove result from global current shown results state
+function removeResult(index) {
+  store.currentResults.splice(index, 1)
+}
+
+export { store, addResult, removeResult }

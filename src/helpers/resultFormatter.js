@@ -89,9 +89,10 @@ function showDatasetInfo(dataset) {
 
 // Format evaluations (including filtered ones)
 function formatEvaluation(e, result) {
-  result[e.name] = e.evaluation.global
+  result[formatMetric(e)] = e.evaluation.global
 
-  //console.log(e.evaluation.filtered)
+  // Flatten filters
+  console.log(e.evaluation, e.evaluation.filtered)
   const filtered = e.evaluation.filtered
     .map((filter) => Object.values(filter))
     .flat()
@@ -100,7 +101,7 @@ function formatEvaluation(e, result) {
 
   // Get filtered values and make subheaders
   if (filtered.length == 0) {
-    return { name: e.name }
+    return { name: formatMetric(e) }
   } else {
     const subheaders = ['Global']
     filtered.map((filter) => {
@@ -113,18 +114,18 @@ function formatEvaluation(e, result) {
       //console.log(subheaders)
     })
 
-    return { name: e.name, subheaders: subheaders }
+    return { name: formatMetric(e), subheaders: subheaders }
   }
 }
 
-// Make headers from a result
-function makeHeaders(result) {
-  //console.log(result)
-  const headers = Object.keys(result).map((key) => ({
-    name: key,
-  }))
-  //console.log(headers)
-  return headers
+// Format metric name
+function formatMetric(evaluation) {
+  // If it is a K metric, replace K with the parameter
+  const name = evaluation.name
+  if (name.toLowerCase()[name.length - 1] == 'k') {
+    console.log(evaluation)
+    return name.slice(0, -1) + evaluation.params[0].value
+  } else return name
 }
 
 function article(word) {
