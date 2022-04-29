@@ -11,7 +11,7 @@ import NewComputation from './components/NewComputation.vue'
 import TestForm from './test/TestForm.vue'
 import { onMounted, ref } from 'vue'
 import { API_URL } from './api'
-import Lan from './test/Lan.vue'
+import MusicDetail from './components/MusicDetail.vue'
 
 const activeComputations = ref(false)
 const done = ref(false)
@@ -38,7 +38,6 @@ b-tab.success {
 </style>
 
 <template>
-  <Lan />
   <div class="bg-dark nav justify-content-center py-2">
     <img src="/RecCoonLogo.png" style="height: 50px" class="ms-auto" />
     <h1 class="text-white my-0 p-0">FairRecKit</h1>
@@ -80,6 +79,7 @@ b-tab.success {
   </div>
   <div class="nav-center">
     <b-tabs v-model="tabIndex" class="m-0 pt-2" align="center">
+      <b-tab title="Music Detail"> <MusicDetail /></b-tab>
       <b-tab title="New Computation"><NewComputation /></b-tab>
       <b-tab :class="{ success: done }">
         <ActiveComputation

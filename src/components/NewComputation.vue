@@ -7,12 +7,8 @@ import FormGroupList from './FormGroupList.vue'
 import { sendMockData } from '../test/mockComputationOptions.js'
 import { store } from '../store.js'
 import { API_URL } from '../api'
-//import { getSongInfo } from '../composables/songInfo'
 
-const result = ref({})
-const token = ref()
 const options = ref()
-const iFrameSrc = ref()
 const form = ref({
   datasets: emptyFormGroup(),
   metrics: emptyFormGroup(),
@@ -27,48 +23,10 @@ const splitOptions = [
   { text: 'Time', value: 'time' },
 ]
 
-const SPOTIFY_API = 'https://api.spotify.com/v1/'
-const SPOTIFY_ClientID = '7e49545dfb45473cbe595d8bb1e22071'
-const SPOTIFY_ClientSecret = 'd5a9e8febef2468b94a5edabe2c5ddeb'
-
 onMounted(async () => {
   await getOptions()
-  console.log('wack')
-  //await spotifyAuthenticate()
-  await getSpotifyID(
-    'BQB7hEVOPzFSUgESW0AHPgjb3RW20_MfWHwhtjEx_BL-ty6PM31CIm1q5De3bXHhJPcTAxuK5oQfFezzoIU',
-    'orion',
-    'metallica'
-  )
   initForm()
 })
-
-async function spotifyAuthenticate() {}
-
-async function getSpotifyID(token, track, artist) {
-  const requestOptions = {
-    withCredentials: true,
-    credentials: 'include',
-    method: 'GET',
-    headers: {
-      Authorization: 'Bearer ' + token,
-      'Access-Control-Allow-Origin': '*',
-    },
-  }
-  console.log(requestOptions)
-  const response = await fetch(
-    SPOTIFY_API + 'search/q=' + artist + '+' + track + '&type=track',
-    requestOptions
-  )
-  console.log(response)
-  const data = await response.data
-  const songID = data.tracks.items[0].id
-  iFrameSrc.value =
-    'https://open.spotify.com/embed/track/' +
-    songID +
-    '?utm_source=generator&amp;theme=0'
-  return songID
-}
 
 // GET request: Get available options for selection from server
 async function getOptions() {
@@ -158,8 +116,6 @@ function reformat(property) {
 <template>
   <div class="py-2 mx-5 bg-primary">
     <b-card>
-      <!--<iframe style="border-radius: 12px;" src={{iframeSrc}}>
-      </iframe>-->
       <!--This form contains all the necessary parameters for a user to submit a request for a computation-->
       <b-form v-if="options" @submit="sendToServer" @reset="initForm">
         <b-row>
