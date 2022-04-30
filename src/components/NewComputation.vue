@@ -184,7 +184,7 @@ function reformat(property) {
                 name="metric"
                 plural="metrics"
                 selectName="a metric"
-                :maxK = form.recommendations
+                :maxK="form.recommendations"
                 :options="
                   form.computationMethod == 'recommendation'
                     ? options.metrics

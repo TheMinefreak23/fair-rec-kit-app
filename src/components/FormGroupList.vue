@@ -211,14 +211,15 @@ function update() {
           <b-row>
             <b-col cols="4">
               <b-form-group :label="'Select ' + selectName">
-                <!--TODO use form bind instead of emit?-->
                 <b-form-select
-                  :form="name"
                   v-model="form.main[i - 1]"
                   :options="options"
                   text-field="name"
                   @change="setParameter(i - 1, $event)"
-                  :required="required"
+                  :required="
+                    // If the option is needed, at least one selection must've been made
+                    !required || form.main.some((x) => x == null)
+                  "
                 >
                   <template #first>
                     <b-form-select-option :value="null" disabled
