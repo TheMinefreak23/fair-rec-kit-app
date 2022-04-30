@@ -2,21 +2,17 @@
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 import FormGroupList from './FormGroupList.vue'
 import { sendMockData } from '../test/mockComputationOptions.js'
 import { store } from '../store.js'
 import { API_URL } from '../api'
 
-const result = ref({})
 const options = ref()
 const form = ref({
   datasets: emptyFormGroup(),
   metrics: emptyFormGroup(),
   approaches: emptyFormGroup(),
-  //filters: emptyFormGroup(),
-  splitMethod: 'random', //The default split method.
-  computationMethod: 'recommendation',
 })
 const metadata = ref({})
 const splitOptions = [
@@ -38,7 +34,6 @@ async function getOptions() {
   const response = await fetch(API_URL + '/computation/options')
   const data = await response.json()
   options.value = data.options
-  console.log(options.value)
 }
 
 // POST request: Send form to server.
@@ -63,25 +58,20 @@ async function sendToServer() {
 
   // Update queue
   const data = response.json()
-  //console.log('calculation route response:', data)
   store.queue = data
-  //console.log('queue:', store.queue)
 }
 
+//Declare default values of the form
 async function initForm() {
-  //console.log(options.value)
-  //console.log(options.value.defaults)
   form.value = {}
   metadata.value = {}
   form.value.datasets = emptyFormGroup()
   form.value.metrics = emptyFormGroup()
   form.value.approaches = emptyFormGroup()
-  //form.value.filters = emptyFormGroup()
-  form.value.recommendations = options.value.defaults.recCount.default
-  form.value.split = options.value.defaults.split
-  form.value.splitMethod = 'random'
-  form.value.computationMethod = 'recommendation'
-  //form.value.result.value = {}
+  form.value.recommendations = options.value.defaults.recCount.default //The default amount of recommendations per user
+  form.value.split = options.value.defaults.split //The default train-test ratio
+  form.value.splitMethod = 'random' //The default method of splitting datasets
+  form.value.computationMethod = 'recommendation' //The default experiment type
 }
 
 function emptyFormGroup() {
@@ -110,10 +100,7 @@ function reformat(property) {
         [setting.name]: reformat(setting),
       }))
     }
-    //console.log('choices:' + choices)
-    //console.log(choices[i])
   }
-
   return choices
 }
 </script>
@@ -141,16 +128,6 @@ function reformat(property) {
                 :options="options.datasets"
                 required
               />
-
-              <!--User can select optional filters-->
-              <!--<FormGroupList
-                v-model:data="form.filters"
-                name="filter"
-                plural="Filters"
-                selectName="a filter"
-                :options="options.filters"
-              />-->
-
               <!--User provides an optional rating conversion-->
               <b-form-group label="Select a rating conversion">
                 <!-- Select a rating conversion from the options received from the server -->
@@ -160,7 +137,7 @@ function reformat(property) {
                 ></b-form-select>
               </b-form-group>
             </div>
-
+            <!-- User can select any number of recommender approaches -->
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
               <FormGroupList
                 v-model:data="form.approaches"
@@ -200,13 +177,14 @@ function reformat(property) {
           </b-col>
 
           <b-col class="p-0">
-            <!--Input for metrics, user can add infinite metrics -->
+            <!--User can select any number of metrics -->
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
               <FormGroupList
                 v-model:data="form.metrics"
                 name="metric"
                 plural="metrics"
                 selectName="a metric"
+                :maxK = form.recommendations
                 :options="
                   form.computationMethod == 'recommendation'
                     ? options.metrics
@@ -216,9 +194,9 @@ function reformat(property) {
             </div>
 
             <!-- Input for metadata such as:
-     Computation Name
-     Optional Tags
-     Optional Email for notification -->
+            Computation Name
+            Tags (optional)
+            Email for notification (optional) -->
             <div class="p-2 m-1 rounded-3 bg-secondary">
               <h3 class="text-center">Meta</h3>
               <b-form-group label="Enter name for computation">
@@ -240,6 +218,7 @@ function reformat(property) {
               </b-form-group>
             </div>
           </b-col>
+          <!-- Buttons to submit or reset an experiment-->
           <div class="d-flex justify-content-center">
             <b-button class="mx-1" type="reset" variant="danger"
               >Reset</b-button
@@ -250,6 +229,7 @@ function reformat(property) {
           </div>
         </b-row>
       </b-form>
+      <!-- Mock data used for testing purposes-->
       <b-button type="test" variant="warning" @click="sendMockData"
         >Mock</b-button
       >
