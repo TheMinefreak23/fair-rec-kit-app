@@ -29,10 +29,6 @@ options = create_available_options(recommender_system)
 
 computation_queue = []
 
-# Create config files directory if it doesn't exist yet
-if not os.path.isdir(CONFIG_DIR):
-    os.mkdir(CONFIG_DIR)
-
 
 def calculate_first():
     """
@@ -59,8 +55,13 @@ def run_experiment(computation):
     # Create configuration dictionary
     config_dict, id = config_dict_from_settings(computation)
 
+    # Create config files directory if it doesn't exist yet
+    if not os.path.isdir(CONFIG_DIR):
+        os.mkdir(CONFIG_DIR)
+        
     # Save configuration to yaml file
     config_file_path = CONFIG_DIR + '/' + id
+
     with open(config_file_path + '.yml', 'w+') as config_file:
         yaml.dump(config_dict, config_file)
 
