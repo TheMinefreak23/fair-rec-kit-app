@@ -30,17 +30,13 @@ async function getSpotifyInfo(token, track, artist) {
     },
   }
   console.log(requestOptions)
-  const response = await fetch(
+  const url =
     SPOTIFY_API +
-      'search?q=' +
-      'artist:' +
-      artist +
-      '+' +
-      'track:' +
-      track +
-      '&type=track',
-    requestOptions
-  )
+    'search?q=' +
+    (artist && 'artist:' + artist) +
+    (track && '+' + 'track:' + track) +
+    '&type=track'
+  const response = await fetch(url, requestOptions)
   /*
   const requestOptions = {
     method: 'POST',
