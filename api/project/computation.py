@@ -60,7 +60,7 @@ def run_experiment(computation):
     config_dict, id = config_dict_from_settings(computation)
 
     # Save configuration to yaml file
-    config_file_path = 'CONFIG_DIR' + id
+    config_file_path = CONFIG_DIR + '/' + id
     with open(config_file_path + '.yml', 'w+') as config_file:
         yaml.dump(config_dict, config_file)
 
