@@ -23,10 +23,16 @@ mock_results_path = 'mock/results.json'
 recommendations_path = 'recs.json'
 evaluations_path = 'evals.json'
 
-
 def save_result(computation, result):
+    """
+    Save result to overview
+
+    :param computation: computation settings
+    :param result: computed result
+    """
     global current_result
     computation['result'] = result
+    computation['metadata']['tags'] = parse_tags(computation['metadata']['tags'])
     current_result = computation
     update_results_overview(current_result)
     print(current_result)
@@ -95,7 +101,7 @@ def edit_result(index, new_name, new_tags, new_email):
         to_edit_result['metadata']['name'] = new_name
         print(to_edit_result['metadata']['name'])
     if new_tags != '':  # Don't change the tags if the input field has been left empty
-        to_edit_result['metadata']['tags'] = new_tags
+        to_edit_result['metadata']['tags'] = parse_tags(new_tags)
         print(to_edit_result['metadata']['tags'])
     if new_email != '':  # Don't change the e-mail if the input field has been left empty
         to_edit_result['metadata']['email'] = new_email
@@ -116,3 +122,11 @@ def create_results_overview():
     if not os.path.exists(results_overview_path) or os.stat(results_overview_path).st_size == 0:
         with open(results_overview_path, 'w') as file:  # Open the file in write mode.
             json.dump({'all_results': []}, file, indent=4)
+
+
+# Parse result tags (given by user as metadata)
+def parse_tags(tags_string):
+    # Split tags by comma and get the unique tags
+    unique = list(set(tags_string.split(',')))
+    # Remove empty tags
+    return [tag for tag in unique if tag]

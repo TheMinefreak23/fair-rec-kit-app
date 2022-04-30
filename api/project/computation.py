@@ -197,7 +197,7 @@ def evaluate(approach, metric):
 def append_queue(metadata, settings):
     timestamp = time.time()
     now = datetime.now()
-    current_dt = now.strftime('%Y-%m-%dT%H:%M:%S') + ('-%02d' % (now.microsecond / 10000))
+    current_dt = now.strftime('%Y-%m-%d %H:%M:%S') #+ ('-%02d' % (now.microsecond / 10000))
     current_request = {'timestamp': {'stamp': str(int(timestamp)), 'datetime': current_dt}, 'metadata': metadata,
                        'settings': settings}
     computation_queue.append(current_request)

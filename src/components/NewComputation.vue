@@ -7,6 +7,7 @@ import FormGroupList from './FormGroupList.vue'
 import { sendMockData } from '../test/mockComputationOptions.js'
 import { store } from '../store.js'
 import { API_URL } from '../api'
+import { emptyOption } from '../helpers/optionsFormatter'
 
 const options = ref()
 const form = ref({
@@ -65,17 +66,24 @@ async function sendToServer() {
 async function initForm() {
   form.value = {}
   metadata.value = {}
-  form.value.datasets = emptyFormGroup()
+  form.value.datasets = emptyFormGroup(true)
   form.value.metrics = emptyFormGroup()
-  form.value.approaches = emptyFormGroup()
+  form.value.approaches = emptyFormGroup(true)
   form.value.recommendations = options.value.defaults.recCount.default //The default amount of recommendations per user
   form.value.split = options.value.defaults.split //The default train-test ratio
   form.value.splitMethod = 'random' //The default method of splitting datasets
   form.value.computationMethod = 'recommendation' //The default experiment type
 }
 
-function emptyFormGroup() {
-  return { main: [], inputs: [], selects: [], lists: [] }
+function emptyFormGroup(required) {
+  return {
+    // For required lists the minimum amount of group items is 1.
+    groupCount: required ? 1 : 0,
+    main: [],
+    inputs: [],
+    selects: [],
+    lists: [],
+  }
 }
 
 // Change the form format (SoA) into a managable data format (AoS)
@@ -184,7 +192,7 @@ function reformat(property) {
                 name="metric"
                 plural="metrics"
                 selectName="a metric"
-                :maxK = form.recommendations
+                :maxK="form.recommendations"
                 :options="
                   form.computationMethod == 'recommendation'
                     ? options.metrics

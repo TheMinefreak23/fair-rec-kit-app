@@ -18,8 +18,6 @@ const props = defineProps({
   data: { type: Object, required: true },
 })
 
-const groupCount = ref(0)
-
 const form = computed({
   // getter
   get() {
@@ -35,10 +33,10 @@ const form = computed({
 //const flatOptions = props.nested ? flattenOptions() : props.options
 
 onMounted(() => {
-  groupCount.value = props.required ? 1 : 0 // For required lists the minimum amount of group items is 1.
-  console.log(props.name)
+  form.value.groupCount = props.required ? 1 : 0 // For required lists the minimum amount of group items is 1.
+  /*console.log(props.name)
   if (props.name == 'filter' || props.name == 'dataset')
-    console.log(props.name, props.options)
+    console.log(props.name, props.options)*/
   form.value.name = props.plural
   //console.log(props.name, 'options', props.options)
 })
@@ -97,8 +95,8 @@ function setParameter(i, option) {
 
 // Splice groups array to remove a group
 function removeGroup(i) {
-  if (props.required && groupCount.value == 1) return
-  groupCount.value--
+  if (props.required && form.value.groupCount == 1) return
+  form.value.groupCount--
   form.value.main.splice(i, 1)
   form.value.inputs.splice(i, 1)
   form.value.selects.splice(i, 1)
@@ -138,12 +136,12 @@ function chooseLabel(name) {
 
 // Copies the selected item and puts it at the end of the list
 function copyItem(i) {
-  groupCount.value++ //Add a new item
-  form.value.main[groupCount.value - 1] = form.value.main[i] //Copy the selected value to the new item
+  form.value.groupCount++ //Add a new item
+  form.value.main[form.value.groupCount - 1] = form.value.main[i] //Copy the selected value to the new item
 
   if (form.value.inputs[i]) {
     //Copy textfield options (if applicable)
-    form.value.inputs[groupCount.value - 1] = form.value.inputs[i].map(
+    form.value.inputs[form.value.groupCount - 1] = form.value.inputs[i].map(
       (param) => ({
         name: param.name,
         value: param.value,
@@ -152,7 +150,7 @@ function copyItem(i) {
   }
   if (form.value.selects[i]) {
     //Copy select options (if applicable)
-    form.value.selects[groupCount.value - 1] = form.value.selects[i].map(
+    form.value.selects[form.value.groupCount - 1] = form.value.selects[i].map(
       (param) => ({
         name: param.name,
         value: param.value,
@@ -161,7 +159,7 @@ function copyItem(i) {
   }
   if (form.value.lists[i]) {
     //Copy nested option list (if applicable)
-    form.value.lists[groupCount.value - 1] = form.value.lists[i].map(
+    form.value.lists[form.value.groupCount - 1] = form.value.lists[i].map(
       (param) => ({
         name: param.name,
         value: param.value,
@@ -185,7 +183,7 @@ function update() {
       form.value.selects[i] = deleteEntry
       form.value.inputs[i] = deleteEntry
       form.value.lists[i] = deleteEntry
-      if (props.required && groupCount.value > 1) groupCount.value--
+      if (props.required && form.value.groupCount > 1) form.value.groupCount--
     }
   }
   //console.log(form.value.main)
@@ -205,23 +203,26 @@ function update() {
       {{ capitalise(plural) }}
       <!--{{ plural }}-->
     </h3>
-    <div v-for="i in groupCount" :key="i - 1">
+    <div v-for="i in form.groupCount" :key="i - 1">
       <b-row class="align-items-end">
         <b-col>
           <b-row>
             <b-col cols="4">
               <b-form-group :label="'Select ' + selectName">
-                <!--TODO use form bind instead of emit?-->
                 <b-form-select
-                  :form="name"
                   v-model="form.main[i - 1]"
                   :options="options"
                   text-field="name"
                   @change="setParameter(i - 1, $event)"
-                  :required="required"
+                  :required="
+                    // If the option is needed, at least one selection must've been made
+                    !required ||
+                    form.main.length == 0 ||
+                    form.main.some((x) => x == null)
+                  "
                 >
                   <template #first>
-                    <b-form-select-option :value="null" disabled
+                    <b-form-select-option :value="null"
                       >Choose..</b-form-select-option
                     >
                   </template>
@@ -251,13 +252,21 @@ function update() {
                 Because of this we use a seperate setting to cover for it.-->
                 <b-form-group
                   :label="capitalise(underscoreToSpace(value.name))"
-                  :description ="'Between ' + value.min + ' and ' + (value.name == 'k' ? props.maxK : value.max)"
+                  :description="
+                    'Between ' +
+                    value.min +
+                    ' and ' +
+                    (value.name == 'k' ? props.maxK : value.max)
+                  "
                 >
                   <b-form-input
                     v-if="!value.name.includes('split')"
                     v-model="form.inputs[i - 1][index].value"
-                    :state ="form.inputs[i - 1][index].value >= value.min &&
-                    form.inputs[i - 1][index].value <= (value.name == 'k' ? props.maxK : value.max)"
+                    :state="
+                      form.inputs[i - 1][index].value >= value.min &&
+                      form.inputs[i - 1][index].value <=
+                        (value.name == 'k' ? props.maxK : value.max)
+                    "
                     validated="true"
                   />
                   <b-form-input
@@ -374,7 +383,7 @@ function update() {
       </b-row>
     </div>
 
-    <b-button @click="groupCount++" align-v="end" variant="primary"
+    <b-button @click="form.groupCount++" align-v="end" variant="primary"
       >Add {{ name }}...</b-button
     >
   </div>
