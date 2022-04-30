@@ -17,7 +17,6 @@ onMounted(async () => {
 
 <template>
   <h1>Music Detail</h1>
-  {{ token.token_type + ': ' + token.access_token }}
   <b-card>
     <h3>Found tracks:</h3>
     <ul>
@@ -26,7 +25,6 @@ onMounted(async () => {
   </b-card>
 
   <template v-if="track">
-    <p>{{ track }}</p>
     <b-button
       style="width: 20vw; display: block"
       class="mx-auto"
@@ -80,9 +78,20 @@ onMounted(async () => {
             allowfullscreen=""
             allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
           />
-          <p>
-            debug | id: {{ track.id }} | preview url: {{ track.preview_url }}
-          </p>
+        </b-row>
+        <b-row class="p-3">
+          <b-button v-b-toggle.collapse-1 variant="primary"
+            >Show full info</b-button
+          >
+          <b-collapse id="collapse-1">
+            <h3>
+              debug | id: {{ track.id }} | preview url: {{ track.preview_url }}
+            </h3>
+            <p v-for="[key, value] of Object.entries(track)">
+              <b>{{ key }}</b
+              >: {{ value }}
+            </p>
+          </b-collapse>
         </b-row>
       </b-container>
     </b-modal>

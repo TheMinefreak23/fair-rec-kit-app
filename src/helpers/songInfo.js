@@ -16,7 +16,9 @@ async function getSongInfo(token, track, artist, musicbrainzId = '') {
 
 async function getSpotifyToken() {
   const response = await fetch(API_URL + '/music/token')
-  return await response.json()
+  const data = await response.json()
+  console.log('token:', data)
+  return data
 }
 
 async function getSpotifyInfo(token, track, artist) {
