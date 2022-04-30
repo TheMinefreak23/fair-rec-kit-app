@@ -32,7 +32,11 @@ def save_result(computation, result):
     """
     global current_result
     computation['result'] = result
-    computation['metadata']['tags'] = parse_tags(computation['metadata']['tags'])
+
+    # Parse tags
+    if 'tags' in computation['metadata']:
+        computation['metadata']['tags'] = parse_tags(computation['metadata']['tags'])
+
     current_result = computation
     update_results_overview(current_result)
     print(current_result)
