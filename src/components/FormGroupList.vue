@@ -184,13 +184,13 @@ function update() {
       if (props.required && groupCount.value > 1) groupCount.value--
     }
   }
-  console.log(form.value.main)
+  //console.log(form.value.main)
   // Filter null values
   form.value.main = form.value.main.filter((x) => x != deleteEntry)
   form.value.selects = form.value.selects.filter((x) => x != deleteEntry)
   form.value.inputs = form.value.inputs.filter((x) => x != deleteEntry)
   form.value.lists = form.value.lists.filter((x) => x != deleteEntry)
-  console.log(form.value.main)
+  //console.log(form.value.main)
 }
 // Flatten options API structure
 function flattenOptions() {
