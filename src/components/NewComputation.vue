@@ -15,6 +15,14 @@ const form = ref({
   approaches: emptyFormGroup(),
 })
 const metadata = ref({})
+const splitOptions = [
+  { text: 'Random', value: 'random' },
+  { text: 'Time', value: 'time' },
+]
+const computationMethods = [
+  { text: 'Recommendation (default)', value: 'recommendation' },
+  { text: 'Prediction', value: 'prediction' },
+]
 
 onMounted(async () => {
   await getOptions()
@@ -106,11 +114,10 @@ function reformat(property) {
           <b-col class="g-0">
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
               <h3>Computation type</h3>
-              <b-form-radio-group v-model="form.computationMethod">
-                <b-form-radio value="recommendation"
-                  >Recommendation (default)</b-form-radio
-                >
-                <b-form-radio value="prediction">Prediction</b-form-radio>
+              <b-form-radio-group
+                v-model="form.computationMethod"
+                :options="computationMethods"
+              >
               </b-form-radio-group>
               <!--User can select a dataset.-->
               <FormGroupList

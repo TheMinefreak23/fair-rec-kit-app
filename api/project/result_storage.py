@@ -14,8 +14,9 @@ import os
 # Result detail format
 # timestamp (ID), per dataset: recommendations result, per recs result: metrics evaluations
 
+
 current_result = {}
-current_recs = {}
+current_recs = None
 results_overview_path = 'results.json'
 mock_results_overview_path = 'mock/results_overview.json'
 mock_results_path = 'mock/results.json'
