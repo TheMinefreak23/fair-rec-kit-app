@@ -31,10 +31,10 @@ function formatMultipleItems(items) {
 
 // Format a result for the result tab
 function formatResult(result) {
-  //console.log(result)
+  console.log(result)
   const formattedResult = {
     id: result.timestamp.stamp,
-    name: result.metadata.name,
+    metadata: result.metadata,
     result: result.result
       // Format result per dataset
       .map((datasetResult) => {
@@ -58,6 +58,7 @@ function formatResult(result) {
         return datasetResult
       }),
   }
+  formattedResult.metadata.datetime = result.timestamp.datetime
 
   //console.log(formattedResult)
   return formattedResult
@@ -123,7 +124,7 @@ function formatMetric(evaluation) {
   // If it is a K metric, replace K with the parameter
   const name = evaluation.name
   if (name.toLowerCase()[name.length - 1] == 'k') {
-    console.log(evaluation)
+    //console.log(evaluation)
     return name.slice(0, -1) + evaluation.params[0].value
   } else return name
 }

@@ -75,7 +75,7 @@ function closeResult(id) {
                 :key="result.id"
               >
                 <template #title>
-                  Result {{ result.name }}
+                  Result {{ result.metadata.name }}
                   <VDismissButton @click.stop="closeResult(index)" />
                 </template>
                 <Result :result="result"

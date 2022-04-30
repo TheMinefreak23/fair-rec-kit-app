@@ -36,9 +36,9 @@ const form = computed({
 
 onMounted(() => {
   groupCount.value = props.required ? 1 : 0 // For required lists the minimum amount of group items is 1.
-  console.log(props.name)
+  /*console.log(props.name)
   if (props.name == 'filter' || props.name == 'dataset')
-    console.log(props.name, props.options)
+    console.log(props.name, props.options)*/
   form.value.name = props.plural
   //console.log(props.name, 'options', props.options)
 })
@@ -251,13 +251,21 @@ function update() {
                 Because of this we use a seperate setting to cover for it.-->
                 <b-form-group
                   :label="capitalise(underscoreToSpace(value.name))"
-                  :description ="'Between ' + value.min + ' and ' + (value.name == 'k' ? props.maxK : value.max)"
+                  :description="
+                    'Between ' +
+                    value.min +
+                    ' and ' +
+                    (value.name == 'k' ? props.maxK : value.max)
+                  "
                 >
                   <b-form-input
                     v-if="!value.name.includes('split')"
                     v-model="form.inputs[i - 1][index].value"
-                    :state ="form.inputs[i - 1][index].value >= value.min &&
-                    form.inputs[i - 1][index].value <= (value.name == 'k' ? props.maxK : value.max)"
+                    :state="
+                      form.inputs[i - 1][index].value >= value.min &&
+                      form.inputs[i - 1][index].value <=
+                        (value.name == 'k' ? props.maxK : value.max)
+                    "
                     validated="true"
                   />
                   <b-form-input

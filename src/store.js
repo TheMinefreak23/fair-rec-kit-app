@@ -11,7 +11,14 @@ function mockResult() {
     results: mockdata.body,
     headers: mockdata.headers,
   }
-  return { id: 0, name: 'computation1', result: [mock, mock] }
+  return {
+    metadata: {
+      id: 0,
+      name: 'computation1',
+      tags: ['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '],
+    },
+    result: [mock, mock],
+  }
 }
 
 const store = reactive({
