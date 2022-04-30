@@ -58,6 +58,7 @@ async function setRecs() {
 
 //POST request: Ask server for next part of user recommendation table.
 async function getUserRecs() {
+  console.log(typeof(headers.value))
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -67,9 +68,9 @@ async function getUserRecs() {
       sortindex: index.value,
       ascending: ascending.value,
       amount: entryAmount.value,
-      //headers: headers.value,
-      //itemheaders: itemHeaders.value,
-      //userheaders: userHeaders.value
+      headers: headers.value,
+      itemheaders: itemHeaders.value,
+      userheaders: userHeaders.value
     }),
   }
 
@@ -118,6 +119,7 @@ function changeColumns(generalHeader, userHeader, itemHeader){
   userHeaders.value = userHeader,
   itemHeaders.value = itemHeader
 
+  console.log(headers.value)
   getUserRecs()
 }
 

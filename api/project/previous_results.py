@@ -77,28 +77,49 @@ def set_recs():
 @results_bp.route('/result', methods=['POST'])
 def user_result():
     json = request.json
-    chunksize = json.get("amount", 20)
-    chunksize = int(chunksize)
+    chunk_size = json.get("amount", 20)
+    chunk_size = int(chunk_size)
 
-    ##read mock dataframe
+    chosen_headers = json.get("headers", [])
+    print(type(chosen_headers))
+    #WHY DOES THIS FIX THINGS??
+    if chosen_headers is None:
+        print("hello")
+        chosen_headers = []
+
+    chosen_headers_2 = json.get("itemheaders", [])
+
+    if chosen_headers_2 is None:
+        print("hello")
+        chosen_headers = []
+
+    chosen_headers_3 = json.get("userheaders", [])
+
+    if chosen_headers_3 is None:
+        print("hello")
+        chosen_headers = []
+
+    #read mock dataframe
     recs = result_storage.current_recs
 
+    #TODO what if sorted on column that is removed?
+    #TODO saving sorted dataframe inbetween
     ##sort dataframe based on index and ascending or not
     df_sorted = recs.sort_values(by=recs.columns[json.get("sortindex", 0)], ascending=json.get("ascending"))
 
     # getting only chunk of data
-    startrows = json.get("start", 0)
-    startrows = int(startrows)
-    endrows = startrows + chunksize
-    endrows = int(endrows)
+    start_rows = json.get("start", 0)
+    start_rows = int(start_rows)
+    end_rows = start_rows + chunk_size
+    end_rows = int(end_rows)
 
     # determine if at the end of the dataset
     columns_number = len(df_sorted)
-    if endrows > columns_number:
-        endrows = columns_number
+    if end_rows > columns_number:
+        end_rows = columns_number
 
     # return part of table that should be shown
-    df_subset = df_sorted[startrows:endrows]
+    df_subset = df_sorted[start_rows:end_rows]
 
     # return {'results': dfSubset.to_json(orient='records'), 'caption': 'hellofriend'}
     return df_subset.to_json(orient='records')
