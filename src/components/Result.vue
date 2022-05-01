@@ -52,9 +52,8 @@ async function setRecs() {
       id: props.result.id,
     }),
   }
-  fetch(API_URL + '/all-results/set-recs', requestOptions).then(() => {
-    getUserRecs()
-  })
+  const response = await fetch(API_URL + '/result/set-recs', requestOptions)
+  if (response.status == 'success') getUserRecs()
 }
 
 //POST request: Ask server for next part of user recommendation table.
@@ -74,7 +73,7 @@ async function getUserRecs() {
     }),
   }
 
-  const response = await fetch(API_URL + '/all-results/result', requestOptions)
+  const response = await fetch(API_URL + '/result/result', requestOptions)
   data.value.results = await response.json()
 }
 

@@ -79,7 +79,6 @@ b-tab.success {
   </div>
   <div class="nav-center">
     <b-tabs v-model="tabIndex" class="m-0 pt-2" align="center">
-      <b-tab title="Music Detail"> <MusicDetail /></b-tab>
       <b-tab title="New Computation"><NewComputation /></b-tab>
       <b-tab :class="{ success: done }">
         <ActiveComputation
@@ -98,8 +97,9 @@ b-tab.success {
       <b-tab title="Documentation"> <Documentation /></b-tab>
       <b-tab title="Results"> <Results @goToResult="goToResult" /></b-tab>
       <b-tab title="All results">
-        <PreviousResults @goToResult="goToResult"
-      /></b-tab>
+        <PreviousResults @goToResult="goToResult" />
+      </b-tab>
+      <b-tab title="Music Detail"> <MusicDetail /></b-tab>
     </b-tabs>
   </div>
 </template>
