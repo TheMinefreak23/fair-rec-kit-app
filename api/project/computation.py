@@ -123,7 +123,7 @@ def calculate():
         global computation_thread
         if computation_thread.is_alive():
             computation_thread.join()
-        response['calculation'] = result_storage.newest_result()
+        response['calculation'] = result_storage.current_result
     print('/calculation response:', response)
     return response
 
