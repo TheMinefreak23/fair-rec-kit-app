@@ -115,7 +115,7 @@ function reformat(property) {
 
 <template>
   <div class="py-2 mx-5 bg-primary">
-    <b-card class="block">
+    <b-card>
       <!--This form contains all the necessary parameters for a user to submit a request for a computation-->
       <b-form v-if="options" @submit="sendToServer" @reset="initForm">
         <b-row>
@@ -142,7 +142,8 @@ function reformat(property) {
                 <b-form-select
                   v-model:data="form.conversion"
                   :options="[{ text: 'None (default)', value: null }]"
-                ></b-form-select>
+                >
+                </b-form-select>
               </b-form-group>
             </div>
             <!-- User can select any number of recommender approaches -->

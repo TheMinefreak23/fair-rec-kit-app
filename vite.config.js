@@ -25,15 +25,5 @@ export default defineConfig({
     // simulate DOM with happy-dom
     // (requires installing happy-dom as a peer dependency)
     environment: 'happy-dom',
-  },
-
-  /*  server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:5000/api',
-        ws: true,
-        changeOrigin: true,
-      },
-    },
-  },*/
+  }
 })

@@ -3,11 +3,11 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
-
 from flask import Flask
 from flask_cors import CORS
 
 from project.computation import compute_bp
+from project.music_detail import detail_bp
 from project.previous_results import results_bp
 from project.result_storage import create_results_overview
 
@@ -39,4 +39,4 @@ def create_app(test_config=None):
 def register_blueprints(app):
     app.register_blueprint(compute_bp)
     app.register_blueprint(results_bp)
-
+    app.register_blueprint(detail_bp)
