@@ -33,7 +33,6 @@ const form = computed({
 //const flatOptions = props.nested ? flattenOptions() : props.options
 
 onMounted(() => {
-  form.value.groupCount = props.required ? 1 : 0 // For required lists the minimum amount of group items is 1.
   /*console.log(props.name)
   if (props.name == 'filter' || props.name == 'dataset')
     console.log(props.name, props.options)*/
@@ -83,6 +82,7 @@ function setParameter(i, option) {
       choices = option.params.dynamic
       // TODO refactor empty form group function
       form.value.lists[i] = choices.map(() => ({
+        groupCount: 0, // For sublists there is no minimum amount of group items.
         main: [],
         inputs: [],
         selects: [],
@@ -216,13 +216,12 @@ function update() {
                   @change="setParameter(i - 1, $event)"
                   :required="
                     // If the option is needed, at least one selection must've been made
-                    !required ||
-                    form.main.length == 0 ||
-                    form.main.some((x) => x == null)
+                    required &&
+                    (form.main.length == 0 || form.main.every((x) => x == ''))
                   "
                 >
                   <template #first>
-                    <b-form-select-option :value="null"
+                    <b-form-select-option :value="''"
                       >Choose..</b-form-select-option
                     >
                   </template>
