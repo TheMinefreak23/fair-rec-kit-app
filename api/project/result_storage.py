@@ -33,11 +33,11 @@ def save_result(computation, result):
     print(current_result)
 
 
-def result_by_id(id):
+def result_by_id(result_id):
     """
     Get a result from the results overview by its id.
 
-    :param id: the result id
+    :param result_id: the result id
     :return: the corresponding result (settings, recs, evaluation)
     """
     results = load_json(RESULTS_OVERVIEW_PATH)
@@ -46,7 +46,7 @@ def result_by_id(id):
     for result in results['all_results']:
         global current_result
         if 'timestamp' in result:
-            if result['timestamp']['stamp'] == id:
+            if result['timestamp']['stamp'] == result_id:
                 # print('result', result)
                 current_result = result
         else:
@@ -63,7 +63,7 @@ def load_json(path):
     :param path: the path to the JSON file
     :return: the JSON as a dictionary
     """
-    with open(path, 'r') as file:
+    with open(path, 'r', encoding='utf-8') as file:
         return json.load(file)  # Load existing data into a dict.
 
 
@@ -85,7 +85,7 @@ def write_results_overview(results):
     :param results: the results to store
     """
     # Open the file in write mode.
-    with open(RESULTS_OVERVIEW_PATH, 'w') as file:
+    with open(RESULTS_OVERVIEW_PATH, 'w', encoding='utf-8') as file:
         # Store it as json data.
         json.dump(results, file, indent=4)
 
@@ -140,11 +140,9 @@ def edit_result(index, new_name, new_tags, new_email):
 
 
 def create_results_overview():
-    """
-    Create a results file if it doesn't exist yet or is empty.
-    """
+    """Create a results file if it doesn't exist yet or is empty."""
     if not os.path.exists(RESULTS_OVERVIEW_PATH) or os.stat(RESULTS_OVERVIEW_PATH).st_size == 0:
-        with open(RESULTS_OVERVIEW_PATH, 'w') as file:  # Open the file in write mode.
+        with open(RESULTS_OVERVIEW_PATH, 'w', encoding='utf-8') as file:  # Open the file in write mode.
             json.dump({'all_results': []}, file, indent=4)
 
 

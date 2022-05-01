@@ -7,10 +7,12 @@ Utrecht University within the Software Project course.
 from flask import (Blueprint, request)
 import pandas as pd
 
-from . import result_storage, results_bp
+from . import result_storage
+
+result_bp = Blueprint('result', __name__, url_prefix='/api/result')
 
 
-@results_bp.route('/set-recs', methods=['POST'])
+@result_bp.route('/set-recs', methods=['POST'])
 def set_recs():
     """
     Set current shown recommendations
@@ -35,7 +37,7 @@ def set_recs():
 
 
 ## get recommender results per user
-@results_bp.route('/result', methods=['POST'])
+@result_bp.route('/result', methods=['POST'])
 def user_result():
     json = request.json
     chunksize = json.get("amount", 20)
