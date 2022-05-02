@@ -37,7 +37,7 @@ def test_result_by_id(client):
 
 
 # Test editing a result POST route
-@patch('project.result_storage.results_overview_path', test_results_path)
+@patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 def test_edit(client):
     save_mock_result()
     index = 0
@@ -61,11 +61,4 @@ def test_edit(client):
 # TODO: delete test
 
 
-# Test setting of current shown recommendations POST route
-# TODO this is kind of a stub because of the randomness
-def test_set_recs(client):
-    response = client.post(url_prefix + '/set-recs', json={'id': test_id})
 
-    # current_recs = TODO check result
-
-    assert b'success' in response.data

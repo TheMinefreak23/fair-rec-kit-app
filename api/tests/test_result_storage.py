@@ -15,7 +15,7 @@ test_computation = {'result': None, 'timestamp': {'stamp': test_id}, 'metadata':
 test_results_path = 'test_results.json'
 
 
-@patch('project.result_storage.results_overview_path', test_results_path)
+@patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 def save_mock_result():
     save_result(test_computation, 'foo')  # Save a result with the id
 
@@ -52,7 +52,7 @@ def test_no_path_json():
 
 
 # Test updating of results overview
-@patch('project.result_storage.results_overview_path', test_results_path)
+@patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 def test_update_results():
     print(load_results_overview())
     old_results_length = len(load_results_overview()['all_results'])
