@@ -3,7 +3,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
 // Format data for a results overview
-function formatResults(allResults) {
+export function formatResults(allResults) {
   const results = []
   for (let i in allResults) {
     results[i] = {
@@ -19,7 +19,7 @@ function formatResults(allResults) {
 }
 
 // Format an array of named objects into a comma separated string
-function formatMultipleItems(items) {
+export function formatMultipleItems(items) {
   var string = ''
   if (items == null) {
     string = 'NULL'
@@ -30,7 +30,7 @@ function formatMultipleItems(items) {
 }
 
 // Format a result for the result tab
-function formatResult(result) {
+export function formatResult(result) {
   console.log(result)
   const formattedResult = {
     id: result.timestamp.stamp,
@@ -80,16 +80,16 @@ function omitRecommendation(arr) {
 }*/
 
 // Show dataset info as formatted caption
-function showDatasetInfo(dataset) {
+export function showDatasetInfo(dataset) {
   return (
     'Dataset: ' +
     dataset.name +
-    (dataset.parameter ? 'with parameters' + dataset.parameter : '')
+    (dataset.parameter ? 'with parameters ' + dataset.parameter : '')
   )
 }
 
 // Format evaluations (including filtered ones)
-function formatEvaluation(e, result) {
+export function formatEvaluation(e, result) {
   result[formatMetric(e)] = e.evaluation.global
 
   // Flatten filters
@@ -120,7 +120,7 @@ function formatEvaluation(e, result) {
 }
 
 // Format metric name
-function formatMetric(evaluation) {
+export function formatMetric(evaluation) {
   // If it is a K metric, replace K with the parameter
   const name = evaluation.name
   if (name.toLowerCase()[name.length - 1] == 'k') {
@@ -129,16 +129,16 @@ function formatMetric(evaluation) {
   } else return name
 }
 
-function article(word) {
+export function article(word) {
   return ['a', 'i', 'u', 'e', 'o'].includes(word[0]) ? 'an' : 'a'
 }
 
-function capitalise(string) {
+export function capitalise(string) {
   return string[0].toUpperCase() + string.slice(1)
 }
 
-function underscoreToSpace(string) {
+export function underscoreToSpace(string) {
   return string.replaceAll('_', ' ')
 }
 
-export { formatResults, formatResult, capitalise, article, underscoreToSpace }
+//export { formatResults, formatResult, capitalise, article, underscoreToSpace }

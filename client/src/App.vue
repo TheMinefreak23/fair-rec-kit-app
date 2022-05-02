@@ -94,7 +94,9 @@ b-tab.success {
           Active Computations
         </template>
       </b-tab>
-      <b-tab title="Documentation"> <Documentation /></b-tab>
+      <b-tab title="Documentation" data-testid="DocTab">
+        <Documentation
+      /></b-tab>
       <b-tab title="Results"> <Results @goToResult="goToResult" /></b-tab>
       <b-tab title="All results">
         <PreviousResults @goToResult="goToResult" />
