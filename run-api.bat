@@ -1,2 +1,2 @@
-cd api
+cd server
 run.bat
