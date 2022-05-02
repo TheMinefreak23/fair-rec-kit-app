@@ -6,7 +6,7 @@ Utrecht University within the Software Project course.
 import Table from './Table.vue'
 import { onMounted, ref, watch } from 'vue'
 
-import mockdata from '../../api/mock/1647818279_HelloWorld/results-table.json'
+import mockdata from '../../../server/mock/1647818279_HelloWorld/results-table.json'
 import { API_URL } from '../api'
 
 const props = defineProps({ headers: Array, result: Object })

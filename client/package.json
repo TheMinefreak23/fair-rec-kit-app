@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "dev-api": "cd api && set FLASK_APP=app.py && set FLASK_ENV=development && flask run && pause",
     "test": "vitest",
     "build": "vite build",
     "preview": "vite preview --port 5050"
@@ -15,7 +14,6 @@
     "bootstrap-vue-3": "^0.1.11",
     "just-sort-by": "^3.0.1",
     "requirejs": "^2.3.6",
-    "vitest": "^0.6.3",
     "vue": "^3.2.31"
   },
   "devDependencies": {
@@ -23,6 +21,7 @@
     "@vitejs/plugin-vue": "^2.2.2",
     "happy-dom": "^2.49.0",
     "sass": "^1.49.11",
-    "vite": "^2.8.4"
+    "vite": "^2.8.4",
+    "vitest": "^0.10.0"
   }
 }
