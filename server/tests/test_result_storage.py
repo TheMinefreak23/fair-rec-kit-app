@@ -12,7 +12,7 @@ from project.result_storage import *
 
 test_id = -1
 test_computation = {'result': None, 'timestamp': {'stamp': test_id}, 'metadata': {'name': 'foo'}}
-test_results_path = 'test_results.json'
+test_results_path = 'tests/test_results.json'
 
 
 @patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
