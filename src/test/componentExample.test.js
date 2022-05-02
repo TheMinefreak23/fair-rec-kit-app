@@ -1,4 +1,4 @@
-import { render, fireEvent } from '@testing-library/vue'
+import { render, fireEvent, getAllByText} from '@testing-library/vue'
 import { test } from 'vitest'
 import App from '../App.vue'
 
@@ -7,10 +7,10 @@ test('switchTab', async () => {
   const { getByText } = render(App)
 
   // get first node that matches tab text
-  const tab = getByText('Documentation')
+  const tab = getAllByText("Documentation")[2].parentNode
 
   await fireEvent.click(tab)
 
   // throws error if the view that appears on press does not have this text
-  getByText('Documentation')
+  getAllByText('Documentation')
 })

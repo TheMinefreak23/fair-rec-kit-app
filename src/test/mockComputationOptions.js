@@ -1,44 +1,28 @@
 import words from 'an-array-of-english-words'
 import { API_URL } from '../api'
 import { store } from '../store'
-import {ref} from 'vue'
+import {ref, onMounted} from 'vue'
 
 var metadata = {}
 var form = {}
 
-const options = ref()
 
-
-// GET request: Get available options for selection from server
-async function getOptions() {
-  const response = await fetch(API_URL + '/computation/options')
-  const data = await response.json()
-  options.value = data.options
-  console.log(options)
-}
-
-async function sendMockData() {
-  await getOptions()
+ async function sendMockData(options) {
   form = {
     recommendations: rand(100),
     split: rand(100),
     splitMethod: 'timesplit',
-    approaches: generateRandomApproach(),
-    metrics: generateRandomMetrics(),
-    datasets: generateRandomDatasets(),
+    approaches: generateRandomApproach(options),
+    metrics: generateRandomMetrics(options),
+    datasets: generateRandomDatasets(options),
     filters: toFormObject(randomWords()),
   }
-  console.log(form)
+
   metadata = {
     name: 'Test' + rand() + ': ' + randomWord(),
     email: randomWord() + '@' + randomWord() + '.com',
     tags: randomWords(),
   }
-
-
-  //form.approaches = reformat(form.approaches)
-  //form.metrics = reformat(form.metrics)
-  //form.datasets = reformat(form.datasets)
 
   const requestOptions = {
     method: 'POST',
@@ -54,68 +38,93 @@ async function sendMockData() {
   store.queue = data
 }
 
-function generateRandomApproach() {
-  let libraries = options.value.approaches.libraries
+function generateRandomApproach(options) {
+  //generate random settings for the Approaches part of a computation
+  let libraries = options.approaches.libraries.prediction
   let result = []
-  for (let i = 0; i < (1 + Math.floor(Math.random * 3)); i++) {
-    approaches = randomItems(randomItems(libraries, 1).options, 1)
-    approachName = approaches.name
-    choices = approaches.params.options
+  var n = (1 + Math.floor(Math.random() * 3))
 
-    randomOption = randomItems(choices, 1)
-    randomOptionName = randomOption.map(x => x.text)
-    randomOptionValue = randomOption.map(x => randomItems(x.options, 1))
+  for (let i = 0; i < n; i++) {
+    var ops = randomItems(libraries, 1)[0].options
 
-    values = approaches.params.values
+    var approach = randomItems(ops, 1)[0]
 
-    randomValue = randomItems(values, 1)
-    randomValuesName = randomValue.map(x => x.text)
-    randomValuesValue = randomValue.map(x => (getRandomInt(x.min, x.max)))
+    var approachName = approach.text
+    var choices = approach.params.options
 
-    params = [{
+    var randomOptionName = randomWord()
+    var randomOptionValue = randomWord()
+    if(choices != (undefined || [])){
+      var randomOption = randomItems(choices, 1)[0]
+      randomOptionName = randomOption.text
+      randomOptionValue = randomItems(randomOption.options, 1)
+    }
+
+    var values = approach.params.values
+
+    var randomValuesName = randomWord()
+    var randomValuesValue = rand()
+    if (values != (undefined || []))
+    {
+      var randomValue = randomItems(values, 1)[0]
+      randomValuesName = randomValue.text
+      randomValuesValue = (getRandomInt(randomValue.min, randomValue.max))
+    }
+
+
+    var params = [{
       'name': randomOptionName,
       'value': randomOptionValue
     },
     {
-      'name': randomValueName,
-      'value': randomValueValue
-    }]=
+      'name': randomValuesName,
+      'value': randomValuesValue
+    }]
 
     result[i] = {
       'name': approachName,
-      'params': params}
+      'settings': params}
   }
-  console.log(result)
+
   return result
 }
 
-function generateRandomMetrics(){
+function generateRandomMetrics(options){
+  //generate random settings for the Metrics part of a computation
   let result = []
-  for (let i = 0; i < (1 + Math.floor(Math.random * 3)) ; i++) {
-    console.log(options.value.metrics)
-    randomOption = randomItems(options.value.metrics.categories, 1)
-    randomOptionName = randomOption.text
+  var n = (1 + Math.floor(Math.random() * 3))
+  for (let i = 0; i < n ; i++) {
+    console.log(options.metrics)
+    var randomOption = randomItems(options.metrics.categories, 1)[0]
+    var randomOptionOptions = randomOption.options
+    var randomOptionName = randomItems(randomOptionOptions,1)[0].text
 
     result[i] = {
       'name': randomOptionName,
-      'params': rand(20)
+      'settings': rand(20)
     }
   }
-  console.log(result)
+
   return result
 }
 
-function generateRandomDatasets() {
+function generateRandomDatasets(options) {
+  //generate random settings for the Datasets part of a computation
   let result = []
-  for (let i = 0; i < (1 + Math.floor(Math.random * 3)); i++) {
+  var n = (1 + Math.floor(Math.random() * 3))
+  for (let i = 0; i < n; i++) {
+    console.log(options.datasets)
+    var randomDataset = randomItems(options.datasets, 1)[0]
 
-    randomDataset = randomItems(options.value.datasets, 1)
-    randomDatasetName = randomDataset.text
+    var randomDatasetName = randomDataset.text
+    var randomDatasetParams = {'name' : randomDataset.params.values[0].text,
+      'value': randomDataset.params.values[0].default}
 
     result[i] = {
       'name': randomDatasetName,
-      'params': rand(20)
+      'settings': randomDatasetParams
     }
+    console.log(result)
   }
   return result
 }
@@ -142,7 +151,12 @@ function randomWords() {
   return array
 }
 
-function randomItems(list, n = Math.floor(Math.random() * list.length)) {
+function randomItems(list = [], n = Math.floor(Math.random() * list.length)) {
+  //takes a list and a number, selects a random amount of item in that list.
+
+  if (list.length == 0){
+    return randomWord()
+  }
   let set = new Set()
   for (let i = 0; i < n; i++) {
     set.add(list[Math.floor(Math.random() * list.length)])
@@ -150,7 +164,6 @@ function randomItems(list, n = Math.floor(Math.random() * list.length)) {
   if (set.size == 0) {
     return randomItems(list)
   }
-  console.log(...set)
   return [...set]
 }
 
@@ -166,7 +179,7 @@ function reformat(property) {
   for (let i in property.main) {
     let parameter = null
     if (property.lists[i] != null) {
-      //console.log(property.lists[i])
+
       choices[i] = {
         name: property.main[i],
         settings: property.lists[i].map((setting) => ({
@@ -177,7 +190,6 @@ function reformat(property) {
       if (property.inputs[i] != null) parameter = property.inputs[i]
       else if (property.selects[i] != null) parameter = property.selects[i]
       choices[i] = { name: property.main[i], parameter: parameter }
-      //console.log('choices:' + choices)
     }
   }
   return choices

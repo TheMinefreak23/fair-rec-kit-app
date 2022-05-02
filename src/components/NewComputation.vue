@@ -10,6 +10,8 @@ import { API_URL } from '../api'
 import { emptyOption } from '../helpers/optionsFormatter'
 
 const options = ref()
+
+//Store the settings of the form in a reference
 const form = ref({
   datasets: emptyFormGroup(),
   metrics: emptyFormGroup(),
@@ -135,6 +137,7 @@ function reformat(property) {
                 selectName="a dataset"
                 :options="options.datasets"
                 required
+                id = "datasets"
               />
               <!--User provides an optional rating conversion-->
               <b-form-group label="Select a rating conversion">
@@ -212,7 +215,6 @@ function reformat(property) {
                 <b-form-input
                   placeholder="New Computation"
                   v-model="metadata.name"
-                  required
                 ></b-form-input>
               </b-form-group>
               <b-form-group label="Enter tags (optional)">
@@ -238,8 +240,8 @@ function reformat(property) {
           </div>
         </b-row>
       </b-form>
-      <!-- Mock data used for testing purposes-->
-      <b-button type="test" variant="warning" @click="sendMockData"
+      <!--Send a plethora of mock data to the queue-->
+      <b-button type="test" variant="warning" @click="sendMockData(options)"
         >Mock</b-button
       >
     </b-card>
