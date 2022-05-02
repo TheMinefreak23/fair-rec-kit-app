@@ -1,10 +1,10 @@
 [
   {
-    "text": "Artist Gender",
+    "name": "Artist Gender",
     "params": {
       "options": [
         {
-          "text": "Gender",
+          "name": "Gender",
           "options": [
             "Male",
             "Female"
@@ -14,11 +14,11 @@
     }
   },
   {
-    "text": "User Gender",
+    "name": "User Gender",
     "params": {
       "options": [
         {
-          "text": "Gender",
+          "name": "Gender",
           "options": [
             "Male",
             "Female"
@@ -28,11 +28,11 @@
     }
   },
   {
-    "text": "Country user threshold",
+    "name": "Country user threshold",
     "params": {
       "values": [
         {
-          "text": "threshold",
+          "name": "threshold",
           "min": 1,
           "max": 1000,
           "default": 10
@@ -41,11 +41,11 @@
     }
   },
   {
-    "text": "Minimum age",
+    "name": "Minimum age",
     "params": {
       "values": [
         {
-          "text": "threshold",
+          "name": "threshold",
           "min": 1,
           "max": 1000,
           "default": 18
@@ -54,11 +54,11 @@
     }
   },
   {
-    "text": "Maximum age",
+    "name": "Maximum age",
     "params": {
       "values": [
         {
-          "text": "threshold",
+          "name": "threshold",
           "min": 1,
           "max": 1000,
           "default": 18
