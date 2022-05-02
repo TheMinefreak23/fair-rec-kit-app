@@ -13,11 +13,6 @@ const props = defineProps({ headers: Array, result: Object })
 
 const headers_rec = ref([{ name: 'User' }, { name: 'Item' }, { name: 'Score' }])
 
-//this needs to come from the server
-const headers_options = ref([{ name: 'Option1' }, { name: 'Option2' }, { name: 'Option3' }])
-const user_header_options = ref([{name: 'OptionA' }])
-const item_header_options = ref([{name: 'OptionB'}])
-
 const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
 const data = ref([])
@@ -41,6 +36,19 @@ onMounted(() => {
   setRecs()
 })
 
+// GET request: Get available options for selection from server
+async function getHeaders() {
+  const response = await fetch(API_URL + '/all-results/headers')
+  const data = await response.json()
+  
+  headers.value = data.headers
+  itemHeaders.value = data.itemHeaders
+  userHeaders.value = data.userHeaders
+
+  console.log(headers.value)
+
+}
+
 //POST request: Send result ID to the server to set current shown recommendations.
 async function setRecs() {
   const requestOptions = {
@@ -52,13 +60,13 @@ async function setRecs() {
   }
   fetch(API_URL + '/all-results/set-recs', requestOptions).then(() => {
     getUserRecs()
+    getHeaders()
   })
 }
 
 
 //POST request: Ask server for next part of user recommendation table.
 async function getUserRecs() {
-  console.log(typeof(headers.value))
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

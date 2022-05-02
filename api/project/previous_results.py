@@ -3,6 +3,7 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
+import json
 
 from flask import (Blueprint, request)
 import pandas as pd
@@ -115,4 +116,28 @@ def user_result():
     # return {'results': dfSubset.to_json(orient='records'), 'caption': 'hellofriend'}
     return df_subset.to_json(orient='records')
 
+@results_bp.route('/headers', methods=['GET'])
+def headers():
+    mock_json = {
+        "headers" : [
+            { "name" : "general option 1"},
+            { "name" : "general option 2"}
+
+        ],
+
+        "itemHeaders" : [
+            { "name" : "item option 1"},
+            { "name" : "item option 2"}
+        ],
+
+        "userHeaders" : [
+            {"name": "user option 1"},
+            {"name": "user option 2"}
+        ]
+
+    }
+
+    result = json.dumps(mock_json)
+    print(result)
+    return result
 
