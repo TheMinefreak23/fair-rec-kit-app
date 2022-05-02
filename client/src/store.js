@@ -1,5 +1,5 @@
 import { reactive } from 'vue'
-import mockdata from '../api/mock/1647818279_HelloWorld/results-table.json'
+import mockdata from '../../server/mock/1647818279_HelloWorld/results-table.json'
 
 // Mockdata result
 function mockResult() {

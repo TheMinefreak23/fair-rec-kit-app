@@ -126,7 +126,7 @@ def config_dict_from_settings(computation):
     """
     settings = computation['settings']
 
-    name = computation['metadata']['name']
+    name = computation['metadata']['name'] 
     id = computation['timestamp']['stamp'] + '_' + name
 
     # Format datasets

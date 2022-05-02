@@ -240,6 +240,11 @@ def append_queue(metadata, settings):
     :param metadata: the computation metadata
     :param settings: the computation settings
     """
+    # Handle empty name
+    if 'name' not in metadata:
+        metadata['name'] = 'Untitled'
+
+    # Set time
     timestamp = time.time()
     now = datetime.now()
     current_dt = now.strftime('%Y-%m-%d %H:%M:%S') #+ ('-%02d' % (now.microsecond / 10000))
