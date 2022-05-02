@@ -13,18 +13,28 @@ const props = defineProps({ headers: Array, result: Object })
 
 const headers_rec = ref([{ name: 'User' }, { name: 'Item' }, { name: 'Score' }])
 
-const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
+//this needs to come from the server
+const headers_options = ref([
+  { name: 'Option1' },
+  { name: 'Option2' },
+  { name: 'Option3' },
+])
+const user_header_options = ref([{ name: 'OptionA' }])
+const item_header_options = ref([{ name: 'OptionB' }])
 
 const data = ref([])
 const startIndex = ref(0)
 const index = ref(0)
 const ascending = ref(true)
 const entryAmount = ref(20)
+const userHeaders = ref([])
+const itemHeaders = ref([])
+const headers = ref([])
 
 watch(
   () => props.result,
   async (newResult) => {
-    //console.log(newResult.id)
+    console.log(newResult.id, newResult)
     setRecs()
   }
 )
@@ -42,9 +52,8 @@ async function setRecs() {
       id: props.result.id,
     }),
   }
-  fetch(API_URL + '/all-results/set-recs', requestOptions).then(() => {
-    getUserRecs()
-  })
+  const response = await fetch(API_URL + '/result/set-recs', requestOptions)
+  if (response.status == 'success') getUserRecs()
 }
 
 //POST request: Ask server for next part of user recommendation table.
@@ -58,14 +67,21 @@ async function getUserRecs() {
       sortindex: index.value,
       ascending: ascending.value,
       amount: entryAmount.value,
+      //headers: headers.value,
+      //itemheaders: itemHeaders.value,
+      //userheaders: userHeaders.value
     }),
   }
 
-  const response = await fetch(API_URL + '/all-results/result', requestOptions)
+  const response = await fetch(API_URL + '/result/result', requestOptions)
   data.value.results = await response.json()
 }
 
-//Loads more data in the table after user asks for more data.
+/**
+ * Loads more data in the table after user asks for more data.
+ * @param {Bool}   increase  - Determines whether the next or previous data is required.
+ * @param {Int}    amount    - Number of items that the user has requested.
+ */
 function loadMore(increase, amount) {
   amount = parseInt(amount)
 
@@ -80,6 +96,10 @@ function loadMore(increase, amount) {
   getUserRecs()
 }
 
+/**
+ * Handles sorting for tables that have pagination.
+ * @param {int}   indexVar  - Index of the column on which is sorted.
+ */
 function paginationSort(indexVar) {
   //When sorting on the same column twice in a row, switch to descending.
   if (index.value === indexVar) {
@@ -92,8 +112,13 @@ function paginationSort(indexVar) {
   getUserRecs()
 }
 
-function handleScroll() {
-  console.log('test')
+//Update headers shown in user recommendations
+function changeColumns(generalHeader, userHeader, itemHeader) {
+  ;(headers.value = generalHeader),
+    (userHeaders.value = userHeader),
+    (itemHeaders.value = itemHeader)
+
+  getUserRecs()
 }
 </script>
 
@@ -101,15 +126,17 @@ function handleScroll() {
   <div class="container">
     <h1 class="display-2">Results</h1>
     <p class="lead">
-      These are the results for your computation with the following name:
-      {{ result.name }}.
+      These are the results for experiment {{ result.metadata.name }} done at
+      {{ result.metadata.datetime }}.
     </p>
 
     <div class="col">
       Tags:
-      <template v-for="tag in mockdata.computation_tags"
-        >{{ tag }} <slot> </slot
-      ></template>
+      <template v-if="!result.metadata.tags">None</template>
+      <template v-for="tag in result.metadata.tags">
+        <b-button disabled> {{ tag }} </b-button
+        ><!--<slot> </slot>-->
+      </template>
     </div>
   </div>
 
@@ -145,12 +172,19 @@ function handleScroll() {
       <!--<template v-for="data in [data]" :key="data">-->
       <div class="col-6">
         <Table
-          caption=""
+          caption="Testcaption"
           :results="data.results"
           :headers="headers_rec"
+          :headerOptions="headers_options"
+          :userOptions="user_header_options"
+          :itemOptions="item_header_options"
           pagination
+          expandable
           @paginationSort="(i) => paginationSort(i)"
           @loadMore="(increase, amount) => loadMore(increase, amount)"
+          @changeColumns="
+            (general, user, item) => changeColumns(general, user, item)
+          "
         />
       </div>
       <!--</template>-->

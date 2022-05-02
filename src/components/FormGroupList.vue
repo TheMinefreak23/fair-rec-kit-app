@@ -1,10 +1,11 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import {
   article,
   capitalise,
   underscoreToSpace,
 } from '../helpers/resultFormatter'
+//import { selectionOptions } from '../helpers/optionsFormatter'
 
 //const emit = defineEmits(['formChange'])
 const props = defineProps({
@@ -13,10 +14,9 @@ const props = defineProps({
   selectName: String,
   options: Array,
   required: Boolean,
+  maxK: Number,
   data: { type: Object, required: true },
 })
-
-const groupCount = ref(0)
 
 const form = computed({
   // getter
@@ -33,11 +33,28 @@ const form = computed({
 //const flatOptions = props.nested ? flattenOptions() : props.options
 
 onMounted(() => {
-  groupCount.value = props.required ? 1 : 0 // For required lists the minimum amount of group items is 1.
-  console.log(props.name, props.nested, props.options)
+  /*console.log(props.name)
+  if (props.name == 'filter' || props.name == 'dataset')
+    console.log(props.name, props.options)*/
   form.value.name = props.plural
   //console.log(props.name, 'options', props.options)
 })
+
+watch(
+  () => {
+    // Watch for the changing of options
+    return props.options
+  },
+  () => {
+    // Update form if this changes
+    update()
+  },
+  {
+    // Make sure this does not trigger on initialization
+    immediate: false,
+    deep: true,
+  }
+)
 
 // Set default values for the group parameters.
 function setParameter(i, option) {
@@ -65,6 +82,7 @@ function setParameter(i, option) {
       choices = option.params.dynamic
       // TODO refactor empty form group function
       form.value.lists[i] = choices.map(() => ({
+        groupCount: 0, // For sublists there is no minimum amount of group items.
         main: [],
         inputs: [],
         selects: [],
@@ -77,8 +95,8 @@ function setParameter(i, option) {
 
 // Splice groups array to remove a group
 function removeGroup(i) {
-  if (props.required && groupCount.value == 1) return
-  groupCount.value--
+  if (props.required && form.value.groupCount == 1) return
+  form.value.groupCount--
   form.value.main.splice(i, 1)
   form.value.inputs.splice(i, 1)
   form.value.selects.splice(i, 1)
@@ -115,6 +133,67 @@ function hasDynamic(index) {
 function chooseLabel(name) {
   return 'Choose ' + article(name) + ' ' + underscoreToSpace(name)
 }
+
+// Copies the selected item and puts it at the end of the list
+function copyItem(i) {
+  form.value.groupCount++ //Add a new item
+  form.value.main[form.value.groupCount - 1] = form.value.main[i] //Copy the selected value to the new item
+
+  if (form.value.inputs[i]) {
+    //Copy textfield options (if applicable)
+    form.value.inputs[form.value.groupCount - 1] = form.value.inputs[i].map(
+      (param) => ({
+        name: param.name,
+        value: param.value,
+      })
+    )
+  }
+  if (form.value.selects[i]) {
+    //Copy select options (if applicable)
+    form.value.selects[form.value.groupCount - 1] = form.value.selects[i].map(
+      (param) => ({
+        name: param.name,
+        value: param.value,
+      })
+    )
+  }
+  if (form.value.lists[i]) {
+    //Copy nested option list (if applicable)
+    form.value.lists[form.value.groupCount - 1] = form.value.lists[i].map(
+      (param) => ({
+        name: param.name,
+        value: param.value,
+      })
+    )
+  }
+}
+//Update the options that cannot be be submitted due to changing experiment type (
+function update() {
+  let entries = props.options
+    .map((category) => category.options)
+    .concat()
+    .flat()
+    .map((entry) => entry.name)
+  const deleteEntry = 'NULL'
+  for (let i = 0; i < form.value.main.length; i++) {
+    if (!entries.includes(form.value.main[i].name)) {
+      //every entry that does not exist in the list of option should be removed
+      //Non-existing entries are replaced with a null entry
+      form.value.main[i] = deleteEntry
+      form.value.selects[i] = deleteEntry
+      form.value.inputs[i] = deleteEntry
+      form.value.lists[i] = deleteEntry
+      if (props.required && form.value.groupCount > 1) form.value.groupCount--
+    }
+  }
+  //console.log(form.value.main)
+  // Filter null values
+  form.value.main = form.value.main.filter((x) => x != deleteEntry)
+  form.value.selects = form.value.selects.filter((x) => x != deleteEntry)
+  form.value.inputs = form.value.inputs.filter((x) => x != deleteEntry)
+  form.value.lists = form.value.lists.filter((x) => x != deleteEntry)
+  //console.log(form.value.main)
+}
 </script>
 
 <template>
@@ -124,27 +203,40 @@ function chooseLabel(name) {
       {{ capitalise(plural) }}
       <!--{{ plural }}-->
     </h3>
-    <div v-for="i in groupCount" :key="i - 1">
+    <div v-for="i in form.groupCount" :key="i - 1">
       <b-row class="align-items-end">
         <b-col>
           <b-row>
             <b-col cols="4">
               <b-form-group :label="'Select ' + selectName">
-                <!--TODO use form bind instead of emit?-->
                 <b-form-select
-                  :form="name"
                   v-model="form.main[i - 1]"
                   :options="options"
                   text-field="name"
                   @change="setParameter(i - 1, $event)"
-                  :required="required"
+                  :required="
+                    // If the option is needed, at least one selection must've been made
+                    required &&
+                    (form.main.length == 0 || form.main.every((x) => x == ''))
+                  "
                 >
                   <template #first>
-                    <b-form-select-option value="" disabled
+                    <b-form-select-option :value="''"
                       >Choose..</b-form-select-option
                     >
                   </template>
                 </b-form-select>
+                <b-button
+                  v-if="form.main[i - 1]"
+                  @click="copyItem(i - 1)"
+                  variant="primary"
+                  >Copy {{ name }}...</b-button
+                >
+                <template #first>
+                  <b-form-select-option value="" disabled
+                    >Choose..</b-form-select-option
+                  >
+                </template>
               </b-form-group>
             </b-col>
 
@@ -155,16 +247,24 @@ function chooseLabel(name) {
                 v-for="(value, index) in form.main[i - 1].params.values"
                 :key="value"
               >
+                <!--The max k value is based on the amount of recommendations.
+                Because of this we use a seperate setting to cover for it.-->
                 <b-form-group
                   :label="capitalise(underscoreToSpace(value.name))"
-                  :description="'Between ' + value.min + ' and ' + value.max"
+                  :description="
+                    'Between ' +
+                    value.min +
+                    ' and ' +
+                    (value.name == 'k' ? props.maxK : value.max)
+                  "
                 >
                   <b-form-input
                     v-if="!value.name.includes('split')"
                     v-model="form.inputs[i - 1][index].value"
                     :state="
                       form.inputs[i - 1][index].value >= value.min &&
-                      form.inputs[i - 1][index].value <= value.max
+                      form.inputs[i - 1][index].value <=
+                        (value.name == 'k' ? props.maxK : value.max)
                     "
                     validated="true"
                   />
@@ -240,7 +340,7 @@ function chooseLabel(name) {
                     required
                   >
                     <template #first>
-                      <b-form-select-option value="" disabled
+                      <b-form-select-option :value="null" disabled
                         >Choose..</b-form-select-option
                       >
                     </template>
@@ -282,7 +382,7 @@ function chooseLabel(name) {
       </b-row>
     </div>
 
-    <b-button @click="groupCount++" align-v="end" variant="primary"
+    <b-button @click="form.groupCount++" align-v="end" variant="primary"
       >Add {{ name }}...</b-button
     >
   </div>

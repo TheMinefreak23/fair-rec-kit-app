@@ -1,18 +1,29 @@
 <script>
 /**
- * Below are all items inside the Documentation tab.
+ * Below are all items -unordered- inside the Documentation tab.
  * To add an item, use the standard format:
 
-{
-<name> sometext abcdef </name>
-<definition> Uses HTML syntax </definition>
-<link> sometext abcdef </link>
+-{
+<name> Sometext abcdef </name>
+I'm a comment!
+Description uses HTML syntax
+<description> 
+<!-- For code snippets use: -->
+<pre>
+  <code> p { color: red } </code>
+  <code> p { color: blue } </code>
+</pre>
+</description>
+<link> http://www.sometext.abcdef </link>
 <other1> sometext abcdef </other1>
 Some comment or notes...
-<other?> sometext abcdef </other?>
-}
+<button> sometext abcdef </button>
+}-
 
- * Adding new <tags>, like <other?>, should be manually added to Documentation.vue's template.
+ *
+ * Adding new items -{...}- should be added to documentation_structure.vue to make it visible.
+ * 
+ * Adding new <tags>, like <button>, should be manually added to Documentation.vue's template.
  * 
  */
 export const doctext = 
@@ -22,20 +33,20 @@ Item list for in documentation tab
 
 =================================================
 
-{
+-{
 <name> FairRecKit </name>
-<definition> 
+<description> 
 WebApp to compare different recommender approaches. Developed by RecCoons, from Utrecht University.
-</definition>
+</description>
 <link> http://fairreckit.science.uu.nl/ </link>
-}
+}-
 
 -----
 Tabs:
 
-{
+-{
 <name> New Computation </name>
-<definition>
+<description>
 <p>In this tab you can start a new computation of your desired datasets and the recommender approach. There are a few well-known datasets built-in, but custom datasets can be uploaded as well. After having chosen the datasets, one or more filters can be applied wat doet dit?.</p>
 <p>Next, add the recommender approaches that you want compared and select the number of recommendation per user wat doet dit?. Then, the train-test ratio and the different metrics to compare the performance.</p>
 <p>Lastly, enter the metadata to identify your computation. After pressing Send, this data will be added to the queue in Active Computations and send to the server to be executed.</p>
@@ -48,246 +59,285 @@ Tabs:
 <li><a href="tabIndex=1">Metrics</li>
 <li><a href="#">Meta</li>
 </ul>
-</definition>
-}
+</description>
+}-
 
-{
+-{
 <name> Active Computations </name>
-<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
+<description> 
+kl
+<pre>
+  <code> p { color: red } </code>
+  <code> p { color: blue } </code>
+</pre>
+nlmlmloloo
+<p>jnl</p>
+</description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
-{
+-{
 <name> Documentation </name>
-<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
+<description> Lorem ipsum dol
+or sit amet consectetur adipisicing eli
+t. Quae rerum qui
+
+ facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magna
+ m quis placeat necessitatibus ea. </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
-{
+-{
 <name> Results </name>
-<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
+<description> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
-{
-<name> All results </name>
-<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
+-{
+<name> All Results </name>
+<description> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
+-{
+<name> Datasets </name>
+}-
 
-Datasets:
-{
+-{
 <name> LFM2B </name>
-<definition> Last FM 2 Billion dataset is a corpus of Music Listening Events for Music Recommendation. It contains more than two billion listening events, intended to be used for various music retrieval and recommendation tasks. </definition>
+<description> Last FM 2 Billion dataset is a corpus of Music Listening Events for Music Recommendation. It contains more than two billion listening events, intended to be used for various music retrieval and recommendation tasks. </description>
 <link> http://www.cp.jku.at/datasets/LFM-2b/ </link>
 <other1> sometext </other1>
-}
+}-
 
-{
+-{
 <name> LFM1B </name>
-<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
+<description> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
-{
+-{
 <name> LFM360K </name>
-<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
+<description> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
-{
+-{
 <name> ML25M </name>
-<definition> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </definition>
+<description> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae rerum qui facilis. Perspiciatis officiis debitis accusamus illum harum sit dolore adipisci voluptatum. Rerum, velit quia magnam quis placeat necessitatibus ea. </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
-{
+-{
 <name> ML100K </name>
-<definition> sometext </definition>
+<description> sometext </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
 ------
 
-Recommender approaches:
+-{
+<name> Recommender approaches </name>
+}-
 
-Elliot:
-{
+-{ 
+<name> Elliot </name>
+}-
+
+-{
 <name> FunkSVD </name>
-<definition> sometext </definition>
+<description> sometext </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
-{
+-{
 <name> ItemKNN </name>
-<definition> sometext </definition>
+<description> sometext </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
-{
+-{
 <name> MultiVAE </name>
-<definition> sometext </definition>
+<description> sometext </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
-{
+-{
 <name> MostPop </name>
-<definition> sometext </definition>
+<description> sometext </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
-{
+-{
+<name> Surprise </name>
+}-
+
+-{
 <name> PureSVD </name>
-<definition> sometext </definition>
+<description> sometext </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
-{
+-{
 <name> Random </name>
-<definition> sometext </definition>
+<description> sometext </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
-{
+-{
 <name> SVDpp </name>
-<definition> sometext </definition>
+<description> sometext </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
-{
+-{
 <name> UserKNN </name>
-<definition> sometext </definition>
+<description> sometext </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
-Implicit:
-{
+-{
+<name> Implicit </name>
+<description> 
+}-
+
+-{
 <name> AlternatingLeastSquares </name>
-<definition> sometext </definition>
+<description> sometext </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
-{
+-{
 <name> BayesianPersonalizedRanking </name>
-<definition> sometext </definition>
+<description> sometext </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
-{
+-{
 <name> LogisticMatrixFactorization </name>
-<definition> sometext </definition>
+<description> sometext </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
-Lenskit:
-{
+-{
+<name> Lenskit </name>
+}-
+
+-{
 <name> BiasedMF </name>
-<definition> sometext </definition>
+<description> sometext </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
-{
+-{
 <name> ImplicitMF </name>
-<definition> sometext </definition>
+<description> sometext </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
-{
+-{
 <name> PopScore </name>
-<definition> sometext </definition>
+<description> sometext </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
-{
+-{
 <name> Ra2ndom </name>
-<definition> sometext </definition>
+<description> sometext </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
 -----
 
-Metrics:
-http://www.cp.jku.at/datasets/LFM-2b/
+-{
+<name> Metrics </name>
+}-
 
-{
-<name> Ran2dom </name>
-<definition> sometext </definition>
+-{
+<name> P@K </name>
+<description> sometext </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
-{
+-{
 <name> Rando2m </name>
-<definition> sometext </definition>
+<description> sometext </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
-{
+-{
 <name> R2andom </name>
-<definition> sometext </definition>
+<description> sometext </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
-{
+-{
 <name> Random2 </name>
-<definition> sometext </definition>
+<description> sometext </description>
 <link> sometext </link>
 <other1> sometext </other1>
-<other?> sometext </other?>
-}
+<button> sometext </button>
+}-
 
+-{
+<name> Filters </name>
+}-
+
+-{
+<name> Meta </name>
+}-
 `
 ;
 

@@ -5,6 +5,7 @@ home/
 config_files/
 results/
 /results.json
+frkenv/
 /results_backup.json
 
 # Byte-compiled files

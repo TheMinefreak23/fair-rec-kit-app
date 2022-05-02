@@ -56,7 +56,7 @@ def test_no_path_json():
 def test_update_results():
     print(load_results_overview())
     old_results_length = len(load_results_overview()['all_results'])
-    update_results_overview(test_computation)
+    add_result(test_computation)
     new_results_length = len(load_results_overview()['all_results'])
     print(load_results_overview())
     assert new_results_length == old_results_length+1
@@ -69,7 +69,7 @@ def test_update_results():
 # Test that the overview exists on the path after being created
 def test_overview_created():
     create_results_overview()
-    assert os.path.exists(results_overview_path)
+    assert os.path.exists(RESULTS_OVERVIEW_PATH)
 
 
 # Test that the overview gets created when it is loaded

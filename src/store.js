@@ -11,7 +11,14 @@ function mockResult() {
     results: mockdata.body,
     headers: mockdata.headers,
   }
-  return { id: 0, name: 'computation1', result: [mock, mock] }
+  return {
+    metadata: {
+      id: 0,
+      name: 'computation1',
+      tags: ['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '],
+    },
+    result: [mock, mock],
+  }
 }
 
 const store = reactive({
@@ -26,4 +33,9 @@ function addResult(result) {
   //console.log(store.currentResults)
 }
 
-export { store, addResult }
+//Remove result from global current shown results state
+function removeResult(index) {
+  store.currentResults.splice(index, 1)
+}
+
+export { store, addResult, removeResult }
