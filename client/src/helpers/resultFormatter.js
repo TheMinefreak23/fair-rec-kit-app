@@ -24,8 +24,12 @@ export function formatMultipleItems(items) {
   if (items == null) {
     string = 'NULL'
   } else {
-    string = items.map((item) => item.name).join(', ')
+    string = items
+      .map((item) => item.name)
+      .filter(() => true) // remove empty array slots
+      .join(', ')
   }
+  console.log(items)
   return string
 }
 

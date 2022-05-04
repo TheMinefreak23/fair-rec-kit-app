@@ -82,6 +82,7 @@ function emptyFormGroup(required) {
   return {
     // For required lists the minimum amount of group items is 1.
     groupCount: required ? 1 : 0,
+    visible: required ? true : false,
     main: [],
     inputs: [],
     selects: [],
@@ -122,14 +123,14 @@ function reformat(property) {
       <!--This form contains all the necessary parameters for a user to submit a request for a computation-->
       <b-form v-if="options" @submit="sendToServer" @reset="initForm">
         <b-row>
+          <h4>Experiment type</h4>
+          <b-form-radio-group
+            v-model="form.computationMethod"
+            :options="computationMethods"
+          >
+          </b-form-radio-group>
           <b-col class="g-0">
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
-              <h3>Computation type</h3>
-              <b-form-radio-group
-                v-model="form.computationMethod"
-                :options="computationMethods"
-              >
-              </b-form-radio-group>
               <!--User can select a dataset.-->
               <FormGroupList
                 v-model:data="form.datasets"
@@ -154,7 +155,11 @@ function reformat(property) {
               <FormGroupList
                 v-model:data="form.approaches"
                 name="approach"
-                plural="Recommender approaches"
+                :plural="
+                  (form.computationMethod == 'recommendation'
+                    ? 'Recommender'
+                    : 'Predictor') + ' approaches'
+                "
                 :options="
                   form.computationMethod == 'recommendation'
                     ? options.recommenders
