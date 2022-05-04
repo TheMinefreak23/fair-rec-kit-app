@@ -184,9 +184,9 @@ function changeColumns(generalHeader, userHeader, itemHeader){
           caption="Testcaption"
           :results="data.results"
           :headers="headers_rec"
-          :headerOptions = "headers_options"
-          :userOptions = "user_header_options"
-          :itemOptions = "item_header_options"
+          :headerOptions = "headers"
+          :userOptions = "userHeaders"
+          :itemOptions = "itemHeaders"
           pagination
           expandable
           @paginationSort="(i) => paginationSort(i)"
