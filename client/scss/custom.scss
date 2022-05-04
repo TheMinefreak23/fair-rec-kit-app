@@ -30,16 +30,16 @@ $subtle: rgb(80, 80, 80), rgb(104, 104, 104);
   @include gradient(bottom, $list2);
 }
 //give danger button gradient color
-.btn-danger {
-  color: #fff;
-  @include gradient(bottom, $dangergradient);
-}
+//.btn-danger {
+//  @include gradient(bottom, $dangergradient);
+//}
 
 // Override default variables.
 $primary: $customprimary;
 $secondary: $customsecondary;
 $dark: $customdark;
-$btn-danger-color: #fff;
+$btn-link-color: #fff;
+
 //$danger: #ffffff;
 
 
