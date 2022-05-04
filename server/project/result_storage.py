@@ -122,19 +122,20 @@ def edit_result(index, new_name, new_tags, new_email):
     :param new_email: the new metadata email of the result
     """
     file_results = load_results_overview()
-    to_edit_result = file_results['all_results'].pop(index)
+    to_edit_result = file_results['all_results'][index]
+    print(new_tags)
 
     def edit_metadata(attr, new_val):
         # Don't change the attribute if the input field has been left empty
-        if new_name != '':  #
+        if new_val != '':  #
             to_edit_result['metadata'][attr] = new_val
-            print(to_edit_result['metadata'][attr])
+            print('changed '+attr, to_edit_result['metadata'][attr])
 
     for (data_name, new_data) in [('name', new_name), ('tags', new_tags), ('email', new_email)]:
         edit_metadata(data_name, new_data)
 
     # TODO Add more editable values
-    file_results['all_results'].insert(index, to_edit_result)
+    file_results['all_results'][index] = to_edit_result
 
     write_results_overview(file_results)
 
