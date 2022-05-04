@@ -1,0 +1,43 @@
+{
+  "timestamp": {
+    "stamp": "1651467547",
+    "datetime": "2022-05-02 06:59:07"
+  },
+  "metadata": {
+    "name": "m"
+  },
+  "settings": {
+    "datasets": [
+      {
+        "name": "ML-100K",
+        "params": [
+          {
+            "name": "Train/testsplit",
+            "value": "80"
+          }
+        ],
+        "settings": [
+          {
+            "filters": []
+          }
+        ]
+      }
+    ],
+    "metrics": [],
+    "approaches": [
+      {
+        "name": "PopScore",
+        "params": [
+          {
+            "name": "Score_method",
+            "value": "quantile"
+          }
+        ]
+      }
+    ],
+    "recommendations": 10,
+    "split": 80,
+    "splitMethod": "random",
+    "computationMethod": "recommendation"
+  }
+}
