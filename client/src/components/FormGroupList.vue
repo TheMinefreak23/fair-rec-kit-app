@@ -11,7 +11,6 @@ import {
 const props = defineProps({
   name: String,
   plural: String,
-  selectName: String,
   options: Array,
   required: Boolean,
   maxK: Number,
@@ -208,9 +207,10 @@ function update() {
         <b-col>
           <b-row>
             <b-col cols="4">
-              <b-form-group :label="'Select ' + selectName">
+              <b-form-group :label="'Select ' + article(name) + ' ' + name">
                 <b-form-select
                   v-model="form.main[i - 1]"
+                  data-testid="main-select"
                   :options="options"
                   text-field="name"
                   @change="setParameter(i - 1, $event)"
@@ -274,6 +274,7 @@ function update() {
                     min="value.min"
                     max="value.max"
                     step="5"
+                    data-testid="split-input"
                     id="customRange"
                     v-model="form.inputs[i - 1][index].value"
                   ></b-form-input>
@@ -351,6 +352,7 @@ function update() {
             <b-col cols="4">
               <b-form-group>
                 <b-button
+                  data-testid="remove-button"
                   v-if="!(i == 1 && required)"
                   @click="removeGroup(i - 1)"
                   variant="danger"
@@ -371,7 +373,6 @@ function update() {
                   v-model:data="form.lists[i - 1][index]"
                   :name="option.name"
                   :plural="option.plural"
-                  :selectName="option.article + ' ' + option.name"
                   :options="option.options"
                   :required="false"
                 />
