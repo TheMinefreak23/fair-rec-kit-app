@@ -3,24 +3,25 @@ import { onMounted, ref } from 'vue'
 import FormGroupList from '../components/FormGroupList.vue'
 import { API_URL } from '../api'
 
-const form = ref({
-  datasets: {
-    main: [],
-    inputs: [],
-    selects: [],
-    lists: [],
-  },
+const props = defineProps({
+  useTestOptions: Boolean,
+  initialForm: Object,
+  testOptions: Array,
 })
-const selected = ref({})
-const testOptions = ref([
-  { text: 'foo', value: { blub: 'bar' } },
-  { text: 'hi', value: { blub: 'hivalue' } },
-  { text: 'foo3', value: { blub: 'bar3' } },
-])
 
-const options = ref({})
+const options = ref([{ name: 'hi', value: { name: 'hivalue' } }])
 
-onMounted(() => getOptions())
+const form = ref({
+  groupCount: 1,
+  main: [],
+  inputs: [],
+  selects: [],
+  lists: [],
+})
+
+onMounted(() => {
+  if (!props.useTestOptions) getOptions()
+})
 
 // GET request: Get available options for selection from server
 async function getOptions() {
@@ -37,21 +38,25 @@ function onSubmit() {
 
 <template>
   <b-card>
-    <h3>test form</h3>
-    <b-form-select v-model="selected" :options="testOptions"></b-form-select>
-    <h4>selected: {{ selected }}</h4>
-    <h4>-----------------------------</h4>
     <h3>test fgl</h3>
-    <b-form v-if="options" @submit="onSubmit">
-      <FormGroupList
+    <b-form v-if="useTestOptions || options" @submit="onSubmit">
+      <!--<FormGroupList
         v-model:data="form.datasets"
         name="Dataset"
         plural="Datasets"
         selectName="a dataset"
         :options="options.datasets"
         :required="true"
+      />-->
+      <!--<p>{{ options.datasets }}</p>-->
+      <FormGroupList
+        v-model:data="form"
+        name="foo"
+        plural="foos"
+        :options="useTestOptions ? options : options.datasets"
+        :required="true"
       />
-
+      <p v-if="form.main[0]">First Selected: {{ form.main[0].name }}</p>
       <b-button type="submit" variant="primary">Send</b-button>
     </b-form>
   </b-card>

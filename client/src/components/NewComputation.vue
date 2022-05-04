@@ -37,6 +37,7 @@ async function getOptions() {
   const response = await fetch(API_URL + '/computation/options')
   const data = await response.json()
   options.value = data.options
+  //console.log('options', options.value)
 }
 
 // POST request: Send form to server.
@@ -134,10 +135,9 @@ function reformat(property) {
                 v-model:data="form.datasets"
                 name="dataset"
                 plural="Datasets"
-                selectName="a dataset"
                 :options="options.datasets"
                 required
-                id = "datasets"
+                id="datasets"
               />
               <!--User provides an optional rating conversion-->
               <b-form-group label="Select a rating conversion">
@@ -155,7 +155,6 @@ function reformat(property) {
                 v-model:data="form.approaches"
                 name="approach"
                 plural="Recommender approaches"
-                selectName="an approach"
                 :options="
                   form.computationMethod == 'recommendation'
                     ? options.recommenders
@@ -195,7 +194,6 @@ function reformat(property) {
                 v-model:data="form.metrics"
                 name="metric"
                 plural="metrics"
-                selectName="a metric"
                 :maxK="form.recommendations"
                 :options="
                   form.computationMethod == 'recommendation'
