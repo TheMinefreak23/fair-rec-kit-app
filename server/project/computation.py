@@ -22,9 +22,10 @@ compute_bp = Blueprint('computation', __name__, url_prefix='/api/computation')
 
 # Constants
 CONFIG_DIR = 'config_files'
+RESULTS_DIR = 'results'
 
 # Initialise
-recommender_system = RecommenderSystem('datasets', 'results')
+recommender_system = RecommenderSystem('datasets', RESULTS_DIR)
 options = create_available_options(recommender_system)
 computation_queue = []
 
