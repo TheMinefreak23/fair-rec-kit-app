@@ -20,10 +20,10 @@ import pandas as pd
 
 current_result = {}
 current_recs = {}
-results_overview_path = 'results.json'
+results_overview_path = 'results/results_overview.json'
 mock_results_overview_path = 'mock/results_overview.json'
 mock_results_path = 'mock/results.json'
-results_root_folder = 'mock/'
+results_root_folder = 'results/'
 recommendations_path = 'recs.json'
 evaluations_path = 'evals.json'
 
@@ -38,7 +38,7 @@ def save_result(computation, result):
 
 def result_by_id(resultid):
 
-    results_overview = load_json(mock_results_overview_path)
+    results_overview = load_json(results_overview_path)
     current_result_overview_id = -1
     # Filter: Loop through all results and find the one with the matching ID.
     for iteration_id in range(len(results_overview['all_results'])):
@@ -67,7 +67,7 @@ def result_by_id(resultid):
                 header=None).to_dict(orient='records')
             result_data = {
                 'name': run_result['name'],
-                'evaluations': evaluation_data['evaluations'],
+                'evaluations': evaluation_data,
                 'ratings_settings': ratings_settings_data}
             run_data['results'].append(result_data)
 

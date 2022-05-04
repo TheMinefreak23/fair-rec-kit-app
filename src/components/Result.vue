@@ -64,7 +64,7 @@ async function loadEvaluations() {
 
 //GET request: Ask server for currently loaded evaluations
 async function getEvaluations() {
-    const evaluation_data = await fetch(API_URL + 'all-results/result-by-id')
+    const evaluation_data = await fetch(API_URL + '/all-results/result-by-id')
     console.log("succesfully retrieved evaluation data.")
     console.log(evaluation_data)
 }
