@@ -80,8 +80,9 @@ def user_result():
     json = request.json
     chunk_size = json.get("amount", 20)
     chunk_size = int(chunk_size)
-
-    chosen_headers = json.get("headers", []) + json.get("itemheaders", []) + json.get("userheaders", [])
+    print(json.get("generalHeaders", []))
+    chosen_headers = json.get("generalHeaders", []) + json.get("userheaders", []) + json.get("itemheaders", [])
+    chosen_headers2 = []
 
     #read mock dataframe
     recs = result_storage.current_recs
@@ -97,7 +98,7 @@ def user_result():
 
     # adding extra columns to dataframe
     for chosen_header in chosen_headers:
-        df_sorted[chosen_header] = 5
+        df_sorted[chosen_header['name']] = chosen_header['name']
 
     # getting only chunk of data
     start_rows = json.get("start", 0)

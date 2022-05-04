@@ -22,7 +22,10 @@ const ascending = ref(true)
 const entryAmount = ref(20)
 const userHeaders = ref([])
 const itemHeaders = ref([])
-const headers = ref([])
+const generalHeaders = ref([])
+const userHeaderOptions = ref([])
+const itemHeaderOptions = ref([])
+const generalHeaderOptions = ref([])
 
 watch(
   () => props.result,
@@ -41,11 +44,16 @@ async function getHeaders() {
   const response = await fetch(API_URL + '/all-results/headers')
   const data = await response.json()
   
-  headers.value = data.headers
-  itemHeaders.value = data.itemHeaders
-  userHeaders.value = data.userHeaders
+  generalHeaderOptions.value = data.headers
+  itemHeaderOptions.value = data.itemHeaders
+  userHeaderOptions.value = data.userHeaders
+  /*headerOptions = {
+    'generalHeaders' : data.headers,
+    'itemHeaders' : data.itemHeaders,
+    'userHeaders' : data.userHeaders
+  }*/
 
-  console.log(headers.value)
+  console.log(generalHeaderOptions.value)
 
 }
 
@@ -76,7 +84,7 @@ async function getUserRecs() {
       sortindex: index.value,
       ascending: ascending.value,
       amount: entryAmount.value,
-      headers: headers.value,
+      generalHeaders: generalHeaders.value,
       itemheaders: itemHeaders.value,
       userheaders: userHeaders.value
     }),
@@ -122,14 +130,18 @@ function paginationSort(indexVar) {
 }
 
 //Update headers shown in user recommendations
-function changeColumns(generalHeader, userHeader, itemHeader){
-  headers.value = generalHeader.map((header) => ({{
-        'name': {{header}}
-  }}))
-  userHeaders.value = userHeader,
-  itemHeaders.value = itemHeader
+function changeColumns(generalHeader, userHeader, itemHeader) {
+  generalHeaders.value = generalHeader.map((header) => ({
+        name: header,
+      }))
+  userHeaders.value = userHeader.map((header) => ({
+        name: header,
+      }))
+  itemHeaders.value = itemHeader.map((header) => ({
+        name: header,
+      }))
 
-  console.log(headers.value)
+  console.log(generalHeaders.value)
   getUserRecs()
 }
 
@@ -185,10 +197,10 @@ function changeColumns(generalHeader, userHeader, itemHeader){
         <Table
           caption="Testcaption"
           :results="data.results"
-          :headers="headers_rec"
-          :headerOptions = "headers"
-          :userOptions = "userHeaders"
-          :itemOptions = "itemHeaders"
+          :headers="headers_rec.concat(generalHeaders).concat(userHeaders).concat(itemHeaders)" 
+          :headerOptions = "generalHeaderOptions"
+          :userOptions = "userHeaderOptions"
+          :itemOptions = "itemHeaderOptions"
           pagination
           expandable
           @paginationSort="(i) => paginationSort(i)"
