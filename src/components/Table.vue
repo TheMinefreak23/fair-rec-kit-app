@@ -212,7 +212,7 @@ function setsorting(i) {
     @ok="$emit('changeColumns', checkedColumns, userColumns, itemColumns)"
     >
     <p>Check the extra columns you want to be shown</p>
-    
+    <p>{{headerOptions}}</p>
     <p>General:</p>
     <div class="form-check form-switch"
       v-for="(header, index) in headerOptions"
@@ -222,11 +222,11 @@ function setsorting(i) {
         v-model="checkedColumns"
         class="form-check-input" 
         type="checkbox" 
-        v-bind:value="header.name" 
-        v-bind:id="header.name">
+        :value="header.name" 
+        :id="header.name">
       <label 
         class="form-check-label" 
-        v-bind:id="header.name">
+        :id="header.name">
         {{ header.name }}
       </label>
     </div>
@@ -240,11 +240,11 @@ function setsorting(i) {
         v-model="userColumns"
         class="form-check-input" 
         type="checkbox" 
-        v-bind:value="header.name" 
-        v-bind:id="header.name">
+        :value="header.name" 
+        :id="header.name">
       <label 
         class="form-check-label" 
-        v-bind:id="header.name">
+        :id="header.name">
         {{ header.name }}
       </label>
     </div>
@@ -258,11 +258,11 @@ function setsorting(i) {
         v-model="itemColumns"
         class="form-check-input" 
         type="checkbox" 
-        v-bind:value="header.name" 
-        v-bind:id="header.name">
+        :value="header.name" 
+        :id="header.name">
       <label 
         class="form-check-label" 
-        v-bind:id="header.name">
+        :id="header.name">
         {{ header.name }}
       </label>
     </div>

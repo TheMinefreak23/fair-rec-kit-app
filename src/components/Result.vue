@@ -123,7 +123,9 @@ function paginationSort(indexVar) {
 
 //Update headers shown in user recommendations
 function changeColumns(generalHeader, userHeader, itemHeader){
-  headers.value = generalHeader,
+  headers.value = generalHeader.map((header) => ({{
+        'name': {{header}}
+  }}))
   userHeaders.value = userHeader,
   itemHeaders.value = itemHeader
 
