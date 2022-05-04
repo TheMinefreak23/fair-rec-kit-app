@@ -38,23 +38,22 @@ def save_result(computation, result):
 
 def result_by_id(resultid):
 
-    results_overview = load_json(results_overview_path)
-    current_result_overview = {}
+    results_overview = load_json(mock_results_overview_path)
+    current_result_overview_id = -1
     # Filter: Loop through all results and find the one with the matching ID.
-    for result in results_overview['all-results']:
-        if result['timestamp']['datetime'] == resultid:
-            current_result_overview = result
-
-    current_name = current_result_overview['metadata']['name']
-    relative_path = results_root_folder + resultid + "_" + current_name
+    for iteration_id in range(len(results_overview['all_results'])):
+        if results_overview['all_results'][iteration_id]['timestamp']['stamp'] == resultid:
+            current_result_overview_id = iteration_id
+    current_name = results_overview['all_results'][current_result_overview_id]['metadata']['name']
+    relative_path = results_root_folder + str(resultid) + "_" + current_name
     data = {'id': resultid, 'name': current_name, 'runs': []}
     # loops through all the subdirectories, and thus - runs, of a certain calculation
     for subdir in [f.path for f in os.scandir(relative_path) if f.is_dir()]:
         run_overview_name = os.path.basename(os.path.normpath(subdir))
-        run_overview = load_json(subdir + "/" + run_overview_name + "_overview.json")
+        run_overview = load_json(subdir + "/" + "overview.json")
         run_data = {'index': run_overview_name, 'results': []}
         # loops through individual results
-        for run_result in run_overview["results"]:
+        for run_result in run_overview["overview"]:
             evaluation_path_full = subdir + "/" + run_overview_name + "/" + result_data['evaluation_path']
             ratings_settings_path_full = subdir + "/" + run_overview_name + "/" + result_data['ratings_settings_path']
             evaluation_data = pd.read_csv(

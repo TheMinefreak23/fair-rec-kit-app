@@ -16,6 +16,7 @@ const headers_rec = ref([{ name: 'User' }, { name: 'Item' }, { name: 'Score' }])
 const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
 const data = ref([])
+const mockdataID = 1650539860
 const startIndex = ref(0)
 const index = ref(0)
 const ascending = ref(true)
@@ -53,7 +54,7 @@ async function loadEvaluations() {
   const requestOptions = {
     method: 'POST',
     headers: {'Content-type': 'application/json' },
-    body: JSON.stringify({id: props.result.id })
+    body: JSON.stringify({id: mockdataID })
   }
   const response = await fetch(API_URL + '/all-results/result-by-id', requestOptions).then(() => {
     console.log("succesful POST request to API to retrieve evaluation data")
