@@ -54,8 +54,9 @@ def result_by_id(resultid):
         run_data = {'index': run_overview_name, 'results': []}
         # loops through individual results
         for run_result in run_overview["overview"]:
-            evaluation_path_full = subdir + "/" + run_overview_name + "/" + result_data['evaluation_path']
-            ratings_settings_path_full = subdir + "/" + run_overview_name + "/" + result_data['ratings_settings_path']
+            evaluation_path_full = run_result['evaluation_path']
+            ratings_settings_path_full = run_result['ratings_settings_path']
+            print("ratings path full = " + ratings_settings_path_full)
             evaluation_data = pd.read_csv(
                 evaluation_path_full,
                 sep='\t',
