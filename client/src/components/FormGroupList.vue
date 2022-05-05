@@ -8,6 +8,9 @@ import {
 } from '../helpers/resultFormatter'
 //import { selectionOptions } from '../helpers/optionsFormatter'
 
+import { useToast } from 'bootstrap-vue-3'
+let toast = useToast()
+
 //const emit = defineEmits(['formChange'])
 const props = defineProps({
   name: String,
@@ -107,13 +110,24 @@ function setParameter(i, option) {
 
 // Splice groups array to remove a group
 function removeGroup(i) {
+  // Don't remove first required option
   if (props.required && form.value.groupCount == 1) return
+
   form.value.groupCount--
   form.value.main.splice(i, 1)
   form.value.inputs.splice(i, 1)
   form.value.selects.splice(i, 1)
   form.value.lists.splice(i, 1)
-  visibleGroup.value = i // Set visible group to last before deleted one
+
+  // Set visible group to last before deleted one
+  visibleGroup.value = i
+
+  // Show toast
+  // TODO delay and variant don't work?
+  toast.show(
+    { title: capitalise(props.name) + ' removed!' },
+    { pos: 'top-right', delay: 800, variant: 'warning' }
+  )
 }
 
 // Check whether the option has values/options params (not dynamic params)
@@ -257,6 +271,11 @@ function shortGroupDescription(i) {
 </script>
 
 <template>
+  <b-container
+    :toast="{ root: true }"
+    fluid="sm"
+    position="position-fixed"
+  ></b-container>
   <h3 class="text-center">
     <b-card no-body class="mb-1">
       <!--Collapsable group list toggle button-->
@@ -288,22 +307,35 @@ function shortGroupDescription(i) {
         :key="i - 1"
       >
         <b-container class="g-0">
-          <b-card no-body class="mb-1">
-            <!--Collapsable group toggle button-->
-            <b-button
-              class="text-start"
-              block
-              @click="
-                // TODO this is pretty hacky
-                visibleGroup == i ? (visibleGroup = -1) : (visibleGroup = i)
-              "
-              :variant="visibleGroup == i ? 'primary' : 'info'"
-            >
-              <template v-if="visibleGroup == i">&#x25BC; | </template>
-              <template v-else>&#x25BA; | </template>
-              {{ shortGroupDescription(i - 1) }}
-            </b-button>
-          </b-card>
+          <b-row>
+            <b-col :cols="!(i == 1 && required) ? 10 : 12">
+              <b-card no-body class="mb-1">
+                <!--Collapsable group toggle button-->
+                <b-button
+                  class="text-start"
+                  block
+                  @click="
+                    // TODO this is pretty hacky
+                    visibleGroup == i ? (visibleGroup = -1) : (visibleGroup = i)
+                  "
+                  :variant="visibleGroup == i ? 'primary' : 'info'"
+                >
+                  <template v-if="visibleGroup == i">&#x25BC; | </template>
+                  <template v-else>&#x25BA; | </template>
+                  {{ shortGroupDescription(i - 1) }}
+                </b-button>
+              </b-card>
+            </b-col>
+            <b-col v-if="!(i == 1 && required)">
+              <b-button
+                data-testid="remove-button"
+                @click="removeGroup(i - 1)"
+                variant="danger"
+                class="mb-2 mr-sm-2 mb-sm-0"
+                >X</b-button
+              >
+            </b-col>
+          </b-row>
           <!--Collapsable group-->
           <b-collapse
             :id="name + 'accordion-' + i"
@@ -472,18 +504,6 @@ function shortGroupDescription(i) {
                         </b-form-select>
                       </b-form-group>
                     </template>
-                  </b-col>
-                  <b-col cols="4">
-                    <b-form-group>
-                      <b-button
-                        data-testid="remove-button"
-                        v-if="!(i == 1 && required)"
-                        @click="removeGroup(i - 1)"
-                        variant="danger"
-                        class="mb-2 mr-sm-2 mb-sm-0"
-                        >X</b-button
-                      >
-                    </b-form-group>
                   </b-col>
                 </b-row>
                 <b-row v-if="hasDynamic(i - 1)">
