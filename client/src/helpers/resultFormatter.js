@@ -25,6 +25,7 @@ export function formatMultipleItems(items) {
     string = 'None'
   } else {
     string = items
+      .filter(() => true) // remove empty array slots
       .map((item) => item.name)
       .filter(() => true) // remove empty array slots
       .join(', ')

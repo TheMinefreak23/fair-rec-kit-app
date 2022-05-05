@@ -9,6 +9,8 @@ import { store } from '../store.js'
 import { API_URL } from '../api'
 import { emptyOption } from '../helpers/optionsFormatter'
 
+const horizontalLayout = ref(false)
+const oldMetadata = ref(false)
 const options = ref()
 
 //Store the settings of the form in a reference
@@ -118,26 +120,64 @@ function reformat(property) {
 </script>
 
 <template>
-  <div class="py-2 mx-5 bg-primary">
+  <b-form-checkbox v-model="horizontalLayout">use broad layout</b-form-checkbox>
+  <b-form-checkbox v-model="oldMetadata"
+    >use old metadata layout</b-form-checkbox
+  >
+  <div class="py-2 mx-5">
     <b-card>
+      <b-row class="text-center"> <h3>New Experiment</h3></b-row>
       <!--This form contains all the necessary parameters for a user to submit a request for a computation-->
       <b-form v-if="options" @submit="sendToServer" @reset="initForm">
         <b-row>
-          <h4>Experiment type</h4>
-          <b-form-radio-group
-            v-model="form.computationMethod"
-            :options="computationMethods"
-          >
-          </b-form-radio-group>
-          <b-col class="g-0">
+          <b-form-group label-cols-md="2" label="Experiment type">
+            <b-form-radio-group
+              v-model="form.computationMethod"
+              :options="computationMethods"
+            >
+            </b-form-radio-group>
+          </b-form-group>
+
+          <!-- Input for metadata such as:
+            Computation Name
+            Tags (optional)
+            Email for notification (optional) -->
+          <div v-if="!oldMetadata" class="p-2 m-1 rounded-3 bg-secondary">
+            <!--<h3 class="text-center">Meta</h3>-->
+            <b-row>
+              <b-col>
+                <b-form-group label-cols-md="4" label="Experiment name">
+                  <b-form-input
+                    placeholder="New Computation"
+                    v-model="metadata.name"
+                  ></b-form-input>
+                </b-form-group>
+              </b-col>
+              <b-col>
+                <b-form-group label-cols-md="4" label="E-mail (optional)">
+                  <b-form-input
+                    type="email"
+                    placeholder="example@mail.com"
+                    v-model="metadata.email"
+                  ></b-form-input>
+                </b-form-group>
+              </b-col>
+              <b-form-group label-cols-md="2" label="Tags (optional)">
+                <b-form-input v-model="metadata.tags"></b-form-input>
+              </b-form-group>
+            </b-row>
+          </div>
+
+          <b-col class="g-0" :cols="horizontalLayout ? 12 : 6">
+            <!--User can select a dataset.-->
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
-              <!--User can select a dataset.-->
               <FormGroupList
                 v-model:data="form.datasets"
                 name="dataset"
                 plural="Datasets"
                 :options="options.datasets"
                 required
+                :horizontalLayout="horizontalLayout"
                 id="datasets"
               />
               <!--User provides an optional rating conversion-->
@@ -150,6 +190,9 @@ function reformat(property) {
                 </b-form-select>
               </b-form-group>
             </div>
+          </b-col>
+
+          <b-col class="g-0" :cols="horizontalLayout ? 12 : 6">
             <!-- User can select any number of recommender approaches -->
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
               <FormGroupList
@@ -166,6 +209,7 @@ function reformat(property) {
                     : options.predictors
                 "
                 :required="true"
+                :horizontalLayout="horizontalLayout"
               />
 
               <!--User can select the amount of recommendations per user -->
@@ -191,56 +235,64 @@ function reformat(property) {
               </b-form-group>
             </div>
           </b-col>
-
-          <b-col class="p-0">
-            <!--User can select any number of metrics -->
-            <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
-              <FormGroupList
-                v-model:data="form.metrics"
-                name="metric"
-                plural="metrics"
-                :maxK="form.recommendations"
-                :options="
-                  form.computationMethod == 'recommendation'
-                    ? options.metrics
-                    : options.metrics.slice(1)
-                "
-              />
-            </div>
-
-            <!-- Input for metadata such as:
+          <b-row>
+            <b-col>
+              <!--User can select any number of metrics -->
+              <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
+                <FormGroupList
+                  v-model:data="form.metrics"
+                  name="metric"
+                  plural="metrics"
+                  :maxK="form.recommendations"
+                  :options="
+                    form.computationMethod == 'recommendation'
+                      ? options.metrics
+                      : options.metrics.slice(1)
+                  "
+                  :horizontalLayout="horizontalLayout"
+                /></div
+            ></b-col>
+            <b-col v-if="oldMetadata">
+              <!-- Input for metadata such as:
             Computation Name
             Tags (optional)
             Email for notification (optional) -->
-            <div class="p-2 m-1 rounded-3 bg-secondary">
-              <h3 class="text-center">Meta</h3>
-              <b-form-group label="Enter name for computation">
-                <b-form-input
-                  placeholder="New Computation"
-                  v-model="metadata.name"
-                ></b-form-input>
-              </b-form-group>
-              <b-form-group label="Enter tags (optional)">
-                <b-form-input v-model="metadata.tags"></b-form-input>
-              </b-form-group>
-              <b-form-group label="Enter e-mail (optional)">
-                <b-form-input
-                  type="email"
-                  placeholder="example@mail.com"
-                  v-model="metadata.email"
-                ></b-form-input>
-              </b-form-group>
+              <div class="p-2 m-1 rounded-3 bg-secondary">
+                <!--<h3 class="text-center">Meta</h3>-->
+                <b-row>
+                  <b-col>
+                    <b-form-group label="Experiment name">
+                      <b-form-input
+                        placeholder="New Computation"
+                        v-model="metadata.name"
+                      ></b-form-input>
+                    </b-form-group>
+                  </b-col>
+                  <b-col>
+                    <b-form-group label="E-mail (optional)">
+                      <b-form-input
+                        type="email"
+                        placeholder="example@mail.com"
+                        v-model="metadata.email"
+                      ></b-form-input>
+                    </b-form-group>
+                  </b-col>
+                  <b-form-group label="Tags (optional)">
+                    <b-form-input v-model="metadata.tags"></b-form-input>
+                  </b-form-group>
+                </b-row>
+              </div>
+            </b-col>
+            <!-- Buttons to submit or reset an experiment-->
+            <div class="d-flex justify-content-center">
+              <b-button class="mx-1" size="lg" type="reset" variant="danger"
+                >Reset</b-button
+              >
+              <b-button class="mx-1" size="lg" type="submit" variant="primary"
+                >Send</b-button
+              >
             </div>
-          </b-col>
-          <!-- Buttons to submit or reset an experiment-->
-          <div class="d-flex justify-content-center">
-            <b-button class="mx-1" type="reset" variant="danger"
-              >Reset</b-button
-            >
-            <b-button class="mx-1" type="submit" variant="primary"
-              >Send</b-button
-            >
-          </div>
+          </b-row>
         </b-row>
       </b-form>
       <!--Send a plethora of mock data to the queue-->
