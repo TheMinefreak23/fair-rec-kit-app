@@ -175,8 +175,11 @@ function copyItem(i) {
     //Copy nested option list (if applicable)
     form.value.lists[form.value.groupCount - 1] = form.value.lists[i].map(
       (param) => ({
-        name: param.name,
-        value: param.value,
+        groupCount: param.groupCount,
+        main: param.main,
+        inputs: param.inputs,
+        selects: param.selects,
+        lists: param.lists,
       })
     )
   }
@@ -228,23 +231,28 @@ function shortGroupDescription(i) {
   if (visibleGroup.value == i + 1) return desc // This group is selected, only show the option name
 
   // Show first inner options as featured option
-  console.log(form.value.lists[i] && form.value.lists[i][0])
-  const featuredOptions =
-    (form.value.selects[i] &&
-      form.value.selects[i][0] &&
-      form.value.selects[i][0].value) +
-    ', ' +
-    (form.value.inputs[i] &&
-      form.value.inputs[i][0] &&
-      form.value.inputs[i][0].value) +
-    ', ' +
-    (form.value.lists[i] &&
-      form.value.lists[i][0] &&
-      // Display inner form list length
-      form.value.lists[i][0].name + ': ' + form.value.lists[i][0].main.length)
+  const featuredOptions = [
+    valueOrEmptyString(form.value.selects),
+    valueOrEmptyString(form.value.inputs),
+    listNonEmpty(form.value.lists) // Display inner form list length
+      ? form.value.lists[i][0].name +
+        ': ' +
+        (form.value.lists[i][0].main && form.value.lists[i][0].main.length)
+      : '',
+  ]
+    .filter((x) => x != '') // remove empty slots
+    .join(', ')
 
-  desc += ' | ' + featuredOptions
+  if (featuredOptions != '') desc += ' | ' + featuredOptions
   return desc
+
+  function valueOrEmptyString(list) {
+    return listNonEmpty(list) ? list[i][0].value : ''
+  }
+
+  function listNonEmpty(list) {
+    return list[i] && list[i].length > 0
+  }
 }
 </script>
 
@@ -253,9 +261,9 @@ function shortGroupDescription(i) {
     <b-card no-body class="mb-1">
       <!--Collapsable group list toggle button-->
       <b-button
-        align-v="end"
+        class="text-start"
         @click="form.visible = !form.visible"
-        :variant="form.visible ? 'primary' : 'danger'"
+        :variant="form.visible ? 'primary' : 'info'"
       >
         <template v-if="form.visible">&#x25BC; | </template>
         <template v-else>&#x25BA; | </template>
@@ -267,31 +275,35 @@ function shortGroupDescription(i) {
   <p>{{ description && capitalise(description) }}</p>
   <!--TODO b-collapse doesn't work-->
   <!--Collapsable group list-->
-  <template id="collapse" v-if="form.visible">
+  <b-collapse id="collapse" :visible="form.visible">
     <b-card class="g-0">
-      <h5>
+      <!--<p>
         {{ capitalise(plural) }} selected:
         {{ formatMultipleItems(form.main) }}
-      </h5>
+      </p>-->
       <div
         class="accordion"
         role="tablist"
         v-for="i in form.groupCount"
         :key="i - 1"
       >
-        <b-card class="g-0">
-          <b-card-header header-tag="header" class="p-1" role="tab">
-            <b-card no-body class="mb-1">
-              <!--Collapsable group toggle button-->
-              <b-button
-                block
-                v-b-toggle="name + 'accordion-' + i"
-                @click="visibleGroup = i"
-                variant="info"
-                >{{ shortGroupDescription(i - 1) }}
-              </b-button>
-            </b-card>
-          </b-card-header>
+        <b-container class="g-0">
+          <b-card no-body class="mb-1">
+            <!--Collapsable group toggle button-->
+            <b-button
+              class="text-start"
+              block
+              @click="
+                // TODO this is pretty hacky
+                visibleGroup == i ? (visibleGroup = -1) : (visibleGroup = i)
+              "
+              :variant="visibleGroup == i ? 'primary' : 'info'"
+            >
+              <template v-if="visibleGroup == i">&#x25BC; | </template>
+              <template v-else>&#x25BA; | </template>
+              {{ shortGroupDescription(i - 1) }}
+            </b-button>
+          </b-card>
           <!--Collapsable group-->
           <b-collapse
             :id="name + 'accordion-' + i"
@@ -480,7 +492,7 @@ function shortGroupDescription(i) {
                     v-for="(option, index) in form.main[i - 1].params.dynamic"
                     :key="option"
                   >
-                    <b-card class="bg-secondary">
+                    <b-card class="mb-1 bg-secondary">
                       <FormGroupList
                         v-model:data="form.lists[i - 1][index]"
                         :name="option.name"
@@ -501,7 +513,7 @@ function shortGroupDescription(i) {
               </b-col>
             </b-row>
           </b-collapse>
-        </b-card>
+        </b-container>
       </div>
 
       <b-button
@@ -510,6 +522,6 @@ function shortGroupDescription(i) {
         variant="primary"
         >Add {{ name }}...</b-button
       >
-    </b-card></template
+    </b-card></b-collapse
   >
 </template>

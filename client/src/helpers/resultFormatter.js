@@ -22,14 +22,14 @@ export function formatResults(allResults) {
 export function formatMultipleItems(items) {
   var string = ''
   if (items == null) {
-    string = 'NULL'
+    string = 'None'
   } else {
     string = items
       .map((item) => item.name)
       .filter(() => true) // remove empty array slots
       .join(', ')
   }
-  console.log(items)
+  //console.log(items)
   return string
 }
 
