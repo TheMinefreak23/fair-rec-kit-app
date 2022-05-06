@@ -120,53 +120,76 @@ function reformat(property) {
 </script>
 
 <template>
-  <b-form-checkbox v-model="horizontalLayout">use broad layout</b-form-checkbox>
-  <b-form-checkbox v-model="oldMetadata"
-    >use old metadata layout</b-form-checkbox
-  >
+  <b-row>
+    <b-col md="auto">
+      <b-form-checkbox v-model="horizontalLayout"
+        >use broad layout</b-form-checkbox
+      >
+    </b-col>
+    <b-col>
+      <b-form-checkbox v-model="oldMetadata"
+        >use old metadata layout</b-form-checkbox
+      >
+    </b-col>
+  </b-row>
   <div class="py-2 mx-5">
     <b-card>
       <b-row class="text-center"> <h3>New Experiment</h3></b-row>
       <!--This form contains all the necessary parameters for a user to submit a request for a computation-->
       <b-form v-if="options" @submit="sendToServer" @reset="initForm">
-        <b-row>
-          <b-form-group label-cols-md="2" label="Experiment type">
-            <b-form-radio-group
-              v-model="form.computationMethod"
-              :options="computationMethods"
-            >
-            </b-form-radio-group>
-          </b-form-group>
-
-          <!-- Input for metadata such as:
+        <b-row class="text-center">
+          <b-row>
+            <b-col>
+              <b-row>
+                <b-col md="auto" class="text-center">
+                  <p>Experiment type</p>
+                </b-col>
+                <b-col md="auto">
+                  <b-form-radio-group
+                    v-model="form.computationMethod"
+                    :options="computationMethods"
+                  >
+                  </b-form-radio-group>
+                </b-col>
+              </b-row>
+            </b-col>
+            <!-- Input for metadata such as:
             Computation Name
             Tags (optional)
             Email for notification (optional) -->
-          <div v-if="!oldMetadata" class="p-2 m-1 rounded-3 bg-secondary">
-            <!--<h3 class="text-center">Meta</h3>-->
-            <b-row>
-              <b-col>
-                <b-form-group label-cols-md="4" label="Experiment name">
-                  <b-form-input
-                    placeholder="New Computation"
-                    v-model="metadata.name"
-                  ></b-form-input>
-                </b-form-group>
-              </b-col>
-              <b-col>
-                <b-form-group label-cols-md="4" label="E-mail (optional)">
-                  <b-form-input
-                    type="email"
-                    placeholder="example@mail.com"
-                    v-model="metadata.email"
-                  ></b-form-input>
-                </b-form-group>
-              </b-col>
-              <b-form-group label-cols-md="2" label="Tags (optional)">
-                <b-form-input v-model="metadata.tags"></b-form-input>
-              </b-form-group>
-            </b-row>
-          </div>
+            <b-col
+              md="auto"
+              v-if="!oldMetadata"
+              class="p-2 m-1 rounded-3 bg-secondary"
+            >
+              <!--<h3 class="text-center">Meta</h3>-->
+              <b-row>
+                <b-col>
+                  <b-form-group label-cols-md="4" label="Experiment name">
+                    <b-form-input
+                      placeholder="New Computation"
+                      v-model="metadata.name"
+                    ></b-form-input>
+                  </b-form-group>
+                </b-col>
+                <b-col>
+                  <b-form-group label-cols-md="4" label="E-mail (optional)">
+                    <b-form-input
+                      type="email"
+                      placeholder="example@mail.com"
+                      v-model="metadata.email"
+                    ></b-form-input>
+                  </b-form-group>
+                </b-col>
+                <b-col cols="12">
+                  <b-form-group label-cols-md="2" label="Tags (optional)">
+                    <b-form-input
+                      v-model="metadata.tags"
+                    ></b-form-input> </b-form-group
+                ></b-col>
+              </b-row>
+            </b-col>
+          </b-row>
 
           <b-col class="g-0" :cols="horizontalLayout ? 12 : 6">
             <!--User can select a dataset.-->
@@ -212,27 +235,39 @@ function reformat(property) {
                 :horizontalLayout="horizontalLayout"
               />
 
-              <!--User can select the amount of recommendations per user -->
-              <b-form-group
-                v-if="form.computationMethod == 'recommendation'"
-                label="Select number of recommendations per user:"
-              >
-                <b-form-input
-                  type="range"
-                  :min="options.defaults.recCount.min"
-                  :max="options.defaults.recCount.max"
-                  v-model="form.recommendations"
-                />
-                <p>{{ form.recommendations }}</p>
-                <b-form-checkbox
-                  v-model="form.includeRatedItems"
-                  buttons
-                  button-variant="outline-primary"
-                  required
-                  >Include already rated items in
-                  recommendations</b-form-checkbox
-                >
-              </b-form-group>
+              <b-row>
+                <b-row>
+                  <b-col md="auto">
+                    <!--User can select the amount of recommendations per user -->
+                    <b-form-group
+                      v-if="form.computationMethod == 'recommendation'"
+                      label="Select number of recommendations per user:"
+                    >
+                      <b-form-input
+                        type="range"
+                        :min="options.defaults.recCount.min"
+                        :max="options.defaults.recCount.max"
+                        v-model="form.recommendations"
+                      />
+                    </b-form-group>
+                  </b-col>
+                  <b-col md="auto">
+                    <b-form-input md="auto" v-model="form.recommendations"
+                      >{{ form.recommendations }}
+                    </b-form-input>
+                  </b-col>
+                  <b-col md="auto">
+                    <b-form-checkbox
+                      v-model="form.includeRatedItems"
+                      buttons
+                      button-variant="outline-primary"
+                      required
+                      >Include already rated items in
+                      recommendations</b-form-checkbox
+                    ></b-col
+                  >
+                </b-row>
+              </b-row>
             </div>
           </b-col>
           <b-row>
