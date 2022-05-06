@@ -3,6 +3,8 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
+import json
+from fairreckitlib.algorithms.elliot_alg.factory import ELLIOT_API
 
 model_API_dict = {}
 
@@ -16,7 +18,6 @@ FILTERS = [{'name': 'Artist Gender', 'params': {'options': [{'name': 'Gender', '
             'params': {'values': [{'name': 'threshold', 'min': 1, 'max': 1000, 'default': 10}]}},
            {'name': 'Minimum age', 'params': {'values': [{'name': 'threshold', 'min': 1, 'max': 1000, 'default': 18}]}},
            {'name': 'Maximum age', 'params': {'values': [{'name': 'threshold', 'min': 1, 'max': 1000, 'default': 18}]}}]
-
 
 # TODO do this in another way
 def create_model_API_dict(predictors, recommenders):
@@ -192,6 +193,14 @@ def reformat(options, nested):
     if nested:
         for option in options:
             option['options'] = reformat_options(option['options'])
+
+            # Disable Elliot options
+            if option['name'] == ELLIOT_API:
+                for disable_option in option['options']:
+                    disable_option['disabled'] = True
+                    #print(disable_option)
+
+                option['name'] = option['name'] + ' (unavailable)'
     else:
         options = reformat_options(options)
 

@@ -7,7 +7,7 @@ import Documentation from './components/Documentation.vue'
 import Results from './components/Results.vue'
 import PreviousResults from './components/PreviousResults.vue'
 import ActiveComputation from './components/ActiveComputation.vue'
-import NewComputation from './components/NewComputation.vue'
+import NewExperiment from './components/NewExperiment.vue'
 import TestForm from './test/TestForm.vue'
 import { onMounted, ref } from 'vue'
 import { API_URL } from './api'
@@ -60,7 +60,7 @@ b-tab.success {
   </div>
   <div class="nav-center">
     <b-tabs v-model="tabIndex" class="m-0 pt-2" align="center">
-      <b-tab title="New Computation"><NewComputation /></b-tab>
+      <b-tab title="New Experiment"><NewExperiment /></b-tab>
       <b-tab :class="{ success: done }">
         <ActiveComputation
           @computing="
