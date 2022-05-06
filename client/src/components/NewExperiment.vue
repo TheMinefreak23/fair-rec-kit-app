@@ -8,6 +8,7 @@ import { sendMockData } from '../test/mockComputationOptions.js'
 import { store } from '../store.js'
 import { API_URL } from '../api'
 import { emptyOption } from '../helpers/optionsFormatter'
+import { emptyFormGroup } from '../helpers/optionsFormatter';
 
 const horizontalLayout = ref(false)
 const oldMetadata = ref(false)
@@ -80,18 +81,6 @@ async function initForm() {
   form.value.computationMethod = 'recommendation' //The default experiment type
 }
 
-function emptyFormGroup(required) {
-  return {
-    // For required lists the minimum amount of group items is 1.
-    groupCount: required ? 1 : 0,
-    visible: required ? true : false,
-    main: [],
-    inputs: [],
-    selects: [],
-    lists: [],
-  }
-}
-
 // Change the form format (SoA) into a managable data format (AoS)
 // TODO just don't use SoA in the first place
 function reformat(property) {
@@ -120,6 +109,7 @@ function reformat(property) {
 </script>
 
 <template>
+  <div class="py-2 mx-5">
   <b-row>
     <b-col md="auto">
       <b-form-checkbox v-model="horizontalLayout"
@@ -132,7 +122,6 @@ function reformat(property) {
       >
     </b-col>
   </b-row>
-  <div class="py-2 mx-5">
     <b-card>
       <b-row class="text-center"> <h3>New Experiment</h3></b-row>
       <!--This form contains all the necessary parameters for a user to submit a request for a computation-->
