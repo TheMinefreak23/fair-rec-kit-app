@@ -12,10 +12,10 @@ from project.result_storage import *
 
 test_id = -1
 test_computation = {'result': None, 'timestamp': {'stamp': test_id}, 'metadata': {'name': 'foo'}}
-test_results_path = 'test_results.json'
+test_results_path = 'tests/test_results.json'
 
 
-@patch('project.result_storage.results_overview_path', test_results_path)
+@patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 def save_mock_result():
     save_result(test_computation, 'foo')  # Save a result with the id
 
@@ -52,11 +52,11 @@ def test_no_path_json():
 
 
 # Test updating of results overview
-@patch('project.result_storage.results_overview_path', test_results_path)
+@patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 def test_update_results():
     print(load_results_overview())
     old_results_length = len(load_results_overview()['all_results'])
-    update_results_overview(test_computation)
+    add_result(test_computation)
     new_results_length = len(load_results_overview()['all_results'])
     print(load_results_overview())
     assert new_results_length == old_results_length+1
@@ -69,7 +69,7 @@ def test_update_results():
 # Test that the overview exists on the path after being created
 def test_overview_created():
     create_results_overview()
-    assert os.path.exists(results_overview_path)
+    assert os.path.exists(RESULTS_OVERVIEW_PATH)
 
 
 # Test that the overview gets created when it is loaded

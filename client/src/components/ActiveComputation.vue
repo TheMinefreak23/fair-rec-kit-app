@@ -33,8 +33,8 @@ onMounted(() => {
 //Reload the queue when a new computation is added
 watch(
   () => store.queue,
-  (data, oldQueue) => {
-    console.log('queue watch new queue:', data)
+  (data) => {
+    //console.log('queue watch new queue:', data)
     //console.log('queue watch old queue:', oldQueue)
     if (data.length != 0) {
       getComputations()

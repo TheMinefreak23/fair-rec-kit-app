@@ -12,12 +12,7 @@ model_API_dict = {}
 DEFAULTS = {'split': 80,
             'recCount': {'min': 0, 'max': 100, 'default': 10},
             }  # default values
-FILTERS = [{'name': 'Artist Gender', 'params': {'options': [{'name': 'Gender', 'options': ['Male', 'Female']}]}},
-           {'name': 'User Gender', 'params': {'options': [{'name': 'Gender', 'options': ['Male', 'Female']}]}},
-           {'name': 'Country user threshold',
-            'params': {'values': [{'name': 'threshold', 'min': 1, 'max': 1000, 'default': 10}]}},
-           {'name': 'Minimum age', 'params': {'values': [{'name': 'threshold', 'min': 1, 'max': 1000, 'default': 18}]}},
-           {'name': 'Maximum age', 'params': {'values': [{'name': 'threshold', 'min': 1, 'max': 1000, 'default': 18}]}}]
+filters = json.load(open('parameters/filters.json'))
 
 # TODO do this in another way
 def create_model_API_dict(predictors, recommenders):
@@ -77,7 +72,6 @@ def create_available_options(recommender_system):
 
     # print(METRICS)
     options['defaults'] = DEFAULTS
-    # options['filters'] = FILTERS
 
     # Format datasets
     # TODO do this in backend
@@ -97,7 +91,7 @@ def create_available_options(recommender_system):
     # Add dynamic (nested settings) settings
     # MOCK: for now use all filters/metrics per dataset
     filter_list = [{'name': 'filter',
-                    'plural': 'filters', 'article': 'a', 'options': reformat(FILTERS, False)}]
+                    'plural': 'filters', 'article': 'a', 'options': reformat(filters, False)}]
 
     for dataset in datasets:
         dataset['params']['dynamic'] = filter_list
@@ -132,7 +126,7 @@ def config_dict_from_settings(computation):
     """
     settings = computation['settings']
 
-    name = computation['metadata']['name']
+    name = computation['metadata']['name'] 
     id = computation['timestamp']['stamp'] + '_' + name
 
     # Format datasets

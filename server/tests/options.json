@@ -1,80 +1,43 @@
 {
-    "timestamp": {
-        "stamp": 1649963724.6449034,
-        "datetime": "2022-04-14T21:15:24-64"
-    },
-    "metadata": {
-        "name": "kjh"
-    },
-    "settings": {
-        "datasets": [
-            {
-                "name": "LFM2B",
-                "settings": [
-                    {
-                        "filters": [
-                            {
-                                "name": "User Gender",
-                                "parameter": [
-                                    {
-                                        "name": "Gender",
-                                        "value": "Male"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            }
+  "timestamp": {
+    "stamp": "1651467547",
+    "datetime": "2022-05-02 06:59:07"
+  },
+  "metadata": {
+    "name": "m"
+  },
+  "settings": {
+    "datasets": [
+      {
+        "name": "ML-100K",
+        "params": [
+          {
+            "name": "Train/testsplit",
+            "value": "80"
+          }
         ],
-        "metrics": [
-            {
-                "name": "NDCG@K",
-                "parameter": [
-                    {
-                        "name": "k",
-                        "value": 10
-                    }
-                ]
-            }
-        ],
-        "approaches": [
-            {
-                "name": "SVDpp",
-                "parameter": [
-                    {
-                        "name": "epochs",
-                        "value": 10
-                    },
-                    {
-                        "name": "batch_size",
-                        "value": 512
-                    },
-                    {
-                        "name": "factors",
-                        "value": 50
-                    },
-                    {
-                        "name": "lr",
-                        "value": 0.001
-                    },
-                    {
-                        "name": "reg_w",
-                        "value": 0.1
-                    },
-                    {
-                        "name": "reg_b",
-                        "value": 0.001
-                    },
-                    {
-                        "name": "seed",
-                        "value": null
-                    }
-                ]
-            }
-        ],
-        "recommendations": 10,
-        "split": 80,
-        "splitMethod": "random"
-    }
+        "settings": [
+          {
+            "filters": []
+          }
+        ]
+      }
+    ],
+    "metrics": [],
+    "approaches": [
+      {
+        "name": "PopScore",
+        "params": [
+          {
+            "name": "Score_method",
+            "value": "quantile"
+          }
+        ]
+      }
+    ],
+    "recommendations": 10,
+    "split": 80,
+    "splitMethod": "random",
+    "computationMethod": "recommendation"
+  }
 }

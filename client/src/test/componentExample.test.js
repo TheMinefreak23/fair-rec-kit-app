@@ -1,16 +1,19 @@
-import { render, fireEvent } from '@testing-library/vue'
+/*This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+
+import { render, fireEvent, getByTestId } from '@testing-library/vue'
 import { test } from 'vitest'
 import App from '../App.vue'
 
 test('switchTab', async () => {
   // get utilities to query component
-  const { getByText } = render(App)
+  const { getAllByText } = render(App)
 
-  // get first node that matches tab text
-  const tab = getByText('Documentation')
+  const tab = getAllByText('Active Computations')[2]
 
   await fireEvent.click(tab)
 
   // throws error if the view that appears on press does not have this text
-  getByText('Documentation')
+  getAllByText('Queue')
 })

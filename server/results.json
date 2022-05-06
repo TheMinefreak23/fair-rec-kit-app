@@ -1,3 +1,1210 @@
 {
-    "all_results": []
+    "all_results": [
+        {
+            "timestamp": {
+                "stamp": "1651663095",
+                "datetime": "2022-05-04 13:18:15"
+            },
+            "metadata": {
+                "name": "help",
+                "tags": "oof",
+                "email": "hoho"
+            },
+            "settings": {
+                "datasets": [
+                    {
+                        "name": "ML-100K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    }
+                ],
+                "metrics": [
+                    {
+                        "name": "RMSE",
+                        "params": null,
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    }
+                ],
+                "approaches": [
+                    {
+                        "name": "BiasedMF",
+                        "params": [
+                            {
+                                "name": "features",
+                                "value": 10
+                            },
+                            {
+                                "name": "iterations",
+                                "value": 20
+                            },
+                            {
+                                "name": "user_reg",
+                                "value": 0.1
+                            },
+                            {
+                                "name": "item_reg",
+                                "value": 0.1
+                            },
+                            {
+                                "name": "damping",
+                                "value": 5
+                            },
+                            {
+                                "name": "random_seed",
+                                "value": null
+                            }
+                        ]
+                    }
+                ],
+                "recommendations": 10,
+                "split": 80,
+                "splitMethod": "random",
+                "computationMethod": "recommendation"
+            },
+            "result": [
+                {
+                    "dataset": {
+                        "name": "ML-100K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    "recs": [
+                        {
+                            "approach": "BiasedMF",
+                            "recommendation": "ML-100KFMdesaiB",
+                            "evals": [
+                                {
+                                    "name": "RMSE",
+                                    "evaluation": {
+                                        "global": 0.32,
+                                        "filtered": []
+                                    },
+                                    "params": null
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "timestamp": {
+                "stamp": "1651667383",
+                "datetime": "2022-05-04 14:29:43"
+            },
+            "metadata": {
+                "name": "Untitled"
+            },
+            "settings": {
+                "datasets": [
+                    {
+                        "name": "LFM-360K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    {
+                        "name": "ML-100K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    }
+                ],
+                "metrics": [],
+                "approaches": [
+                    {
+                        "name": "ImplicitMF",
+                        "params": [
+                            {
+                                "name": "features",
+                                "value": 3
+                            },
+                            {
+                                "name": "iterations",
+                                "value": 20
+                            },
+                            {
+                                "name": "reg",
+                                "value": 0.1
+                            },
+                            {
+                                "name": "weight",
+                                "value": 40
+                            },
+                            {
+                                "name": "random_seed",
+                                "value": null
+                            }
+                        ]
+                    }
+                ],
+                "recommendations": 10,
+                "split": 80,
+                "splitMethod": "random",
+                "computationMethod": "recommendation"
+            },
+            "result": [
+                {
+                    "dataset": {
+                        "name": "LFM-360K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    "recs": [
+                        {
+                            "approach": "ImplicitMF",
+                            "recommendation": "LFM-360KFMticilpmI",
+                            "evals": []
+                        }
+                    ]
+                },
+                {
+                    "dataset": {
+                        "name": "ML-100K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    "recs": [
+                        {
+                            "approach": "ImplicitMF",
+                            "recommendation": "ML-100KFMticilpmI",
+                            "evals": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "timestamp": {
+                "stamp": "1651668024",
+                "datetime": "2022-05-04 14:40:24"
+            },
+            "metadata": {
+                "name": "Untitled"
+            },
+            "settings": {
+                "datasets": [
+                    {
+                        "name": "ML-25M",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    {
+                        "name": "ML-100K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    }
+                ],
+                "metrics": [],
+                "approaches": [
+                    {
+                        "name": "ImplicitMF",
+                        "params": [
+                            {
+                                "name": "features",
+                                "value": 3
+                            },
+                            {
+                                "name": "iterations",
+                                "value": 20
+                            },
+                            {
+                                "name": "reg",
+                                "value": 0.1
+                            },
+                            {
+                                "name": "weight",
+                                "value": 40
+                            },
+                            {
+                                "name": "random_seed",
+                                "value": null
+                            }
+                        ]
+                    }
+                ],
+                "recommendations": 10,
+                "split": 80,
+                "splitMethod": "random",
+                "computationMethod": "recommendation"
+            },
+            "result": [
+                {
+                    "dataset": {
+                        "name": "ML-25M",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    "recs": [
+                        {
+                            "approach": "ImplicitMF",
+                            "recommendation": "ML-25MFMticilpmI",
+                            "evals": []
+                        }
+                    ]
+                },
+                {
+                    "dataset": {
+                        "name": "ML-100K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    "recs": [
+                        {
+                            "approach": "ImplicitMF",
+                            "recommendation": "ML-100KFMticilpmI",
+                            "evals": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "timestamp": {
+                "stamp": "1651668033",
+                "datetime": "2022-05-04 14:40:33"
+            },
+            "metadata": {
+                "name": "Untitled"
+            },
+            "settings": {
+                "datasets": [
+                    {
+                        "name": "ML-25M",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    {
+                        "name": "ML-100K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    }
+                ],
+                "metrics": [],
+                "approaches": [
+                    {
+                        "name": "FunkSVD",
+                        "params": [
+                            {
+                                "name": "epochs",
+                                "value": 10
+                            },
+                            {
+                                "name": "batch_size",
+                                "value": 512
+                            },
+                            {
+                                "name": "factors",
+                                "value": 10
+                            },
+                            {
+                                "name": "lr",
+                                "value": 0.001
+                            },
+                            {
+                                "name": "reg_w",
+                                "value": 0.1
+                            },
+                            {
+                                "name": "reg_b",
+                                "value": 0.001
+                            },
+                            {
+                                "name": "seed",
+                                "value": null
+                            }
+                        ]
+                    }
+                ],
+                "recommendations": 10,
+                "split": 80,
+                "splitMethod": "random",
+                "computationMethod": "recommendation"
+            },
+            "result": [
+                {
+                    "dataset": {
+                        "name": "ML-25M",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    "recs": [
+                        {
+                            "approach": "FunkSVD",
+                            "recommendation": "ML-25MDVSknuF",
+                            "evals": []
+                        }
+                    ]
+                },
+                {
+                    "dataset": {
+                        "name": "ML-100K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    "recs": [
+                        {
+                            "approach": "FunkSVD",
+                            "recommendation": "ML-100KDVSknuF",
+                            "evals": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "timestamp": {
+                "stamp": "1651668121",
+                "datetime": "2022-05-04 14:42:01"
+            },
+            "metadata": {
+                "name": "Untitled"
+            },
+            "settings": {
+                "datasets": [
+                    {
+                        "name": "ML-25M",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    {
+                        "name": "ML-25M",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    {
+                        "name": "ML-25M",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    }
+                ],
+                "metrics": [],
+                "approaches": [
+                    {
+                        "name": "FunkSVD",
+                        "params": [
+                            {
+                                "name": "epochs",
+                                "value": 10
+                            },
+                            {
+                                "name": "batch_size",
+                                "value": 512
+                            },
+                            {
+                                "name": "factors",
+                                "value": 10
+                            },
+                            {
+                                "name": "lr",
+                                "value": 0.001
+                            },
+                            {
+                                "name": "reg_w",
+                                "value": 0.1
+                            },
+                            {
+                                "name": "reg_b",
+                                "value": 0.001
+                            },
+                            {
+                                "name": "seed",
+                                "value": null
+                            }
+                        ]
+                    }
+                ],
+                "recommendations": 10,
+                "split": 80,
+                "splitMethod": "random",
+                "computationMethod": "recommendation"
+            },
+            "result": [
+                {
+                    "dataset": {
+                        "name": "ML-25M",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    "recs": [
+                        {
+                            "approach": "FunkSVD",
+                            "recommendation": "ML-25MDVSknuF",
+                            "evals": []
+                        }
+                    ]
+                },
+                {
+                    "dataset": {
+                        "name": "ML-25M",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    "recs": [
+                        {
+                            "approach": "FunkSVD",
+                            "recommendation": "ML-25MDVSknuF",
+                            "evals": []
+                        }
+                    ]
+                },
+                {
+                    "dataset": {
+                        "name": "ML-25M",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    "recs": [
+                        {
+                            "approach": "FunkSVD",
+                            "recommendation": "ML-25MDVSknuF",
+                            "evals": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "timestamp": {
+                "stamp": "1651742344",
+                "datetime": "2022-05-05 11:19:04"
+            },
+            "metadata": {
+                "name": "Untitled"
+            },
+            "settings": {
+                "datasets": [
+                    {
+                        "name": "ML-100K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    }
+                ],
+                "metrics": [],
+                "approaches": [
+                    {
+                        "name": "ItemItem",
+                        "params": [
+                            {
+                                "name": "max_nnbrs",
+                                "value": 10
+                            },
+                            {
+                                "name": "min_nbrs",
+                                "value": 1
+                            },
+                            {
+                                "name": "min_sim",
+                                "value": 1e-06
+                            }
+                        ]
+                    }
+                ],
+                "recommendations": 10,
+                "split": 80,
+                "splitMethod": "random",
+                "computationMethod": "recommendation"
+            },
+            "result": [
+                {
+                    "dataset": {
+                        "name": "ML-100K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    "recs": [
+                        {
+                            "approach": "ItemItem",
+                            "recommendation": "ML-100KmetImetI",
+                            "evals": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "timestamp": {
+                "stamp": "1651742367",
+                "datetime": "2022-05-05 11:19:27"
+            },
+            "metadata": {
+                "name": "halp"
+            },
+            "settings": {
+                "datasets": [
+                    {
+                        "name": "ML-100K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    }
+                ],
+                "metrics": [],
+                "approaches": [
+                    {
+                        "name": "ImplicitMF",
+                        "params": [
+                            {
+                                "name": "features",
+                                "value": 3
+                            },
+                            {
+                                "name": "iterations",
+                                "value": 20
+                            },
+                            {
+                                "name": "reg",
+                                "value": 0.1
+                            },
+                            {
+                                "name": "weight",
+                                "value": 40
+                            },
+                            {
+                                "name": "random_seed",
+                                "value": null
+                            }
+                        ]
+                    }
+                ],
+                "recommendations": 10,
+                "split": 80,
+                "splitMethod": "random",
+                "computationMethod": "recommendation"
+            },
+            "result": [
+                {
+                    "dataset": {
+                        "name": "ML-100K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    "recs": [
+                        {
+                            "approach": "ImplicitMF",
+                            "recommendation": "ML-100KFMticilpmI",
+                            "evals": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "timestamp": {
+                "stamp": "1651751842",
+                "datetime": "2022-05-05 13:57:22"
+            },
+            "metadata": {
+                "name": "t"
+            },
+            "settings": {
+                "datasets": [
+                    {
+                        "name": "ML-100K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    }
+                ],
+                "metrics": [],
+                "approaches": [
+                    {
+                        "name": "PopScore",
+                        "params": [
+                            {
+                                "name": "random_seed",
+                                "value": null
+                            }
+                        ]
+                    },
+                    {
+                        "name": "ItemKNN",
+                        "params": [
+                            {
+                                "name": "neighbours",
+                                "value": 40
+                            }
+                        ]
+                    }
+                ],
+                "recommendations": 10,
+                "split": 80,
+                "splitMethod": "random",
+                "computationMethod": "recommendation"
+            },
+            "result": [
+                {
+                    "dataset": {
+                        "name": "ML-100K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    "recs": [
+                        {
+                            "approach": "PopScore",
+                            "recommendation": "ML-100KerocSpoP",
+                            "evals": []
+                        },
+                        {
+                            "approach": "ItemKNN",
+                            "recommendation": "ML-100KNNKmetI",
+                            "evals": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "timestamp": {
+                "stamp": "1651763667",
+                "datetime": "2022-05-05 17:14:27"
+            },
+            "metadata": {
+                "name": "Untitled"
+            },
+            "settings": {
+                "datasets": [
+                    {
+                        "name": "ML-100K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    {
+                        "name": "LFM-360K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": [
+                                    {
+                                        "name": "Minimum age",
+                                        "params": [
+                                            {
+                                                "name": "threshold",
+                                                "value": 18
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "metrics": [],
+                "approaches": [
+                    {
+                        "name": "BiasedMF",
+                        "params": [
+                            {
+                                "name": "features",
+                                "value": 10
+                            },
+                            {
+                                "name": "iterations",
+                                "value": 20
+                            },
+                            {
+                                "name": "user_reg",
+                                "value": 0.1
+                            },
+                            {
+                                "name": "item_reg",
+                                "value": 0.1
+                            },
+                            {
+                                "name": "damping",
+                                "value": 5
+                            },
+                            {
+                                "name": "random_seed",
+                                "value": null
+                            }
+                        ]
+                    }
+                ],
+                "recommendations": 10,
+                "split": 80,
+                "splitMethod": "random",
+                "computationMethod": "recommendation"
+            },
+            "result": [
+                {
+                    "dataset": {
+                        "name": "ML-100K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    "recs": [
+                        {
+                            "approach": "BiasedMF",
+                            "recommendation": "ML-100KFMdesaiB",
+                            "evals": []
+                        }
+                    ]
+                },
+                {
+                    "dataset": {
+                        "name": "LFM-360K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": [
+                                    {
+                                        "name": "Minimum age",
+                                        "params": [
+                                            {
+                                                "name": "threshold",
+                                                "value": 18
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "recs": [
+                        {
+                            "approach": "BiasedMF",
+                            "recommendation": "LFM-360KFMdesaiB",
+                            "evals": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "timestamp": {
+                "stamp": "1651763684",
+                "datetime": "2022-05-05 17:14:44"
+            },
+            "metadata": {
+                "name": "Untitled"
+            },
+            "settings": {
+                "datasets": [
+                    {
+                        "name": "ML-100K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    {
+                        "name": "LFM-360K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": [
+                                    {
+                                        "name": "Minimum age",
+                                        "params": [
+                                            {
+                                                "name": "threshold",
+                                                "value": 18
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "metrics": [
+                    {
+                        "name": "Item Coverage",
+                        "params": null,
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    }
+                ],
+                "approaches": [
+                    {
+                        "name": "BiasedMF",
+                        "params": [
+                            {
+                                "name": "features",
+                                "value": 10
+                            },
+                            {
+                                "name": "iterations",
+                                "value": 20
+                            },
+                            {
+                                "name": "user_reg",
+                                "value": 0.1
+                            },
+                            {
+                                "name": "item_reg",
+                                "value": 0.1
+                            },
+                            {
+                                "name": "damping",
+                                "value": 5
+                            },
+                            {
+                                "name": "random_seed",
+                                "value": null
+                            }
+                        ]
+                    }
+                ],
+                "recommendations": 10,
+                "split": 80,
+                "splitMethod": "random",
+                "computationMethod": "recommendation"
+            },
+            "result": [
+                {
+                    "dataset": {
+                        "name": "ML-100K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    "recs": [
+                        {
+                            "approach": "BiasedMF",
+                            "recommendation": "ML-100KFMdesaiB",
+                            "evals": [
+                                {
+                                    "name": "Item Coverage",
+                                    "evaluation": {
+                                        "global": 1.04,
+                                        "filtered": []
+                                    },
+                                    "params": null
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "dataset": {
+                        "name": "LFM-360K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": [
+                                    {
+                                        "name": "Minimum age",
+                                        "params": [
+                                            {
+                                                "name": "threshold",
+                                                "value": 18
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "recs": [
+                        {
+                            "approach": "BiasedMF",
+                            "recommendation": "LFM-360KFMdesaiB",
+                            "evals": [
+                                {
+                                    "name": "Item Coverage",
+                                    "evaluation": {
+                                        "global": 1.04,
+                                        "filtered": []
+                                    },
+                                    "params": null
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
 }

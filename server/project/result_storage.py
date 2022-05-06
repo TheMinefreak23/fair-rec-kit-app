@@ -6,113 +6,155 @@ Utrecht University within the Software Project course.
 import json
 import os
 
-# Results overview format
-# timestamp (ID)
-# metadata: name, tag
-# settings: datasets, approaches, metrics, per metric: name, k value
-
-# Result detail format
-# timestamp (ID), per dataset: recommendations result, per recs result: metrics evaluations
-
-
+# Global current result variables
 current_result = {}
 current_recs = None
-results_overview_path = 'results.json'
-mock_results_overview_path = 'mock/results_overview.json'
-mock_results_path = 'mock/results.json'
-recommendations_path = 'recs.json'
-evaluations_path = 'evals.json'
+
+# Storage paths
+RESULTS_OVERVIEW_PATH = 'results.json'
 
 
 def save_result(computation, result):
+    """
+    Save result to overview.
+
+    :param computation: the computation settings
+    :param result: the computed result
+    """
     global current_result
     computation['result'] = result
+
+    # Parse tags
+    if 'tags' in computation['metadata']:
+        computation['metadata']['tags'] = parse_tags(computation['metadata']['tags'])
+
     current_result = computation
-    update_results_overview(current_result)
+    add_result(current_result)
     print(current_result)
 
 
-def result_by_id(id):
-    results = load_json(results_overview_path)
+def result_by_id(result_id):
+    """
+    Get a result from the results overview by its id.
+
+    :param result_id: the result id
+    :return: the corresponding result (settings, recs, evaluation)
+    """
+    results = load_json(RESULTS_OVERVIEW_PATH)
 
     # Filter: Loop through all results and find the one with the matching ID.
     for result in results['all_results']:
         global current_result
         if 'timestamp' in result:
-            if result['timestamp']['stamp'] == id:
-                print('result', result)
+            if result['timestamp']['stamp'] == result_id:
+                # print('result', result)
                 current_result = result
         else:
-            current_result = None # If there is an incorrectly formatted result, return nothing
+            # If there is an incorrectly formatted result, return nothing.
+            current_result = None
 
-    print('current result',current_result)
-
-    # current_result = results_df.filter(like='')
-
-
-def newest_result():
-    return current_result
+    # print('current result',current_result)
 
 
 def load_json(path):
-    with open(path, 'r') as file:
+    """
+    Load a JSON file to a dictionary using its path.
+
+    :param path: the path to the JSON file
+    :return: the JSON as a dictionary
+    """
+    with open(path, 'r', encoding='utf-8') as file:
         return json.load(file)  # Load existing data into a dict.
 
 
 def load_results_overview():
+    """
+    Load the results overview.
+
+    :return: the loaded results
+    """
+    # Ensure the results overview exists.
     create_results_overview()
-    return load_json(results_overview_path)
+    return load_json(RESULTS_OVERVIEW_PATH)
 
 
-def update_results_overview(new_result):
-    create_results_overview()
-    file_data = load_json(results_overview_path)
-    file_data['all_results'].append(new_result)
-    with open(results_overview_path, 'w') as file:  # Open the file in write mode.
-        # Rewind file pointer's position.
-        file.seek(0)
+def write_results_overview(results):
+    """
+    Write (store) results to the overview.
+
+    :param results: the results to store
+    """
+    # Open the file in write mode.
+    with open(RESULTS_OVERVIEW_PATH, 'w', encoding='utf-8') as file:
         # Store it as json data.
-        json.dump(file_data, file, indent=4)
+        json.dump(results, file, indent=4)
+
+
+def add_result(result):
+    """
+    Add a result at the end of the results overview.
+
+    :param result: the (new) result
+    """
+    file_results = load_results_overview()
+    file_results['all_results'].append(result)
+    write_results_overview(file_results)
 
 
 def delete_result(index):
-    create_results_overview()
-    file_data = load_results_overview()
-    file_data['all_results'].pop(index)
-    with open(results_overview_path, 'w') as file:  # Open the file in write mode.
-        # Rewind file pointer's position.
-        file.seek(0)
-        # Store it as json data.
-        json.dump(file_data, file)
+    """
+    Delete a result by its index.
+
+    :param index: the index of the result
+    """
+    file_results = load_results_overview()
+    file_results['all_results'].pop(index)
+    write_results_overview(file_results)
 
 
 def edit_result(index, new_name, new_tags, new_email):
-    create_results_overview()
-    file_data = load_results_overview()
-    to_edit_result = file_data['all_results'].pop(index)
+    """
+    Edit a result.
 
-    if new_name != '':  # Don't change the name if the input field has been left empty
-        to_edit_result['metadata']['name'] = new_name
-        print(to_edit_result['metadata']['name'])
-    if new_tags != '':  # Don't change the tags if the input field has been left empty
-        to_edit_result['metadata']['tags'] = new_tags
-        print(to_edit_result['metadata']['tags'])
-    if new_email != '':  # Don't change the e-mail if the input field has been left empty
-        to_edit_result['metadata']['email'] = new_email
-        print(to_edit_result['metadata']['email'])
+    :param index: the result index
+    :param new_name: the new metadata name of the result
+    :param new_tags: the new metadata tags of the result
+    :param new_email: the new metadata email of the result
+    """
+    file_results = load_results_overview()
+    to_edit_result = file_results['all_results'][index]
+    print(new_tags)
+
+    def edit_metadata(attr, new_val):
+        # Don't change the attribute if the input field has been left empty
+        if new_val != '':  #
+            to_edit_result['metadata'][attr] = new_val
+            print('changed '+attr, to_edit_result['metadata'][attr])
+
+    for (data_name, new_data) in [('name', new_name), ('tags', new_tags), ('email', new_email)]:
+        edit_metadata(data_name, new_data)
 
     # TODO Add more editable values
-    file_data['all_results'].insert(index, to_edit_result)
+    file_results['all_results'][index] = to_edit_result
 
-    with open(results_overview_path, 'w') as file:  # Open the file in write mode.
-        # Rewind file pointer's position.
-        file.seek(0)
-        # Store it as json data.
-        json.dump(file_data, file)
+    write_results_overview(file_results)
 
 
-# Create results file if it doesn't exist yet or is empty
 def create_results_overview():
-    if not os.path.exists(results_overview_path) or os.stat(results_overview_path).st_size == 0:
-        with open(results_overview_path, 'w') as file:  # Open the file in write mode.
+    """Create a results file if it doesn't exist yet or is empty."""
+    if not os.path.exists(RESULTS_OVERVIEW_PATH) or os.stat(RESULTS_OVERVIEW_PATH).st_size == 0:
+        with open(RESULTS_OVERVIEW_PATH, 'w', encoding='utf-8') as file:  # Open the file in write mode.
             json.dump({'all_results': []}, file, indent=4)
+
+
+def parse_tags(tags_string):
+    """
+    Parse result tags (given by user as metadata)
+
+    :param tags_string: the tags as raw string input (comma-separated)
+    :return: the split list of tags
+    """
+    # Split tags by comma and get the unique tags
+    unique = list(set(tags_string.split(',')))
+    # Remove empty tags
+    return [tag for tag in unique if tag]

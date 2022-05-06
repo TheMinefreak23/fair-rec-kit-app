@@ -1,5 +1,5 @@
 import { reactive } from 'vue'
-import mockdata from '../api/mock/1647818279_HelloWorld/results-table.json'
+import mockdata from '../../server/mock/1647818279_HelloWorld/results-table.json'
 
 // Mockdata result
 function mockResult() {
@@ -11,7 +11,14 @@ function mockResult() {
     results: mockdata.body,
     headers: mockdata.headers,
   }
-  return { id: 0, name: 'computation1', result: [mock, mock] }
+  return {
+    metadata: {
+      id: 0,
+      name: 'computation1',
+      tags: ['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '],
+    },
+    result: [mock, mock],
+  }
 }
 
 const store = reactive({

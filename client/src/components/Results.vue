@@ -2,43 +2,54 @@
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
+import { ref, watch } from 'vue'
+import { API_URL } from '../api'
 import Result from './Result.vue'
 import VDismissButton from './VDismissButton.vue'
 import PreviousResults from './PreviousResults.vue'
-import { onMounted, ref, watch } from 'vue'
 import { store, addResult, removeResult } from '../store'
 import { formatResult } from '../helpers/resultFormatter'
-import { API_URL } from '../api'
 
 const emit = defineEmits(['goToResult'])
 const showResultModal = ref(false)
 
+// Request latest calculation when the queue is updated
 watch(
   () => store.queue,
   (newQueue, oldQueue) => {
+    // Only request if the queue length has decreased
+    // (An experiment has finished)
     if (newQueue.length < oldQueue.length) getCalculation()
   }
 )
 
-// GET request: Ask server for latest calculation
+/**
+ * GET request: Ask server for latest calculation
+ */
 async function getCalculation() {
-  const response = await fetch(API_URL + '/computation/calculation')
-  const data = await response.json()
-  console.log(data)
-  //if (Object.keys(data).length === 0) // not null check
-  //store.currentResult = data.calculation
-  addResult(formatResult(data.calculation))
-  showResultModal.value = true
+  try {
+    const response = await fetch(API_URL + '/computation/calculation')
+    const data = await response.json()
+    console.log(data)
+    addResult(formatResult(data.calculation))
+    showResultModal.value = true
+  } catch (e) {
+    console.log(e) // TODO better error handling, composable
+  }
 }
 
-function closeResult(id) {
-  console.log(id)
-  removeResult(id)
+/**
+ * Close an inner result tab by index
+ * @param {Int} index - the index of the tab within the result tabs
+ */
+function closeResult(index) {
+  console.log(index)
+  removeResult(index)
 }
 </script>
 
 <template>
-  <!--Shows when there is a new result-->
+  <!--Show modal overlay when there is a new result-->
   <b-modal
     id="result-modal"
     v-model="showResultModal"
@@ -50,9 +61,11 @@ function closeResult(id) {
   >
     <p>An experiment has finished.</p>
   </b-modal>
+  <!--Result content-->
   <b-card>
     <div class="mx-5 mt-2">
       <div class="border-top-0 p-0">
+        <!--Open previous results sidebar on button press-->
         <div class="p-3 m-0 container-fluid">
           <h3 class="d-inline">Results</h3>
           <button
@@ -68,26 +81,27 @@ function closeResult(id) {
         <div class="border">
           <template v-if="[...store.currentResults].length > 0">
             <b-tabs card content-class="mt-3">
-              <!-- Result tabs.-->
-              <!--Always show JSON Mockdata result tab.-->
+              <!-- Show opened results in tabs.-->
               <b-tab
                 v-for="(result, index) in [...store.currentResults]"
                 :key="result.id"
               >
                 <template #title>
-                  Result {{ result.name }}
+                  Result {{ result.metadata.name }}
                   <VDismissButton @click.stop="closeResult(index)" />
                 </template>
                 <Result :result="result"
               /></b-tab>
             </b-tabs>
           </template>
+          <!--Show message when there are no results.-->
           <p v-else>
             No results to show, start a new experiment or choose a previous
             experiment
           </p>
         </div>
 
+        <!--Toggled results sidebar (offcanvas)-->
         <div
           class="offcanvas offcanvas-end"
           tabindex="-1"
@@ -97,11 +111,6 @@ function closeResult(id) {
           <PreviousResults @goToResult="" />
         </div>
       </div>
-
-      <!--<div class="col-md-4 border-top-0 p-0">
-      <h3 class="text-center py-2 m-0 border-bottom">Previous Results</h3>
-      <PreviousResults />
-    </div>-->
     </div>
   </b-card>
 </template>

@@ -24,8 +24,6 @@ const props = defineProps({
   data: { type: Object, required: true },
 })
 
-const groupCount = ref(0)
-
 const form = computed({
   // getter
   get() {
@@ -43,10 +41,9 @@ const form = computed({
 const visibleGroup = ref(1)
 
 onMounted(() => {
-  groupCount.value = props.required ? 1 : 0 // For required lists the minimum amount of group items is 1.
-  console.log(props.name)
+  /*console.log(props.name)
   if (props.name == 'filter' || props.name == 'dataset')
-    console.log(props.name, props.options)
+    console.log(props.name, props.options)*/
   form.value.name = props.plural
   //console.log(props.name, 'options', props.options)
 })
@@ -102,6 +99,7 @@ function setParameter(i, option) {
       choices = option.params.dynamic
       // TODO refactor empty form group function
       form.value.lists[i] = choices.map(() => ({
+        groupCount: 0, // For sublists there is no minimum amount of group items.
         main: [],
         inputs: [],
         selects: [],
@@ -173,7 +171,7 @@ function copyItem(i) {
 
   if (form.value.inputs[i]) {
     //Copy textfield options (if applicable)
-    form.value.inputs[groupCount.value - 1] = form.value.inputs[i].map(
+    form.value.inputs[form.value.groupCount - 1] = form.value.inputs[i].map(
       (param) => ({
         name: param.name,
         value: param.value,
@@ -182,7 +180,7 @@ function copyItem(i) {
   }
   if (form.value.selects[i]) {
     //Copy select options (if applicable)
-    form.value.selects[groupCount.value - 1] = form.value.selects[i].map(
+    form.value.selects[form.value.groupCount - 1] = form.value.selects[i].map(
       (param) => ({
         name: param.name,
         value: param.value,
@@ -191,7 +189,7 @@ function copyItem(i) {
   }
   if (form.value.lists[i]) {
     //Copy nested option list (if applicable)
-    form.value.lists[groupCount.value - 1] = form.value.lists[i].map(
+    form.value.lists[form.value.groupCount - 1] = form.value.lists[i].map(
       (param) => ({
         groupCount: param.groupCount,
         main: param.main,
@@ -218,7 +216,7 @@ function update() {
       form.value.selects[i] = deleteEntry
       form.value.inputs[i] = deleteEntry
       form.value.lists[i] = deleteEntry
-      if (props.required && groupCount.value > 1) groupCount.value--
+      if (props.required && form.value.groupCount > 1) form.value.groupCount--
     }
   }
   //console.log(form.value.main)
