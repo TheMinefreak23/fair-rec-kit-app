@@ -60,7 +60,7 @@ def get_background():
 
     Returns:
         Image: Background-image
-    """``
+    """
     playlist_id = '37i9dQZEVXbMDoHDwVN2tF'
     url = 'https://api.spotify.com/v1/playlists/' + playlist_id + '/tracks?limit=50'
     headers = {'Authorization': 'Bearer ' + token['access_token'], 'Content-Type': 'application/json'}
