@@ -6,7 +6,6 @@ Utrecht University within the Software Project course.
 import base64
 import json
 import time
-from turtle import back
 import requests as requests
 import numpy as np
 
@@ -54,7 +53,7 @@ def get_acousticbrainz_data():
     res = requests.get(url)
     return json.loads(res.text)
 
-@detail_bp.route('/background', methods = ["GET"])
+@detail_bp.route('/background', methods = ['GET'])
 def get_background():
     """Generates a background from the album covers of a Spotify Playlist
 
