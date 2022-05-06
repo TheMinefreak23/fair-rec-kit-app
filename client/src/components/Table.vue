@@ -11,7 +11,7 @@ const emit = defineEmits([
   'loadResults',
   'loadMore',
   'paginationSort',
-  'changeColumns'
+  'updateHeaders'
 ])
 const props = defineProps({
   overview: Boolean,
@@ -35,7 +35,7 @@ const entryAmount = ref(20)
 const deleteModalShow = ref(false)
 const editModalShow = ref(false)
 const viewModalShow = ref(false)
-const changeColumnsModalShow = ref(false)
+const updateHeadersModalShow = ref(false)
 const checkedColumns = ref([])
 const itemColumns = ref([])
 const userColumns = ref([])
@@ -207,9 +207,9 @@ function setsorting(i) {
   <!-- Modal used for changing the headers of the user recommendations table -->
   <b-modal 
     id="change-columns-modal"
-    v-model="changeColumnsModalShow"
-    title="Change headers"
-    @ok="$emit('changeColumns', checkedColumns, userColumns, itemColumns)"
+    v-model="updateHeadersModalShow"
+    title="Change columns"
+    @ok="$emit('updateHeaders', checkedColumns, userColumns, itemColumns)"
     >
     <p>Select the extra headers you want to be shown</p>
     <p>{{headerOptions}}</p>
@@ -278,7 +278,7 @@ function setsorting(i) {
       }}
        <template v-if="expandable">
       <b-button 
-        @click="changeColumnsModalShow = !changeColumnsModalShow">  
+        @click="updateHeadersModalShow = !updateHeadersModalShow">  
         change headers 
       </b-button>
     </template>

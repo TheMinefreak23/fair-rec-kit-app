@@ -11,7 +11,9 @@ import { API_URL } from '../api'
 
 const props = defineProps({ headers: Array, result: Object })
 
+//Default headers for recommendation experiments.
 const headers_rec = ref([{ name: 'Rank'}, { name: 'User' }, { name: 'Item' }, { name: 'Score' }])
+//Default headers for prediction experiments
 const headers_pre = ref([{ name: 'User' }, { name: 'Item' }, { name: 'Predicted Score' }])
 
 const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
@@ -48,14 +50,6 @@ async function getHeaders() {
   generalHeaderOptions.value = makeHeaders(data.headers)
   itemHeaderOptions.value = makeHeaders(data.itemHeaders)
   userHeaderOptions.value = makeHeaders(data.userHeaders)
-  /*headerOptions = {
-    'generalHeaders' : data.headers,
-    'itemHeaders' : data.itemHeaders,
-    'userHeaders' : data.userHeaders
-  }*/
-
-  console.log(generalHeaderOptions.value)
-
 }
 
 //POST request: Send result ID to the server to set current shown recommendations.
@@ -130,17 +124,25 @@ function paginationSort(indexVar) {
   getUserRecs()
 }
 
-//Update headers shown in user recommendations
-function changeColumns(generalHeader, userHeader, itemHeader) {
+
+/**
+ * Update headers shown in user recommendations
+ * @param {Array}   generalHeader  - list of headers that apply to the user-item pair.
+ * @param {Array}   userHeader    - list of headers that apply to the user entries.
+ * @param {Array}   itemHeader    - list of headers that apply to the item entries.
+ */
+function updateHeaders(generalHeader, userHeader, itemHeader) {
   generalHeaders.value = makeHeaders(generalHeader)
   userHeaders.value = makeHeaders(userHeader)
   itemHeaders.value = makeHeaders(itemHeader)
-
-  console.log(generalHeaders.value)
   getUserRecs()
 }
 
-//convert list of header names into supported header format
+
+/**
+ * convert list of header names into supported header format, capitalize and remove underscores
+ * @param {Array}   headers  - list of headers.
+ */
 function makeHeaders(headers) {
   for(var i=0; i<headers.length; i++){
     headers[i] = capitalizeFirstLetter(headers[i].replace("_", " "))
@@ -150,6 +152,10 @@ function makeHeaders(headers) {
       }))
 }
 
+/**
+ * Capitalize the first letter of a string
+ * @param {int}   string  - the string that needs to be capitalized.
+ */
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
@@ -214,7 +220,7 @@ function capitalizeFirstLetter(string) {
           expandable
           @paginationSort="(i) => paginationSort(i)"
           @loadMore="(increase, amount) => loadMore(increase, amount)"
-          @changeColumns="(general, user, item) => changeColumns(general, user, item)"
+          @updateHeaders="(general, user, item) => updateHeaders(general, user, item)"
         />
       </div>
       <!--</template>-->
