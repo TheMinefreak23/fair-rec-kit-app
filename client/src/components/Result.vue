@@ -44,9 +44,9 @@ async function getHeaders() {
   const response = await fetch(API_URL + '/all-results/headers')
   const data = await response.json()
   
-  generalHeaderOptions.value = data.headers
-  itemHeaderOptions.value = data.itemHeaders
-  userHeaderOptions.value = data.userHeaders
+  generalHeaderOptions.value = makeHeaders(data.headers)
+  itemHeaderOptions.value = makeHeaders(data.itemHeaders)
+  userHeaderOptions.value = makeHeaders(data.userHeaders)
   /*headerOptions = {
     'generalHeaders' : data.headers,
     'itemHeaders' : data.itemHeaders,
@@ -131,18 +131,19 @@ function paginationSort(indexVar) {
 
 //Update headers shown in user recommendations
 function changeColumns(generalHeader, userHeader, itemHeader) {
-  generalHeaders.value = generalHeader.map((header) => ({
-        name: header,
-      }))
-  userHeaders.value = userHeader.map((header) => ({
-        name: header,
-      }))
-  itemHeaders.value = itemHeader.map((header) => ({
-        name: header,
-      }))
+  generalHeaders.value = makeHeaders(generalHeader)
+  userHeaders.value = makeHeaders(userHeader)
+  itemHeaders.value = makeHeaders(itemHeader)
 
   console.log(generalHeaders.value)
   getUserRecs()
+}
+
+//convert list of header names into supported header format
+function makeHeaders(headers) {
+  return headers.map((header) => ({
+        name: header,
+      }))
 }
 
 </script>

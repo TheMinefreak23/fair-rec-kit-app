@@ -123,7 +123,7 @@ async function getResult() {
 
 /**
  * Sorts data based on index.
- * @param {Int}	i	- i is the coumn index on which is being sorted.
+ * @param {Int}	i	- i is the column index on which is being sorted.
  * @return	{[Object]} Sorted array of results.
  */
 function sort(i) {
@@ -140,7 +140,7 @@ function sort(i) {
 /**
  * Sets index on which is being sorted and determines if the
  * sorting is ascending or descending.
- * @param {Int}	i	- i is the coumn index on which is being sorted.
+ * @param {Int}	i	- i is the column index on which is being sorted.
  */
 function setsorting(i) {
   if (i === sortindex.value) {
