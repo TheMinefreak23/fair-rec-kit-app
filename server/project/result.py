@@ -48,6 +48,10 @@ def set_recs():
 @result_bp.route('/result', methods=['POST'])
 def user_result():
     json = request.json
+
+    filters = json.get("filters")
+    #TODO implement backend filtering
+    
     chunksize = json.get("amount", 20)
     chunksize = int(chunksize)
 
