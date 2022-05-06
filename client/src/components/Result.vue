@@ -141,9 +141,16 @@ function changeColumns(generalHeader, userHeader, itemHeader) {
 
 //convert list of header names into supported header format
 function makeHeaders(headers) {
+  for(var i=0; i<headers.length; i++){
+    headers[i] = capitalizeFirstLetter(headers[i].replace("_", " "))
+  }
   return headers.map((header) => ({
         name: header,
       }))
+}
+
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 </script>
