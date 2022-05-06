@@ -208,10 +208,10 @@ function setsorting(i) {
   <b-modal 
     id="change-columns-modal"
     v-model="changeColumnsModalShow"
-    title="Change columns"
+    title="Change headers"
     @ok="$emit('changeColumns', checkedColumns, userColumns, itemColumns)"
     >
-    <p>Check the extra columns you want to be shown</p>
+    <p>Select the extra headers you want to be shown</p>
     <p>{{headerOptions}}</p>
     <p>General:</p>
     <div class="form-check form-switch"
