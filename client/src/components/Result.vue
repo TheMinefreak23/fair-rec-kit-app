@@ -5,6 +5,7 @@ Utrecht University within the Software Project course.
 
 import Table from './Table.vue'
 import { onMounted, ref, watch } from 'vue'
+import { emptyFormGroup } from '../helpers/optionsFormatter';
 
 import mockdata from '../../../server/mock/1647818279_HelloWorld/results-table.json'
 import { API_URL } from '../api'
@@ -30,6 +31,8 @@ const entryAmount = ref(20)
 const userHeaders = ref([])
 const itemHeaders = ref([])
 const headers = ref([])
+const availableFilters = ref([])
+const filters = ref(emptyFormGroup(false))
 
 watch(
   () => props.result,
@@ -39,8 +42,9 @@ watch(
   }
 )
 
-onMounted(() => {
-  setRecs()
+onMounted(async () => {
+  await setRecs()
+  console.log('availableFilters',availableFilters.value)
 })
 
 //POST request: Send result ID to the server to set current shown recommendations.
@@ -53,7 +57,13 @@ async function setRecs() {
     }),
   }
   const response = await fetch(API_URL + '/result/set-recs', requestOptions)
-  if (response.status == 'success') getUserRecs()
+      console.log('resultfetch', response)
+  if (response.status == '200'){
+    const data = await response.json()
+    console.log('data',data)
+    availableFilters.value = data.availableFilters
+    console.log('resultfetch', response)
+    getUserRecs()}
 }
 
 //POST request: Ask server for next part of user recommendation table.
@@ -67,6 +77,7 @@ async function getUserRecs() {
       sortindex: index.value,
       ascending: ascending.value,
       amount: entryAmount.value,
+      filters: filters.value,
       //headers: headers.value,
       //itemheaders: itemHeaders.value,
       //userheaders: userHeaders.value
@@ -120,9 +131,16 @@ function changeColumns(generalHeader, userHeader, itemHeader) {
 
   getUserRecs()
 }
+
+function changeFilters(changedFilters){
+  filters.value = changedFilters
+
+  getUserRecs()
+}
 </script>
 
 <template>
+<div>
   <div class="container">
     <h1 class="display-2">Results</h1>
     <p class="lead">
@@ -176,6 +194,8 @@ function changeColumns(generalHeader, userHeader, itemHeader) {
           :results="data.results"
           :headers="headers_rec"
           :headerOptions="headers_options"
+          :filters="filters"
+          :filterOptions= "availableFilters"
           :userOptions="user_header_options"
           :itemOptions="item_header_options"
           pagination
@@ -185,9 +205,13 @@ function changeColumns(generalHeader, userHeader, itemHeader) {
           @changeColumns="
             (general, user, item) => changeColumns(general, user, item)
           "
+          @changeFilters="
+            (changedFilters) => changeFilters(changedFilters)
+          "
         />
       </div>
       <!--</template>-->
     </div>
+  </div>
   </div>
 </template>

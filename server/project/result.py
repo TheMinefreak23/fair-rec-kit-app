@@ -4,8 +4,10 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 
+from .computation import options
 from flask import (Blueprint, request)
 import pandas as pd
+import json as Jason
 
 from . import result_storage
 
@@ -23,6 +25,10 @@ def set_recs():
     result_id = json.get("id")  # Result timestamp TODO use to get result
     print(result_id)
 
+
+    filters = options['filters']
+
+
     # Get random mockdata for now TODO
     filepaths = ['mock/1647818279_HelloWorld/1647818279_run_0/LFM-360K_0/Foo_ALS_0/ratings.tsv',
                  'mock/1649162862_HelloFRK/run_0/LFM-1B_0/Implicit_AlternatingLeastSquares_0/ratings.tsv',
@@ -33,7 +39,9 @@ def set_recs():
     random_file = random.choice(filepaths)
     print(random_file)
     result_storage.current_recs = pd.read_csv(random_file, sep='\t', header=None)
-    return {'status': 'success'}
+    response = {'status': 'success', 'availableFilters' : filters}
+    print(response)
+    return response
 
 
 ## get recommender results per user

@@ -1,7 +1,10 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import sortBy from 'just-sort-by'
 import { API_URL } from '../api'
+import FormGroupList from './FormGroupList.vue'
+import { emptyFormGroup } from '../helpers/optionsFormatter';
+
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
@@ -12,6 +15,7 @@ const emit = defineEmits([
   'loadMore',
   'paginationSort',
   'changeColumns',
+  'changeFilters'
 ])
 const props = defineProps({
   overview: Boolean,
@@ -28,6 +32,8 @@ const props = defineProps({
   headerOptions: Array,
   userOptions: Array,
   itemOptions: Array,
+  filters: Array,
+  filterOptions: Array
 })
 
 const caption = ref('')
@@ -36,9 +42,11 @@ const deleteModalShow = ref(false)
 const editModalShow = ref(false)
 const viewModalShow = ref(false)
 const changeColumnsModalShow = ref(false)
+const filtersModalShow = ref(false)
 const checkedColumns = ref([])
 const itemColumns = ref([])
 const userColumns = ref([])
+const filters = ref(emptyFormGroup(false))
 const newName = ref('')
 const newTags = ref('')
 const newEmail = ref('')
@@ -64,6 +72,11 @@ const sorted = computed(() => {
 
   if (!props.pagination) return sort(sortindex.value)
   else return props.results
+})
+
+onMounted(() => {
+  if (props.caption == "Testcaption")
+    console.log('filterOptions', props.filterOptions)
 })
 
 async function editEntry() {
@@ -149,6 +162,7 @@ function setsorting(i) {
   sortindex.value = i
   emit('paginationSort', i)
 }
+console.log('propsfilteroptions',props.filterOptions)
 </script>
 
 <template>
@@ -257,16 +271,37 @@ function setsorting(i) {
       </label>
     </div>
   </b-modal>
+  <b-modal
+    id="change-columns-modal"
+    v-model="filtersModalShow"
+    title="Change filters"
+    @ok="$emit('changeFilters', filters)"
+    >
+    <FormGroupList
+      v-model:data="filters"
+      name="filter"
+      plural="filters"
+      :options="filterOptions"
+      id="filters"
+      />
+  </b-modal>
 
   <b-table-simple hover striped responsive caption-top>
+    
     <caption>
       {{
         props.caption
       }}
+      
       <template v-if="expandable">
-        <b-button @click="changeColumnsModalShow = !changeColumnsModalShow">
-          change headers
+      <div class="float-end">
+        <b-button @click="changeColumnsModalShow = !changeColumnsModalShow" class="m-1">
+          Change Headers
         </b-button>
+        <b-button @click="filtersModalShow = !filterModalShow" class="m-1">
+          Filters
+        </b-button>
+        </div>
       </template>
     </caption>
     <b-thead head-variant="dark">

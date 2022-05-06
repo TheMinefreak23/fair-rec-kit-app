@@ -8,6 +8,7 @@ import { sendMockData } from '../test/mockComputationOptions.js'
 import { store } from '../store.js'
 import { API_URL } from '../api'
 import { emptyOption } from '../helpers/optionsFormatter'
+import { emptyFormGroup } from '../helpers/optionsFormatter';
 
 const options = ref()
 
@@ -78,16 +79,6 @@ async function initForm() {
   form.value.computationMethod = 'recommendation' //The default experiment type
 }
 
-function emptyFormGroup(required) {
-  return {
-    // For required lists the minimum amount of group items is 1.
-    groupCount: required ? 1 : 0,
-    main: [],
-    inputs: [],
-    selects: [],
-    lists: [],
-  }
-}
 
 // Change the form format (SoA) into a managable data format (AoS)
 // TODO just don't use SoA in the first place

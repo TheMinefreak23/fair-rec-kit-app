@@ -88,10 +88,11 @@ def create_available_options(recommender_system):
 
         dataset['params'] = params
 
+    formatted_filters = reformat(filters, False)
     # Add dynamic (nested settings) settings
     # MOCK: for now use all filters/metrics per dataset
     filter_list = [{'name': 'filter',
-                    'plural': 'filters', 'article': 'a', 'options': reformat(filters, False)}]
+                    'plural': 'filters', 'article': 'a', 'options': formatted_filters}]
 
     for dataset in datasets:
         dataset['params']['dynamic'] = filter_list
@@ -102,6 +103,7 @@ def create_available_options(recommender_system):
 
     print(options)
     options = reformat_all(options, datasets, recommenders, predictors, metrics)
+    options['filters'] = formatted_filters
     # print(options)
 
     return options
