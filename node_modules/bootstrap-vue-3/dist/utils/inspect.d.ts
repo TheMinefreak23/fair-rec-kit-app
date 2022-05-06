@@ -1,0 +1,12 @@
+export declare const isBoolean: (value: any) => boolean;
+export declare const isObject: (obj: any) => boolean;
+export declare const isString: (value: any) => boolean;
+export declare const isUndefined: (value: any) => boolean;
+export declare const isNull: (value: any) => boolean;
+export declare const isUndefinedOrNull: (value: any) => boolean;
+export declare const isNumeric: (value: any) => boolean;
+export declare const isNumber: (value: any) => boolean;
+export declare const toType: (value: any) => "string" | "number" | "bigint" | "boolean" | "symbol" | "undefined" | "object" | "function";
+export declare const isFunction: (value: any) => boolean;
+export declare const isPlainObject: (obj: any) => boolean;
+export declare const isArray: (value: any) => boolean;

@@ -12,16 +12,10 @@ import { API_URL } from '../api'
 
 const props = defineProps({ headers: Array, result: Object })
 
-const headers_rec = ref([{ name: 'User' }, { name: 'Item' }, { name: 'Score' }])
+const headers_rec = ref([{ name: 'Rank'}, { name: 'User' }, { name: 'Item' }, { name: 'Score' }])
+const headers_pre = ref([{ name: 'User' }, { name: 'Item' }, { name: 'Predicted Score' }])
 
-//this needs to come from the server
-const headers_options = ref([
-  { name: 'Option1' },
-  { name: 'Option2' },
-  { name: 'Option3' },
-])
-const user_header_options = ref([{ name: 'OptionA' }])
-const item_header_options = ref([{ name: 'OptionB' }])
+const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
 const data = ref([])
 const startIndex = ref(0)
@@ -33,11 +27,15 @@ const itemHeaders = ref([])
 const headers = ref([])
 const availableFilters = ref([])
 const filters = ref(emptyFormGroup(false))
+const generalHeaders = ref([])
+const userHeaderOptions = ref([])
+const itemHeaderOptions = ref([])
+const generalHeaderOptions = ref([])
 
 watch(
   () => props.result,
   async (newResult) => {
-    console.log(newResult.id, newResult)
+    //console.log(newResult.id)
     setRecs()
   }
 )
@@ -46,6 +44,24 @@ onMounted(async () => {
   await setRecs()
   console.log('availableFilters',availableFilters.value)
 })
+
+// GET request: Get available options for selection from server
+async function getHeaders() {
+  const response = await fetch(API_URL + '/all-results/headers')
+  const data = await response.json()
+  
+  generalHeaderOptions.value = makeHeaders(data.headers)
+  itemHeaderOptions.value = makeHeaders(data.itemHeaders)
+  userHeaderOptions.value = makeHeaders(data.userHeaders)
+  /*headerOptions = {
+    'generalHeaders' : data.headers,
+    'itemHeaders' : data.itemHeaders,
+    'userHeaders' : data.userHeaders
+  }*/
+
+  console.log(generalHeaderOptions.value)
+
+}
 
 //POST request: Send result ID to the server to set current shown recommendations.
 async function setRecs() {
@@ -63,8 +79,10 @@ async function setRecs() {
     console.log('data',data)
     availableFilters.value = data.availableFilters
     console.log('resultfetch', response)
-    getUserRecs()}
+    getUserRecs()
+    getHeaders()}
 }
+
 
 //POST request: Ask server for next part of user recommendation table.
 async function getUserRecs() {
@@ -78,13 +96,13 @@ async function getUserRecs() {
       ascending: ascending.value,
       amount: entryAmount.value,
       filters: filters.value,
-      //headers: headers.value,
-      //itemheaders: itemHeaders.value,
-      //userheaders: userHeaders.value
+      generalHeaders: generalHeaders.value,
+      itemheaders: itemHeaders.value,
+      userheaders: userHeaders.value
     }),
   }
 
-  const response = await fetch(API_URL + '/result/result', requestOptions)
+  const response = await fetch(API_URL + '/all-results/result', requestOptions)
   data.value.results = await response.json()
 }
 
@@ -125,10 +143,11 @@ function paginationSort(indexVar) {
 
 //Update headers shown in user recommendations
 function changeColumns(generalHeader, userHeader, itemHeader) {
-  ;(headers.value = generalHeader),
-    (userHeaders.value = userHeader),
-    (itemHeaders.value = itemHeader)
+  generalHeaders.value = makeHeaders(generalHeader)
+  userHeaders.value = makeHeaders(userHeader)
+  itemHeaders.value = makeHeaders(itemHeader)
 
+  console.log(generalHeaders.value)
   getUserRecs()
 }
 
@@ -137,6 +156,20 @@ function changeFilters(changedFilters){
 
   getUserRecs()
 }
+//convert list of header names into supported header format
+function makeHeaders(headers) {
+  for(var i=0; i<headers.length; i++){
+    headers[i] = capitalizeFirstLetter(headers[i].replace("_", " "))
+  }
+  return headers.map((header) => ({
+        name: header,
+      }))
+}
+
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 </script>
 
 <template>
@@ -144,17 +177,15 @@ function changeFilters(changedFilters){
   <div class="container">
     <h1 class="display-2">Results</h1>
     <p class="lead">
-      These are the results for experiment {{ result.metadata.name }} done at
-      {{ result.metadata.datetime }}.
+      These are the results for your computation with the following name:
+      {{ result.name }}.
     </p>
 
     <div class="col">
       Tags:
-      <template v-if="!result.metadata.tags">None</template>
-      <template v-for="tag in result.metadata.tags">
-        <b-button disabled> {{ tag }} </b-button
-        ><!--<slot> </slot>-->
-      </template>
+      <template v-for="tag in mockdata.computation_tags"
+        >{{ tag }} <slot> </slot
+      ></template>
     </div>
   </div>
 
@@ -192,12 +223,12 @@ function changeFilters(changedFilters){
         <Table
           caption="Testcaption"
           :results="data.results"
-          :headers="headers_rec"
-          :headerOptions="headers_options"
+          :headers="headers_rec.concat(generalHeaders).concat(userHeaders).concat(itemHeaders)" 
+          :headerOptions = "generalHeaderOptions"
           :filters="filters"
           :filterOptions= "availableFilters"
-          :userOptions="user_header_options"
-          :itemOptions="item_header_options"
+          :userOptions = "userHeaderOptions"
+          :itemOptions = "itemHeaderOptions"
           pagination
           expandable
           @paginationSort="(i) => paginationSort(i)"

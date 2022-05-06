@@ -4,6 +4,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 import json
+from fairreckitlib.algorithms.elliot_alg.factory import ELLIOT_API
 
 model_API_dict = {}
 
@@ -12,7 +13,6 @@ DEFAULTS = {'split': 80,
             'recCount': {'min': 0, 'max': 100, 'default': 10},
             }  # default values
 filters = json.load(open('parameters/filters.json'))
-
 
 # TODO do this in another way
 def create_model_API_dict(predictors, recommenders):
@@ -189,6 +189,14 @@ def reformat(options, nested):
     if nested:
         for option in options:
             option['options'] = reformat_options(option['options'])
+
+            # Disable Elliot options
+            if option['name'] == ELLIOT_API:
+                for disable_option in option['options']:
+                    disable_option['disabled'] = True
+                    #print(disable_option)
+
+                option['name'] = option['name'] + ' (unavailable)'
     else:
         options = reformat_options(options)
 

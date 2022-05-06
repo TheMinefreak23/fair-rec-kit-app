@@ -4,10 +4,13 @@ Utrecht University within the Software Project course.
 
 import { createApp } from 'vue'
 import BootstrapVue3 from 'bootstrap-vue-3'
+import { BToastPlugin } from 'bootstrap-vue-3'
+
 // import the root component App from a single-file component.
 import App from './App.vue'
 import '../scss/custom.scss'
 
 const app = createApp(App)
 app.use(BootstrapVue3)
+app.use(BToastPlugin)
 app.mount('#app')
