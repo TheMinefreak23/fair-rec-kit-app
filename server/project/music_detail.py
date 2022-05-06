@@ -66,7 +66,7 @@ def get_background():
     res = requests.get(url, headers=headers)
     if(res.status_code == 401):
         get_spotify_token()
-        get_background()
+        return get_background()
     playlist = json.loads(res.text)
     images = []
     for item in (playlist['items']):
