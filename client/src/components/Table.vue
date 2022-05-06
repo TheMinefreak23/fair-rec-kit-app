@@ -186,16 +186,6 @@ function setsorting(i) {
       placeholder="New e-mail"
       type="email"
     ></b-form-input>
-    <br />
-    Color (this doesn't do anything):
-    <!-- I may have gotten a little carried away -->
-    <b-form-input type="color"></b-form-input>
-    <br />
-    Date (this doesn't do anything):
-    <b-form-input type="date"></b-form-input>
-    <br />
-    Credit card number (this doesn't do anything):
-    <b-form-input type="password"></b-form-input>
   </b-modal>
 
   <!-- Shows the metadata of the designated entry -->
