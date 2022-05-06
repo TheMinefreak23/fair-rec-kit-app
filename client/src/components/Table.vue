@@ -11,7 +11,7 @@ const emit = defineEmits([
   'loadResults',
   'loadMore',
   'paginationSort',
-  'changeColumns',
+  'changeColumns'
 ])
 const props = defineProps({
   overview: Boolean,
@@ -27,7 +27,7 @@ const props = defineProps({
   expandable: Boolean,
   headerOptions: Array,
   userOptions: Array,
-  itemOptions: Array,
+  itemOptions: Array
 })
 
 const caption = ref('')
@@ -186,88 +186,102 @@ function setsorting(i) {
       placeholder="New e-mail"
       type="email"
     ></b-form-input>
+    <br />
+    Color (this doesn't do anything):
+    <!-- I may have gotten a little carried away -->
+    <b-form-input type="color"></b-form-input>
+    <br />
+    Date (this doesn't do anything):
+    <b-form-input type="date"></b-form-input>
+    <br />
+    Credit card number (this doesn't do anything):
+    <b-form-input type="password"></b-form-input>
   </b-modal>
 
-  <!-- Shows the metadata of the designated entry -->
+<!-- Shows the metadata of the designated entry -->
   <b-modal id="view-modal" v-model="viewModalShow" title="Metadata" ok-only>
     <h5>Here is the metadata:</h5>
     <p>{{ metadataStr }}</p>
   </b-modal>
-
+  
   <!-- Modal used for changing the headers of the user recommendations table -->
-  <b-modal
+  <b-modal 
     id="change-columns-modal"
     v-model="changeColumnsModalShow"
     title="Change columns"
     @ok="$emit('changeColumns', checkedColumns, userColumns, itemColumns)"
-  >
+    >
     <p>Check the extra columns you want to be shown</p>
-
+    <p>{{headerOptions}}</p>
     <p>General:</p>
-    <div
-      class="form-check form-switch"
-      v-for="header in headerOptions"
+    <div class="form-check form-switch"
+      v-for="(header, index) in headerOptions"
       :key="header"
     >
-      <input
+      <input 
         v-model="checkedColumns"
-        class="form-check-input"
-        type="checkbox"
-        v-bind:value="header.name"
-        v-bind:id="header.name"
-      />
-      <label class="form-check-label" v-bind:id="header.name">
+        class="form-check-input" 
+        type="checkbox" 
+        :value="header.name" 
+        :id="header.name">
+      <label 
+        class="form-check-label" 
+        :id="header.name">
         {{ header.name }}
       </label>
     </div>
 
-    <p>User specific:</p>
-    <div
-      class="form-check form-switch"
-      v-for="header in userOptions"
+    <p>User specific: </p>
+    <div class="form-check form-switch"
+      v-for="(header, index) in userOptions"
       :key="header"
     >
-      <input
+      <input 
         v-model="userColumns"
-        class="form-check-input"
-        type="checkbox"
-        v-bind:value="header.name"
-        v-bind:id="header.name"
-      />
-      <label class="form-check-label" v-bind:id="header.name">
+        class="form-check-input" 
+        type="checkbox" 
+        :value="header.name" 
+        :id="header.name">
+      <label 
+        class="form-check-label" 
+        :id="header.name">
         {{ header.name }}
       </label>
     </div>
 
-    <p>Item specific:</p>
-    <div
-      class="form-check form-switch"
-      v-for="header in itemOptions"
+    <p>Item specific: </p>
+    <div class="form-check form-switch"
+      v-for="(header, index) in itemOptions"
       :key="header"
     >
-      <input
+      <input 
         v-model="itemColumns"
-        class="form-check-input"
-        type="checkbox"
-        v-bind:value="header.name"
-        v-bind:id="header.name"
-      />
-      <label class="form-check-label" v-bind:id="header.name">
+        class="form-check-input" 
+        type="checkbox" 
+        :value="header.name" 
+        :id="header.name">
+      <label 
+        class="form-check-label" 
+        :id="header.name">
         {{ header.name }}
       </label>
     </div>
+
   </b-modal>
+
+  
 
   <b-table-simple hover striped responsive caption-top>
     <caption>
       {{
         props.caption
       }}
-      <template v-if="expandable">
-        <b-button @click="changeColumnsModalShow = !changeColumnsModalShow">
-          change headers
-        </b-button>
-      </template>
+       <template v-if="expandable">
+      <b-button 
+        @click="changeColumnsModalShow = !changeColumnsModalShow">  
+        change headers 
+      </b-button>
+    </template>
     </caption>
     <b-thead head-variant="dark">
       <b-tr>
@@ -284,7 +298,7 @@ function setsorting(i) {
       </b-tr>
       <b-tr>
         <b-th v-if="overview"></b-th>
-        <b-th v-for="subheader in subheaders" :key="subheader">
+        <b-th v-for="(subheader, index) in subheaders" :key="subheader">
           {{ subheader }}
         </b-th>
       </b-tr>
@@ -353,4 +367,6 @@ function setsorting(i) {
     type="number"
     >20</b-form-input
   >
+
+  
 </template>
