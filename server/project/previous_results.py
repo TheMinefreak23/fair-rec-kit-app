@@ -138,7 +138,17 @@ def headers():
 
     }
 
-    result = json.dumps(mock_json)
+    #result = json.dumps(mock_json)
+    #print(result)
+
+    with open('project/headers.json') as j:
+        jsonfile = json.load(j)
+
+    result = jsonfile['LFM-1B']
+    j.close()
+
     print(result)
+
     return result
+
 
