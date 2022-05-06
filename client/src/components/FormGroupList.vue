@@ -280,14 +280,14 @@ function shortGroupDescription(i) {
       position="position-fixed"
     ></b-container>
     <b-row>
-      <h3 class="text-center">
-        <b-card no-body class="mb-1 bg-primary">
+      <h3 class="text-center text-white">
+        <b-card no-body class="mb-1 bg-dark">
           {{ capitalise(plural) }}
           <!--Collapsable group list toggle button-->
           <b-button
             class="text-start"
             @click="form.visible = !form.visible"
-            variant="primary"
+            variant="dark"
           >
             <template v-if="form.visible">&#x25BC; | </template>
             <template v-else>&#x25BA; | </template>
@@ -317,8 +317,8 @@ function shortGroupDescription(i) {
               <b-container class="g-0">
                 <!--Collapsable group toggle button with remove button-->
                 <b-row md="auto">
-                  <b-row>
-                    <b-col>
+                  <b-row class="pe-0">
+                    <b-col class="pe-0">
                       <b-card no-body class="mb-1">
                         <b-button
                           class="text-start"
@@ -329,7 +329,7 @@ function shortGroupDescription(i) {
                               ? (visibleGroup = -1)
                               : (visibleGroup = i)
                           "
-                          :variant="visibleGroup == i ? 'primary' : 'info'"
+                          :variant="visibleGroup == i ? 'secondary' : 'dark'"
                         >
                           <template v-if="visibleGroup == i"
                             >&#x25BC; |
@@ -340,12 +340,13 @@ function shortGroupDescription(i) {
                       </b-card>
                     </b-col>
                     <!--Remove button-->
-                    <b-col cols="1" v-if="!(i == 1 && required)">
+                    <b-col cols="1" v-if="!(i == 1 && required)" class="p-0">
                       <b-button
                         data-testid="remove-button"
                         @click="removeGroup(i - 1)"
                         variant="danger"
-                        class="mb-2 mr-sm-2 mb-sm-0"
+                        class="mb-2 mr-sm-2 mb-sm-0 float-end"
+                        style="width: 90%;"
                         >X</b-button
                       >
                     </b-col>
