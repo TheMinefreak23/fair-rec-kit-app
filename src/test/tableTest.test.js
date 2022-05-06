@@ -61,21 +61,20 @@ test('editTableItem', async () => {
   
 // })
 
-test('viewMetadata', async () => {
-  const {getAllByText, getByTitle} = render(Table, {
-    props: {
-      overview: true,
-      results: [{foo: 3, bar: 3}],
-      headers: [{ name: 'whats'}, { name: 'up'}],
-      buttonText: 'this part doesnt matter so I could put anything here and no-one will ever notice hehehe',
-      removable: false,
-    },
-  })
+// test('viewResult', async () => {
+//   const {getByText, getByTitle} = render(Table, {
+//     props: {
+//       overview: true,
+//       results: [{foo: 3, bar: 3}],
+//       headers: [{ name: 'whats'}, { name: 'up'}],
+//       buttonText: 'button',
+//       removable: false,
+//     },
+//   })
 
-  const button = getAllByText('View')[0]
+//   const button = getByText('View result')
 
-  await fireEvent.click(button)
+//   await fireEvent.click(button)
 
-  // check if the modal shows up
-  getByTitle('Metadata')
-})
+
+// })

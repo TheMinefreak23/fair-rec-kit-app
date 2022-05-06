@@ -37,7 +37,6 @@ b-tab.success {
 </style>
 
 <template>
-  <!--<TestForm :useTestOptions="true" />-->
   <div class="bg-dark nav justify-content-center py-2">
     <img src="/RecCoonLogo.png" style="height: 50px" class="ms-auto" />
     <h1 class="text-white my-0 p-0">FairRecKit</h1>
