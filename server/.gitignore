@@ -9,9 +9,3 @@ tests/test_results.json
 frkenv/
 /results_backup.json
 
-# Byte-compiled files
-__pycache__
-
-# IntelliJ
-.idea/
-
