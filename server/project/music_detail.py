@@ -6,11 +6,11 @@ Utrecht University within the Software Project course.
 import base64
 import json
 import time
-import requests as requests
-import numpy as np
-
-from PIL import Image
 from io import BytesIO
+import requests
+import numpy as np
+from PIL import Image
+
 from flask import Blueprint, request, send_file
 
 detail_bp = Blueprint('music', __name__, url_prefix='/api/music')
@@ -20,14 +20,18 @@ token = None
 SPOTIFY_API = 'https://api.spotify.com/v1'
 MAX_TRACK_LIMIT = 50
 
-# Route: Spotify token.
+
 @detail_bp.route('/token', methods=['GET'])
 def get_spotify_token():
+    """Route: Get Spotify auth token using id and secret
+
+    Returns: the spotify token
+    """
     global token
     if not (token and token['expiration_time'] - 100 > time.time()):
-        id = '7e49545dfb45473cbe595d8bb1e22071'
-        secret = 'd5a9e8febef2468b94a5edabe2c5ddeb'
-        message = (id + ':' + secret).encode()
+        spotify_id = '7e49545dfb45473cbe595d8bb1e22071'
+        spotify_secret = 'd5a9e8febef2468b94a5edabe2c5ddeb'
+        message = (spotify_id + ':' + spotify_secret).encode()
         encoded = base64.b64encode(message)
         # print('encoded',encoded)
         headers = {'Authorization': 'Basic ' + encoded.decode()
@@ -64,10 +68,10 @@ def get_background():
     Returns:
         Image: Background-image
     """
-    kek = '5PorskWxAZMSnVB8nG9ojL'
+    #kek = '5PorskWxAZMSnVB8nG9ojL'
     kekw = '6KnSfElksjrqygPIc4TDmf'
-    TOP_50 = '37i9dQZEVXbMDoHDwVN2tF'
-    TOP_100 = '3IsxzDS04BvejFJcQ0iVyW'
+    #TOP_50 = '37i9dQZEVXbMDoHDwVN2tF'
+    #TOP_100 = '3IsxzDS04BvejFJcQ0iVyW'
     playlist_id = kekw
 
     items = []
@@ -91,22 +95,27 @@ def get_background():
 
 
 def collage(urls):
-    images = []
-    for url in urls:
-        img = Image.open(BytesIO(requests.get(url).content))
-        images.append(img)
+    """Create collage from image urls
+
+    Args:
+        urls: the image urls
+
+    Returns:
+        the collage in PNG format
+    """
+    images = [Image.open(BytesIO(requests.get(url).content)) for url in urls]
 
     print('image size', images[0].size)
     image_count = MAX_TRACK_LIMIT*2
     image_scale = image_count // 10
     image_width, image_height = images[0].size
-    w, h = image_width*image_scale, image_height*image_scale
-    w_step, h_step = w // image_scale, h // image_scale
-    background = Image.new('RGB', (w, h))
+    width, height = image_width*image_scale, image_height*image_scale
+    w_step, h_step = width // image_scale, height // image_scale
+    background = Image.new('RGB', (width, height))
 
     index = 0
-    for i in range(0, w, w_step):
-        for j in range(0, h, h_step):
+    for i in range(0, width, w_step):
+        for j in range(0, height, h_step):
             background.paste(images[index], (i, j))
             index += 1
             # Handle contents size smaller than image count (flip).
@@ -122,6 +131,11 @@ def collage(urls):
 
 @detail_bp.route('/unique-album-background', methods=['GET'])
 def first_100_album_collage():
+    """Route: Make a collage from the first 100 relevant albums from Spotify
+
+    Returns:
+        an PNG image with the collage
+    """
     # TODO can we get all items a different way?
     # Get all items by setting year to maximal span.
     # Going negative in the year causes a non-year query.
@@ -129,15 +143,25 @@ def first_100_album_collage():
     return collage(albums)
 
 
-# Given a Spotify query, find the n most relevant (first) unique items.
-def get_unique_n(query, n, category, image):
+def get_unique_n(query, amount, category, image):
+    """Route: Given a Spotify query, find the n most relevant (first) unique items.
+
+    Args:
+        query: the query to do in the Spotify search
+        amount: the amount of unique items
+        category: the query object category (tracks/albums/playlists/etc.)
+        image(bool): whether image items should be retrieved
+
+    Returns:
+        the n unique items
+    """
     # Amount of items returned are a multiple of 10.
     limit = 10
     url = SPOTIFY_API + '/search?' + query + '&type=' + category + '&limit=' + str(limit)
 
     items = []
     # Get next until we have n items.
-    while len(items) < n:
+    while len(items) < amount:
         query = request_spotify_data(url)
         category_data = query[category+'s']
         print('total items', category_data['total'])
@@ -153,11 +177,19 @@ def get_unique_n(query, n, category, image):
     return items
 
 
-
 def request_spotify_data(url):
+    """Make an authorised Spotify JSON request from the url
+
+    Args:
+        url: the url at which to do the request
+
+    Returns:
+        the response text
+    """
     # TODO exception
     if not token:
         get_spotify_token()
-    headers = {'Authorization': 'Bearer ' + token['access_token'], 'Content-Type': 'application/json'}
+    headers = {'Authorization': 'Bearer ' + token['access_token'],
+               'Content-Type': 'application/json'}
     res = requests.get(url, headers=headers)
     return json.loads(res.text)
