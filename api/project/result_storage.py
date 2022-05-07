@@ -39,12 +39,7 @@ def save_result(computation, result):
 def result_by_id(resultid):
 
     results_overview = load_json(results_overview_path)
-    current_result_overview_id = -1
-    # Filter: Loop through all results and find the one with the matching ID.
-    for iteration_id in range(len(results_overview['all_results'])):
-        if results_overview['all_results'][iteration_id]['timestamp']['stamp'] == resultid:
-            current_result_overview_id = iteration_id
-    current_name = results_overview['all_results'][current_result_overview_id]['metadata']['name']
+    current_name = id_to_name(results_overview,resultid)
     relative_path = results_root_folder + str(resultid) + "_" + current_name
     data = {'id': resultid, 'name': current_name, 'runs': []}
     # loops through all the subdirectories, and thus - runs, of a certain calculation
@@ -76,6 +71,15 @@ def result_by_id(resultid):
     global current_result
     current_result = json.dumps(data)
 
+
+def id_to_name(json_data, resultid):
+    current_result_overview_id = -1
+    # Filter: Loop through all results and find the one with the matching ID.
+    for iteration_id in range(len(json_data['all_results'])):
+        if json_data['all_results'][iteration_id]['timestamp']['stamp'] == resultid:
+            current_result_overview_id = iteration_id
+    current_name = json_data['all_results'][current_result_overview_id]['metadata']['name']
+    return current_name
 
 def newest_result():
     return current_result
