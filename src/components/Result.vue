@@ -64,9 +64,10 @@ async function loadEvaluations() {
 
 //GET request: Ask server for currently loaded evaluations
 async function getEvaluations() {
-    const evaluation_data = await fetch(API_URL + '/all-results/result-by-id')
+    const response = await fetch(API_URL + '/all-results/result-by-id')
     console.log("succesfully retrieved evaluation data.")
-    console.log(evaluation_data)
+    const results_data = await response.json()
+    console.log(JSON.stringify(results_data))
 }
 
 //POST request: Ask server for next part of user recommendation table.

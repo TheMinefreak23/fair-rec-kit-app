@@ -19,7 +19,6 @@ def result_by_id():
     if request.method == 'POST':    
         data = request.get_json()
         result_storage.result_by_id(data['id'])
-        print(data)
         if result_storage.current_result:
             response = {'status': 'success'}
         else:
