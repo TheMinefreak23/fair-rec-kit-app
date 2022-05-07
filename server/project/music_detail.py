@@ -17,6 +17,7 @@ detail_bp = Blueprint('music', __name__, url_prefix='/api/music')
 
 token = None
 
+SPOTIFY_API = 'https://api.spotify.com/v1'
 MAX_TRACK_LIMIT = 50
 
 # Route: Spotify token.
@@ -63,10 +64,6 @@ def get_background():
     Returns:
         Image: Background-image
     """
-
-    if not token:
-        get_spotify_token()
-
     kek = '5PorskWxAZMSnVB8nG9ojL'
     kekw = '6KnSfElksjrqygPIc4TDmf'
     TOP_50 = '37i9dQZEVXbMDoHDwVN2tF'
@@ -74,17 +71,15 @@ def get_background():
     playlist_id = kekw
 
     items = []
-    # Keep querying until we have all playlist items
+    # Keep querying until we have all playlist items.
     offset = 0
     playlist_length = 0
     while offset < playlist_length or offset == 0:
-        url = 'https://api.spotify.com/v1/playlists/' \
+        url = SPOTIFY_API + '/playlists/' \
               + playlist_id + '/tracks?limit=' \
               + str(MAX_TRACK_LIMIT) + '&offset=' \
               + str(offset)
-        headers = {'Authorization': 'Bearer ' + token['access_token'], 'Content-Type': 'application/json'}
-        res = requests.get(url, headers=headers)
-        playlist = json.loads(res.text)
+        playlist = request_spotify_data(url)
 
         items += playlist['items']
         if offset == 0: # TODO refactor into separate request and for loop?
@@ -92,41 +87,30 @@ def get_background():
             print('playlist length', playlist_length)
         offset += MAX_TRACK_LIMIT
 
-    images = []
-    for item in items:
-        response = requests.get(item['track']['album']['images'][1]['url'])
-        img = Image.open(BytesIO(response.content))
-        images.append(img)
+    return collage([item['track']['album']['images'][1]['url'] for item in items])
 
-    # DEV check for duplicates
-    #items.append(items[0])
-    duplicates = [item for item in items if items.count(item) > 1]
-    print('item duplicates', set([x['track']['name'] for x in duplicates]))
-    duplicates = [index for index in range(len(images)) if images.count(images[index]) > 1]
-    print('image duplicates', set([(items[i]['track']['album']['name'],
-                                    images.count(images[i])) for i in duplicates]))
-    """
-    print('image duplicates', [(items[i]['track']['name'],
-                                    items[i]['track']['album']['name'],
-                                    json.dumps([artist['name'] for artist in items[i]['track']['artists']]),
-                                    images.count(images[i])) for i in duplicates])
-                                    """
+
+def collage(urls):
+    images = []
+    for url in urls:
+        img = Image.open(BytesIO(requests.get(url).content))
+        images.append(img)
 
     print('image size', images[0].size)
     image_count = MAX_TRACK_LIMIT*2
     image_scale = image_count // 10
     image_width, image_height = images[0].size
     w, h = image_width*image_scale, image_height*image_scale
-    max_width, max_height = w // image_scale, h // image_scale
+    w_step, h_step = w // image_scale, h // image_scale
     background = Image.new('RGB', (w, h))
 
     index = 0
-    for i in range(0, w, max_width):
-        for j in range(0, h, max_height):
+    for i in range(0, w, w_step):
+        for j in range(0, h, h_step):
             background.paste(images[index], (i, j))
             index += 1
-            # Handle playlist size smaller than image count (flip)
-            if index == playlist_length - 1:
+            # Handle contents size smaller than image count (flip).
+            if index == len(urls) - 1:
                 np.flip(images)
                 index = 0
     background.save('background.png')
@@ -135,3 +119,45 @@ def get_background():
     # TODO why do we need to go back once tho
     return send_file('../background.png', mimetype='image/png')
 
+
+@detail_bp.route('/unique-album-background', methods=['GET'])
+def first_100_album_collage():
+    # TODO can we get all items a different way?
+    # Get all items by setting year to maximal span.
+    # Going negative in the year causes a non-year query.
+    albums = get_unique_n('q=year:0-10000', 100, 'album', True)
+    return collage(albums)
+
+
+# Given a Spotify query, find the n most relevant (first) unique items.
+def get_unique_n(query, n, category, image):
+    # Amount of items returned are a multiple of 10.
+    limit = 10
+    url = SPOTIFY_API + '/search?' + query + '&type=' + category + '&limit=' + str(limit)
+
+    items = []
+    # Get next until we have n items.
+    while len(items) < n:
+        query = request_spotify_data(url)
+        category_data = query[category+'s']
+        print('total items', category_data['total'])
+        if image:
+            items = list(set(items+[item['images'][1]['url'] for item in category_data['items']]))
+        else:
+            items += list(set(items+[item['id'] for item in category_data['items']]))
+        if len(items) < limit:
+            break # Stop if there are less items left than the limit
+        url = category_data['next']
+    print('items length', len(items))
+
+    return items
+
+
+
+def request_spotify_data(url):
+    # TODO exception
+    if not token:
+        get_spotify_token()
+    headers = {'Authorization': 'Bearer ' + token['access_token'], 'Content-Type': 'application/json'}
+    res = requests.get(url, headers=headers)
+    return json.loads(res.text)
