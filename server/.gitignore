@@ -8,6 +8,7 @@ tests/test_results.json
 /results.json
 frkenv/
 /results_backup.json
+background.png
 
 # Byte-compiled files
 __pycache__
