@@ -17,6 +17,8 @@ const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
 const data = ref([])
 const mockdataID = 1650539860
+const mockdataRunIndex = 0;
+const mockdataPairIndex = 0;
 const startIndex = ref(0)
 const index = ref(0)
 const ascending = ref(true)
@@ -41,7 +43,9 @@ async function setRecs() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      id: props.result.id,
+      id: mockdataID,
+      runid: mockdataRunIndex,
+      pairid: mockdataPairIndex
     }),
   }
   fetch(API_URL + '/all-results/set-recs', requestOptions).then(() => {

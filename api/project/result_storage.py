@@ -45,7 +45,7 @@ def result_by_id(resultid):
     # loops through all the subdirectories, and thus - runs, of a certain calculation
     for subdir in [f.path for f in os.scandir(relative_path) if f.is_dir()]:
         run_overview_name = os.path.basename(os.path.normpath(subdir))
-        run_overview = load_json(subdir + "/" + "overview.json")
+        run_overview = load_json(subdir + "/overview.json")
         run_data = {'index': run_overview_name, 'results': []}
         # loops through individual results
         for run_result in run_overview["overview"]:
@@ -70,6 +70,16 @@ def result_by_id(resultid):
 
     global current_result
     current_result = json.dumps(data)
+
+
+def get_rec_path(evaluation_id, runid, pairid):
+    results_overview = load_json(results_overview_path)
+    name = id_to_name(results_overview, evaluation_id)
+    relative_path = results_root_folder + str(evaluation_id) + "_" + name + "/" + "run_" + str(runid)
+    overview_path = relative_path + "/overview.json"
+    run_overview = load_json(overview_path)
+    rec_path = run_overview['overview'][pairid]['ratings_path']
+    return rec_path
 
 
 def id_to_name(json_data, resultid):
