@@ -41,6 +41,7 @@ const itemColumns = ref([])
 const userColumns = ref([])
 const newName = ref('')
 const newTags = ref('')
+const newTagsList = ref([])
 const newEmail = ref('')
 const metadataStr = ref('')
 const selectedEntry = ref(0)
@@ -66,15 +67,40 @@ const sorted = computed(() => {
   else return props.results
 })
 
+/**
+ * Turns a string into an array separated by comma's
+ * @param {string} str the string that turns into an array
+ * @return {[string]} array of strings
+ */
+function stringToList(str){
+  return str.split(",")
+}
+
+/**
+ * returns an empty string if the Email is not valid
+ * @param {string} Email Email to validate
+ * @return {string}
+ */
+function checkEmail(Email){
+  if (validateEmail(Email)){
+    return Email
+  }
+  else{
+    return ''
+  }
+}
+
 async function editEntry() {
   //Inform the server of the new values at the selected index
+  newTagsList.value = stringToList(newTags.value)
+  newEmail.value = checkEmail(newEmail.value)
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       index: selectedEntry.value,
       new_name: newName.value,
-      new_tags: newTags.value,
+      new_tags: newTagsList.value,
       new_email: newEmail.value,
     }),
   }
@@ -119,6 +145,34 @@ async function getResult() {
   const response = await fetch(API_URL + props.serverFile3)
   const data = await response.json()
   metadataStr.value = data.result
+}
+
+async function getNameTagsMail(selectedID){
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: selectedID }),
+  }
+  fetch(API_URL + props.serverFile3, requestOptions).then(() => {
+    console.log('Metadata succesfully requested')
+    getOldValues()
+  })
+}
+async function getOldValues() {
+  const response = await fetch(API_URL + props.serverFile3)
+  const data = await response.json()
+  newName.value = data.result.metadata.name
+  newTags.value = data.result.metadata.tags.toString()
+  newEmail.value = data.result.metadata.email
+}
+
+/**
+ * Checks if Email is valid
+ * @param {string} email
+ * @return {bool} Whether or not the string is valid E-mail adress
+ */
+function validateEmail(email){
+  return email.match(/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)
 }
 
 /**
@@ -175,15 +229,23 @@ function setsorting(i) {
   >
     <h6>Please type in the new values. Blank fields will be left unchanged.</h6>
     Name:
-    <b-form-input v-model="newName" placeholder="New name"></b-form-input>
+    <b-form-input 
+      v-model="newName" 
+      placeholder="Enter new name"
+    ></b-form-input>
     <br />
-    Tags:
-    <b-form-input v-model="newTags" placeholder="New tags"></b-form-input>
+    Tags: (separate tags using a single comma)
+    <b-form-input 
+      v-model="newTags" 
+      placeholder="Enter new tags"
+    ></b-form-input>
     <br />
     E-mail:
+    <p v-if="validateEmail(newEmail)" style="color:green">This is E-mail is valid :)</p>
+    <p v-else-if="newEmail!=''" style="color:red">This is not a valid E-mail :(</p>
     <b-form-input
       v-model="newEmail"
-      placeholder="New e-mail"
+      placeholder="Enter new e-mail"
       type="email"
     ></b-form-input>
     <br />
@@ -312,7 +374,7 @@ function setsorting(i) {
           <b-button
             v-if="overview"
             pill
-            @click=";(editModalShow = !editModalShow), (selectedEntry = index)"
+            @click=";(editModalShow = !editModalShow), (selectedEntry = index), getNameTagsMail(item.id)"
             >Edit</b-button
           >
           <b-button
