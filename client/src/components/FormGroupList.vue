@@ -295,7 +295,7 @@ function shortGroupDescription(i) {
           </b-button>
         </b-card>
       </h3>
-      <p>{{ description && capitalise(description) }}</p>
+      
     </b-row>
     <!--TODO b-collapse doesn't work-->
     <!--Collapsable group list-->
@@ -629,7 +629,7 @@ function shortGroupDescription(i) {
     </b-row>
     <b-row>
       <h3>
-        <b-card no-body class="mb-1">
+        <b-card no-body class="my-1">
           <b-button
             @click="
               form.groupCount++,
