@@ -234,7 +234,7 @@ function setsorting(i) {
       placeholder="Enter new name"
     ></b-form-input>
     <br />
-    Tags:
+    Tags: (separate tags using a single comma)
     <b-form-input 
       v-model="newTags" 
       placeholder="Enter new tags"
