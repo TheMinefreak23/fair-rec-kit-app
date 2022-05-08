@@ -148,15 +148,17 @@ function changeColumns(generalHeader, userHeader, itemHeader) {
   <div class="container">
     <h1 class="display-2">Results</h1>
     <p class="lead">
-      These are the results for your experiment with the following name:
-      {{ result.name }}.
+      These are the results for experiment {{ result.metadata.name }} done at
+      {{ result.metadata.datetime }}.
     </p>
 
     <div class="col">
       Tags:
-      <template v-for="tag in mockdata.computation_tags"
-        >{{ tag }} <slot> </slot
-      ></template>
+      <template v-if="!result.metadata.tags">None</template>
+      <template v-for="tag in result.metadata.tags">
+        <b-button disabled> {{ tag }} </b-button
+        ><!--<slot> </slot>-->
+      </template>
     </div>
   </div>
 
