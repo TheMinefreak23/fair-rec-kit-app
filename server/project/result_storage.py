@@ -127,7 +127,7 @@ def edit_result(index, new_name, new_tags, new_email):
 
     def edit_metadata(attr, new_val):
         # Don't change the attribute if the input field has been left empty
-        if new_val != '':  #
+        if new_val != '':  
             to_edit_result['metadata'][attr] = new_val
             print('changed '+attr, to_edit_result['metadata'][attr])
 
