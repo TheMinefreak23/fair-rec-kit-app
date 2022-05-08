@@ -41,6 +41,7 @@ const itemColumns = ref([])
 const userColumns = ref([])
 const newName = ref('')
 const newTags = ref('')
+const newTagsList = ref([])
 const newEmail = ref('')
 const metadataStr = ref('')
 const selectedEntry = ref(0)
@@ -66,15 +67,40 @@ const sorted = computed(() => {
   else return props.results
 })
 
+/**
+ * Turns a string into an array separated by comma's
+ * @param {string} str the string that turns into an array
+ * @return {[string]} array of strings
+ */
+function stringToList(str){
+  return str.split(",")
+}
+
+/**
+ * returns an empty string if the Email is not valid
+ * @param {string} Email Email to validate
+ * @return {string}
+ */
+function checkEmail(Email){
+  if (validateEmail(Email)){
+    return Email
+  }
+  else{
+    return ''
+  }
+}
+
 async function editEntry() {
   //Inform the server of the new values at the selected index
+  newTagsList.value = stringToList(newTags.value)
+  newEmail.value = checkEmail(newEmail.value)
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       index: selectedEntry.value,
       new_name: newName.value,
-      new_tags: newTags.value,
+      new_tags: newTagsList.value,
       new_email: newEmail.value,
     }),
   }
@@ -136,7 +162,7 @@ async function getOldValues() {
   const response = await fetch(API_URL + props.serverFile3)
   const data = await response.json()
   newName.value = data.result.metadata.name
-  newTags.value = data.result.metadata.tags
+  newTags.value = data.result.metadata.tags.toString()
   newEmail.value = data.result.metadata.email
 }
 
@@ -208,7 +234,7 @@ function setsorting(i) {
       placeholder="Enter new name"
     ></b-form-input>
     <br />
-    Tags:
+    Tags: (separate tags using a single comma)
     <b-form-input 
       v-model="newTags" 
       placeholder="Enter new tags"
