@@ -222,6 +222,11 @@ function setsorting(i) {
       placeholder="Enter new e-mail"
       type="email"
     ></b-form-input>
+    <br />
+    <!--
+    Color (this doesn't do anything):
+    <b-form-input type="color"></b-form-input>
+    <br />-->
   </b-modal>
 
   <!-- Shows the metadata of the designated entry -->
@@ -238,21 +243,21 @@ function setsorting(i) {
     @ok="$emit('changeColumns', checkedColumns, userColumns, itemColumns)"
   >
     <p>Check the extra columns you want to be shown</p>
-
+    <p>{{ headerOptions }}</p>
     <p>General:</p>
     <div
       class="form-check form-switch"
-      v-for="header in headerOptions"
+      v-for="(header, index) in headerOptions"
       :key="header"
     >
       <input
         v-model="checkedColumns"
         class="form-check-input"
         type="checkbox"
-        v-bind:value="header.name"
-        v-bind:id="header.name"
+        :value="header.name"
+        :id="header.name"
       />
-      <label class="form-check-label" v-bind:id="header.name">
+      <label class="form-check-label" :id="header.name">
         {{ header.name }}
       </label>
     </div>
@@ -260,17 +265,17 @@ function setsorting(i) {
     <p>User specific:</p>
     <div
       class="form-check form-switch"
-      v-for="header in userOptions"
+      v-for="(header, index) in userOptions"
       :key="header"
     >
       <input
         v-model="userColumns"
         class="form-check-input"
         type="checkbox"
-        v-bind:value="header.name"
-        v-bind:id="header.name"
+        :value="header.name"
+        :id="header.name"
       />
-      <label class="form-check-label" v-bind:id="header.name">
+      <label class="form-check-label" :id="header.name">
         {{ header.name }}
       </label>
     </div>
@@ -278,17 +283,17 @@ function setsorting(i) {
     <p>Item specific:</p>
     <div
       class="form-check form-switch"
-      v-for="header in itemOptions"
+      v-for="(header, index) in itemOptions"
       :key="header"
     >
       <input
         v-model="itemColumns"
         class="form-check-input"
         type="checkbox"
-        v-bind:value="header.name"
-        v-bind:id="header.name"
+        :value="header.name"
+        :id="header.name"
       />
-      <label class="form-check-label" v-bind:id="header.name">
+      <label class="form-check-label" :id="header.name">
         {{ header.name }}
       </label>
     </div>
@@ -326,7 +331,7 @@ function setsorting(i) {
       </b-tr>
     </b-thead>
     <b-tbody>
-      <b-tr v-for="(item, index) of sorted" :key="item"
+      <b-tr v-for="(item, index) in sorted" :key="item"
         ><b-td v-if="overview">
           <b-button @click="$emit('loadResult', item.id)">View result</b-button>
         </b-td>
