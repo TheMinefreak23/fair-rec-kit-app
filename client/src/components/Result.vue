@@ -13,7 +13,7 @@ const props = defineProps({ headers: Array, result: Object })
 
 const headers_rec = ref([{ name: 'User' }, { name: 'Item' }, { name: 'Score' }])
 
-const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
+const experiment_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
 const data = ref([])
 const startIndex = ref(0)
@@ -43,7 +43,7 @@ onMounted(() => {
 async function getHeaders() {
   const response = await fetch(API_URL + '/all-results/headers')
   const data = await response.json()
-  
+
   generalHeaderOptions.value = data.headers
   itemHeaderOptions.value = data.itemHeaders
   userHeaderOptions.value = data.userHeaders
@@ -54,7 +54,6 @@ async function getHeaders() {
   }*/
 
   console.log(generalHeaderOptions.value)
-
 }
 
 //POST request: Send result ID to the server to set current shown recommendations.
@@ -72,7 +71,6 @@ async function setRecs() {
   })
 }
 
-
 //POST request: Ask server for next part of user recommendation table.
 async function getUserRecs() {
   const requestOptions = {
@@ -86,7 +84,7 @@ async function getUserRecs() {
       amount: entryAmount.value,
       generalHeaders: generalHeaders.value,
       itemheaders: itemHeaders.value,
-      userheaders: userHeaders.value
+      userheaders: userHeaders.value,
     }),
   }
 
@@ -132,26 +130,25 @@ function paginationSort(indexVar) {
 //Update headers shown in user recommendations
 function changeColumns(generalHeader, userHeader, itemHeader) {
   generalHeaders.value = generalHeader.map((header) => ({
-        name: header,
-      }))
+    name: header,
+  }))
   userHeaders.value = userHeader.map((header) => ({
-        name: header,
-      }))
+    name: header,
+  }))
   itemHeaders.value = itemHeader.map((header) => ({
-        name: header,
-      }))
+    name: header,
+  }))
 
   console.log(generalHeaders.value)
   getUserRecs()
 }
-
 </script>
 
 <template>
   <div class="container">
     <h1 class="display-2">Results</h1>
     <p class="lead">
-      These are the results for your computation with the following name:
+      These are the results for your experiment with the following name:
       {{ result.name }}.
     </p>
 
@@ -197,15 +194,22 @@ function changeColumns(generalHeader, userHeader, itemHeader) {
         <Table
           caption="Testcaption"
           :results="data.results"
-          :headers="headers_rec.concat(generalHeaders).concat(userHeaders).concat(itemHeaders)" 
-          :headerOptions = "generalHeaderOptions"
-          :userOptions = "userHeaderOptions"
-          :itemOptions = "itemHeaderOptions"
+          :headers="
+            headers_rec
+              .concat(generalHeaders)
+              .concat(userHeaders)
+              .concat(itemHeaders)
+          "
+          :headerOptions="generalHeaderOptions"
+          :userOptions="userHeaderOptions"
+          :itemOptions="itemHeaderOptions"
           pagination
           expandable
           @paginationSort="(i) => paginationSort(i)"
           @loadMore="(increase, amount) => loadMore(increase, amount)"
-          @changeColumns="(general, user, item) => changeColumns(general, user, item)"
+          @changeColumns="
+            (general, user, item) => changeColumns(general, user, item)
+          "
         />
       </div>
       <!--</template>-->

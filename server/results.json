@@ -1205,6 +1205,234 @@
                     ]
                 }
             ]
+        },
+        {
+            "timestamp": {
+                "stamp": "1652027527",
+                "datetime": "2022-05-08 18:32:07"
+            },
+            "metadata": {
+                "name": "Untitled"
+            },
+            "settings": {
+                "datasets": [
+                    {
+                        "name": "ML-25M",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    }
+                ],
+                "metrics": [],
+                "approaches": [
+                    {
+                        "name": "Random",
+                        "params": [
+                            {
+                                "name": "random_seed",
+                                "value": null
+                            }
+                        ]
+                    }
+                ],
+                "recommendations": 10,
+                "split": 80,
+                "splitMethod": "random",
+                "experimentMethod": "recommendation"
+            },
+            "result": [
+                {
+                    "dataset": {
+                        "name": "ML-25M",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    "recs": [
+                        {
+                            "approach": "Random",
+                            "recommendation": "ML-25MmodnaR",
+                            "evals": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "timestamp": {
+                "stamp": "1652028412",
+                "datetime": "2022-05-08 18:46:52"
+            },
+            "metadata": {
+                "name": "Untitled"
+            },
+            "settings": {
+                "datasets": [
+                    {
+                        "name": "ML-100K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    }
+                ],
+                "metrics": [],
+                "approaches": [
+                    {
+                        "name": "Random",
+                        "params": [
+                            {
+                                "name": "random_seed",
+                                "value": null
+                            }
+                        ]
+                    }
+                ],
+                "recommendations": 10,
+                "split": 80,
+                "splitMethod": "random",
+                "experimentMethod": "recommendation"
+            },
+            "result": [
+                {
+                    "dataset": {
+                        "name": "ML-100K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    "recs": [
+                        {
+                            "approach": "Random",
+                            "recommendation": "ML-100KmodnaR",
+                            "evals": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "timestamp": {
+                "stamp": "1652028432",
+                "datetime": "2022-05-08 18:47:12"
+            },
+            "metadata": {
+                "name": "fdfd",
+                "tags": [
+                    "c"
+                ],
+                "email": "wl@kdjf"
+            },
+            "settings": {
+                "datasets": [
+                    {
+                        "name": "ML-100K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    }
+                ],
+                "metrics": [],
+                "approaches": [
+                    {
+                        "name": "BiasedMF",
+                        "params": [
+                            {
+                                "name": "features",
+                                "value": 10
+                            },
+                            {
+                                "name": "iterations",
+                                "value": 20
+                            },
+                            {
+                                "name": "user_reg",
+                                "value": 0.1
+                            },
+                            {
+                                "name": "item_reg",
+                                "value": 0.1
+                            },
+                            {
+                                "name": "damping",
+                                "value": 5
+                            },
+                            {
+                                "name": "random_seed",
+                                "value": null
+                            }
+                        ]
+                    }
+                ],
+                "recommendations": 10,
+                "split": 80,
+                "splitMethod": "random",
+                "experimentMethod": "recommendation"
+            },
+            "result": [
+                {
+                    "dataset": {
+                        "name": "ML-100K",
+                        "params": [
+                            {
+                                "name": "Train/testsplit",
+                                "value": "80"
+                            }
+                        ],
+                        "settings": [
+                            {
+                                "filters": []
+                            }
+                        ]
+                    },
+                    "recs": [
+                        {
+                            "approach": "BiasedMF",
+                            "recommendation": "ML-100KFMdesaiB",
+                            "evals": []
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }

@@ -14,21 +14,21 @@ current_recs = None
 RESULTS_OVERVIEW_PATH = 'results.json'
 
 
-def save_result(computation, result):
-    """
-    Save result to overview.
+def save_result(experiment, result):
+    """Save result to overview.
 
-    :param computation: the computation settings
-    :param result: the computed result
+    Args:
+        experiment(dict): the experiment settings
+        result(dict): the computed result
     """
     global current_result
-    computation['result'] = result
+    experiment['result'] = result
 
     # Parse tags
-    if 'tags' in computation['metadata']:
-        computation['metadata']['tags'] = parse_tags(computation['metadata']['tags'])
+    if 'tags' in experiment['metadata']:
+        experiment['metadata']['tags'] = parse_tags(experiment['metadata']['tags'])
 
-    current_result = computation
+    current_result = experiment
     add_result(current_result)
     print(current_result)
 
