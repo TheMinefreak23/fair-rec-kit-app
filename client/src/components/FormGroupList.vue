@@ -295,7 +295,7 @@ function shortGroupDescription(i) {
           </b-button>
         </b-card>
       </h3>
-      
+      <p>{{ description && capitalise(description) }}</p>
     </b-row>
     <!--TODO b-collapse doesn't work-->
     <!--Collapsable group list-->
