@@ -108,6 +108,11 @@ async function editEntry() {
     console.log('Item edited succesfully')
     emit('loadResults')
   })
+  emptyVmodels()
+}
+
+// Resets the editable values
+function emptyVmodels(){
   newName.value = ''
   newTags.value = ''
   newEmail.value = ''
@@ -217,6 +222,7 @@ function setsorting(i) {
     title="Editing results"
     size="lg"
     @ok="editEntry()"
+    @cancel="emptyVmodels()"
   >
     <h6>Please type in the new values. Blank fields will be left unchanged.</h6>
     Name:
@@ -229,7 +235,7 @@ function setsorting(i) {
     <p v-if="validateEmail(newEmail)" style="color: green">
       This is E-mail is valid :)
     </p>
-    <p v-else-if="newEmail != ''" style="color: red">
+    <p v-else-if="newEmail != ''&&newEmail!=null" style="color: red">
       This is not a valid E-mail :(
     </p>
     <b-form-input

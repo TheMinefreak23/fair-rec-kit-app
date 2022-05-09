@@ -10,12 +10,26 @@ export function formatResults(allResults) {
       id: allResults[i].timestamp.stamp,
       datetime: allResults[i].timestamp.datetime,
       name: allResults[i].metadata.name,
+      tags: formatArray(allResults[i].metadata.tags),
       dataset: formatMultipleItems(allResults[i].settings.datasets),
       approach: formatMultipleItems(allResults[i].settings.approaches),
       metric: formatMultipleItems(allResults[i].settings.metrics),
     }
   }
   return results
+}
+
+// Format an array of strings into a comma separated string
+export function formatArray(array) {
+  var string = ''
+  if (array == null){
+    string = 'None'
+  } else {
+    string = array
+    .filter(() => true)
+    .join(', ')
+  }
+  return string
 }
 
 // Format an array of named objects into a comma separated string
