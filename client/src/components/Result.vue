@@ -16,7 +16,7 @@ const headers_rec = ref([{ name: 'Rank'}, { name: 'User' }, { name: 'Item' }, { 
 //Default headers for prediction experiments
 const headers_pre = ref([{ name: 'User' }, { name: 'Item' }, { name: 'Predicted Score' }])
 
-const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
+const experiment_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
 const data = ref([])
 const startIndex = ref(0)
@@ -67,7 +67,6 @@ async function setRecs() {
   })
 }
 
-
 //POST request: Ask server for next part of user recommendation table.
 async function getUserRecs() {
   const requestOptions = {
@@ -81,7 +80,7 @@ async function getUserRecs() {
       amount: entryAmount.value,
       generalHeaders: generalHeaders.value,
       itemheaders: itemHeaders.value,
-      userheaders: userHeaders.value
+      userheaders: userHeaders.value,
     }),
   }
 
@@ -166,15 +165,17 @@ function capitalizeFirstLetter(string) {
   <div class="container">
     <h1 class="display-2">Results</h1>
     <p class="lead">
-      These are the results for your computation with the following name:
-      {{ result.name }}.
+      These are the results for experiment {{ result.metadata.name }} done at
+      {{ result.metadata.datetime }}.
     </p>
 
     <div class="col">
       Tags:
-      <template v-for="tag in mockdata.computation_tags"
-        >{{ tag }} <slot> </slot
-      ></template>
+      <template v-if="!result.metadata.tags">None</template>
+      <template v-for="tag in result.metadata.tags">
+        <b-button disabled> {{ tag }} </b-button
+        ><!--<slot> </slot>-->
+      </template>
     </div>
   </div>
 
@@ -212,10 +213,15 @@ function capitalizeFirstLetter(string) {
         <Table
           caption="Testcaption"
           :results="data.results"
-          :headers="headers_rec.concat(generalHeaders).concat(userHeaders).concat(itemHeaders)" 
-          :headerOptions = "generalHeaderOptions"
-          :userOptions = "userHeaderOptions"
-          :itemOptions = "itemHeaderOptions"
+          :headers="
+            headers_rec
+              .concat(generalHeaders)
+              .concat(userHeaders)
+              .concat(itemHeaders)
+          "
+          :headerOptions="generalHeaderOptions"
+          :userOptions="userHeaderOptions"
+          :itemOptions="itemHeaderOptions"
           pagination
           expandable
           @paginationSort="(i) => paginationSort(i)"

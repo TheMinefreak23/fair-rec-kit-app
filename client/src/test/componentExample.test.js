@@ -10,7 +10,7 @@ test('switchTab', async () => {
   // get utilities to query component
   const { getAllByText } = render(App)
 
-  const tab = getAllByText('Active Computations')[2]
+  const tab = getAllByText('Active Experiments')[2]
 
   await fireEvent.click(tab)
 

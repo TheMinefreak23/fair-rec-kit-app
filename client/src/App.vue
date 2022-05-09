@@ -6,14 +6,14 @@ Utrecht University within the Software Project course.
 import Documentation from './components/Documentation.vue'
 import Results from './components/Results.vue'
 import PreviousResults from './components/PreviousResults.vue'
-import ActiveComputation from './components/ActiveComputation.vue'
+import ActiveExperiments from './components/ActiveExperiments.vue'
 import NewExperiment from './components/NewExperiment.vue'
 import TestForm from './test/TestForm.vue'
 import { onMounted, ref } from 'vue'
 import { API_URL } from './api'
 import MusicDetail from './components/MusicDetail.vue'
 
-const activeComputations = ref(false)
+const activeExperiments = ref(false)
 const done = ref(false)
 
 // Ping
@@ -76,17 +76,17 @@ function goToResult() {
     <b-tabs v-model="tabIndex" class="m-0 pt-2" align="center">
       <b-tab title="New Experiment"><NewExperiment /></b-tab>
       <b-tab :class="{ success: done }">
-        <ActiveComputation
+        <ActiveExperiments
           @computing="
-            ;(activeComputations = true), (done = false), (tabIndex = 1)
+            ;(activeExperiments = true), (done = false), (tabIndex = 1)
           "
-          @done=";(activeComputations = false), (done = true)"
-          @stop=";(activeComputations = false), (done = false)"
+          @done=";(activeExperiments = false), (done = true)"
+          @stop=";(activeExperiments = false), (done = false)"
         />
         <template v-slot:title :class="{ success: done }">
-          <b-spinner v-if="activeComputations" small align="center"></b-spinner>
+          <b-spinner v-if="activeExperiments" small align="center"></b-spinner>
           <b-icon v-if="done" align="center" icon="check">√</b-icon>
-          Active Computations
+          Active Experiments
         </template>
       </b-tab>
       <b-tab title="Documentation" data-testid="DocTab">

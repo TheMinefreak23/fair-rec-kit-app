@@ -11,7 +11,7 @@ import { store } from '../store.js'
 const emit = defineEmits(['computing', 'done', 'stop'])
 const props = defineProps({
   names: [String],
-  computations: [],
+  experiments: [],
 })
 
 //Declare the info about the experiments that will be shown to the user
@@ -27,17 +27,17 @@ const headers = ref([
 
 //Retrieve the queue when the page is loaded
 onMounted(() => {
-  getComputations()
+  getQueue()
 })
 
-//Reload the queue when a new computation is added
+//Reload the queue when a new experiment is added
 watch(
   () => store.queue,
   (data) => {
     //console.log('queue watch new queue:', data)
     //console.log('queue watch old queue:', oldQueue)
     if (data.length != 0) {
-      getComputations()
+      getQueue()
       emit('computing')
     } else {
       emit('done')
@@ -45,8 +45,8 @@ watch(
   }
 )
 
-async function getComputations() {
-  const response = await fetch(API_URL + '/computation/queue')
+async function getQueue() {
+  const response = await fetch(API_URL + '/experiment/queue')
   const data = await response.json()
   //store.queue = formatResults(data).map(x=>x.omit(x,'ID'))
   //store.queue = formatResults(data)
@@ -63,7 +63,7 @@ async function getComputations() {
         :headers="headers"
         buttonText="Cancel"
         :removable="true"
-        serverFile="/computation/queue/delete"
+        serverFile="/experiment/queue/delete"
       />
     </div>
   </b-card>
