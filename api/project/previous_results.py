@@ -56,7 +56,6 @@ def set_recs():
     result_id = json.get("id")  # Result timestamp TODO use to get result
     run_id = json.get("runid")
     pair_id = json.get("pairid")
-    print("owo " + str(result_id) + " uwu " + str(run_id) + " :3c " + str(pair_id))
     path = result_storage.get_rec_path(result_id, run_id, pair_id)
     result_storage.current_recs = pd.read_csv(path, sep='\t', header=None)
     return {'status': 'success'}

@@ -39,8 +39,9 @@ def save_result(computation, result):
 def result_by_id(resultid):
 
     results_overview = load_json(results_overview_path)
-    current_name = id_to_name(results_overview,resultid)
-    relative_path = results_root_folder + str(resultid) + "_" + current_name
+    calculation_id = results_overview['all_results'][resultid]['timestamp']['stamp']
+    current_name = id_to_name(results_overview,calculation_id)
+    relative_path = results_root_folder + str(calculation_id) + "_" + current_name
     data = {'id': resultid, 'name': current_name, 'runs': []}
     # loops through all the subdirectories, and thus - runs, of a certain calculation
     for subdir in [f.path for f in os.scandir(relative_path) if f.is_dir()]:
@@ -51,7 +52,6 @@ def result_by_id(resultid):
         for run_result in run_overview["overview"]:
             evaluation_path_full = run_result['evaluation_path']
             ratings_settings_path_full = run_result['ratings_settings_path']
-            print("ratings path full = " + ratings_settings_path_full)
             evaluation_data = pd.read_csv(
                 evaluation_path_full,
                 sep='\t',

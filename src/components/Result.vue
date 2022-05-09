@@ -16,9 +16,9 @@ const headers_rec = ref([{ name: 'User' }, { name: 'Item' }, { name: 'Score' }])
 const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
 const data = ref([])
-const mockdataID = 1650539860
-const mockdataRunIndex = 0;
-const mockdataPairIndex = 0;
+const mockdataID = 1650539935
+const mockdataRunIndex = ref(0);
+const mockdataPairIndex = ref(1);
 const startIndex = ref(0)
 const index = ref(0)
 const ascending = ref(true)
@@ -44,8 +44,8 @@ async function setRecs() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       id: mockdataID,
-      runid: mockdataRunIndex,
-      pairid: mockdataPairIndex
+      runid: mockdataRunIndex.value,
+      pairid: mockdataPairIndex.value
     }),
   }
   fetch(API_URL + '/all-results/set-recs', requestOptions).then(() => {
@@ -58,7 +58,7 @@ async function loadEvaluations() {
   const requestOptions = {
     method: 'POST',
     headers: {'Content-type': 'application/json' },
-    body: JSON.stringify({id: mockdataID })
+    body: JSON.stringify({id: props.result.id })
   }
   const response = await fetch(API_URL + '/all-results/result-by-id', requestOptions).then(() => {
     console.log("succesful POST request to API to retrieve evaluation data")
