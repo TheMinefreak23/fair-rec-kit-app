@@ -8,6 +8,7 @@ import { sendMockData } from '../test/mockExperimentOptions.js'
 import { store } from '../store.js'
 import { API_URL } from '../api'
 import { emptyOption } from '../helpers/optionsFormatter'
+import { validateEmail } from '../helpers/optionsFormatter'
 
 const horizontalLayout = ref(false)
 const oldMetadata = ref(false)
@@ -177,6 +178,11 @@ function reformat(property) {
                     <b-form-input
                       type="email"
                       placeholder="example@mail.com"
+                      :state="
+                        metadata.email
+                          ? validateEmail(metadata.email) != null
+                          : null
+                      "
                       v-model="metadata.email"
                     ></b-form-input>
                   </b-form-group>
@@ -284,7 +290,7 @@ function reformat(property) {
                       ? options.metrics
                       : options.metrics.slice(1)
                   "
-                  :horizontalLayout="horizontalLayout"
+                  :horizontalLayout="!oldMetadata"
                 /></div
             ></b-col>
             <b-col v-if="oldMetadata">

@@ -1,10 +1,11 @@
 <script setup>
-import { computed, ref } from 'vue'
-import sortBy from 'just-sort-by'
-import { API_URL } from '../api'
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
+import { computed, ref } from 'vue'
+import sortBy from 'just-sort-by'
+import { API_URL } from '../api'
+import { validateEmail } from '../helpers/optionsFormatter'
 
 const emit = defineEmits([
   'loadResult',
@@ -72,8 +73,8 @@ const sorted = computed(() => {
  * @param {string} str the string that turns into an array
  * @return {[string]} array of strings
  */
-function stringToList(str){
-  return str.split(",")
+function stringToList(str) {
+  return str.split(',')
 }
 
 /**
@@ -81,11 +82,10 @@ function stringToList(str){
  * @param {string} Email Email to validate
  * @return {string}
  */
-function checkEmail(Email){
-  if (validateEmail(Email)){
+function checkEmail(Email) {
+  if (validateEmail(Email)) {
     return Email
-  }
-  else{
+  } else {
     return ''
   }
 }
@@ -147,7 +147,7 @@ async function getResult() {
   metadataStr.value = data.result
 }
 
-async function getNameTagsMail(selectedID){
+async function getNameTagsMail(selectedID) {
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -164,15 +164,6 @@ async function getOldValues() {
   newName.value = data.result.metadata.name
   newTags.value = data.result.metadata.tags.toString()
   newEmail.value = data.result.metadata.email
-}
-
-/**
- * Checks if Email is valid
- * @param {string} email
- * @return {bool} Whether or not the string is valid E-mail adress
- */
-function validateEmail(email){
-  return email.match(/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)
 }
 
 /**
@@ -229,20 +220,18 @@ function setsorting(i) {
   >
     <h6>Please type in the new values. Blank fields will be left unchanged.</h6>
     Name:
-    <b-form-input 
-      v-model="newName" 
-      placeholder="Enter new name"
-    ></b-form-input>
+    <b-form-input v-model="newName" placeholder="Enter new name"></b-form-input>
     <br />
     Tags: (separate tags using a single comma)
-    <b-form-input 
-      v-model="newTags" 
-      placeholder="Enter new tags"
-    ></b-form-input>
+    <b-form-input v-model="newTags" placeholder="Enter new tags"></b-form-input>
     <br />
     E-mail:
-    <p v-if="validateEmail(newEmail)" style="color:green">This is E-mail is valid :)</p>
-    <p v-else-if="newEmail!=''" style="color:red">This is not a valid E-mail :(</p>
+    <p v-if="validateEmail(newEmail)" style="color: green">
+      This is E-mail is valid :)
+    </p>
+    <p v-else-if="newEmail != ''" style="color: red">
+      This is not a valid E-mail :(
+    </p>
     <b-form-input
       v-model="newEmail"
       placeholder="Enter new e-mail"
@@ -375,7 +364,11 @@ function setsorting(i) {
           <b-button
             v-if="overview"
             pill
-            @click=";(editModalShow = !editModalShow), (selectedEntry = index), getNameTagsMail(item.id)"
+            @click="
+              ;(editModalShow = !editModalShow),
+                (selectedEntry = index),
+                getNameTagsMail(item.id)
+            "
             >Edit</b-button
           >
           <b-button

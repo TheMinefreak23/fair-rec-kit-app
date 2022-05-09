@@ -36,7 +36,7 @@ export function formatMultipleItems(items) {
 
 // Format a result for the result tab
 export function formatResult(result) {
-  console.log(result)
+  console.log('before format', JSON.parse(JSON.stringify(result)))
   const formattedResult = {
     id: result.timestamp.stamp,
     metadata: result.metadata,
@@ -65,7 +65,7 @@ export function formatResult(result) {
   }
   formattedResult.metadata.datetime = result.timestamp.datetime
 
-  //console.log(formattedResult)
+  console.log('formatted', formattedResult)
   return formattedResult
 }
 
