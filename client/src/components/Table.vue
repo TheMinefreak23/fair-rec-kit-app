@@ -108,6 +108,11 @@ async function editEntry() {
     console.log('Item edited succesfully')
     emit('loadResults')
   })
+  emptyVmodels()
+}
+
+// Resets the editable values
+function emptyVmodels(){
   newName.value = ''
   newTags.value = ''
   newEmail.value = ''
@@ -172,7 +177,11 @@ async function getOldValues() {
  * @return {bool} Whether or not the string is valid E-mail adress
  */
 function validateEmail(email){
+  if (email == null){
+    return false
+  } else {
   return email.match(/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)
+  }
 }
 
 /**
@@ -226,6 +235,7 @@ function setsorting(i) {
     title="Editing results"
     size="lg"
     @ok="editEntry()"
+    @cancel="emptyVmodels()"
   >
     <h6>Please type in the new values. Blank fields will be left unchanged.</h6>
     Name:
@@ -242,7 +252,7 @@ function setsorting(i) {
     <br />
     E-mail:
     <p v-if="validateEmail(newEmail)" style="color:green">This is E-mail is valid :)</p>
-    <p v-else-if="newEmail!=''" style="color:red">This is not a valid E-mail :(</p>
+    <p v-else-if="newEmail!=''&&newEmail!=null" style="color:red">This is not a valid E-mail :(</p>
     <b-form-input
       v-model="newEmail"
       placeholder="Enter new e-mail"

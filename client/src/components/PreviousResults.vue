@@ -22,6 +22,7 @@ const headers = ref([
   { name: 'ID' },
   { name: 'Date Time' },
   { name: 'Name' },
+  { name: 'Tags'},
   { name: 'Datasets' },
   { name: 'Approaches' },
   { name: 'Metrics' },

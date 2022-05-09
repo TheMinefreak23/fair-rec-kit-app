@@ -7,8 +7,10 @@
             },
             "metadata": {
                 "name": "help",
-                "tags": "oof",
-                "email": "hoho"
+                "tags": [
+                    "oof"
+                ],
+                "email": "fake@email.gov"
             },
             "settings": {
                 "datasets": [
@@ -115,7 +117,20 @@
                 "datetime": "2022-05-04 14:29:43"
             },
             "metadata": {
-                "name": "Untitled"
+                "name": "new name",
+                "tags": [
+                    "here",
+                    "are",
+                    "a",
+                    "bunch",
+                    "of",
+                    "tags",
+                    "to",
+                    "test",
+                    "this",
+                    "out",
+                    "123"
+                ]
             },
             "settings": {
                 "datasets": [
@@ -812,7 +827,17 @@
                 "datetime": "2022-05-05 13:57:22"
             },
             "metadata": {
-                "name": "t"
+                "name": "t",
+                "tags": [
+                    "Lorem",
+                    "ipsum",
+                    "dolor",
+                    "sit",
+                    "amet",
+                    "consectetur",
+                    "adipiscing",
+                    "elit"
+                ]
             },
             "settings": {
                 "datasets": [
@@ -1039,7 +1064,11 @@
                 "datetime": "2022-05-05 17:14:44"
             },
             "metadata": {
-                "name": "Untitled"
+                "name": "Untitled",
+                "tags": [
+                    "foo",
+                    "bar"
+                ]
             },
             "settings": {
                 "datasets": [
