@@ -10,8 +10,10 @@ import PreviousResults from './PreviousResults.vue'
 import { store, addResult, removeResult } from '../store'
 import { formatResult } from '../helpers/resultFormatter'
 
-const emit = defineEmits(['goToResult'])
+
+const emit = defineEmits(['goToResult', 'toast'])
 const showResultModal = ref(false)
+const currentTab = ref(0)
 
 // Request latest calculation when the queue is updated
 watch(
@@ -19,7 +21,11 @@ watch(
   (newQueue, oldQueue) => {
     // Only request if the queue length has decreased
     // (An experiment has finished)
-    if (newQueue.length < oldQueue.length) getCalculation()
+    if (newQueue.length < oldQueue.length) 
+    {
+      getCalculation()
+      currentTab.value = 0
+    }
   }
 )
 
@@ -32,7 +38,7 @@ async function getCalculation() {
     const data = await response.json()
     console.log(data)
     addResult(formatResult(data.calculation))
-    showResultModal.value = true
+    emit('toast')
   } catch (e) {
     console.log(e) // TODO better error handling, composable
   }
@@ -61,6 +67,7 @@ function closeResult(index) {
   >
     <p>An experiment has finished.</p>
   </b-modal>
+  <h3>{{currentTab}}</h3>
   <!--Result content-->
   <b-card>
     <div class="mx-5 mt-2">
@@ -79,8 +86,9 @@ function closeResult(index) {
           </button>
         </div>
         <div class="border">
+          <b-button @click="currentTab = 0">hoi</b-button>
           <template v-if="[...store.currentResults].length > 0">
-            <b-tabs card content-class="mt-3">
+            <b-tabs v-model="currentTab" card content-class="mt-3">
               <!-- Show opened results in tabs.-->
               <b-tab
                 v-for="(result, index) in [...store.currentResults]"
