@@ -13,7 +13,7 @@ const props = defineProps({ headers: Array, result: Object })
 
 const headers_rec = ref([{ name: 'User' }, { name: 'Item' }, { name: 'Score' }])
 
-const computation_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
+const experiment_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
 const data = ref([])
 const startIndex = ref(0)

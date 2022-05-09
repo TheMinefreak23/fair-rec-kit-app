@@ -18,7 +18,7 @@ from flask import (Blueprint, request)
 from . import result_storage
 from .options_formatter import create_available_options, config_dict_from_settings
 
-compute_bp = Blueprint('computation', __name__, url_prefix='/api/computation')
+compute_bp = Blueprint('experiment', __name__, url_prefix='/api/experiment')
 
 # Constants
 CONFIG_DIR = 'config_files'
@@ -27,29 +27,29 @@ RESULTS_DIR = 'results'
 # Initialise
 recommender_system = RecommenderSystem('datasets', RESULTS_DIR)
 options = create_available_options(recommender_system)
-computation_queue = []
+experiment_queue = []
 
 
 def calculate_first():
     """Take the oldest settings in the queue and perform an experiment with them"""
     # TODO We need this delay for the queue to work fsr
     time.sleep(0.1)
-    # Get the oldest computation from the queue.
-    computation = computation_queue.pop()
+    # Get the oldest experiment from the queue.
+    experiment = experiment_queue.pop()
 
-    run_experiment(computation)
-    #mock_computation(computation)
-
-
-computation_thread = threading.Thread(target=calculate_first)
+    run_experiment(experiment)
+    #mock_experiment(experiment)
 
 
-def run_experiment(computation):
+experiment_thread = threading.Thread(target=calculate_first)
+
+
+def run_experiment(experiment):
     """Run an experiment and save the result."""
-    print(computation)
+    print(experiment)
 
     # Create configuration dictionary.
-    config_dict, config_id = config_dict_from_settings(computation)
+    config_dict, config_id = config_dict_from_settings(experiment)
 
     # Create config files directory if it doesn't exist yet.
     if not os.path.isdir(CONFIG_DIR):
@@ -63,22 +63,23 @@ def run_experiment(computation):
 
     recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)
     # TODO get real recs&eval result
-    result_storage.save_result(computation, mock_result(computation['settings']))
+    result_storage.save_result(experiment, mock_result(experiment['settings']))
 
 
-def mock_computation(computation):
+def mock_experiment(experiment):
     """Mock running an experiment and save the mock result."""
-    # Mock computation duration.
+    # Mock experiment duration.
     time.sleep(2.5)
-    result_storage.save_result(computation, mock_result(computation['settings']))
+    result_storage.save_result(experiment, mock_result(experiment['settings']))
 
 
 def mock_result(settings):
-    """
-    Mock result computation.
+    """Mock result experiment.
 
-    :param settings: the computation settings
-    :return: the mock result
+    Args:
+        settings(dict): the experiment settings
+
+    Returns: (list) the mock result
     """
     result = []
     datasets = settings['datasets']
@@ -100,10 +101,10 @@ def mock_result(settings):
 
 @compute_bp.route('/options', methods=['GET'])
 def params():
-    """
-    Route: Send selection options.
+    """Route: Send selection options.
 
-    :return: options reponse
+    Returns:
+         (dict) options response
     """
     response = {'options': options}
     # print(response)
@@ -113,10 +114,10 @@ def params():
 # TODO rename route
 @compute_bp.route('/calculation', methods=['GET', 'POST'])
 def calculate():
-    """
-    Route: Perform a calculation (experiment).
+    """Route: Perform a calculation (experiment).
 
-    :return: the queue for POST requests, or the current result for GET requests
+    Returns:
+        (str) the queue for POST requests, or the current (dict) result for GET requests
     """
 
     response = {}
@@ -127,11 +128,11 @@ def calculate():
         append_queue(data.get('metadata'), settings)
 
         # response = {'status': 'success'}
-        response = json.dumps(computation_queue)
+        response = json.dumps(experiment_queue)
     else:
-        # Wait until the current computation is done.
-        if computation_thread.is_alive():
-            computation_thread.join()
+        # Wait until the current experiment is done.
+        if experiment_thread.is_alive():
+            experiment_thread.join()
         response['calculation'] = result_storage.current_result
     print('/calculation response:', response)
     return response
@@ -139,48 +140,50 @@ def calculate():
 
 @compute_bp.route('/queue', methods=['GET', 'POST'])
 def queue():
-    """
-    Route: Send the queue. Handle it using a thread.
+    """Route: Send the queue. Handle it using a thread.
 
-    :return: the queue
+    Returns:
+         (string) the queue
     """
-    # Handle computation thread.
-    global computation_thread
+    # Handle experiment thread.
+    global experiment_thread
     # If the thread is running, wait until it's done.
-    if computation_thread.is_alive():
-        computation_thread.join()
+    if experiment_thread.is_alive():
+        experiment_thread.join()
     # Else, if the queue isn't empty, start a thread to compute the oldest entry.
-    elif computation_queue:
-        print('Starting computation thread')
-        computation_thread = threading.Thread(target=calculate_first)
-        computation_thread.start()
+    elif experiment_queue:
+        print('Starting experiment thread')
+        experiment_thread = threading.Thread(target=calculate_first)
+        experiment_thread.start()
     else:
         print('error')
 
-    print('queue:', computation_queue)
-    return json.dumps(computation_queue)
+    print('queue:', experiment_queue)
+    return json.dumps(experiment_queue)
 
 
 @compute_bp.route('/queue/delete', methods=['POST'])
 def delete_item():
-    """
-    Pop the selected index from the queue.
+    """Pop the selected index from the queue.
 
-    :return: a removal message
+    Returns:
+         (string) a removal message
     """
     data = request.get_json()
     index = data.get('index')
-    computation_queue.pop(index)
+    experiment_queue.pop(index)
     return "Removed index"
 
 
 def recommend(dataset, approach):
-    """
-    Mock recommendation.
+    """Mock recommendation.
 
-    :param dataset: a dataset with a name
-    :param approach: an approach with a name
-    :return: a magic result
+    Args:
+        dataset(dict): a dataset with a name
+        approach(dict): an approach with a name
+
+    Returns:
+        (string) a magic result
     """
     # Combine the names, flipping the approach name.
     return dataset['name'] + approach['name'][::-1]
@@ -190,7 +193,7 @@ def evaluate_all(settings, approach, metric):
     """
     Do a mock evaluation for all filters.
 
-    :param settings: the computation settings
+    :param settings: the experiment settings
     :param approach: the approach with a name
     :param metric: the metric
     :return: the evaluation dictionary containing all evaluations
@@ -236,10 +239,10 @@ def evaluate(approach, metric):
 
 def append_queue(metadata, settings):
     """
-    Add a computation item (settings) to the queue.
+    Add a experiment item (settings) to the queue.
 
-    :param metadata: the computation metadata
-    :param settings: the computation settings
+    :param metadata: the experiment metadata
+    :param settings: the experiment settings
     """
     # Handle empty name
     if 'name' not in metadata:
@@ -253,4 +256,4 @@ def append_queue(metadata, settings):
                                      'datetime': current_dt},
                        'metadata': metadata,
                        'settings': settings}
-    computation_queue.append(current_request)
+    experiment_queue.append(current_request)

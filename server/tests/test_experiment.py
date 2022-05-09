@@ -5,7 +5,7 @@ import json
 import time
 from unittest.mock import patch
 
-from project.computation import *
+from project.experiment import *
 from tests.test_result_storage import test_results_path, test_computation, delete_test_results
 
 url_prefix = '/api/computation'
@@ -27,11 +27,11 @@ def get_test_options():
 # Test if computation route works on mock JSON form data
 @patch('project.computation.RESULTS_DIR', TEST_RESULTS_PATH)
 def test_form(client):
-    from project.computation import computation_queue
+    from project.experiment import computation_queue
     old_queue_length = len(computation_queue)
     response = client.post(url_prefix + '/calculation', json=get_test_options())
     assert response.status_code == 200  # Assert success
-    from project.computation import computation_queue
+    from project.experiment import computation_queue
     assert len(computation_queue) == old_queue_length + 1  # Check if the queue has a new result
 
     # Start the queue
@@ -49,11 +49,11 @@ def test_form(client):
 
 @patch('project.computation.RESULTS_DIR', TEST_RESULTS_PATH)
 def test_calculate():
-    from project.computation import computation_queue
+    from project.experiment import computation_queue
     computation_queue.append(get_test_options())
     old_queue_length = len(computation_queue)
 
-    from project.computation import computation_queue
+    from project.experiment import computation_queue
     calculate_first()
     assert len(computation_queue) == old_queue_length - 1
 
@@ -110,14 +110,14 @@ def test_delete(client):
     test_computation2['metadata']['name'] = 'bar'
 
     # Add the test computations to the queue
-    from project.computation import computation_queue
+    from project.experiment import computation_queue
     computation_queue.append(test_computation)
     computation_queue.append(test_computation2)
 
     old_queue_length = len(computation_queue)
 
     response = client.post(url_prefix + '/queue/delete', json={'index': index})
-    from project.computation import computation_queue
+    from project.experiment import computation_queue
     neighbour = computation_queue[index+1]
 
     # Test that the correct computation has been deleted
