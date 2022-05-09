@@ -11,7 +11,7 @@ const emit = defineEmits([
   'loadResults',
   'loadMore',
   'paginationSort',
-  'changeColumns',
+  'updateHeaders'
 ])
 const props = defineProps({
   overview: Boolean,
@@ -35,7 +35,7 @@ const entryAmount = ref(20)
 const deleteModalShow = ref(false)
 const editModalShow = ref(false)
 const viewModalShow = ref(false)
-const changeColumnsModalShow = ref(false)
+const updateHeadersModalShow = ref(false)
 const checkedColumns = ref([])
 const itemColumns = ref([])
 const userColumns = ref([])
@@ -177,7 +177,7 @@ function validateEmail(email){
 
 /**
  * Sorts data based on index.
- * @param {Int}	i	- i is the coumn index on which is being sorted.
+ * @param {Int}	i	- i is the column index on which is being sorted.
  * @return	{[Object]} Sorted array of results.
  */
 function sort(i) {
@@ -194,7 +194,7 @@ function sort(i) {
 /**
  * Sets index on which is being sorted and determines if the
  * sorting is ascending or descending.
- * @param {Int}	i	- i is the coumn index on which is being sorted.
+ * @param {Int}	i	- i is the column index on which is being sorted.
  */
 function setsorting(i) {
   if (i === sortindex.value) {
@@ -264,12 +264,12 @@ function setsorting(i) {
   <!-- Modal used for changing the headers of the user recommendations table -->
   <b-modal
     id="change-columns-modal"
-    v-model="changeColumnsModalShow"
+    v-model="updateHeadersModalShow"
     title="Change columns"
-    @ok="$emit('changeColumns', checkedColumns, userColumns, itemColumns)"
-  >
-    <p>Check the extra columns you want to be shown</p>
-    <p>{{ headerOptions }}</p>
+    @ok="$emit('updateHeaders', checkedColumns, userColumns, itemColumns)"
+    >
+    <p>Select the extra headers you want to be shown</p>
+    <p>{{headerOptions}}</p>
     <p>General:</p>
     <div
       class="form-check form-switch"
@@ -330,11 +330,12 @@ function setsorting(i) {
       {{
         props.caption
       }}
-      <template v-if="expandable">
-        <b-button @click="changeColumnsModalShow = !changeColumnsModalShow">
-          change headers
-        </b-button>
-      </template>
+       <template v-if="expandable">
+      <b-button 
+        @click="updateHeadersModalShow = !updateHeadersModalShow">  
+        change headers 
+      </b-button>
+    </template>
     </caption>
     <b-thead head-variant="dark">
       <b-tr>

@@ -11,7 +11,10 @@ import { API_URL } from '../api'
 
 const props = defineProps({ headers: Array, result: Object })
 
-const headers_rec = ref([{ name: 'User' }, { name: 'Item' }, { name: 'Score' }])
+//Default headers for recommendation experiments.
+const headers_rec = ref([{ name: 'Rank'}, { name: 'User' }, { name: 'Item' }, { name: 'Score' }])
+//Default headers for prediction experiments
+const headers_pre = ref([{ name: 'User' }, { name: 'Item' }, { name: 'Predicted Score' }])
 
 const experiment_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
@@ -43,17 +46,10 @@ onMounted(() => {
 async function getHeaders() {
   const response = await fetch(API_URL + '/all-results/headers')
   const data = await response.json()
-
-  generalHeaderOptions.value = data.headers
-  itemHeaderOptions.value = data.itemHeaders
-  userHeaderOptions.value = data.userHeaders
-  /*headerOptions = {
-    'generalHeaders' : data.headers,
-    'itemHeaders' : data.itemHeaders,
-    'userHeaders' : data.userHeaders
-  }*/
-
-  console.log(generalHeaderOptions.value)
+  
+  generalHeaderOptions.value = makeHeaders(data.headers)
+  itemHeaderOptions.value = makeHeaders(data.itemHeaders)
+  userHeaderOptions.value = makeHeaders(data.userHeaders)
 }
 
 //POST request: Send result ID to the server to set current shown recommendations.
@@ -127,21 +123,42 @@ function paginationSort(indexVar) {
   getUserRecs()
 }
 
-//Update headers shown in user recommendations
-function changeColumns(generalHeader, userHeader, itemHeader) {
-  generalHeaders.value = generalHeader.map((header) => ({
-    name: header,
-  }))
-  userHeaders.value = userHeader.map((header) => ({
-    name: header,
-  }))
-  itemHeaders.value = itemHeader.map((header) => ({
-    name: header,
-  }))
 
-  console.log(generalHeaders.value)
+/**
+ * Update headers shown in user recommendations
+ * @param {Array}   generalHeader  - list of headers that apply to the user-item pair.
+ * @param {Array}   userHeader    - list of headers that apply to the user entries.
+ * @param {Array}   itemHeader    - list of headers that apply to the item entries.
+ */
+function updateHeaders(generalHeader, userHeader, itemHeader) {
+  generalHeaders.value = makeHeaders(generalHeader)
+  userHeaders.value = makeHeaders(userHeader)
+  itemHeaders.value = makeHeaders(itemHeader)
   getUserRecs()
 }
+
+
+/**
+ * convert list of header names into supported header format, capitalize and remove underscores
+ * @param {Array}   headers  - list of headers.
+ */
+function makeHeaders(headers) {
+  for(var i=0; i<headers.length; i++){
+    headers[i] = capitalizeFirstLetter(headers[i].replace("_", " "))
+  }
+  return headers.map((header) => ({
+        name: header,
+      }))
+}
+
+/**
+ * Capitalize the first letter of a string
+ * @param {int}   string  - the string that needs to be capitalized.
+ */
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 </script>
 
 <template>
@@ -209,9 +226,7 @@ function changeColumns(generalHeader, userHeader, itemHeader) {
           expandable
           @paginationSort="(i) => paginationSort(i)"
           @loadMore="(increase, amount) => loadMore(increase, amount)"
-          @changeColumns="
-            (general, user, item) => changeColumns(general, user, item)
-          "
+          @updateHeaders="(general, user, item) => updateHeaders(general, user, item)"
         />
       </div>
       <!--</template>-->
