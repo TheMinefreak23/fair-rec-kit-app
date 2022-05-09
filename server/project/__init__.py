@@ -6,7 +6,7 @@ Utrecht University within the Software Project course.
 from flask import Flask
 from flask_cors import CORS
 
-from .computation import compute_bp
+from .experiment import compute_bp
 from .music_detail import detail_bp
 from .result import result_bp
 from .previous_results import results_bp

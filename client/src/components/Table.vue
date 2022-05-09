@@ -1,17 +1,18 @@
 <script setup>
-import { computed, ref } from 'vue'
-import sortBy from 'just-sort-by'
-import { API_URL } from '../api'
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
+import { computed, ref } from 'vue'
+import sortBy from 'just-sort-by'
+import { API_URL } from '../api'
+import { validateEmail } from '../helpers/optionsFormatter'
 
 const emit = defineEmits([
   'loadResult',
   'loadResults',
   'loadMore',
   'paginationSort',
-  'changeColumns',
+  'updateHeaders'
 ])
 const props = defineProps({
   overview: Boolean,
@@ -35,7 +36,7 @@ const entryAmount = ref(20)
 const deleteModalShow = ref(false)
 const editModalShow = ref(false)
 const viewModalShow = ref(false)
-const changeColumnsModalShow = ref(false)
+const updateHeadersModalShow = ref(false)
 const checkedColumns = ref([])
 const itemColumns = ref([])
 const userColumns = ref([])
@@ -72,8 +73,8 @@ const sorted = computed(() => {
  * @param {string} str the string that turns into an array
  * @return {[string]} array of strings
  */
-function stringToList(str){
-  return str.split(",")
+function stringToList(str) {
+  return str.split(',')
 }
 
 /**
@@ -81,11 +82,10 @@ function stringToList(str){
  * @param {string} Email Email to validate
  * @return {string}
  */
-function checkEmail(Email){
-  if (validateEmail(Email)){
+function checkEmail(Email) {
+  if (validateEmail(Email)) {
     return Email
-  }
-  else{
+  } else {
     return ''
   }
 }
@@ -152,7 +152,7 @@ async function getResult() {
   metadataStr.value = data.result
 }
 
-async function getNameTagsMail(selectedID){
+async function getNameTagsMail(selectedID) {
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -172,21 +172,8 @@ async function getOldValues() {
 }
 
 /**
- * Checks if Email is valid
- * @param {string} email
- * @return {bool} Whether or not the string is valid E-mail adress
- */
-function validateEmail(email){
-  if (email == null){
-    return false
-  } else {
-  return email.match(/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)
-  }
-}
-
-/**
  * Sorts data based on index.
- * @param {Int}	i	- i is the coumn index on which is being sorted.
+ * @param {Int}	i	- i is the column index on which is being sorted.
  * @return	{[Object]} Sorted array of results.
  */
 function sort(i) {
@@ -203,7 +190,7 @@ function sort(i) {
 /**
  * Sets index on which is being sorted and determines if the
  * sorting is ascending or descending.
- * @param {Int}	i	- i is the coumn index on which is being sorted.
+ * @param {Int}	i	- i is the column index on which is being sorted.
  */
 function setsorting(i) {
   if (i === sortindex.value) {
@@ -239,20 +226,18 @@ function setsorting(i) {
   >
     <h6>Please type in the new values. Blank fields will be left unchanged.</h6>
     Name:
-    <b-form-input 
-      v-model="newName" 
-      placeholder="Enter new name"
-    ></b-form-input>
+    <b-form-input v-model="newName" placeholder="Enter new name"></b-form-input>
     <br />
     Tags: (separate tags using a single comma)
-    <b-form-input 
-      v-model="newTags" 
-      placeholder="Enter new tags"
-    ></b-form-input>
+    <b-form-input v-model="newTags" placeholder="Enter new tags"></b-form-input>
     <br />
     E-mail:
-    <p v-if="validateEmail(newEmail)" style="color:green">This is E-mail is valid :)</p>
-    <p v-else-if="newEmail!=''&&newEmail!=null" style="color:red">This is not a valid E-mail :(</p>
+    <p v-if="validateEmail(newEmail)" style="color: green">
+      This is E-mail is valid :)
+    </p>
+    <p v-else-if="newEmail != ''&&newEmail!=null" style="color: red">
+      This is not a valid E-mail :(
+    </p>
     <b-form-input
       v-model="newEmail"
       placeholder="Enter new e-mail"
@@ -274,12 +259,12 @@ function setsorting(i) {
   <!-- Modal used for changing the headers of the user recommendations table -->
   <b-modal
     id="change-columns-modal"
-    v-model="changeColumnsModalShow"
+    v-model="updateHeadersModalShow"
     title="Change columns"
-    @ok="$emit('changeColumns', checkedColumns, userColumns, itemColumns)"
-  >
-    <p>Check the extra columns you want to be shown</p>
-    <p>{{ headerOptions }}</p>
+    @ok="$emit('updateHeaders', checkedColumns, userColumns, itemColumns)"
+    >
+    <p>Select the extra headers you want to be shown</p>
+    <p>{{headerOptions}}</p>
     <p>General:</p>
     <div
       class="form-check form-switch"
@@ -340,11 +325,12 @@ function setsorting(i) {
       {{
         props.caption
       }}
-      <template v-if="expandable">
-        <b-button @click="changeColumnsModalShow = !changeColumnsModalShow">
-          change headers
-        </b-button>
-      </template>
+       <template v-if="expandable">
+      <b-button 
+        @click="updateHeadersModalShow = !updateHeadersModalShow">  
+        change headers 
+      </b-button>
+    </template>
     </caption>
     <b-thead head-variant="dark">
       <b-tr>
@@ -384,7 +370,11 @@ function setsorting(i) {
           <b-button
             v-if="overview"
             pill
-            @click=";(editModalShow = !editModalShow), (selectedEntry = index), getNameTagsMail(item.id)"
+            @click="
+              ;(editModalShow = !editModalShow),
+                (selectedEntry = index),
+                getNameTagsMail(item.id)
+            "
             >Edit</b-button
           >
           <b-button

@@ -119,26 +119,14 @@ def user_result():
 
 @results_bp.route('/headers', methods=['GET'])
 def headers():
-    mock_json = {
-        "headers" : [
-            { "name" : "general option 1"},
-            { "name" : "general option 2"}
+    with open('project/headers.json') as j:
+        jsonfile = json.load(j)
 
-        ],
+    result = jsonfile['LFM-1B']
+    j.close()
 
-        "itemHeaders" : [
-            { "name" : "item option 1"},
-            { "name" : "item option 2"}
-        ],
-
-        "userHeaders" : [
-            {"name": "user option 1"},
-            {"name": "user option 2"}
-        ]
-
-    }
-
-    result = json.dumps(mock_json)
     print(result)
+
     return result
+
 

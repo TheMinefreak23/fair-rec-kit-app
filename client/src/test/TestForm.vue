@@ -25,7 +25,7 @@ onMounted(() => {
 
 // GET request: Get available options for selection from server
 async function getOptions() {
-  const response = await fetch(API_URL + '/computation/options')
+  const response = await fetch(API_URL + '/experiment/options')
   const data = await response.json()
   options.value = data.options
   console.log(options.value)
