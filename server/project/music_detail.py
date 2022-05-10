@@ -35,3 +35,14 @@ def get_spotify_token():
     print(time.time(), token['expiration_time'])
     return token
 
+@detail_bp.route('/AcousticBrainz', methods=['POST'])
+def get_acousticbrainz_data():
+    data = request.get_json()
+    print(data)
+    ab_api = 'https://acousticbrainz.org/api/v1/'
+    musicbrainz_id = data.get('mbid')
+    url = ab_api + 'high-level' + '?recording_ids=' + musicbrainz_id
+    print(url)
+    res = requests.get(url)
+    print(res.status_code)
+    return json.loads(res.text)
