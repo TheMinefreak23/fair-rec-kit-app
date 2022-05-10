@@ -1,2 +1,3 @@
 npm run dev &
-. run-api.sh
+cd server
+. run.sh

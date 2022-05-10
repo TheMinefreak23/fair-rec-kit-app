@@ -1,5 +1,0 @@
-{"all_results": [{"timestamp": {"stamp": 1650539860, "datetime": "2022-03-24T13:54:49-30"}, "metadata": {"name": "Recommenders_Simple"}, "settings": {"datasets": ["LFM1B"],
-  "recommendations": 10, "split": 80, "splitMethod": "random", "approaches": [{"name": "POP", "parameter":
-  {"name": "method", "value": "quantile"}}], "metrics": [{"name": "HR@K", "parameter": {"name": "k", "value": 10}}]}},
-  {"timestamp":  {"stamp":  1650539935, "datetime":  "2022-03-24T13:54:49-30"}, "metadata": {"name": "Recommenders_MultiSet"}, "settings":  {}}
-]}

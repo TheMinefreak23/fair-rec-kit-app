@@ -1,0 +1,17 @@
+# Linux
+home/ 
+
+# Data
+config_files/
+results/
+tests/test_results.json
+results.json
+/results.json
+frkenv/
+/results_backup.json
+
+# Byte-compiled files
+__pycache__
+
+# IntelliJ
+.idea/
