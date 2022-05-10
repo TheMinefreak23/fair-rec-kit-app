@@ -4,7 +4,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 import json
-from fairreckitlib.algorithms.elliot_alg.factory import ELLIOT_API
+from fairreckitlib.model.algorithms.elliot.elliot_factory import ELLIOT_API
 
 model_API_dict = {}
 
