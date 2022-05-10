@@ -1,13 +1,12 @@
 import words from 'an-array-of-english-words'
 import { API_URL } from '../api'
 import { store } from '../store'
-import {ref, onMounted} from 'vue'
+import { ref, onMounted } from 'vue'
 
 var metadata = {}
 var form = {}
 
-
- async function sendMockData(options) {
+async function sendMockData(options) {
   form = {
     recommendations: rand(100),
     split: rand(100),
@@ -30,7 +29,7 @@ var form = {}
     body: JSON.stringify({ metadata: metadata, settings: form }),
   }
   const response = await fetch(
-    API_URL + '/computation/calculation',
+    API_URL + '/experiment/calculation',
     requestOptions
   )
   // Update queue
@@ -39,10 +38,10 @@ var form = {}
 }
 
 function generateRandomApproach(options) {
-  //generate random settings for the Approaches part of a computation
+  //generate random settings for the Approaches part of a experiment
   let libraries = options.approaches.libraries.prediction
   let result = []
-  var n = (1 + Math.floor(Math.random() * 3))
+  var n = 1 + Math.floor(Math.random() * 3)
 
   for (let i = 0; i < n; i++) {
     var ops = randomItems(libraries, 1)[0].options
@@ -54,7 +53,7 @@ function generateRandomApproach(options) {
 
     var randomOptionName = randomWord()
     var randomOptionValue = randomWord()
-    if(choices != (undefined || [])){
+    if (choices != (undefined || [])) {
       var randomOption = randomItems(choices, 1)[0]
       randomOptionName = randomOption.text
       randomOptionValue = randomItems(randomOption.options, 1)
@@ -64,44 +63,45 @@ function generateRandomApproach(options) {
 
     var randomValuesName = randomWord()
     var randomValuesValue = rand()
-    if (values != (undefined || []))
-    {
+    if (values != (undefined || [])) {
       var randomValue = randomItems(values, 1)[0]
       randomValuesName = randomValue.text
-      randomValuesValue = (getRandomInt(randomValue.min, randomValue.max))
+      randomValuesValue = getRandomInt(randomValue.min, randomValue.max)
     }
 
-
-    var params = [{
-      'name': randomOptionName,
-      'value': randomOptionValue
-    },
-    {
-      'name': randomValuesName,
-      'value': randomValuesValue
-    }]
+    var params = [
+      {
+        name: randomOptionName,
+        value: randomOptionValue,
+      },
+      {
+        name: randomValuesName,
+        value: randomValuesValue,
+      },
+    ]
 
     result[i] = {
-      'name': approachName,
-      'settings': params}
+      name: approachName,
+      settings: params,
+    }
   }
 
   return result
 }
 
-function generateRandomMetrics(options){
-  //generate random settings for the Metrics part of a computation
+function generateRandomMetrics(options) {
+  //generate random settings for the Metrics part of a experiment
   let result = []
-  var n = (1 + Math.floor(Math.random() * 3))
-  for (let i = 0; i < n ; i++) {
+  var n = 1 + Math.floor(Math.random() * 3)
+  for (let i = 0; i < n; i++) {
     console.log(options.metrics)
     var randomOption = randomItems(options.metrics.categories, 1)[0]
     var randomOptionOptions = randomOption.options
-    var randomOptionName = randomItems(randomOptionOptions,1)[0].text
+    var randomOptionName = randomItems(randomOptionOptions, 1)[0].text
 
     result[i] = {
-      'name': randomOptionName,
-      'settings': rand(20)
+      name: randomOptionName,
+      settings: rand(20),
     }
   }
 
@@ -109,20 +109,22 @@ function generateRandomMetrics(options){
 }
 
 function generateRandomDatasets(options) {
-  //generate random settings for the Datasets part of a computation
+  //generate random settings for the Datasets part of a experiment
   let result = []
-  var n = (1 + Math.floor(Math.random() * 3))
+  var n = 1 + Math.floor(Math.random() * 3)
   for (let i = 0; i < n; i++) {
     console.log(options.datasets)
     var randomDataset = randomItems(options.datasets, 1)[0]
 
     var randomDatasetName = randomDataset.text
-    var randomDatasetParams = {'name' : randomDataset.params.values[0].text,
-      'value': randomDataset.params.values[0].default}
+    var randomDatasetParams = {
+      name: randomDataset.params.values[0].text,
+      value: randomDataset.params.values[0].default,
+    }
 
     result[i] = {
-      'name': randomDatasetName,
-      'settings': randomDatasetParams
+      name: randomDatasetName,
+      settings: randomDatasetParams,
     }
     console.log(result)
   }
@@ -130,9 +132,9 @@ function generateRandomDatasets(options) {
 }
 
 function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
+  min = Math.ceil(min)
+  max = Math.floor(max)
+  return Math.floor(Math.random() * (max - min) + min) //The maximum is exclusive and the minimum is inclusive
 }
 
 function rand(n = 1000) {
@@ -154,7 +156,7 @@ function randomWords() {
 function randomItems(list = [], n = Math.floor(Math.random() * list.length)) {
   //takes a list and a number, selects a random amount of item in that list.
 
-  if (list.length == 0){
+  if (list.length == 0) {
     return randomWord()
   }
   let set = new Set()
@@ -179,7 +181,6 @@ function reformat(property) {
   for (let i in property.main) {
     let parameter = null
     if (property.lists[i] != null) {
-
       choices[i] = {
         name: property.main[i],
         settings: property.lists[i].map((setting) => ({
