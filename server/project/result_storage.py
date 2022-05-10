@@ -92,9 +92,13 @@ def result_by_id(result_id):
 
 def get_rec_path(evaluation_id, runid, pairid):
     results_overview = load_json(RESULTS_OVERVIEW_PATH)
+    # TODO DEV: Mock
+    if evaluation_id == 0:
+        results_overview = load_json('mock/results_overview.json')
+
     name = id_to_name(results_overview, evaluation_id)
 
-    # TODO DEV
+    # TODO DEV: Mock
     results_root_folder = RESULTS_ROOT_FOLDER
     if evaluation_id == 0:
         results_root_folder = 'mock/'
@@ -106,11 +110,11 @@ def get_rec_path(evaluation_id, runid, pairid):
     return rec_path
 
 
-def id_to_name(json_data, resultid):
+def id_to_name(json_data, result_id):
     current_result_overview_id = -1
     # Filter: Loop through all results and find the one with the matching ID.
     for iteration_id in range(len(json_data['all_results'])):
-        if json_data['all_results'][iteration_id]['timestamp']['stamp'] == resultid:
+        if json_data['all_results'][iteration_id]['timestamp']['stamp'] == result_id:
             current_result_overview_id = iteration_id
     current_name = json_data['all_results'][current_result_overview_id]['metadata']['name']
     return current_name
@@ -188,7 +192,7 @@ def edit_result(index, new_name, new_tags, new_email):
 
     def edit_metadata(attr, new_val):
         # Don't change the attribute if the input field has been left empty
-        if new_val != '':  
+        if new_val != '':
             to_edit_result['metadata'][attr] = new_val
             print('changed '+attr, to_edit_result['metadata'][attr])
 

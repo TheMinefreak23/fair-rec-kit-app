@@ -1,3 +1,140 @@
-{"all_results": [{"timestamp": {"stamp": 1650539860, "datetime": "2022-03-24T13:54:49-30"}, "metadata": {"name": "Recommenders_Simple"}, "settings": {"datasets": ["LFM1B"],
-  "recommendations": 10, "split": 80, "splitMethod": "random", "approaches": [{"name": "POP", "parameter":
-  {"name": "method", "value": "quantile"}}], "metrics": [{"name": "HR@K", "parameter": {"name": "k", "value": 10}}]}}]}
+{
+  "all_results":
+  [
+      {
+          "timestamp": {
+              "stamp": "0",
+              "datetime": "2022-05-10 11:15:54"
+          },
+          "metadata": {
+              "name": "Foobar"
+          },
+          "settings": {
+              "datasets": [
+                  {
+                      "name": "ML-100K",
+                      "params": [
+                          {
+                              "name": "Train/testsplit",
+                              "value": "80"
+                          }
+                      ],
+                      "settings": [
+                          {
+                              "filters": []
+                          }
+                      ]
+                  }
+              ],
+              "metrics": [
+                  {
+                      "name": "P@K",
+                      "params": [
+                          {
+                              "name": "k",
+                              "value": 10
+                          }
+                      ],
+                      "settings": [
+                          {
+                              "filters": [
+                                  {
+                                      "name": "User Gender",
+                                      "params": [
+                                          {
+                                              "name": "Gender",
+                                              "value": "Male"
+                                          }
+                                      ]
+                                  }
+                              ]
+                          }
+                      ]
+                  }
+              ],
+              "approaches": [
+                  {
+                      "name": "BiasedMF",
+                      "params": [
+                          {
+                              "name": "features",
+                              "value": 10
+                          },
+                          {
+                              "name": "iterations",
+                              "value": 20
+                          },
+                          {
+                              "name": "user_reg",
+                              "value": 0.1
+                          },
+                          {
+                              "name": "item_reg",
+                              "value": 0.1
+                          },
+                          {
+                              "name": "damping",
+                              "value": 5
+                          },
+                          {
+                              "name": "random_seed",
+                              "value": null
+                          }
+                      ]
+                  }
+              ],
+              "recommendations": 10,
+              "split": 80,
+              "splitMethod": "random",
+              "experimentMethod": "recommendation"
+          },
+          "result": [
+              {
+                  "dataset": {
+                      "name": "ML-100K",
+                      "params": [
+                          {
+                              "name": "Train/testsplit",
+                              "value": "80"
+                          }
+                      ],
+                      "settings": [
+                          {
+                              "filters": []
+                          }
+                      ]
+                  },
+                  "recs": [
+                      {
+                          "approach": "BiasedMF",
+                          "recommendation": "ML-100KFMdesaiB",
+                          "evals": [
+                              {
+                                  "name": "P@K",
+                                  "evaluation": {
+                                      "global": 2.4,
+                                      "filtered": [
+                                          {
+                                              "User Gender": [
+                                                  {
+                                                      "Gender Male": 6.6
+                                                  }
+                                              ]
+                                          }
+                                      ]
+                                  },
+                                  "params": [
+                                      {
+                                          "name": "k",
+                                          "value": 10
+                                      }
+                                  ]
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      }
+  ]
+}
