@@ -82,14 +82,17 @@ async function setRecs() {
       pairid: mockdataPairIndex.value,
     }),
   }
-  const response = await fetch(API_URL + '/result/set-recs', requestOptions)
+  const response = await fetch(
+    API_URL + '/all-results/set-recs',
+    requestOptions
+  )
   console.log('resultfetch', response)
   if (response.status == '200') {
     const data = await response.json()
     console.log('data', data)
     availableFilters.value = data.availableFilters
     console.log('resultfetch', response)
-    getUserRecs()
+    await getUserRecs()
     getHeaders()
   }
 }
