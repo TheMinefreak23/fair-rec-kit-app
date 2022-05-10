@@ -601,8 +601,7 @@ function shortGroupDescription(i) {
                               .dynamic"
                             :key="option"
                           >
-                            <b-card class="mb-1 bg-secondary p-0">
-                              <FormGroupList
+                          <FormGroupList
                                 class="p-0"
                                 v-model:data="form.lists[i - 1][index]"
                                 :name="option.name"
@@ -616,8 +615,7 @@ function shortGroupDescription(i) {
                                 "
                                 :options="option.options"
                                 :required="false"
-                              />
-                            </b-card>
+                          />
                           </template>
                         </b-col>
                       </b-col>
