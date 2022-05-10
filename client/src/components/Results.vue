@@ -66,7 +66,6 @@ function closeResult(index) {
   >
     <p>An experiment has finished.</p>
   </b-modal>
-  <h3>{{currentTab}}</h3>
   <!--Result content-->
   <b-card>
     <div class="mx-5 mt-2">
@@ -85,7 +84,6 @@ function closeResult(index) {
           </button>
         </div>
         <div class="border">
-          <b-button @click="currentTab = 0">hoi</b-button>
           <template v-if="[...store.currentResults].length > 0">
             <b-tabs v-model="currentTab" card content-class="mt-3">
               <!-- Show opened results in tabs.-->
