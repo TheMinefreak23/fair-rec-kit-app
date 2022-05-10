@@ -36,7 +36,6 @@ async function getCalculation() {
   try {
     const response = await fetch(API_URL + '/experiment/calculation')
     const data = await response.json()
-    console.log(data)
     addResult(formatResult(data.calculation))
     emit('toast')
   } catch (e) {

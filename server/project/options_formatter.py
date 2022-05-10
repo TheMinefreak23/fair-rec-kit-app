@@ -12,6 +12,7 @@ model_API_dict = {}
 DEFAULTS = {'split': 80,
             'recCount': {'min': 0, 'max': 100, 'default': 10},
             }  # default values
+DEFAULT_SPLIT = {'name': 'Train/testsplit', 'default': '80', 'min': 1, 'max': 99}
 filters = json.load(open('parameters/filters.json'))
 
 
@@ -85,7 +86,7 @@ def create_available_options(recommender_system):
 
         # Reformat and add parameters
         params = dataset['params']
-        params['values'] = [{'name': 'Train/testsplit', 'default': '80', 'min': 0, 'max': 100}]
+        params['values'] = [DEFAULT_SPLIT]
         splits = ['Random'] + (['Time'] if params['timestamp'] else [])
         params['options'] = [{'name': 'Type of split', 'default': "Random", 'options': splits}]
 
