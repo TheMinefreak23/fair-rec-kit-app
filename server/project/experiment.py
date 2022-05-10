@@ -10,6 +10,8 @@ import threading
 import time
 from datetime import datetime
 import yaml
+from fairreckitlib.experiment.experiment_config_parsing import Parser
+from fairreckitlib.experiment.experiment_event import *
 
 from fairreckitlib.recommender_system import RecommenderSystem
 
@@ -61,7 +63,23 @@ def run_experiment(experiment):
     with open(config_file_path + '.yml', 'w+', encoding='utf-8') as config_file:
         yaml.dump(config_dict, config_file)
 
-    recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)
+    parser = Parser(True)
+    config = parser.parse_experiment_config_from_yml(config_file_path,
+                                                     recommender_system.data_registry,
+                                                     recommender_system.experiment_factory)
+
+    events = {
+        ON_BEGIN_EXPERIMENT: lambda x, **kwargs: print('uwu'),
+        ON_END_EXPERIMENT: lambda x, **kwargs: print('owo'),
+        ON_BEGIN_THREAD_EXPERIMENT: lambda x, **kwargs: print('letsgooo'),
+        ON_END_THREAD_EXPERIMENT: lambda x, **kwargs: print('yay')
+    }
+
+    recommender_system.run_experiment(events, config, num_threads=4)
+
+    # TODO USE THIS FUNCTION INSTEAD OF PARSING
+    #recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)
+
     # TODO get real recs&eval result
     result_storage.save_result(experiment, mock_result(experiment['settings']))
 
@@ -126,7 +144,6 @@ def calculate():
         settings = data.get('settings')
         # print(data)
         append_queue(data.get('metadata'), settings)
-
         # response = {'status': 'success'}
         response = json.dumps(experiment_queue)
     else:
