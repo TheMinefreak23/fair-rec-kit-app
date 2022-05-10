@@ -42,7 +42,7 @@ test('editTableItem', async () => {
 })
 
 test('userItemTable', async () => {
-  const {getByText} = render(Table, {
+  const {getByText, getByTitle, getByPlaceholderText} = render(Table, {
     props: {
     caption: 'testcaption',
     results: [{foo: 2, bar: 2}],
@@ -56,7 +56,7 @@ test('userItemTable', async () => {
 
   })
 
-  //getByPlaceholderText('20')
+  getByTitle(/select/)
 
   const prevbutton = getByText(/previous/)
   const nextbutton = getByText(/next/)
@@ -66,8 +66,9 @@ test('userItemTable', async () => {
   await fireEvent.click(nextbutton)
   await fireEvent.click(headerbutton)
 
-  
+  getByPlaceholderText('20')
 
+  
   
 })
 

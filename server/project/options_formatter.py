@@ -12,25 +12,29 @@ model_API_dict = {}
 DEFAULTS = {'split': 80,
             'recCount': {'min': 0, 'max': 100, 'default': 10},
             }  # default values
+DEFAULT_SPLIT = {'name': 'Train/testsplit', 'default': '80', 'min': 1, 'max': 99}
 filters = json.load(open('parameters/filters.json'))
 
+
 # TODO do this in another way
-def create_model_API_dict(predictors, recommenders):
+def create_model_api_dict(predictors, recommenders):
     approaches = list(predictors.items()) + list(recommenders.items())
-    dict = {}
+    model_to_api = {}
     for (header, options) in approaches:
         for option in options:
-            dict[option['name']] = header
+            model_to_api[option['name']] = header
     # print(dict)
-    return dict
+    return model_to_api
 
 
 def create_available_options(recommender_system):
-    """
-    Gets options from FairRecKitLib and formats them for usage on the client side
+    """Gets options from FairRecKitLib and formats them for usage on the client side
 
-    :param recommender_system: the recomender system to get the options from
-    :return: the formatted options
+    Args:
+        recommender_system(RecommenderSystem): the recommender system to get the options from
+
+    Returns:
+        (dict) the formatted options
     """
     options = {}
 
@@ -44,7 +48,7 @@ def create_available_options(recommender_system):
     # print(frk_metrics)
 
     global model_API_dict
-    model_API_dict = create_model_API_dict(frk_predictors, frk_recommenders)
+    model_API_dict = create_model_api_dict(frk_predictors, frk_recommenders)
 
     def format_categorised(settings):
         formatted_settings = []
@@ -82,7 +86,7 @@ def create_available_options(recommender_system):
 
         # Reformat and add parameters
         params = dataset['params']
-        params['values'] = [{'name': 'Train/testsplit', 'default': '80', 'min': 0, 'max': 100}]
+        params['values'] = [DEFAULT_SPLIT]
         splits = ['Random'] + (['Time'] if params['timestamp'] else [])
         params['options'] = [{'name': 'Type of split', 'default': "Random", 'options': splits}]
 
@@ -110,7 +114,6 @@ def create_available_options(recommender_system):
 
 
 def reformat_all(options, datasets, recommenders, predictors, metrics):
-
     options['datasets'] = reformat(datasets, False)
     # options['approaches'] = APPROACHES
     options['predictors'] = reformat(predictors, True)
@@ -119,17 +122,18 @@ def reformat_all(options, datasets, recommenders, predictors, metrics):
     return options
 
 
-def config_dict_from_settings(computation):
-    """
-    Create a configuration dictionary from client settings
+def config_dict_from_settings(experiment):
+    """Create a configuration dictionary from client settings
 
-    :param computation: the computation settings sent from the client
-    :return: the configuration dictionary
+    Args:
+        experiment(dict): the experiment settings sent from the client
+    Returns:
+        (dict) the configuration
     """
-    settings = computation['settings']
+    settings = experiment['settings']
 
-    name = computation['metadata']['name'] 
-    id = computation['timestamp']['stamp'] + '_' + name
+    name = experiment['metadata']['name'] 
+    experiment_id = experiment['timestamp']['stamp'] + '_' + name
 
     # Format datasets
     datasets = list(
@@ -157,12 +161,12 @@ def config_dict_from_settings(computation):
     # evaluation = list(map(lambda metric: {'name': metric['name']}, settings['metrics']))  # TODO filters
 
     """
-    if settings['computationMethod'] == 'recommendation':
+    if settings['experimentMethod'] == 'recommendation':
         config = RecommenderExperimentConfig(datasets, models, evaluation, id,
-                                             settings['computationMethod'], settings['recommendations'])
+                                             settings['experimentMethod'], settings['recommendations'])
     else:
         config = PredictorExperimentConfig(datasets, models, evaluation, id,
-                                           settings['computationMethod'])
+                                           settings['experimentMethod'])
 
     print(config)"""
 
@@ -170,12 +174,12 @@ def config_dict_from_settings(computation):
     config_dict = {'datasets': datasets,
                    'models': models,
                    'evaluation': evaluation,
-                   'name': id,
+                   'name': experiment_id,
                    'top_K': settings['recommendations'],
-                   'type': settings['computationMethod']}
+                   'type': settings['experimentMethod']}
 
     print(config_dict)
-    return config_dict, id
+    return config_dict, experiment_id
 
 
 # Reformat an options list

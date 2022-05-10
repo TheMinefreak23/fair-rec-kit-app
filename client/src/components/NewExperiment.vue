@@ -4,11 +4,12 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import { onMounted, ref } from 'vue'
 import FormGroupList from './FormGroupList.vue'
-import { sendMockData } from '../test/mockComputationOptions.js'
+import { sendMockData } from '../test/mockExperimentOptions.js'
 import { store } from '../store.js'
 import { API_URL } from '../api'
 import { emptyOption } from '../helpers/optionsFormatter'
-import { emptyFormGroup } from '../helpers/optionsFormatter';
+import { emptyFormGroup } from '../helpers/optionsFormatter'
+import { validateEmail } from '../helpers/optionsFormatter'
 
 const horizontalLayout = ref(false)
 const oldMetadata = ref(false)
@@ -25,7 +26,7 @@ const splitOptions = [
   { text: 'Random', value: 'random' },
   { text: 'Time', value: 'time' },
 ]
-const computationMethods = [
+const experimentMethods = [
   { text: 'Recommendation (default)', value: 'recommendation' },
   { text: 'Prediction', value: 'prediction' },
 ]
@@ -37,10 +38,10 @@ onMounted(async () => {
 
 // GET request: Get available options for selection from server
 async function getOptions() {
-  const response = await fetch(API_URL + '/computation/options')
+  const response = await fetch(API_URL + '/experiment/options')
   const data = await response.json()
   options.value = data.options
-  //console.log('options', options.value)
+  console.log('options', options.value)
 }
 
 // POST request: Send form to server.
@@ -59,7 +60,7 @@ async function sendToServer() {
   }
   console.log('sendForm', sendForm)
   const response = await fetch(
-    API_URL + '/computation/calculation',
+    API_URL + '/experiment/calculation',
     requestOptions
   )
 
@@ -78,7 +79,7 @@ async function initForm() {
   form.value.recommendations = options.value.defaults.recCount.default //The default amount of recommendations per user
   form.value.split = options.value.defaults.split //The default train-test ratio
   form.value.splitMethod = 'random' //The default method of splitting datasets
-  form.value.computationMethod = 'recommendation' //The default experiment type
+  form.value.experimentMethod = 'recommendation' //The default experiment type
 }
 
 // Change the form format (SoA) into a managable data format (AoS)
@@ -110,21 +111,21 @@ function reformat(property) {
 
 <template>
   <div class="py-2 mx-5">
-  <b-row>
-    <b-col md="auto">
-      <b-form-checkbox v-model="horizontalLayout"
-        >use broad layout</b-form-checkbox
-      >
-    </b-col>
-    <b-col>
-      <b-form-checkbox v-model="oldMetadata"
-        >use old metadata layout</b-form-checkbox
-      >
-    </b-col>
-  </b-row>
+    <b-row>
+      <b-col md="auto">
+        <b-form-checkbox v-model="horizontalLayout"
+          >use broad layout</b-form-checkbox
+        >
+      </b-col>
+      <b-col>
+        <b-form-checkbox v-model="oldMetadata"
+          >use old metadata layout</b-form-checkbox
+        >
+      </b-col>
+    </b-row>
     <b-card>
       <b-row class="text-center"> <h3>New Experiment</h3></b-row>
-      <!--This form contains all the necessary parameters for a user to submit a request for a computation-->
+      <!--This form contains all the necessary parameters for a user to submit a request for a experiment-->
       <b-form v-if="options" @submit="sendToServer" @reset="initForm">
         <b-row class="text-center">
           <b-row>
@@ -135,15 +136,15 @@ function reformat(property) {
                 </b-col>
                 <b-col md="auto">
                   <b-form-radio-group
-                    v-model="form.computationMethod"
-                    :options="computationMethods"
+                    v-model="form.experimentMethod"
+                    :options="experimentMethods"
                   >
                   </b-form-radio-group>
                 </b-col>
               </b-row>
             </b-col>
             <!-- Input for metadata such as:
-            Computation Name
+            experiment Name
             Tags (optional)
             Email for notification (optional) -->
             <b-col
@@ -156,7 +157,7 @@ function reformat(property) {
                 <b-col>
                   <b-form-group label-cols-md="4" label="Experiment name">
                     <b-form-input
-                      placeholder="New Computation"
+                      placeholder="New experiment"
                       v-model="metadata.name"
                     ></b-form-input>
                   </b-form-group>
@@ -166,6 +167,11 @@ function reformat(property) {
                     <b-form-input
                       type="email"
                       placeholder="example@mail.com"
+                      :state="
+                        metadata.email
+                          ? validateEmail(metadata.email) != null
+                          : null
+                      "
                       v-model="metadata.email"
                     ></b-form-input>
                   </b-form-group>
@@ -211,12 +217,12 @@ function reformat(property) {
                 v-model:data="form.approaches"
                 name="approach"
                 :plural="
-                  (form.computationMethod == 'recommendation'
+                  (form.experimentMethod == 'recommendation'
                     ? 'Recommender'
                     : 'Predictor') + ' approaches'
                 "
                 :options="
-                  form.computationMethod == 'recommendation'
+                  form.experimentMethod == 'recommendation'
                     ? options.recommenders
                     : options.predictors
                 "
@@ -229,7 +235,7 @@ function reformat(property) {
                   <b-col md="auto">
                     <!--User can select the amount of recommendations per user -->
                     <b-form-group
-                      v-if="form.computationMethod == 'recommendation'"
+                      v-if="form.experimentMethod == 'recommendation'"
                       label="Select number of recommendations per user:"
                     >
                       <b-form-input
@@ -269,16 +275,16 @@ function reformat(property) {
                   plural="metrics"
                   :maxK="form.recommendations"
                   :options="
-                    form.computationMethod == 'recommendation'
+                    form.experimentMethod == 'recommendation'
                       ? options.metrics
                       : options.metrics.slice(1)
                   "
-                  :horizontalLayout="horizontalLayout"
+                  :horizontalLayout="!oldMetadata"
                 /></div
             ></b-col>
             <b-col v-if="oldMetadata">
               <!-- Input for metadata such as:
-            Computation Name
+            experiment Name
             Tags (optional)
             Email for notification (optional) -->
               <div class="p-2 m-1 rounded-3 bg-secondary">
@@ -287,7 +293,7 @@ function reformat(property) {
                   <b-col>
                     <b-form-group label="Experiment name">
                       <b-form-input
-                        placeholder="New Computation"
+                        placeholder="New experiment"
                         v-model="metadata.name"
                       ></b-form-input>
                     </b-form-group>

@@ -118,6 +118,7 @@ function setParameter(i, option) {
 function removeGroup(i) {
   // Don't remove first required option
   if (props.required && form.value.groupCount == 1) return
+  const mainOption = form.value.main[i]
 
   form.value.groupCount--
   form.value.main.splice(i, 1)
@@ -128,12 +129,7 @@ function removeGroup(i) {
   // Set visible group to last before deleted one
   visibleGroup.value = i
 
-  // Show toast
-  // TODO delay and variant don't work?
-  toast.show(
-    { title: capitalise(props.name) + ' removed!' },
-    { pos: 'top-right', delay: 800, variant: 'warning' }
-  )
+  showToast(mainOption, 'removed')
 }
 
 // Check whether the option has values/options params (not dynamic params)
@@ -203,7 +199,24 @@ function copyItem(i) {
       })
     )
   }
+  showToast(form.value.main[i], 'copied')
 }
+
+/**
+ *
+ */
+function showToast(object, actionMessage) {
+  // Show toast
+  // TODO delay and variant don't work?
+  toast.show(
+    {
+      title:
+        capitalise(props.name) + ' ' + object.name + ' ' + actionMessage + '!',
+    },
+    { pos: 'top-right', delay: 800, variant: 'warning' }
+  )
+}
+
 //Update the options that cannot be be submitted due to changing experiment type (
 function update() {
   let entries = props.options

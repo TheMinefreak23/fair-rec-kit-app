@@ -6,9 +6,9 @@ Utrecht University within the Software Project course.
 from flask import Flask
 from flask_cors import CORS
 
-from .computation import compute_bp
+from .experiment import compute_bp
 from .music_detail import detail_bp
-from .result import result_bp
+#from .result import result_bp
 from .previous_results import results_bp
 from .result_storage import create_results_overview
 
@@ -45,6 +45,6 @@ def register_blueprints(app):
     :param app: the main app
     """
     app.register_blueprint(compute_bp)
-    app.register_blueprint(result_bp)
+    #app.register_blueprint(result_bp)
     app.register_blueprint(results_bp)
     app.register_blueprint(detail_bp)

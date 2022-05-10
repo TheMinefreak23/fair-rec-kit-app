@@ -1,0 +1,9 @@
+{
+    "features": 10,
+    "iterations": 20,
+    "user_reg": 0.1,
+    "item_reg": 0.1,
+    "damping": 5.0,
+    "random_seed": 1652174155,
+    "method": "cd"
+}

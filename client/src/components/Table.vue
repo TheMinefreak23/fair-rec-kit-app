@@ -1,21 +1,20 @@
 <script setup>
+/*This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import { computed, onMounted, ref } from 'vue'
 import sortBy from 'just-sort-by'
 import { API_URL } from '../api'
 import FormGroupList from './FormGroupList.vue'
-import { emptyFormGroup } from '../helpers/optionsFormatter';
-
-/*This program has been developed by students from the bachelor Computer Science at
-Utrecht University within the Software Project course.
-© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+import { validateEmail, emptyFormGroup } from '../helpers/optionsFormatter'
 
 const emit = defineEmits([
   'loadResult',
   'loadResults',
   'loadMore',
   'paginationSort',
-  'changeColumns',
-  'changeFilters'
+  'changeFilters',
+  'updateHeaders',
 ])
 const props = defineProps({
   overview: Boolean,
@@ -33,7 +32,7 @@ const props = defineProps({
   userOptions: Array,
   itemOptions: Array,
   filters: Array,
-  filterOptions: Array
+  filterOptions: Array,
 })
 
 const caption = ref('')
@@ -41,14 +40,15 @@ const entryAmount = ref(20)
 const deleteModalShow = ref(false)
 const editModalShow = ref(false)
 const viewModalShow = ref(false)
-const changeColumnsModalShow = ref(false)
 const filtersModalShow = ref(false)
+const updateHeadersModalShow = ref(false)
 const checkedColumns = ref([])
 const itemColumns = ref([])
 const userColumns = ref([])
 const filters = ref(emptyFormGroup(false))
 const newName = ref('')
 const newTags = ref('')
+const newTagsList = ref([])
 const newEmail = ref('')
 const metadataStr = ref('')
 const selectedEntry = ref(0)
@@ -75,19 +75,42 @@ const sorted = computed(() => {
 })
 
 onMounted(() => {
-  if (props.caption == "Testcaption")
+  if (props.caption == 'Testcaption')
     console.log('filterOptions', props.filterOptions)
 })
+/**
+ * Turns a string into an array separated by comma's
+ * @param {string} str the string that turns into an array
+ * @return {[string]} array of strings
+ */
+function stringToList(str) {
+  return str.split(',')
+}
+
+/**
+ * returns an empty string if the Email is not valid
+ * @param {string} Email Email to validate
+ * @return {string}
+ */
+function checkEmail(Email) {
+  if (validateEmail(Email)) {
+    return Email
+  } else {
+    return ''
+  }
+}
 
 async function editEntry() {
   //Inform the server of the new values at the selected index
+  newTagsList.value = stringToList(newTags.value)
+  newEmail.value = checkEmail(newEmail.value)
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       index: selectedEntry.value,
       new_name: newName.value,
-      new_tags: newTags.value,
+      new_tags: newTagsList.value,
       new_email: newEmail.value,
     }),
   }
@@ -95,6 +118,11 @@ async function editEntry() {
     console.log('Item edited succesfully')
     emit('loadResults')
   })
+  emptyVmodels()
+}
+
+// Resets the editable values
+function emptyVmodels() {
   newName.value = ''
   newTags.value = ''
   newEmail.value = ''
@@ -134,6 +162,25 @@ async function getResult() {
   metadataStr.value = data.result
 }
 
+async function getNameTagsMail(selectedID) {
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: selectedID }),
+  }
+  fetch(API_URL + props.serverFile3, requestOptions).then(() => {
+    console.log('Metadata succesfully requested')
+    getOldValues()
+  })
+}
+async function getOldValues() {
+  const response = await fetch(API_URL + props.serverFile3)
+  const data = await response.json()
+  newName.value = data.result.metadata.name
+  newTags.value = data.result.metadata.tags.toString()
+  newEmail.value = data.result.metadata.email
+}
+
 /**
  * Sorts data based on index.
  * @param {Int}	i	- i is the column index on which is being sorted.
@@ -162,7 +209,7 @@ function setsorting(i) {
   sortindex.value = i
   emit('paginationSort', i)
 }
-console.log('propsfilteroptions',props.filterOptions)
+console.log('propsfilteroptions', props.filterOptions)
 </script>
 
 <template>
@@ -186,134 +233,135 @@ console.log('propsfilteroptions',props.filterOptions)
     title="Editing results"
     size="lg"
     @ok="editEntry()"
+    @cancel="emptyVmodels()"
   >
     <h6>Please type in the new values. Blank fields will be left unchanged.</h6>
     Name:
-    <b-form-input v-model="newName" placeholder="New name"></b-form-input>
+    <b-form-input v-model="newName" placeholder="Enter new name"></b-form-input>
     <br />
-    Tags:
-    <b-form-input v-model="newTags" placeholder="New tags"></b-form-input>
+    Tags: (separate tags using a single comma)
+    <b-form-input v-model="newTags" placeholder="Enter new tags"></b-form-input>
     <br />
     E-mail:
+    <p v-if="validateEmail(newEmail)" style="color: green">
+      This is E-mail is valid :)
+    </p>
+    <p v-else-if="newEmail != '' && newEmail != null" style="color: red">
+      This is not a valid E-mail :(
+    </p>
     <b-form-input
       v-model="newEmail"
-      placeholder="New e-mail"
+      placeholder="Enter new e-mail"
       type="email"
     ></b-form-input>
     <br />
+    <!--
     Color (this doesn't do anything):
-    <!-- I may have gotten a little carried away -->
     <b-form-input type="color"></b-form-input>
-    <br />
-    Date (this doesn't do anything):
-    <b-form-input type="date"></b-form-input>
-    <br />
-    Credit card number (this doesn't do anything):
-    <b-form-input type="password"></b-form-input>
+    <br />-->
   </b-modal>
 
-<!-- Shows the metadata of the designated entry -->
+  <!-- Shows the metadata of the designated entry -->
   <b-modal id="view-modal" v-model="viewModalShow" title="Metadata" ok-only>
     <h5>Here is the metadata:</h5>
     <p>{{ metadataStr }}</p>
   </b-modal>
-  
+
   <!-- Modal used for changing the headers of the user recommendations table -->
-  <b-modal 
+  <b-modal
     id="change-columns-modal"
-    v-model="changeColumnsModalShow"
+    v-model="updateHeadersModalShow"
     title="Change columns"
-    @ok="$emit('changeColumns', checkedColumns, userColumns, itemColumns)"
-    >
-    <p>Check the extra columns you want to be shown</p>
-    <p>{{headerOptions}}</p>
+    @ok="$emit('updateHeaders', checkedColumns, userColumns, itemColumns)"
+  >
+    <p>Select the extra headers you want to be shown</p>
+    <p>{{ headerOptions }}</p>
     <p>General:</p>
-    <div class="form-check form-switch"
+    <div
+      class="form-check form-switch"
       v-for="(header, index) in headerOptions"
       :key="header"
     >
-      <input 
+      <input
         v-model="checkedColumns"
-        class="form-check-input" 
-        type="checkbox" 
-        :value="header.name" 
-        :id="header.name">
-      <label 
-        class="form-check-label" 
-        :id="header.name">
+        class="form-check-input"
+        type="checkbox"
+        :value="header.name"
+        :id="header.name"
+      />
+      <label class="form-check-label" :id="header.name">
         {{ header.name }}
       </label>
     </div>
 
-    <p>User specific: </p>
-    <div class="form-check form-switch"
+    <p>User specific:</p>
+    <div
+      class="form-check form-switch"
       v-for="(header, index) in userOptions"
       :key="header"
     >
-      <input 
+      <input
         v-model="userColumns"
-        class="form-check-input" 
-        type="checkbox" 
-        :value="header.name" 
-        :id="header.name">
-      <label 
-        class="form-check-label" 
-        :id="header.name">
+        class="form-check-input"
+        type="checkbox"
+        :value="header.name"
+        :id="header.name"
+      />
+      <label class="form-check-label" :id="header.name">
         {{ header.name }}
       </label>
     </div>
 
-    <p>Item specific: </p>
-    <div class="form-check form-switch"
+    <p>Item specific:</p>
+    <div
+      class="form-check form-switch"
       v-for="(header, index) in itemOptions"
       :key="header"
     >
-      <input 
+      <input
         v-model="itemColumns"
-        class="form-check-input" 
-        type="checkbox" 
-        :value="header.name" 
-        :id="header.name">
-      <label 
-        class="form-check-label" 
-        :id="header.name">
+        class="form-check-input"
+        type="checkbox"
+        :value="header.name"
+        :id="header.name"
+      />
+      <label class="form-check-label" :id="header.name">
         {{ header.name }}
       </label>
     </div>
-
   </b-modal>
   <b-modal
     id="change-columns-modal"
     v-model="filtersModalShow"
     title="Change filters"
     @ok="$emit('changeFilters', filters)"
-    >
+  >
     <FormGroupList
       v-model:data="filters"
       name="filter"
       plural="filters"
       :options="filterOptions"
       id="filters"
-      />
+    />
   </b-modal>
 
-  
-
   <b-table-simple hover striped responsive caption-top>
-    
     <caption>
       {{
         props.caption
       }}
-      
+
       <template v-if="expandable">
-      <div class="float-end">
-        <b-button @click="changeColumnsModalShow = !changeColumnsModalShow" class="m-1">
-          Change Headers
-        </b-button>
-        <b-button @click="filtersModalShow = !filterModalShow" class="m-1">
-          Filters
-        </b-button>
+        <div class="float-end">
+          <b-button
+            @click="updateHeadersModalShow = !updateHeadersModalShow"
+            class="m-1"
+          >
+            Change Headers
+          </b-button>
+          <b-button @click="filtersModalShow = !filterModalShow" class="m-1">
+            Filters
+          </b-button>
         </div>
       </template>
     </caption>
@@ -332,13 +380,13 @@ console.log('propsfilteroptions',props.filterOptions)
       </b-tr>
       <b-tr>
         <b-th v-if="overview"></b-th>
-        <b-th v-for="(subheader, index) in subheaders" :key="subheader">
+        <b-th v-for="subheader in subheaders" :key="subheader">
           {{ subheader }}
         </b-th>
       </b-tr>
     </b-thead>
     <b-tbody>
-      <b-tr v-for="(item, index) of sorted" :key="item"
+      <b-tr v-for="(item, index) in sorted" :key="item"
         ><b-td v-if="overview">
           <b-button @click="$emit('loadResult', item.id)">View result</b-button>
         </b-td>
@@ -355,7 +403,11 @@ console.log('propsfilteroptions',props.filterOptions)
           <b-button
             v-if="overview"
             pill
-            @click=";(editModalShow = !editModalShow), (selectedEntry = index)"
+            @click="
+              ;(editModalShow = !editModalShow),
+                (selectedEntry = index),
+                getNameTagsMail(item.id)
+            "
             >Edit</b-button
           >
           <b-button
@@ -401,6 +453,4 @@ console.log('propsfilteroptions',props.filterOptions)
     type="number"
     >20</b-form-input
   >
-
-  
 </template>
