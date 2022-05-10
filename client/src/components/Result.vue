@@ -40,6 +40,7 @@ const generalHeaders = ref([])
 const userHeaderOptions = ref([])
 const itemHeaderOptions = ref([])
 const generalHeaderOptions = ref([])
+const results_data = ref({})
 
 watch(
   () => props.result,
@@ -57,9 +58,19 @@ onMounted(() => {
 })
 
 // GET request: Get available options for selection from server
-async function getHeaders() {
-  const response = await fetch(API_URL + '/all-results/headers')
+async function getHeaders(index, file) {
+  //TODO replace mock variables in body
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-type': 'application/json' },
+    body: JSON.stringify({
+      index: index,
+      location: file,
+    }),
+  }
+  const response = await fetch(API_URL + '/all-results/headers', requestOptions)
   const data = await response.json()
+  
 
   generalHeaderOptions.value = makeHeaders(data.headers)
   itemHeaderOptions.value = makeHeaders(data.itemHeaders)
@@ -79,7 +90,7 @@ async function setRecs() {
   }
   fetch(API_URL + '/all-results/set-recs', requestOptions).then(() => {
     getUserRecs()
-    getHeaders()
+    getHeaders(0, '0_Foobar/run_0/overview.json')
   })
 }
 
@@ -103,7 +114,7 @@ async function loadEvaluations() {
 async function getEvaluations() {
   const response = await fetch(API_URL + '/all-results/result-by-id')
   console.log('succesfully retrieved evaluation data.')
-  const results_data = await response.json()
+  results_data = await response.json()
   console.log(JSON.stringify(results_data))
 }
 

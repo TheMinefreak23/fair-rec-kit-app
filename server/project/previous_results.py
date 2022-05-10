@@ -109,15 +109,23 @@ def user_result():
     # return {'results': dfSubset.to_json(orient='records'), 'caption': 'hellofriend'}
     return df_subset.to_json(orient='records')
 
-@results_bp.route('/headers', methods=['GET'])
+@results_bp.route('/headers', methods=['POST'])
 def headers():
+    info = request.json
+    index = info.get("index", 0)
+    file = info.get("location", "")
     with open('project/headers.json') as j:
-        jsonfile = json.load(j)
-
-    result = jsonfile['LFM-1B']
+        headers = json.load(j)  
+    with open('../server/mock/' + file) as j2:
+        overview2 = json.load(j2)
+    
+    dataset = overview2['overview'][index]['name'].split('_')[0]
+    #print(type(dataset))
+    result = headers[dataset]
     j.close()
+    j2.close()
 
-    print(result)
+    #print(result)
 
     return result
 

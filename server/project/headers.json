@@ -11,24 +11,24 @@
     "itemHeaders": ["artist_name"]
   },
   "LFM-360K": {
-    "user_item": ["rating"],
-    "user": [
+    "headers": ["rating"],
+    "userHeaders": [
       "user_sha",
       "user_gender",
       "user_age",
       "user_country",
       "user_signup"
     ],
-    "item": ["artist_name"]
+    "itemHeaders": ["artist_name"]
   },
   "ML-25M": {
-    "user_item": ["rating"],
-    "item": ["movie_title", "movie_genres"]
+    "headers": ["rating"],
+    "itemHeaders": ["movie_title", "movie_genres"]
   },
   "ML-100K": {
-    "user_item": ["rating"],
-    "user": ["user_age", "user_gender", "user_occupation", "user_zip code"],
-    "item": [
+    "headers": ["rating"],
+    "userHeaders": ["user_age", "user_gender", "user_occupation", "user_zip code"],
+    "itemHeaders": [
       "movie_title",
       "movie_release date",
       "movie_video release date",
