@@ -66,9 +66,9 @@ Tabs:
 <name> Active Computations </name>
 <description> 
 kl
-<pre>
-  <code> p { color: red } </code>
-  <code> p { color: blue } </code>
+<pre class="bg-white">
+  <code>p { color: red }
+  p { color: blue } </code>
 </pre>
 nlmlmloloo
 <p>jnl</p>
