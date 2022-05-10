@@ -280,8 +280,8 @@ function shortGroupDescription(i) {
       position="position-fixed"
     ></b-container>
     <b-row>
-      <h3 class="text-center text-white">
-        <b-card no-body class="mb-1 bg-dark">
+      <h3 class="text-center text-white mb-0">
+        <b-card no-body class="mb-0 bg-dark">
           {{ capitalise(plural) }}
           <!--Collapsable group list toggle button-->
           <b-button
@@ -295,7 +295,7 @@ function shortGroupDescription(i) {
           </b-button>
         </b-card>
       </h3>
-      <p>{{ description && capitalise(description) }}</p>
+      <!-- <p>{{ description && capitalise(description) }}</p> -->
     </b-row>
     <!--TODO b-collapse doesn't work-->
     <!--Collapsable group list-->
@@ -395,6 +395,7 @@ function shortGroupDescription(i) {
                                     v-if="form.main[i - 1]"
                                     @click="copyItem(i - 1)"
                                     variant="primary"
+                                    class="mt-1"
                                     >Copy {{ name }}...</b-button
                                   >
                                   <template #first>
@@ -572,8 +573,9 @@ function shortGroupDescription(i) {
                                 .dynamic"
                               :key="option"
                             >
-                              <b-card class="mb-1 bg-secondary">
+                              <b-card class="mb-1 bg-secondary p-0">
                                 <FormGroupList
+                                  class="p-0"
                                   v-model:data="form.lists[i - 1][index]"
                                   :name="option.name"
                                   :plural="option.plural"
@@ -599,8 +601,9 @@ function shortGroupDescription(i) {
                               .dynamic"
                             :key="option"
                           >
-                            <b-card class="mb-1 bg-secondary">
+                            <b-card class="mb-1 bg-secondary p-0">
                               <FormGroupList
+                                class="p-0"
                                 v-model:data="form.lists[i - 1][index]"
                                 :name="option.name"
                                 :plural="option.plural"
@@ -628,8 +631,8 @@ function shortGroupDescription(i) {
       </b-collapse>
     </b-row>
     <b-row>
-      <h3>
-        <b-card no-body class="my-1">
+      <h3 class="m-0">
+        <b-card no-body class="mt-1">
           <b-button
             @click="
               form.groupCount++,
