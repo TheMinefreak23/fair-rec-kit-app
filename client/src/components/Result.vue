@@ -12,16 +12,24 @@ import { API_URL } from '../api'
 const props = defineProps({ headers: Array, result: Object })
 
 //Default headers for recommendation experiments.
-const headers_rec = ref([{ name: 'Rank'}, { name: 'User' }, { name: 'Item' }, { name: 'Score' }])
+const headers_rec = ref([
+  { name: 'Rank' },
+  { name: 'User' },
+  { name: 'Item' },
+  { name: 'Score' },
+])
 //Default headers for prediction experiments
-const headers_pre = ref([{ name: 'User' }, { name: 'Item' }, { name: 'Predicted Score' }])
+const headers_pre = ref([
+  { name: 'User' },
+  { name: 'Item' },
+  { name: 'Predicted Score' },
+])
 
 const experiment_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
 const data = ref([])
-const mockdataID = 1650539935
-const mockdataRunIndex = ref(0);
-const mockdataPairIndex = ref(1);
+const mockdataRunIndex = ref(0)
+const mockdataPairIndex = ref(0)
 const startIndex = ref(0)
 const index = ref(0)
 const ascending = ref(true)
@@ -42,6 +50,8 @@ watch(
 )
 
 onMounted(() => {
+  console.log('result', props.result)
+  console.log('result id', props.result.id)
   setRecs()
   loadEvaluations()
 })
@@ -50,7 +60,7 @@ onMounted(() => {
 async function getHeaders() {
   const response = await fetch(API_URL + '/all-results/headers')
   const data = await response.json()
-  
+
   generalHeaderOptions.value = makeHeaders(data.headers)
   itemHeaderOptions.value = makeHeaders(data.itemHeaders)
   userHeaderOptions.value = makeHeaders(data.userHeaders)
@@ -62,9 +72,9 @@ async function setRecs() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      id: mockdataID,
+      id: props.result.id,
       runid: mockdataRunIndex.value,
-      pairid: mockdataPairIndex.value
+      pairid: mockdataPairIndex.value,
     }),
   }
   fetch(API_URL + '/all-results/set-recs', requestOptions).then(() => {
@@ -77,21 +87,24 @@ async function setRecs() {
 async function loadEvaluations() {
   const requestOptions = {
     method: 'POST',
-    headers: {'Content-type': 'application/json' },
-    body: JSON.stringify({id: props.result.id })
+    headers: { 'Content-type': 'application/json' },
+    body: JSON.stringify({ id: props.result.id }),
   }
-  const response = await fetch(API_URL + '/all-results/result-by-id', requestOptions).then(() => {
-    console.log("succesful POST request to API to retrieve evaluation data")
+  const response = await fetch(
+    API_URL + '/all-results/result-by-id',
+    requestOptions
+  ).then(() => {
+    console.log('succesful POST request to API to retrieve evaluation data')
     getEvaluations()
-    })
+  })
 }
 
 //GET request: Ask server for currently loaded evaluations
 async function getEvaluations() {
-    const response = await fetch(API_URL + '/all-results/result-by-id')
-    console.log("succesfully retrieved evaluation data.")
-    const results_data = await response.json()
-    console.log(JSON.stringify(results_data))
+  const response = await fetch(API_URL + '/all-results/result-by-id')
+  console.log('succesfully retrieved evaluation data.')
+  const results_data = await response.json()
+  console.log(JSON.stringify(results_data))
 }
 
 //POST request: Ask server for next part of user recommendation table.
@@ -150,7 +163,6 @@ function paginationSort(indexVar) {
   getUserRecs()
 }
 
-
 /**
  * Update headers shown in user recommendations
  * @param {Array}   generalHeader  - list of headers that apply to the user-item pair.
@@ -164,18 +176,17 @@ function updateHeaders(generalHeader, userHeader, itemHeader) {
   getUserRecs()
 }
 
-
 /**
  * convert list of header names into supported header format, capitalize and remove underscores
  * @param {Array}   headers  - list of headers.
  */
 function makeHeaders(headers) {
-  for(var i=0; i<headers.length; i++){
-    headers[i] = capitalizeFirstLetter(headers[i].replace("_", " "))
+  for (var i = 0; i < headers.length; i++) {
+    headers[i] = capitalizeFirstLetter(headers[i].replace('_', ' '))
   }
   return headers.map((header) => ({
-        name: header,
-      }))
+    name: header,
+  }))
 }
 
 /**
@@ -183,9 +194,8 @@ function makeHeaders(headers) {
  * @param {int}   string  - the string that needs to be capitalized.
  */
 function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
+  return string.charAt(0).toUpperCase() + string.slice(1)
 }
-
 </script>
 
 <template>
@@ -253,7 +263,9 @@ function capitalizeFirstLetter(string) {
           expandable
           @paginationSort="(i) => paginationSort(i)"
           @loadMore="(increase, amount) => loadMore(increase, amount)"
-          @updateHeaders="(general, user, item) => updateHeaders(general, user, item)"
+          @updateHeaders="
+            (general, user, item) => updateHeaders(general, user, item)
+          "
         />
       </div>
       <!--</template>-->
