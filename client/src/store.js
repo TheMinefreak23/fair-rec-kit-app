@@ -12,8 +12,8 @@ function mockResult() {
     headers: mockdata.headers,
   }
   return {
+    id: 0,
     metadata: {
-      id: 0,
       name: 'computation1',
       tags: ['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '],
     },
