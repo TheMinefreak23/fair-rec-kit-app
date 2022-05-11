@@ -103,6 +103,7 @@ function goToResult() {
   </div>
   <!-- Footer -->
   <div class="bg-dark py-1 mt-auto">
+    <p class="text-white my-0 mt-2 pb-2 text-center">&copy; Utrecht University (ICS).</p>
     <div class="container text-center text-white py-2">
       <!-- Github -->
       <a href="#" class="btn btn-outline-light btn-floating m-1 mx-3 rounded-pill border-2 p-0" role="button">
@@ -135,7 +136,7 @@ function goToResult() {
         </svg>
       </a>       
     </div>
-    <p class="text-white my-0 pb-2 text-center">&copy; Utrecht University (ICS).</p>
+
   </div>
 </div>
 </template>
