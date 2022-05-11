@@ -6,6 +6,7 @@ import { computed, ref } from 'vue'
 import sortBy from 'just-sort-by'
 import { API_URL } from '../api'
 import { validateEmail } from '../helpers/optionsFormatter'
+import { formatMetadata } from '../helpers/metadataFormatter'
 
 const emit = defineEmits([
   'loadResult',
@@ -149,7 +150,7 @@ async function getMetadata(selectedID) {
 async function getResult() {
   const response = await fetch(API_URL + props.serverFile3)
   const data = await response.json()
-  metadataStr.value = data.result
+  metadataStr.value = formatMetadata(data.result)
 }
 
 async function getNameTagsMail(selectedID) {
@@ -253,7 +254,7 @@ function setsorting(i) {
   <!-- Shows the metadata of the designated entry -->
   <b-modal id="view-modal" v-model="viewModalShow" title="Metadata" ok-only>
     <h5>Here is the metadata:</h5>
-    <p>{{ metadataStr }}</p>
+    <span style="white-space: pre-wrap">{{ metadataStr}}</span>
   </b-modal>
 
   <!-- Modal used for changing the headers of the user recommendations table -->
@@ -381,7 +382,7 @@ function setsorting(i) {
             v-if="overview"
             pill
             @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
-            >View</b-button
+            >View Metadata</b-button
           >
           <template v-if="removable"> </template>
           <b-button
