@@ -46,7 +46,6 @@ def result_by_id(result_id):
     Args:
         result_id(int): the result id
     """
-    print(":3c " + str(result_id))
     # TODO DEV
     results_root_folder = RESULTS_ROOT_FOLDER
     if result_id == 0:
@@ -115,14 +114,11 @@ def get_rec_path(evaluation_id, runid, pairid):
 
 def id_to_name(json_data, result_id):
     current_result_overview_id = -1
-    print(":3 " + str(result_id))
     print(str(json_data))
     # Filter: Loop through all results and find the one with the matching ID.
     for iteration_id in range(len(json_data['all_results'])):
         if int(json_data['all_results'][iteration_id]['timestamp']['stamp']) == result_id:
-            print("owo " + str(iteration_id) + " uwu " + str(result_id))
             current_result_overview_id = iteration_id
-    print("uwuwuwuwuwuw " + str(current_result_overview_id))
     current_name = json_data['all_results'][current_result_overview_id]['metadata']['name']
     return current_name
 
