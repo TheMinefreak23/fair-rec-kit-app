@@ -46,12 +46,13 @@ def result_by_id(result_id):
     Args:
         result_id(int): the result id
     """
+    print(":3c " + str(result_id))
     # TODO DEV
     results_root_folder = RESULTS_ROOT_FOLDER
     if result_id == 0:
         results_root_folder = 'mock/'
 
-    results_overview = load_json(RESULTS_OVERVIEW_PATH)
+    results_overview = load_json(results_root_folder + "results_overview.json")
     #calculation_id = results_overview['all_results'][result_id]['timestamp']['stamp']
     calculation_id = result_id # TODO replace calculation_id with result_id?
     current_name = id_to_name(results_overview, calculation_id)
@@ -63,7 +64,7 @@ def result_by_id(result_id):
         run_overview = load_json(subdir + "/overview.json")
         run_data = {'index': run_overview_name, 'results': []}
         # loops through individual results
-        for run_result in run_overview["overview"]:
+        for run_result in run_overview['overview']:
             evaluation_path_full = run_result['evaluation_path']
             ratings_settings_path_full = run_result['ratings_settings_path']
             evaluation_data = {}
@@ -78,6 +79,8 @@ def result_by_id(result_id):
                 header=None).to_dict(orient='records')
             result_data = {
                 'name': run_result['name'],
+                'dataset': run_result['dataset'],
+                'recommender_system': run_result['recommender_system'],
                 'evaluations': evaluation_data,
                 'ratings_settings': ratings_settings_data}
             run_data['results'].append(result_data)
@@ -112,10 +115,14 @@ def get_rec_path(evaluation_id, runid, pairid):
 
 def id_to_name(json_data, result_id):
     current_result_overview_id = -1
+    print(":3 " + str(result_id))
+    print(str(json_data))
     # Filter: Loop through all results and find the one with the matching ID.
     for iteration_id in range(len(json_data['all_results'])):
-        if json_data['all_results'][iteration_id]['timestamp']['stamp'] == result_id:
+        if int(json_data['all_results'][iteration_id]['timestamp']['stamp']) == result_id:
+            print("owo " + str(iteration_id) + " uwu " + str(result_id))
             current_result_overview_id = iteration_id
+    print("uwuwuwuwuwuw " + str(current_result_overview_id))
     current_name = json_data['all_results'][current_result_overview_id]['metadata']['name']
     return current_name
 
