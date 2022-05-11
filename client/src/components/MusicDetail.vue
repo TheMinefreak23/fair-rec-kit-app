@@ -2,12 +2,26 @@
 import { onMounted, ref } from 'vue'
 import { API_URL } from '../api'
 import { getSpotifyToken, getSongInfo } from '../helpers/songInfo'
+import { Bar } from 'vue-chartjs'
+import {
+  Chart as ChartJS,
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+} from 'chart.js'
+
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
 const token = ref('test')
 const tracks = ref([])
 const track = ref({})
 const trackModalShow = ref(false)
 const query = ref({ track: 'orion', artist: 'metallica' })
+const songInfo = ref()
+const chartInfo = ref({labels: [], datasets : []})
 
 onMounted(async () => {
   token.value = await getSpotifyToken()
@@ -16,14 +30,33 @@ onMounted(async () => {
 
 // Get music detail info
 async function getInfo() {
-  const songInfo = await getSongInfo(
+    songInfo.value = await getSongInfo(
     token.value,
     query.value.track,
     query.value.artist
   )
-  console.log("Song Info", songInfo)
-  tracks.value = await songInfo.Spotify
+  console.log("Song Info", songInfo.value)
+  tracks.value = await songInfo.value.Spotify
   track.value = tracks.value.items[0]
+  const highlevelFeatures = await songInfo.value.AcousticBrainz[songInfo.value.LastFM.track.mbid][0]['highlevel']
+  console.log('highlevel', highlevelFeatures)
+  await generateChart(await highlevelFeatures)
+  console.log(chartInfo)
+}
+
+
+
+async function generateChart(highlevelFeatures) {
+  const moods = ['acoustic', 'aggressive', 'electronic', 'happy', 'party', 'relaxed', 'sad']
+  const data = []
+  for(const mood of moods){
+    const tagname = 'mood_'+ mood
+    const feature = highlevelFeatures[(tagname)]
+    console.log('value', feature)
+    data.push(feature.all[mood])
+  }
+  chartInfo.value.datasets[0] = ({'label': 'Attributes','backgroundColor' : "#000080", 'data': data})
+  chartInfo.value.labels = moods
 }
 </script>
 
@@ -95,8 +128,15 @@ async function getInfo() {
                 </p>
                 <p>Album: {{ track.album.name }}</p>
                 <p>Attributes (graph of danceability etc): TODO</p>
-
-                <p>..:</p>
+                <Bar 
+                  :chartData="chartInfo"
+                >
+                </Bar>
+                <p v-html="songInfo.LastFM.track.wiki.summary"></p>
+                <p>LastFM tags:</p>
+                <div v-for="item in songInfo.LastFM.track.toptags.tag">
+                  <a href="item.url">{{item.name}}</a>
+                </div>
               </b-col>
               <b-col>
                 <!--Using medium sized image-->
