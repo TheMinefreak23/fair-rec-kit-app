@@ -2,60 +2,49 @@
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { API_URL } from '../api'
 import Result from './Result.vue'
 import VDismissButton from './VDismissButton.vue'
 import PreviousResults from './PreviousResults.vue'
 import { store, addResult, removeResult } from '../store'
 import { formatResult } from '../helpers/resultFormatter'
+import mockdata from '../../../server/mock/1647818279_HelloWorld/results-table.json'
 
 const emit = defineEmits(['goToResult', 'toast'])
 const showResultModal = ref(false)
 const currentTab = ref(0)
-const fetchResult = ref(false)
 
-// Request latest calculation when the queue is updated
 watch(
-  () => store.queue,
-  (newQueue, oldQueue) => {
-    // Only request if the queue length has decreased
-    // (An experiment has finished)
-    if (newQueue.length < oldQueue.length) {
-      // Long polling: Try to get the finished result every interval
-      const interval = 1000 // Every second
-      fetchResult.value = true
-      setInterval(() => getCalculation(), interval)
+  () => store.currentExperiment,
+  // New result added
+  (newState, oldState) => {
+    if (!newState && oldState) {
+      emit('toast')
       currentTab.value = 0
     }
   }
 )
 
-/**
- * GET request: Ask server for latest calculation
- */
-async function getCalculation() {
-  if (fetchResult.value) {
-    console.log('fetching result')
-    try {
-      const response = await fetch(API_URL + '/experiment/calculation')
-      const data = await response.json()
+onMounted(() => (store.currentResults = [mockResult()]))
 
-      if (data.status == 'done') {
-        console.log('done', data)
-        addResult(formatResult(data.calculation))
-        emit('toast')
-        fetchResult.value = false
-        store.experimentRunning = false
-        store.currentExperiment = null
-      } else if (data.status == 'busy') {
-        console.log('busy', data)
-        store.experimentRunning = true
-      }
-    } catch (e) {
-      console.log(e) // TODO better error handling, composable
-      fetchResult.value = false
-    }
+// Mockdata result
+function mockResult() {
+  const testcaption = 'Dataset: LFM-1b, Algorithm: ALS'
+
+  // Add mockdata result to current results
+  const mock = {
+    caption: testcaption,
+    results: mockdata.body,
+    headers: mockdata.headers,
+  }
+  return {
+    id: 0,
+    metadata: {
+      name: 'computation1',
+      tags: ['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '],
+    },
+    result: [mock, mock],
   }
 }
 
@@ -102,18 +91,15 @@ function closeResult(index) {
           </button>
         </div>
         <div class="border">
-          <template v-if="[...store.currentResults].length > 0">
+          <template v-if="store.currentResults.length > 0">
             <b-tabs v-model="currentTab" card content-class="mt-3">
               <!-- Show opened results in tabs.-->
-              <b-tab
-                v-for="(result, index) in [...store.currentResults]"
-                :key="result.id"
-              >
+              <b-tab v-for="(result, index) in store.currentResults">
                 <template #title>
                   Result {{ result.metadata.name }}
                   <VDismissButton @click.stop="closeResult(index)" />
                 </template>
-                <Result :result="result"
+                <Result :result="result" :key="result.id"
               /></b-tab>
             </b-tabs>
           </template>

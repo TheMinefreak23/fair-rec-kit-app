@@ -88,7 +88,7 @@ def result_by_id(result_id):
         data['runs'].append(run_data)
 
     global current_result
-    current_result = json.dumps(data)
+    current_result = data
 
     # print('current result',current_result)
 

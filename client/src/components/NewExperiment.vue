@@ -5,7 +5,7 @@ Utrecht University within the Software Project course.
 import { onMounted, ref } from 'vue'
 import FormGroupList from './FormGroupList.vue'
 import { sendMockData } from '../test/mockExperimentOptions.js'
-import { store } from '../store.js'
+import { store, getCalculation } from '../store.js'
 import { API_URL } from '../api'
 import { emptyOption } from '../helpers/optionsFormatter'
 import { emptyFormGroup } from '../helpers/optionsFormatter'
@@ -71,6 +71,8 @@ async function sendToServer() {
   console.log('sendToServer() queue', store.queue)
   // Switch to queue
   store.currentTab = 1
+  const interval = 1000
+  store.resultPoll = setInterval(getCalculation, interval)
 }
 
 //Declare default values of the form

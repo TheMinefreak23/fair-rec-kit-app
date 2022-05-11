@@ -4,7 +4,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
 import Table from './Table.vue'
-import { onMounted, ref, watch } from 'vue'
+import { onActivated, onMounted, onUpdated, ref, watch } from 'vue'
 import { emptyFormGroup } from '../helpers/optionsFormatter'
 
 import mockdata from '../../../server/mock/1647818279_HelloWorld/results-table.json'
@@ -45,25 +45,12 @@ const userHeaderOptions = ref([])
 const itemHeaderOptions = ref([])
 const generalHeaderOptions = ref([])
 
-watch(
-  () => props.result,
-  async (newResult) => {
-    console.log(
-      'new result ID',
-      newResult.id,
-      'for result',
-      newResult.metadata.name
-    )
-    setRecs()
-  }
-)
-
-onMounted(async () => {
-  await setRecs()
-  console.log('availableFilters', availableFilters.value)
+onMounted(() => {
   console.log('result', props.result)
   console.log('result id', props.result.id)
-  loadEvaluations()
+  setRecs()
+  console.log('availableFilters', availableFilters.value)
+  //loadEvaluations()
 })
 
 // GET request: Get available options for selection from server
@@ -92,12 +79,12 @@ async function setRecs() {
     API_URL + '/all-results/set-recs',
     requestOptions
   )
-  console.log('resultfetch', response)
+  //console.log('resultfetch', response)
   if (response.status == '200') {
     const data = await response.json()
-    console.log('data', data)
+    //console.log('data', data)
     availableFilters.value = data.availableFilters
-    console.log('resultfetch', response)
+    //console.log('resultfetch', response)
     await getUserRecs()
     getHeaders()
   }
@@ -123,8 +110,8 @@ async function loadEvaluations() {
 async function getEvaluations() {
   const response = await fetch(API_URL + '/all-results/result-by-id')
   console.log('succesfully retrieved evaluation data.')
-  const results_data = await response.json()
-  console.log(JSON.stringify(results_data))
+  const resultsData = await response.json()
+  console.log('results data', resultsData)
 }
 
 //POST request: Ask server for next part of user recommendation table.

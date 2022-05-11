@@ -116,11 +116,11 @@ function callToast() {
         <template v-slot:title>
           <div
             :style="{
-              color: store.experimentRunning ? 'red' : 'black',
-              backgroundColor: store.experimentRunning ? 'yellow' : 'white',
+              color: store.currentExperiment ? 'red' : 'black',
+              backgroundColor: store.currentExperiment ? 'yellow' : 'white',
             }"
           >
-            <b-spinner v-if="store.experimentRunning" small></b-spinner>
+            <b-spinner v-if="store.currentExperiment" small></b-spinner>
             <VCheckmark v-else />
             Active Experiments
           </div>

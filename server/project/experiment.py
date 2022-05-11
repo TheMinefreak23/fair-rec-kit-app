@@ -160,7 +160,10 @@ def calculate():
         settings = data.get('settings')
         # print(data)
         append_queue(data.get('metadata'), settings)
-        print('queue',experiment_queue)
+
+        calculate_first()
+
+        print('queue', experiment_queue)
         # response = {'status': 'success'}
         response = {'queue': experiment_queue }
     else:
@@ -206,9 +209,9 @@ def queue():
     print('queue:', experiment_queue)
     response['queue'] = experiment_queue
     return response
-    """
     if experiment_queue and not experiment_running:
         calculate_first()
+    """
     return { 'queue': experiment_queue }
 
 

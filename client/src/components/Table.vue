@@ -31,7 +31,7 @@ const props = defineProps({
   headerOptions: Array,
   userOptions: Array,
   itemOptions: Array,
-  filters: Array,
+  filters: Object,
   filterOptions: Array,
 })
 
@@ -74,10 +74,10 @@ const sorted = computed(() => {
   else return props.results
 })
 
-onMounted(() => {
+/*onMounted(() => {
   if (props.caption == 'Testcaption')
     console.log('filterOptions', props.filterOptions)
-})
+})*/
 /**
  * Turns a string into an array separated by comma's
  * @param {string} str the string that turns into an array

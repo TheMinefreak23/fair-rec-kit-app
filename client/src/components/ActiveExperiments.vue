@@ -30,6 +30,7 @@ onMounted(() => {
   getQueue()
 })
 
+/*
 //Reload the queue when a new experiment is added
 watch(
   () => store.queue,
@@ -40,7 +41,7 @@ watch(
       getQueue()
     }
   }
-)
+)*/
 
 async function getQueue() {
   const response = await fetch(API_URL + '/experiment/queue')
