@@ -33,10 +33,10 @@ onMounted(() => {
 //Reload the queue when a new experiment is added
 watch(
   () => store.queue,
-  (data) => {
-    console.log('queue watch new queue:', data)
+  (newQueue) => {
+    console.log('queue watch new queue:', newQueue)
     //console.log('queue watch old queue:', oldQueue)
-    if (data.length != 0) {
+    if (newQueue.length != 0) {
       getQueue()
     }
   }

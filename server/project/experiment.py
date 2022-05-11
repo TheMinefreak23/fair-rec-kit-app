@@ -82,6 +82,9 @@ def run_experiment(experiment):
         global experiment_running
         experiment_running = False
         print('yay')
+        # Calculate next item in queue
+        if experiment_queue:
+            calculate_first()
 
 
     events = {
@@ -191,7 +194,6 @@ def queue():
         experiment_thread.start()
     else:
         print('error') 
-    """
     response = {}
     #response['updated'] = False
 
@@ -204,6 +206,10 @@ def queue():
     print('queue:', experiment_queue)
     response['queue'] = experiment_queue
     return response
+    """
+    if experiment_queue and not experiment_running:
+        calculate_first()
+    return { 'queue': experiment_queue }
 
 
 # Test cancel experiment
