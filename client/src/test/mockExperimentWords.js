@@ -30,7 +30,7 @@ async function sendMockData() {
   }
   console.log(form)
   const response = await fetch(
-    API_URL + '/computation/calculation',
+    API_URL + '/experiment/calculation',
     requestOptions
   )
 

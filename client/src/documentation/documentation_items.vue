@@ -26,8 +26,7 @@ Some comment or notes...
  * Adding new <tags>, like <button>, should be manually added to Documentation.vue's template.
  * 
  */
-export const doctext = 
-`
+export const doctext = `
 # Documentation items
 Item list for in documentation tab
 
@@ -45,11 +44,11 @@ WebApp to compare different recommender approaches. Developed by RecCoons, from 
 Tabs:
 
 -{
-<name> New Computation </name>
+<name> New Experiment </name>
 <description>
-<p>In this tab you can start a new computation of your desired datasets and the recommender approach. There are a few well-known datasets built-in, but custom datasets can be uploaded as well. After having chosen the datasets, one or more filters can be applied wat doet dit?.</p>
+<p>In this tab you can start a new experiment of your desired datasets and the recommender approach. There are a few well-known datasets built-in, but custom datasets can be uploaded as well. After having chosen the datasets, one or more filters can be applied wat doet dit?.</p>
 <p>Next, add the recommender approaches that you want compared and select the number of recommendation per user wat doet dit?. Then, the train-test ratio and the different metrics to compare the performance.</p>
-<p>Lastly, enter the metadata to identify your computation. After pressing Send, this data will be added to the queue in Active Computations and send to the server to be executed.</p>
+<p>Lastly, enter the metadata to identify your experiment. After pressing Send, this data will be added to the queue in Active Experiments and send to the server to be executed.</p>
 <p>For more information about each step, refer to the list below:</p>
 <ul>
 <li><a href="#LFM2B">Datasets</li>
@@ -63,7 +62,7 @@ Tabs:
 }-
 
 -{
-<name> Active Computations </name>
+<name> Active Experiments </name>
 <description> 
 kl
 <pre class="bg-white">
@@ -339,6 +338,4 @@ t. Quae rerum qui
 <name> Meta </name>
 }-
 `
-;
-
 </script>
