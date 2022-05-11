@@ -136,7 +136,7 @@ async function generateChart(highlevelFeatures) {
                 <p v-html="songInfo.LastFM.track.wiki.summary"></p>
                 <p>LastFM tags:</p>
                 <div v-for="item in songInfo.LastFM.track.toptags.tag">
-                  <a href="item.url">{{item.name}}</a>
+                  <a :href="item.url">{{item.name}}</a>
                 </div>
               </b-col>
               <b-col>
