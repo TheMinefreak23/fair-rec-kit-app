@@ -34,7 +34,7 @@ onMounted(() => {
 watch(
   () => store.queue,
   (data) => {
-    //console.log('queue watch new queue:', data)
+    console.log('queue watch new queue:', data)
     //console.log('queue watch old queue:', oldQueue)
     if (data.length != 0) {
       getQueue()
@@ -50,7 +50,7 @@ async function getQueue() {
   const data = await response.json()
   //store.queue = formatResults(data).map(x=>x.omit(x,'ID'))
   //store.queue = formatResults(data)
-  store.queue = data
+  store.queue = data.queue
 }
 </script>
 

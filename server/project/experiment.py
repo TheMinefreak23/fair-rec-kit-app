@@ -11,7 +11,7 @@ import time
 from datetime import datetime
 import yaml
 from fairreckitlib.experiment.experiment_config_parsing import Parser
-from fairreckitlib.experiment.experiment_event import *
+from fairreckitlib.experiment.experiment_event import ON_END_EXPERIMENT, ON_END_THREAD_EXPERIMENT, ON_BEGIN_THREAD_EXPERIMENT, ON_BEGIN_EXPERIMENT
 
 from fairreckitlib.recommender_system import RecommenderSystem
 
@@ -30,12 +30,15 @@ RESULTS_DIR = 'results'
 recommender_system = RecommenderSystem('datasets', RESULTS_DIR)
 options = create_available_options(recommender_system)
 experiment_queue = []
+# TODO refactor
+experiment_running = False
+current_experiment_name = ''
 
 
 def calculate_first():
     """Take the oldest settings in the queue and perform an experiment with them"""
     # TODO We need this delay for the queue to work fsr
-    time.sleep(0.1)
+    #time.sleep(0.1)
     # Get the oldest experiment from the queue.
     experiment = experiment_queue.pop()
 
@@ -43,15 +46,20 @@ def calculate_first():
     #mock_experiment(experiment)
 
 
-experiment_thread = threading.Thread(target=calculate_first)
+#experiment_thread = threading.Thread(target=calculate_first)
 
 
 def run_experiment(experiment):
     """Run an experiment and save the result."""
+    global experiment_running
+    experiment_running = True
+
     print(experiment)
 
     # Create configuration dictionary.
     config_dict, config_id = config_dict_from_settings(experiment)
+    global current_experiment_name
+    current_experiment_name = config_id
 
     # Create config files directory if it doesn't exist yet.
     if not os.path.isdir(CONFIG_DIR):
@@ -68,20 +76,25 @@ def run_experiment(experiment):
                                                      recommender_system.data_registry,
                                                      recommender_system.experiment_factory)
 
+    def on_end_experiment(event_listener, **kwargs):
+        # TODO get real recs&eval result
+        result_storage.save_result(experiment, mock_result(experiment['settings']))
+        global experiment_running
+        experiment_running = False
+        print('yay')
+
+
     events = {
         ON_BEGIN_EXPERIMENT: lambda x, **kwargs: print('uwu'),
         ON_END_EXPERIMENT: lambda x, **kwargs: print('owo'),
         ON_BEGIN_THREAD_EXPERIMENT: lambda x, **kwargs: print('letsgooo'),
-        ON_END_THREAD_EXPERIMENT: lambda x, **kwargs: print('yay')
+        ON_END_THREAD_EXPERIMENT: on_end_experiment
     }
 
     recommender_system.run_experiment(events, config, num_threads=4)
 
     # TODO USE THIS FUNCTION INSTEAD OF PARSING
     #recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)
-
-    # TODO get real recs&eval result
-    result_storage.save_result(experiment, mock_result(experiment['settings']))
 
 
 def mock_experiment(experiment):
@@ -144,13 +157,16 @@ def calculate():
         settings = data.get('settings')
         # print(data)
         append_queue(data.get('metadata'), settings)
+        print('queue',experiment_queue)
         # response = {'status': 'success'}
-        response = json.dumps(experiment_queue)
+        response = {'queue': experiment_queue }
     else:
         # Wait until the current experiment is done.
-        if experiment_thread.is_alive():
-            experiment_thread.join()
-        response['calculation'] = result_storage.current_result
+        #if experiment_thread.is_alive():
+        #    experiment_thread.join()
+        if not experiment_running:
+            response['calculation'] = result_storage.current_result
+        response['status'] = 'busy' if experiment_running else 'done'
     print('/calculation response:', response)
     return response
 
@@ -161,6 +177,7 @@ def queue():
 
     Returns:
          (string) the queue
+    """
     """
     # Handle experiment thread.
     global experiment_thread
@@ -173,10 +190,27 @@ def queue():
         experiment_thread = threading.Thread(target=calculate_first)
         experiment_thread.start()
     else:
-        print('error')
+        print('error') 
+    """
+    response = {}
+    #response['updated'] = False
+
+    if not experiment_running:
+        calculate_first()
+        #response['updated'] = True
+
+    print('experiment running')
 
     print('queue:', experiment_queue)
-    return json.dumps(experiment_queue)
+    response['queue'] = experiment_queue
+    return response
+
+
+# Test cancel experiment
+@compute_bp.route('/cancel', methods=['GET'])
+def cancel_current():
+    recommender_system.abort_computation(current_experiment_name)
+    return "Canceled"
 
 
 @compute_bp.route('/queue/delete', methods=['POST'])

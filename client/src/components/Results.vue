@@ -10,10 +10,10 @@ import PreviousResults from './PreviousResults.vue'
 import { store, addResult, removeResult } from '../store'
 import { formatResult } from '../helpers/resultFormatter'
 
-
 const emit = defineEmits(['goToResult', 'toast'])
 const showResultModal = ref(false)
 const currentTab = ref(0)
+const fetchResult = ref(false)
 
 // Request latest calculation when the queue is updated
 watch(
@@ -21,9 +21,11 @@ watch(
   (newQueue, oldQueue) => {
     // Only request if the queue length has decreased
     // (An experiment has finished)
-    if (newQueue.length < oldQueue.length) 
-    {
-      getCalculation()
+    if (newQueue.length < oldQueue.length) {
+      // Long polling: Try to get the finished result every interval
+      const interval = 1000 // Every second
+      fetchResult.value = true
+      setInterval(() => getCalculation(), interval)
       currentTab.value = 0
     }
   }
@@ -33,13 +35,24 @@ watch(
  * GET request: Ask server for latest calculation
  */
 async function getCalculation() {
-  try {
-    const response = await fetch(API_URL + '/experiment/calculation')
-    const data = await response.json()
-    addResult(formatResult(data.calculation))
-    emit('toast')
-  } catch (e) {
-    console.log(e) // TODO better error handling, composable
+  if (fetchResult.value) {
+    console.log('fetching result')
+    try {
+      const response = await fetch(API_URL + '/experiment/calculation')
+      const data = await response.json()
+
+      if (data.status == 'done') {
+        console.log('done', data)
+        addResult(formatResult(data.calculation))
+        emit('toast')
+        fetchResult.value = false
+      } else if (data.status == 'busy') {
+        console.log('busy', data)
+      }
+    } catch (e) {
+      console.log(e) // TODO better error handling, composable
+      fetchResult.value = false
+    }
   }
 }
 

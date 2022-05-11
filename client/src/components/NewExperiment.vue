@@ -53,6 +53,7 @@ async function sendToServer() {
   console.log(form.value.metrics, sendForm.metrics)
   sendForm.datasets = reformat(sendForm.datasets)
 
+  // Post settings to server
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -63,10 +64,10 @@ async function sendToServer() {
     API_URL + '/experiment/calculation',
     requestOptions
   )
-
   // Update queue
-  const data = response.json()
-  store.queue = data
+  const data = await response.json()
+  store.queue = data.queue
+  console.log('sendToServer() queue', store.queue)
 }
 
 //Declare default values of the form

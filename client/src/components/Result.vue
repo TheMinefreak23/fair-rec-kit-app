@@ -48,7 +48,12 @@ const generalHeaderOptions = ref([])
 watch(
   () => props.result,
   async (newResult) => {
-    //console.log(newResult.id)
+    console.log(
+      'new result ID',
+      newResult.id,
+      'for result',
+      newResult.metadata.name
+    )
     setRecs()
   }
 )
@@ -82,6 +87,7 @@ async function setRecs() {
       pairid: mockdataPairIndex.value,
     }),
   }
+  console.log('sending to server:', requestOptions.body)
   const response = await fetch(
     API_URL + '/all-results/set-recs',
     requestOptions
