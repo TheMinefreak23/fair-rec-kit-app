@@ -34,6 +34,7 @@ b-tab.success {
 </style>
 
 <template>
+<div>
   <div class="bg-dark nav justify-content-center py-2">
     <img src="/RecCoonLogo.png" style="height: 50px" class="ms-auto" />
     <h1 class="text-white my-0 p-0">FairRecKit</h1>
@@ -53,7 +54,6 @@ b-tab.success {
         </li>
       </ul>
     </div>
-
   </div>
   <div class="nav-center">
     <b-tabs v-model="tabIndex" class="m-0 pt-2" align="center">
@@ -77,4 +77,8 @@ b-tab.success {
       <b-tab title="All Results"> <PreviousResults /></b-tab>
     </b-tabs>
   </div>
+  <div>
+    <h1>Footer</h1>
+  </div>
+</div>
 </template>
