@@ -35,7 +35,11 @@ function goToResult() {
 function callToast() {
   toast.show(
     { title: 'An experiment has finished! View here' },
-    { pos: 'top-right', delay: 800, href: 'https://cdmoro.github.io/bootstrap-vue-3/components/Toast.html#variants' }
+    {
+      pos: 'top-right',
+      delay: 800,
+      href: 'https://cdmoro.github.io/bootstrap-vue-3/components/Toast.html#variants',
+    }
   )
 }
 </script>
@@ -88,9 +92,16 @@ function callToast() {
     </div>
   </div>
   <div class="nav-center">
-    <b-tabs v-model="tabIndex" class="m-0 pt-2" align="center">
-      <b-tab title="New Experiment"><NewExperiment /></b-tab>
-      <b-tab :class="{ success: done }">
+    <b-tabs
+      v-model="tabIndex"
+      class="m-0 pt-2"
+      align="center"
+      nav-class="tab-active"
+    >
+      <b-tab title="New Experiment" title-item-class="tab-title-class"
+        ><NewExperiment
+      /></b-tab>
+      <b-tab title-item-class="tab-title-class">
         <ActiveExperiments
           @computing="
             ;(activeExperiments = true), (done = false), (tabIndex = 1)
@@ -98,10 +109,17 @@ function callToast() {
           @done=";(activeExperiments = false), (done = true)"
           @stop=";(activeExperiments = false), (done = false)"
         />
-        <template v-slot:title :class="{ success: done }">
+        <template v-slot:title>
           <b-spinner v-if="activeExperiments" small align="center"></b-spinner>
           <b-icon v-if="done" align="center" icon="check">√</b-icon>
-          Active Experiments
+          <div
+            :style="{
+              color: 'red',
+              backgroundColor: 'yellow',
+            }"
+          >
+            Active Experiments
+          </div>
         </template>
       </b-tab>
       <b-tab title="Documentation" data-testid="DocTab">
@@ -119,7 +137,17 @@ function callToast() {
 </template>
 
 <style scoped>
-b-tab.success {
-  color: yellow;
+/* NOT WORKING
+b-tab {
+  background-color: yellow;
+}*/
+.tab-title-class {
+  font-size: 300;
+  bacground-color: green;
+  color: #ff0000 !important;
+}
+.tab-active {
+  background-color: #ff0000;
+  color: green;
 }
 </style>
