@@ -92,6 +92,7 @@ function closeResult(index) {
                 :key="result.id"
               >
                 <template #title>
+                  <b-spinner v-if="index == 0" type="grow" variant="info" small></b-spinner>
                   Result {{ result.metadata.name }}
                   <VDismissButton @click.stop="closeResult(index)" />
                 </template>

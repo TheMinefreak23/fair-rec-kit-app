@@ -3,7 +3,6 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
-import json
 
 from flask import (Blueprint, request)
 import pandas as pd
@@ -77,7 +76,6 @@ def user_result():
 
     chunk_size = json.get("amount", 20)
     chunk_size = int(chunk_size)
-    print(json.get("generalHeaders", []))
     chosen_headers = json.get("generalHeaders", []) + json.get("userheaders", []) + json.get("itemheaders", [])
     chosen_headers2 = []
 
@@ -119,19 +117,10 @@ def headers():
     info = request.json
     index = info.get("index", 0)
     file = info.get("location", "")
-    with open('project/headers.json') as j:
-        headers = json.load(j)  
-    with open('../server/mock/' + file) as j2:
-        overview2 = json.load(j2)
-    
-    dataset = overview2['overview'][index]['name'].split('_')[0]
-    #print(type(dataset))
+    headers = result_storage.load_json('project/headers.json')
+    overview = result_storage.load_json('../server/mock/' + file)    
+    dataset = overview['overview'][index]['name'].split('_')[0]
     result = headers[dataset]
-    j.close()
-    j2.close()
-
-    #print(result)
-
     return result
 
 
