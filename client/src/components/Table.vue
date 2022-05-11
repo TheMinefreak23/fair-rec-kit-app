@@ -2,17 +2,19 @@
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import sortBy from 'just-sort-by'
 import { API_URL } from '../api'
-import { validateEmail } from '../helpers/optionsFormatter'
+import FormGroupList from './FormGroupList.vue'
+import { validateEmail, emptyFormGroup } from '../helpers/optionsFormatter'
 
 const emit = defineEmits([
   'loadResult',
   'loadResults',
   'loadMore',
   'paginationSort',
-  'updateHeaders'
+  'changeFilters',
+  'updateHeaders',
 ])
 const props = defineProps({
   overview: Boolean,
@@ -29,6 +31,8 @@ const props = defineProps({
   headerOptions: Array,
   userOptions: Array,
   itemOptions: Array,
+  filters: Array,
+  filterOptions: Array,
 })
 
 const caption = ref('')
@@ -36,10 +40,12 @@ const entryAmount = ref(20)
 const deleteModalShow = ref(false)
 const editModalShow = ref(false)
 const viewModalShow = ref(false)
+const filtersModalShow = ref(false)
 const updateHeadersModalShow = ref(false)
 const checkedColumns = ref([])
 const itemColumns = ref([])
 const userColumns = ref([])
+const filters = ref(emptyFormGroup(false))
 const newName = ref('')
 const newTags = ref('')
 const newTagsList = ref([])
@@ -68,6 +74,10 @@ const sorted = computed(() => {
   else return props.results
 })
 
+onMounted(() => {
+  if (props.caption == 'Testcaption')
+    console.log('filterOptions', props.filterOptions)
+})
 /**
  * Turns a string into an array separated by comma's
  * @param {string} str the string that turns into an array
@@ -112,7 +122,7 @@ async function editEntry() {
 }
 
 // Resets the editable values
-function emptyVmodels(){
+function emptyVmodels() {
   newName.value = ''
   newTags.value = ''
   newEmail.value = ''
@@ -199,6 +209,7 @@ function setsorting(i) {
   sortindex.value = i
   emit('paginationSort', i)
 }
+console.log('propsfilteroptions', props.filterOptions)
 </script>
 
 <template>
@@ -235,7 +246,7 @@ function setsorting(i) {
     <p v-if="validateEmail(newEmail)" style="color: green">
       This is E-mail is valid :)
     </p>
-    <p v-else-if="newEmail != ''&&newEmail!=null" style="color: red">
+    <p v-else-if="newEmail != '' && newEmail != null" style="color: red">
       This is not a valid E-mail :(
     </p>
     <b-form-input
@@ -262,7 +273,7 @@ function setsorting(i) {
     v-model="updateHeadersModalShow"
     title="Change columns"
     @ok="$emit('updateHeaders', checkedColumns, userColumns, itemColumns)"
-    >
+  >
     <p>Select the extra headers you want to be shown</p>
     <p>General:</p>
     <div
@@ -318,18 +329,40 @@ function setsorting(i) {
       </label>
     </div>
   </b-modal>
+  <b-modal
+    id="change-columns-modal"
+    v-model="filtersModalShow"
+    title="Change filters"
+    @ok="$emit('changeFilters', filters)"
+  >
+    <FormGroupList
+      v-model:data="filters"
+      name="filter"
+      plural="filters"
+      :options="filterOptions"
+      id="filters"
+    />
+  </b-modal>
 
   <b-table-simple hover striped responsive caption-top>
     <caption>
       {{
         props.caption
       }}
-       <template v-if="expandable">
-      <b-button 
-        @click="updateHeadersModalShow = !updateHeadersModalShow">  
-        change headers 
-      </b-button>
-    </template>
+
+      <template v-if="expandable">
+        <div class="float-end">
+          <b-button
+            @click="updateHeadersModalShow = !updateHeadersModalShow"
+            class="m-1"
+          >
+            Change Headers
+          </b-button>
+          <b-button @click="filtersModalShow = !filterModalShow" class="m-1">
+            Filters
+          </b-button>
+        </div>
+      </template>
     </caption>
     <b-thead head-variant="dark">
       <b-tr>

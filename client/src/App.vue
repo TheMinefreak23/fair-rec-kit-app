@@ -13,6 +13,7 @@ import { onMounted, ref } from 'vue'
 import { API_URL } from './api'
 import MusicDetail from './components/MusicDetail.vue'
 import { useToast } from 'bootstrap-vue-3'
+import VCheckmark from './components/VCheckmark.vue'
 let toast = useToast()
 
 const activeExperiments = ref(false)
@@ -35,7 +36,11 @@ function goToResult() {
 function callToast() {
   toast.show(
     { title: 'An experiment has finished! View here' },
-    { pos: 'top-right', delay: 800, href: 'https://cdmoro.github.io/bootstrap-vue-3/components/Toast.html#variants' }
+    {
+      pos: 'top-right',
+      delay: 800,
+      href: 'https://cdmoro.github.io/bootstrap-vue-3/components/Toast.html#variants',
+    }
   )
 }
 </script>
@@ -89,7 +94,9 @@ function callToast() {
   </div>
   <div class="nav-center">
     <b-tabs v-model="tabIndex" class="m-0 pt-2" align="center">
-      <b-tab title="New Experiment"><NewExperiment /></b-tab>
+      <b-tab title="New Experiment">
+        <NewExperiment />
+      </b-tab>
       <b-tab :class="{ success: done }">
         <ActiveExperiments
           @computing="
@@ -100,7 +107,8 @@ function callToast() {
         />
         <template v-slot:title :class="{ success: done }">
           <b-spinner v-if="activeExperiments" small align="center"></b-spinner>
-          <b-icon v-if="done" align="center" icon="check">√</b-icon>
+          <VCheckmark v-else />
+
           Active Experiments
         </template>
       </b-tab>
@@ -113,7 +121,9 @@ function callToast() {
       <b-tab title="All results">
         <PreviousResults @goToResult="goToResult" />
       </b-tab>
-      <b-tab title="Music Detail"> <MusicDetail /></b-tab>
+      <b-tab title="Music Detail">
+        <MusicDetail />
+      </b-tab>
     </b-tabs>
   </div>
 </template>

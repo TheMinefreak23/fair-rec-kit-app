@@ -9,6 +9,7 @@ from flask import (Blueprint, request)
 import pandas as pd
 
 from . import result_storage
+from .experiment import options
 
 results_bp = Blueprint('results', __name__, url_prefix='/api/all-results')
 
@@ -63,13 +64,17 @@ def set_recs():
     pair_id = json.get("pairid")
     path = result_storage.get_rec_path(result_id, run_id, pair_id)
     result_storage.current_recs = pd.read_csv(path, sep='\t', header=None)
-    return {'status': 'success'}
+    return {'status': 'success', 'availableFilters' : options['filters']}
 
 
 ## get recommender results per user
 @results_bp.route('/result', methods=['POST'])
 def user_result():
     json = request.json
+
+    filters = json.get("filters")
+    #TODO implement backend filtering
+
     chunk_size = json.get("amount", 20)
     chunk_size = int(chunk_size)
     print(json.get("generalHeaders", []))
