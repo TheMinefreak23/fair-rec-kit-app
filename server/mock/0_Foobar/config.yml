@@ -1,0 +1,20 @@
+datasets:
+- name: ML-100K
+  splitting:
+    test_ratio: 0.2
+    type: random
+models:
+  LensKit:
+  - name: BiasedMF
+    params:
+      damping: 5.0
+      features: 10
+      item_reg: 0.1
+      iterations: 20
+      method: cd
+      random_seed: null
+      user_reg: 0.1
+name: 0_Foobar
+rated_items_filter: true
+top_K: 10
+type: recommendation

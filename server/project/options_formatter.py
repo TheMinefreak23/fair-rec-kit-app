@@ -4,7 +4,8 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 import json
-from fairreckitlib.algorithms.elliot_alg.factory import ELLIOT_API
+from fairreckitlib.core.apis import ELLIOT_API
+from fairreckitlib.core.config_constants import TYPE_PREDICTION, TYPE_RECOMMENDATION
 
 model_API_dict = {}
 
@@ -39,9 +40,10 @@ def create_available_options(recommender_system):
     options = {}
 
     frk_datasets = recommender_system.get_available_datasets()
-    frk_predictors = recommender_system.get_available_predictors()
-    frk_recommenders = recommender_system.get_available_recommenders()
-    frk_metrics = recommender_system.get_available_metrics()
+    frk_predictors = recommender_system.get_available_algorithms(TYPE_PREDICTION)
+    frk_recommenders = recommender_system.get_available_algorithms(TYPE_RECOMMENDATION)
+    # TODO different metrics for diff types
+    frk_metrics = recommender_system.get_available_metrics(TYPE_RECOMMENDATION)
     # print('DATASETS:\n', frk_datasets)
     # print(frk_predictors)
     # print(frk_recommenders)
@@ -92,10 +94,11 @@ def create_available_options(recommender_system):
 
         dataset['params'] = params
 
+    formatted_filters = reformat(filters, False)
     # Add dynamic (nested settings) settings
     # MOCK: for now use all filters/metrics per dataset
     filter_list = [{'name': 'filter',
-                    'plural': 'filters', 'article': 'a', 'options': reformat(filters, False)}]
+                    'plural': 'filters', 'article': 'a', 'options': formatted_filters}]
 
     for dataset in datasets:
         dataset['params']['dynamic'] = filter_list
@@ -106,6 +109,7 @@ def create_available_options(recommender_system):
 
     print(options)
     options = reformat_all(options, datasets, recommenders, predictors, metrics)
+    options['filters'] = formatted_filters
     # print(options)
 
     return options
