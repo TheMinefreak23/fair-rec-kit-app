@@ -10,7 +10,6 @@ import PreviousResults from './PreviousResults.vue'
 import { store, addResult, removeResult } from '../store'
 import { formatResult } from '../helpers/resultFormatter'
 
-
 const emit = defineEmits(['goToResult', 'toast'])
 const showResultModal = ref(false)
 const currentTab = ref(0)
@@ -21,8 +20,7 @@ watch(
   (newQueue, oldQueue) => {
     // Only request if the queue length has decreased
     // (An experiment has finished)
-    if (newQueue.length < oldQueue.length) 
-    {
+    if (newQueue.length < oldQueue.length) {
       getCalculation()
       currentTab.value = 0
     }

@@ -19,6 +19,7 @@ const headers_rec = ref([
   { name: 'Item' },
   { name: 'Score' },
 ])
+
 //Default headers for prediction experiments
 const headers_pre = ref([
   { name: 'User' },
@@ -44,6 +45,7 @@ const generalHeaders = ref([])
 const userHeaderOptions = ref([])
 const itemHeaderOptions = ref([])
 const generalHeaderOptions = ref([])
+const visibleDatasets = ref([])
 
 watch(
   () => props.result,
@@ -59,6 +61,7 @@ onMounted(async () => {
   console.log('result', props.result)
   console.log('result id', props.result.id)
   loadEvaluations()
+  fillVisibleDatasets()
 })
 
 // GET request: Get available options for selection from server
@@ -217,6 +220,14 @@ function makeHeaders(headers) {
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
 }
+
+function fillVisibleDatasets(){
+  for(let i=0; i<props.result.result[1].results.length;i++){
+    visibleDatasets.value[i] = props.result.result[1].results[i].dataset
+  }
+
+
+}
 </script>
 
 <template>
@@ -228,12 +239,31 @@ function capitalizeFirstLetter(string) {
         {{ result.metadata.datetime }}.
       </p>
 
+      <p>
+        Datasets shown:
+        <div class="form-check" v-for="dataset in result.result[1].results">
+          <input
+            v-model = "visibleDatasets"
+            class = "form-check-input"
+            type="checkbox"
+            :value="dataset.dataset"
+            :id="dataset.dataset"
+          />
+          <label class="form-check-label" :id="dataset.dataset">
+            {{dataset.dataset}}
+          </label>
+        </div>
+      </p>
+    <div>
+      {{visibleDatasets}}
+    </div>
+    
       <div class="col">
         Tags:
         <template v-if="!result.metadata.tags">None</template>
         <template v-for="tag in result.metadata.tags">
           <b-button disabled> {{ tag }} </b-button
-          ><!--<slot> </slot>-->
+          >
         </template>
       </div>
     </div>
@@ -249,13 +279,18 @@ function capitalizeFirstLetter(string) {
             : [result.result[0]]"
           :key="datasetResult"
         >
+          <p> HELLOOOO {{datasetResult.results[0].dataset}}</p>
           <div class="col-6">
+            
+            <!-- this is per dataset so should be changed to include that-->
+          <template v-if="visibleDatasets.includes(datasetResult.dataset)">
             <Table
               :caption="datasetResult.caption"
               :results="datasetResult.results"
               :headers="datasetResult.headers"
               :removable="false"
             />
+          </template>
           </div>
         </template>
       </div>
