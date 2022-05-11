@@ -48,7 +48,9 @@ async function getInfo() {
 
 async function generateChart(highlevelFeatures) {
   const moods = ['acoustic', 'aggressive', 'electronic', 'happy', 'party', 'relaxed', 'sad']
-  const data = []
+  const danceability = highlevelFeatures['danceability']['all']['danceable']
+  console.log(danceability)
+  const data = [danceability]
   for(const mood of moods){
     const tagname = 'mood_'+ mood
     const feature = highlevelFeatures[(tagname)]
@@ -56,7 +58,7 @@ async function generateChart(highlevelFeatures) {
     data.push(feature.all[mood])
   }
   chartInfo.value.datasets[0] = ({'label': 'Attributes','backgroundColor' : "#000080", 'data': data})
-  chartInfo.value.labels = moods
+  chartInfo.value.labels = ['danceability'].concat(moods.map(mood => mood + '-ness'))
 }
 </script>
 
@@ -127,7 +129,6 @@ async function generateChart(highlevelFeatures) {
                   }}</template>
                 </p>
                 <p>Album: {{ track.album.name }}</p>
-                <p>Attributes (graph of danceability etc): TODO</p>
                 <Bar 
                   :chartData="chartInfo"
                 >
