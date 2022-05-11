@@ -39,23 +39,24 @@ async function sendMockData(options) {
 
 function generateRandomApproach(options) {
   //generate random settings for the Approaches part of a experiment
-  let libraries = options.approaches.libraries.prediction
+  console.log(options)
+  let libraries = options.predictors
   let result = []
   var n = 1 + Math.floor(Math.random() * 3)
 
   for (let i = 0; i < n; i++) {
     var ops = randomItems(libraries, 1)[0].options
 
-    var approach = randomItems(ops, 1)[0]
+    var approach = randomItems(ops, 1)[0].value
 
-    var approachName = approach.text
+    var approachName = approach.name
     var choices = approach.params.options
 
     var randomOptionName = randomWord()
     var randomOptionValue = randomWord()
     if (choices != (undefined || [])) {
       var randomOption = randomItems(choices, 1)[0]
-      randomOptionName = randomOption.text
+      randomOptionName = randomOption.name
       randomOptionValue = randomItems(randomOption.options, 1)
     }
 
@@ -65,7 +66,7 @@ function generateRandomApproach(options) {
     var randomValuesValue = rand()
     if (values != (undefined || [])) {
       var randomValue = randomItems(values, 1)[0]
-      randomValuesName = randomValue.text
+      randomValuesName = randomValue.name
       randomValuesValue = getRandomInt(randomValue.min, randomValue.max)
     }
 
@@ -95,9 +96,9 @@ function generateRandomMetrics(options) {
   var n = 1 + Math.floor(Math.random() * 3)
   for (let i = 0; i < n; i++) {
     console.log(options.metrics)
-    var randomOption = randomItems(options.metrics.categories, 1)[0]
+    var randomOption = randomItems(options.metrics, 1)[0]
     var randomOptionOptions = randomOption.options
-    var randomOptionName = randomItems(randomOptionOptions, 1)[0].text
+    var randomOptionName = randomItems(randomOptionOptions, 1)[0].name
 
     result[i] = {
       name: randomOptionName,
@@ -114,11 +115,11 @@ function generateRandomDatasets(options) {
   var n = 1 + Math.floor(Math.random() * 3)
   for (let i = 0; i < n; i++) {
     console.log(options.datasets)
-    var randomDataset = randomItems(options.datasets, 1)[0]
+    var randomDataset = randomItems(options.datasets, 1)[0].value
 
-    var randomDatasetName = randomDataset.text
+    var randomDatasetName = randomDataset.name
     var randomDatasetParams = {
-      name: randomDataset.params.values[0].text,
+      name: randomDataset.params.values[0].name,
       value: randomDataset.params.values[0].default,
     }
 
