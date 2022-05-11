@@ -14,6 +14,7 @@ import { API_URL } from './api'
 import MusicDetail from './components/MusicDetail.vue'
 import { useToast } from 'bootstrap-vue-3'
 import { store } from './store'
+import VCheckmark from './components/VCheckmark.vue'
 let toast = useToast()
 
 /*
@@ -120,7 +121,7 @@ function callToast() {
             }"
           >
             <b-spinner v-if="store.experimentRunning" small></b-spinner>
-            <b-icon v-else icon="check">√</b-icon>
+            <VCheckmark v-else />
             Active Experiments
           </div>
         </template>
@@ -134,7 +135,9 @@ function callToast() {
       <b-tab title="All results">
         <PreviousResults @goToResult="goToResult" />
       </b-tab>
-      <b-tab title="Music Detail"> <MusicDetail /></b-tab>
+      <b-tab title="Music Detail">
+        <MusicDetail />
+      </b-tab>
     </b-tabs>
   </div>
 </template>
