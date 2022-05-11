@@ -12,6 +12,9 @@ import TestForm from './test/TestForm.vue'
 import { onMounted, ref } from 'vue'
 import { API_URL } from './api'
 import MusicDetail from './components/MusicDetail.vue'
+import { useToast } from 'bootstrap-vue-3'
+import VCheckmark from './components/VCheckmark.vue'
+let toast = useToast()
 
 const activeExperiments = ref(false)
 const done = ref(false)
@@ -29,9 +32,26 @@ const tabIndex = ref(0)
 function goToResult() {
   tabIndex.value = 3
 }
+
+function callToast() {
+  toast.show(
+    { title: 'An experiment has finished! View here' },
+    {
+      pos: 'top-right',
+      delay: 800,
+      href: 'https://cdmoro.github.io/bootstrap-vue-3/components/Toast.html#variants',
+    }
+  )
+}
 </script>
 
 <template>
+  <b-container
+    :toast="{ root: true }"
+    fluid="sm"
+    position="position-fixed"
+    @click="goToResult()"
+  ></b-container>
   <!--<TestForm :useTestOptions="true" />-->
   <div class="bg-dark nav justify-content-center py-2">
     <img src="/RecCoonLogo.png" style="height: 50px" class="ms-auto" />
@@ -74,7 +94,9 @@ function goToResult() {
   </div>
   <div class="nav-center">
     <b-tabs v-model="tabIndex" class="m-0 pt-2" align="center">
-      <b-tab title="New Experiment"><NewExperiment /></b-tab>
+      <b-tab title="New Experiment">
+        <NewExperiment />
+      </b-tab>
       <b-tab :class="{ success: done }">
         <ActiveExperiments
           @computing="
@@ -85,18 +107,23 @@ function goToResult() {
         />
         <template v-slot:title :class="{ success: done }">
           <b-spinner v-if="activeExperiments" small align="center"></b-spinner>
-          <b-icon v-if="done" align="center" icon="check">√</b-icon>
+          <VCheckmark v-else />
+
           Active Experiments
         </template>
       </b-tab>
       <b-tab title="Documentation" data-testid="DocTab">
         <Documentation
       /></b-tab>
-      <b-tab title="Results"> <Results @goToResult="goToResult" /></b-tab>
+      <b-tab title="Results">
+        <Results @goToResult="goToResult" @toast="callToast"
+      /></b-tab>
       <b-tab title="All results">
         <PreviousResults @goToResult="goToResult" />
       </b-tab>
-      <b-tab title="Music Detail"> <MusicDetail /></b-tab>
+      <b-tab title="Music Detail">
+        <MusicDetail />
+      </b-tab>
     </b-tabs>
   </div>
 </template>

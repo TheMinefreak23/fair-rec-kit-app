@@ -8,12 +8,24 @@ const AB_API = 'https://acousticbrainz.org/api/v1/'
 const LFM_API = 'http://ws.audioscrobbler.com/2.0/'
 const LFM_key = '5ffe852eb4ffb7e7d5d53e71981cad7f'
 
-async function getSongInfo(token, track, artist, musicbrainzId = '') {
-  /*var spotifyID = getSpotifyID(token, track, artist)
-  return spotifyID*/
-  return getSpotifyInfo(token, track, artist)
+
+async function getSongInfo(token, track, artist, musicbrainzId ) {
+  const lastFMData = await getLastFMinfo(artist, track)
+
+  console.log('mbid', musicbrainzId)
+  if (musicbrainzId == undefined) {
+    musicbrainzId = await lastFMData.track.mbid
+    console.log('mbid',musicbrainzId)
+  }
+  return {
+    'Spotify': await getSpotifyInfo(token, track, artist),
+    'AcousticBrainz': await getAcousticBrainzInfo(musicbrainzId),
+    'LastFM': lastFMData
+  }
 }
 
+
+// Request an authentication token from the Spotify API
 async function getSpotifyToken() {
   const response = await fetch(API_URL + '/music/token')
   const data = await response.json()
@@ -21,6 +33,8 @@ async function getSpotifyToken() {
   return data
 }
 
+
+//Request Spotify data from artist and track name
 async function getSpotifyInfo(token, track, artist) {
   const requestOptions = {
     method: 'GET',
@@ -37,16 +51,37 @@ async function getSpotifyInfo(token, track, artist) {
     (track && '+' + 'track:' + track) +
     '&type=track'
   const response = await fetch(url, requestOptions)
-  /*
+  const data = await response.json()
+  console.log('Spotify:', data)
+  return data.tracks
+}
+
+// Request song-data from LastFM
+async function getLastFMinfo(artist, track) {
+  const url = LFM_API + '?method=track.getInfo&api_key=' + LFM_key + '&artist=' + artist + '&track=' + track + '&autocorrect=1&format=json'
+  const response = await fetch(url)
+  const data = await response.json()
+  console.log('LastFM', data)
+  return data
+}
+
+// Request High-level audio features from AcousticBrainz using a musicbrainzID
+async function getAcousticBrainzInfo(musicbrainzId) {
   const requestOptions = {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ track: track, artist: artist }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      mbid: musicbrainzId
+    })
   }
-  const response = await fetch(API_URL + '/music/info', requestOptions)*/
-  const data = await response.json()
-  console.log(data)
-  return data.tracks
+
+  const url = API_URL + '/music/AcousticBrainz'
+  const response = await fetch(url, requestOptions)
+  const json = await response.json()
+  console.log('AcousticBrainz:', json)
+  return json
 }
 
 export { getSongInfo, getSpotifyToken }
