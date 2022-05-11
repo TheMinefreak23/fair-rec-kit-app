@@ -25,6 +25,8 @@ const store = reactive({
   currentResults: [mockResult()],
   queue: [],
   allResults: [],
+  experimentRunning: false, // TODO refactor out of store?
+  currentTab: 0,
 })
 
 // Add a new result to the global current shown results state

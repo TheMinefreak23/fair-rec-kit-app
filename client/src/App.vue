@@ -13,10 +13,12 @@ import { onMounted, ref } from 'vue'
 import { API_URL } from './api'
 import MusicDetail from './components/MusicDetail.vue'
 import { useToast } from 'bootstrap-vue-3'
+import { store } from './store'
 let toast = useToast()
 
+/*
 const activeExperiments = ref(false)
-const done = ref(false)
+const done = ref(false)*/
 
 // Ping
 onMounted(async () => {
@@ -25,7 +27,7 @@ onMounted(async () => {
   const data = await response.json()
   console.log(data)
 })
-const tabIndex = ref(0)
+//const tabIndex = ref(0)
 
 // Make result tab the active tab
 function goToResult() {
@@ -93,7 +95,7 @@ function callToast() {
   </div>
   <div class="nav-center">
     <b-tabs
-      v-model="tabIndex"
+      v-model="store.currentTab"
       class="m-0 pt-2"
       align="center"
       nav-class="tab-active"
@@ -102,22 +104,23 @@ function callToast() {
         ><NewExperiment
       /></b-tab>
       <b-tab title-item-class="tab-title-class">
-        <ActiveExperiments
+        <!--<ActiveExperiments
           @computing="
             ;(activeExperiments = true), (done = false), (tabIndex = 1)
           "
           @done=";(activeExperiments = false), (done = true)"
           @stop=";(activeExperiments = false), (done = false)"
-        />
+        />-->
+        <ActiveExperiments />
         <template v-slot:title>
-          <b-spinner v-if="activeExperiments" small align="center"></b-spinner>
-          <b-icon v-if="done" align="center" icon="check">√</b-icon>
           <div
             :style="{
-              color: 'red',
-              backgroundColor: 'yellow',
+              color: store.experimentRunning ? 'red' : 'black',
+              backgroundColor: store.experimentRunning ? 'yellow' : 'white',
             }"
           >
+            <b-spinner v-if="store.experimentRunning" small></b-spinner>
+            <b-icon v-else icon="check">√</b-icon>
             Active Experiments
           </div>
         </template>
@@ -143,7 +146,7 @@ b-tab {
 }*/
 .tab-title-class {
   font-size: 300;
-  bacground-color: green;
+  background-color: green;
   color: #ff0000 !important;
 }
 .tab-active {

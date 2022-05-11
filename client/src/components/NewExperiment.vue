@@ -68,6 +68,8 @@ async function sendToServer() {
   const data = await response.json()
   store.queue = data.queue
   console.log('sendToServer() queue', store.queue)
+  // Switch to queue
+  store.currentTab = 1
 }
 
 //Declare default values of the form

@@ -8,7 +8,7 @@ import { onMounted, ref, watch } from 'vue'
 import { formatResults } from '../helpers/resultFormatter.js'
 import { store } from '../store.js'
 
-const emit = defineEmits(['computing', 'done', 'stop'])
+//const emit = defineEmits(['computing', 'done', 'stop'])
 const props = defineProps({
   names: [String],
   experiments: [],
@@ -38,9 +38,6 @@ watch(
     //console.log('queue watch old queue:', oldQueue)
     if (data.length != 0) {
       getQueue()
-      emit('computing')
-    } else {
-      emit('done')
     }
   }
 )

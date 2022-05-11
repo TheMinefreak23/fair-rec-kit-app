@@ -46,8 +46,10 @@ async function getCalculation() {
         addResult(formatResult(data.calculation))
         emit('toast')
         fetchResult.value = false
+        store.experimentRunning = false
       } else if (data.status == 'busy') {
         console.log('busy', data)
+        store.experimentRunning = true
       }
     } catch (e) {
       console.log(e) // TODO better error handling, composable
@@ -75,7 +77,9 @@ function closeResult(index) {
     ok-title="View new result"
     ok-variant="danger"
     cancel-title="Cancel"
-    @ok="$emit('goToResult')"
+    @ok="
+      store.currentTab = 3 //$emit('goToResult')
+    "
   >
     <p>An experiment has finished.</p>
   </b-modal>
@@ -126,7 +130,7 @@ function closeResult(index) {
           id="offcanvasRight"
           aria-labelledby="offcanvasRightLabel"
         >
-          <PreviousResults @goToResult="" />
+          <PreviousResults />
         </div>
       </div>
     </div>
