@@ -21,7 +21,7 @@ const track = ref({})
 const trackModalShow = ref(false)
 const query = ref({ track: 'orion', artist: 'metallica' })
 const songInfo = ref()
-const chartInfo = ref({labels: [], datasets : []})
+const chartInfo = ref({ labels: [], datasets: [] })
 
 onMounted(async () => {
   token.value = await getSpotifyToken()
@@ -30,34 +30,35 @@ onMounted(async () => {
 
 // Get music detail info
 async function getInfo() {
-    songInfo.value = await getSongInfo(
+  songInfo.value = await getSongInfo(
     token.value,
     query.value.track,
     query.value.artist
   )
-  console.log("Song Info", songInfo.value)
+
   tracks.value = await songInfo.value.Spotify
   track.value = tracks.value.items[0]
+  //get AcousticBrainz highlevel features using LastFM's mbid
   const highlevelFeatures = await songInfo.value.AcousticBrainz[songInfo.value.LastFM.track.mbid][0]['highlevel']
-  console.log('highlevel', highlevelFeatures)
+
   await generateChart(await highlevelFeatures)
-  console.log(chartInfo)
+
 }
 
-
-
+//Generate the data for the audiofeatures Bar-chart
 async function generateChart(highlevelFeatures) {
+  //available moods from AcousticBrainz
   const moods = ['acoustic', 'aggressive', 'electronic', 'happy', 'party', 'relaxed', 'sad']
+  //also include danceability seperately
   const danceability = highlevelFeatures['danceability']['all']['danceable']
-  console.log(danceability)
   const data = [danceability]
-  for(const mood of moods){
-    const tagname = 'mood_'+ mood
+  for (const mood of moods) {
+    const tagname = 'mood_' + mood
     const feature = highlevelFeatures[(tagname)]
     console.log('value', feature)
     data.push(feature.all[mood])
   }
-  chartInfo.value.datasets[0] = ({'label': 'Attributes','backgroundColor' : "#000080", 'data': data})
+  chartInfo.value.datasets[0] = ({ 'label': 'Attributes', 'backgroundColor': "#000080", 'data': data })
   chartInfo.value.labels = ['danceability'].concat(moods.map(mood => mood + '-ness'))
 }
 </script>
@@ -70,18 +71,12 @@ async function generateChart(highlevelFeatures) {
         <b-row>
           <b-col>
             <b-form-group label="Track">
-              <b-form-input
-                v-model="query.track"
-                placeholder="Enter track name"
-              />
+              <b-form-input v-model="query.track" placeholder="Enter track name" />
             </b-form-group>
           </b-col>
           <b-col>
             <b-form-group label="Artist">
-              <b-form-input
-                v-model="query.artist"
-                placeholder="Enter artist name"
-              />
+              <b-form-input v-model="query.artist" placeholder="Enter artist name" />
             </b-form-group>
           </b-col>
           <b-col>
@@ -100,23 +95,14 @@ async function generateChart(highlevelFeatures) {
     </b-card>
 
     <template v-if="track">
-      <b-button
-        style="width: 20vw; display: block"
-        class="mx-auto"
-        variant="primary"
-        @click="trackModalShow = !trackModalShow"
-        >Show track
+      <b-button style="width: 20vw; display: block" class="mx-auto" variant="primary"
+        @click="trackModalShow = !trackModalShow">Show track
       </b-button>
-      <b-modal
-        :style="{
-          backgroundColor: 'black',
-          color: 'black',
-        }"
-        v-if="track.artists"
-        v-model="trackModalShow"
-        :title="track.name + ' by ' + track.artists[0].name"
-        size="lg"
-      >
+      <b-modal :style="{
+        backgroundColor: 'black',
+        color: 'black',
+      }" v-if="track.artists" v-model="trackModalShow" :title="track.name + ' by ' + track.artists[0].name"
+        size="lg">
         <b-container class="p-3">
           <b-row v-if="track.album">
             <b-row class="p-3">
@@ -125,18 +111,16 @@ async function generateChart(highlevelFeatures) {
                   <!--TODO refactor into component with dynamic formatting-->
                   Artist(s):
                   <template v-for="(artist, index) in track.artists">{{
-                    artist.name
+                      artist.name
                   }}</template>
                 </p>
                 <p>Album: {{ track.album.name }}</p>
-                <Bar 
-                  :chartData="chartInfo"
-                >
+                <Bar :chartData="chartInfo">
                 </Bar>
                 <p v-html="songInfo.LastFM.track.wiki.summary"></p>
                 <p>LastFM tags:</p>
                 <div v-for="item in songInfo.LastFM.track.toptags.tag">
-                  <a :href="item.url">{{item.name}}</a>
+                  <a :href="item.url">{{ item.name }}</a>
                 </div>
               </b-col>
               <b-col>
@@ -146,32 +130,22 @@ async function generateChart(highlevelFeatures) {
             </b-row>
           </b-row>
           <b-row class="p-3">
-            <iframe
-              style="border-radius: 12px"
-              :src="
-                'https://open.spotify.com/embed/track/' +
-                track.id +
-                '?utm_source=generator'
-              "
-              width="100%"
-              height="80"
-              frameBorder="0"
-              allowfullscreen=""
-              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-            />
+            <iframe style="border-radius: 12px" :src="
+              'https://open.spotify.com/embed/track/' +
+              track.id +
+              '?utm_source=generator'
+            " width="100%" height="80" frameBorder="0" allowfullscreen=""
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" />
           </b-row>
           <b-row class="p-3">
-            <b-button v-b-toggle.collapse-1 variant="primary"
-              >Show full info</b-button
-            >
+            <b-button v-b-toggle.collapse-1 variant="primary">Show full info</b-button>
             <b-collapse id="collapse-1">
               <h3>
                 debug | id: {{ track.id }} | preview url:
                 {{ track.preview_url }}
               </h3>
               <p v-for="[key, value] of Object.entries(track)">
-                <b>{{ key }}</b
-                >: {{ value }}
+                <b>{{ key }}</b>: {{ value }}
               </p>
             </b-collapse>
           </b-row>
