@@ -31,7 +31,7 @@ onMounted(async () => {
 
 // Make result tab the active tab
 function goToResult() {
-  tabIndex.value = 3
+  store.currentTab = 3
 }
 
 function callToast() {

@@ -52,12 +52,13 @@ async function sendToServer() {
   sendForm.metrics = reformat(sendForm.metrics)
   console.log(form.value.metrics, sendForm.metrics)
   sendForm.datasets = reformat(sendForm.datasets)
+  store.currentExperiment = { metadata: metadata.value, settings: sendForm }
 
   // Post settings to server
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ metadata: metadata.value, settings: sendForm }),
+    body: JSON.stringify(store.currentExperiment),
   }
   console.log('sendForm', sendForm)
   const response = await fetch(

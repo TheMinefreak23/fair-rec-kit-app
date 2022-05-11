@@ -26,6 +26,7 @@ const store = reactive({
   queue: [],
   allResults: [],
   experimentRunning: false, // TODO refactor out of store?
+  currentExperiment: null, // REFACTOR
   currentTab: 0,
 })
 

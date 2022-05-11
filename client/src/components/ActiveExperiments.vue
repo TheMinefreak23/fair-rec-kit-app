@@ -55,6 +55,14 @@ async function getQueue() {
   <b-card>
     <div class="text-center py-2 mx-5">
       <h3>Queue</h3>
+      <h4>
+        Current experiment:
+        {{
+          store.currentExperiment
+            ? store.currentExperiment.metadata.name
+            : 'None'
+        }}
+      </h4>
       <Table
         :results="formatResults(store.queue)"
         :headers="headers"

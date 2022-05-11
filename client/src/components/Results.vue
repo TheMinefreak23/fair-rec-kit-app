@@ -47,6 +47,7 @@ async function getCalculation() {
         emit('toast')
         fetchResult.value = false
         store.experimentRunning = false
+        store.currentExperiment = null
       } else if (data.status == 'busy') {
         console.log('busy', data)
         store.experimentRunning = true
