@@ -450,7 +450,7 @@ function shortGroupDescription(i) {
                                           'Between ' +
                                           value.min +
                                           ' and ' +
-                                          (value.name == 'k'
+                                          (value.name.toLowerCase() == 'k'
                                             ? props.maxK
                                             : value.max)
                                         "
@@ -464,7 +464,7 @@ function shortGroupDescription(i) {
                                             form.inputs[i - 1][index].value >=
                                               value.min &&
                                             form.inputs[i - 1][index].value <=
-                                              (value.name == 'k'
+                                              (value.name.toLowerCase() == 'k'
                                                 ? props.maxK
                                                 : value.max)
                                           "

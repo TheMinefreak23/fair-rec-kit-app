@@ -46,8 +46,8 @@ def create_available_options(recommender_system):
     frk_metrics = recommender_system.get_available_metrics(TYPE_RECOMMENDATION)
     # print('DATASETS:\n', frk_datasets)
     # print(frk_predictors)
-    # print(frk_recommenders)
-    # print(frk_metrics)
+    print('recs',frk_recommenders)
+    print('metrics',frk_metrics)
 
     global model_API_dict
     model_API_dict = create_model_api_dict(frk_predictors, frk_recommenders)
@@ -67,16 +67,6 @@ def create_available_options(recommender_system):
     predictors = format_categorised(frk_predictors)
     metrics = format_categorised(frk_metrics)
 
-    # Generate metrics parameter data
-    # metric_categories = metrics['categories']
-    for category in metrics:
-        if category['name'] == 'Accuracy':
-            metric_params = {'values': [{'name': 'k', 'default': 10, 'min': 1, 'max': 20}]}
-        else:
-            metric_params = {}
-        category['options'] = list(map(lambda metric: {'name': metric, 'params': metric_params}, category['options']))
-
-    # print(METRICS)
     options['defaults'] = DEFAULTS
 
     # Format datasets
