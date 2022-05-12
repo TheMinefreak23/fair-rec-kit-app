@@ -38,16 +38,32 @@ $subtle: rgb(80, 80, 80), rgb(104, 104, 104);
 $primary: $customprimary;
 $secondary: $customsecondary;
 $dark: $customdark;
-$btn-link-color: #fff;
 
 //$danger: #ffffff;
 
 
+:root {
+  --color-background: #fff;
+  --color-text: #000;
+}
+
+:root.dark {
+  --color-background: #212121;
+  --color-text: #fff;
+}
+
+
+
 // Default variable overrides
-$body-bg: #fff;
-$body-color: #111;
+//$body-bg: #fff;
+//$body-color: #111;
 
+body {
+  background-color:  var(--color-background);
+  color: var(--color-text);
+}
 
+/*
 
 // -- Themes -- //
 
@@ -66,18 +82,18 @@ $card-dark: #212121;
 $form-dark: #414141;
 
 // Darkmode test
-//$secondary: t($secon);
-//$body-color: t($text);
-//$body-bg: t($bg);
-//$card-bg: t($card);
-//$input-bg: t($inputbg);
-//$input-border-color: t($inputbordercolor);
-//$input-color: t($inputcolor);
-//$nav-tabs-link-active-color: t($navtabslinkactivecolor);
-//$nav-tabs-link-active-bg: t($navtabslinkactivebg);
-//$nav-tabs-border-color: t($navtabsbordercolor);
-//$nav-tabs-link-active-border-color: t($navtabslinkactivebordercolor);
-//$dropdown-bg: t($dropdownbg);
+$secondary: t($secon);
+$body-color: t($text);
+$body-bg: t($bg);
+$card-bg: t($card);
+$input-bg: t($inputbg);
+$input-border-color: t($inputbordercolor);
+$input-color: t($inputcolor);
+$nav-tabs-link-active-color: t($navtabslinkactivecolor);
+$nav-tabs-link-active-bg: t($navtabslinkactivebg);
+$nav-tabs-border-color: t($navtabsbordercolor);
+$nav-tabs-link-active-border-color: t($navtabslinkactivebordercolor);
+$dropdown-bg: t($dropdownbg);
 
 $bg: 'bg';
 
@@ -112,5 +128,7 @@ $themes: (
     dropdownbg: $card-dark
   ),
 );
+
+*/
 
 @import 'bootstrap/scss/bootstrap';
