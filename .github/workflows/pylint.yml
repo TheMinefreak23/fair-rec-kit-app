@@ -35,4 +35,4 @@ jobs:
         pip install fairreckitlib
     - name: Analysing the code with pylint
       run: |
-        pylint $(git ls-files '*.py')
+        pylint $(git ls-files '*.py') --exit-zero --fail-on=E --fail-under=9
