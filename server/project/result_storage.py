@@ -3,15 +3,22 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
+import csv  # TODO fix this import
 import json
 import os
+from os import walk
+from csv import writer
+import time
+import datetime
+import pandas as pd
 
 # Global current result variables
 current_result = {}
 current_recs = None
 
 # Storage paths
-RESULTS_OVERVIEW_PATH = 'results.json'
+RESULTS_OVERVIEW_PATH = 'results/results_overview.json'
+RESULTS_ROOT_FOLDER = 'results/'
 
 
 def save_result(experiment, result):
@@ -39,20 +46,81 @@ def result_by_id(result_id):
     Args:
         result_id(int): the result id
     """
-    results = load_json(RESULTS_OVERVIEW_PATH)
+    # TODO DEV
+    results_root_folder = RESULTS_ROOT_FOLDER
+    if result_id == 0:
+        results_root_folder = 'mock/'
 
-    # Filter: Loop through all results and find the one with the matching ID.
-    for result in results['all_results']:
-        global current_result
-        if 'timestamp' in result:
-            if result['timestamp']['stamp'] == result_id:
-                # print('result', result)
-                current_result = result
-        else:
-            # If there is an incorrectly formatted result, return nothing.
-            current_result = None
+    results_overview = load_json(results_root_folder + "results_overview.json")
+    #calculation_id = results_overview['all_results'][result_id]['timestamp']['stamp']
+    calculation_id = result_id # TODO replace calculation_id with result_id?
+    current_name = id_to_name(results_overview, calculation_id)
+    relative_path = results_root_folder + str(calculation_id) + "_" + current_name
+    data = {'id': result_id, 'name': current_name, 'runs': []}
+    # loops through all the subdirectories, and thus - runs, of a certain calculation
+    for subdir in [f.path for f in os.scandir(relative_path) if f.is_dir()]:
+        run_overview_name = os.path.basename(os.path.normpath(subdir))
+        run_overview = load_json(subdir + "/overview.json")
+        run_data = {'index': run_overview_name, 'results': []}
+        # loops through individual results
+        for run_result in run_overview['overview']:
+            evaluation_path_full = run_result['evaluation_path']
+            ratings_settings_path_full = run_result['ratings_settings_path']
+            evaluation_data = {}
+            if os.path.exists(evaluation_path_full):
+                evaluation_data = pd.read_csv(
+                    evaluation_path_full,
+                    sep='\t',
+                    header=None).to_dict(orient='records')
+            ratings_settings_data = pd.read_csv(
+                ratings_settings_path_full,
+                sep='\t',
+                header=None).to_dict(orient='records')
+            result_data = {
+                'name': run_result['name'],
+                'dataset': run_result['dataset'],
+                'recommender_system': run_result['recommender_system'],
+                'evaluations': evaluation_data,
+                'ratings_settings': ratings_settings_data}
+            run_data['results'].append(result_data)
+
+        data['runs'].append(run_data)
+
+    global current_result
+    current_result = json.dumps(data)
 
     # print('current result',current_result)
+
+
+def get_rec_path(evaluation_id, runid, pairid):
+    results_overview = load_json(RESULTS_OVERVIEW_PATH)
+    # TODO DEV: Mock
+    if evaluation_id == 0:
+        results_overview = load_json('mock/results_overview.json')
+
+    name = id_to_name(results_overview, evaluation_id)
+
+    # TODO DEV: Mock
+    results_root_folder = RESULTS_ROOT_FOLDER
+    if evaluation_id == 0:
+        results_root_folder = 'mock/'
+
+    relative_path = results_root_folder + str(evaluation_id) + "_" + name + "/" + "run_" + str(runid)
+    overview_path = relative_path + "/overview.json"
+    run_overview = load_json(overview_path)
+    rec_path = run_overview['overview'][pairid]['ratings_path']
+    return rec_path
+
+
+def id_to_name(json_data, result_id):
+    current_result_overview_id = -1
+    print(str(json_data))
+    # Filter: Loop through all results and find the one with the matching ID.
+    for iteration_id in range(len(json_data['all_results'])):
+        if int(json_data['all_results'][iteration_id]['timestamp']['stamp']) == result_id:
+            current_result_overview_id = iteration_id
+    current_name = json_data['all_results'][current_result_overview_id]['metadata']['name']
+    return current_name
 
 
 def load_json(path):
@@ -127,7 +195,7 @@ def edit_result(index, new_name, new_tags, new_email):
 
     def edit_metadata(attr, new_val):
         # Don't change the attribute if the input field has been left empty
-        if new_val != '':  
+        if new_val != '':
             to_edit_result['metadata'][attr] = new_val
             print('changed '+attr, to_edit_result['metadata'][attr])
 

@@ -9,6 +9,7 @@ from flask import (Blueprint, request)
 import pandas as pd
 
 from . import result_storage
+from .experiment import options
 
 results_bp = Blueprint('results', __name__, url_prefix='/api/all-results')
 
@@ -20,10 +21,10 @@ def results():
 
 @results_bp.route('/result-by-id', methods=['POST', 'GET'])
 def result_by_id():
-    if request.method == 'POST':
+    if request.method == 'POST':    
         data = request.get_json()
-        result_storage.result_by_id(data['id'])
-        print(data)
+        print('data', data)
+        result_storage.result_by_id(int(data['id']))
         if result_storage.current_result:
             response = {'status': 'success'}
         else:
@@ -59,25 +60,21 @@ def delete():
 def set_recs():
     json = request.json
     result_id = json.get("id")  # Result timestamp TODO use to get result
-    print(result_id)
-
-    # Get random mockdata for now TODO
-    filepaths = ['mock/1647818279_HelloWorld/1647818279_run_0/LFM-360K_0/Foo_ALS_0/ratings.tsv',
-                 'mock/1649162862_HelloFRK/run_0/LFM-1B_0/Implicit_AlternatingLeastSquares_0/ratings.tsv',
-                 'mock/1649162862_HelloFRK/run_0/LFM-1B_0/LensKit_PopScore_0/ratings.tsv',
-                 'mock/1649162862_HelloFRK/run_0/LFM-360K_0/Implicit_AlternatingLeastSquares_0/ratings.tsv',
-                 'mock/1649162862_HelloFRK/run_0/LFM-360K_0/LensKit_PopScore_0/ratings.tsv']
-    import random
-    random_file = random.choice(filepaths)
-    print(random_file)
-    result_storage.current_recs = pd.read_csv(random_file, sep='\t', header=None)
-    return {'status': 'success'}
+    run_id = json.get("runid")
+    pair_id = json.get("pairid")
+    path = result_storage.get_rec_path(result_id, run_id, pair_id)
+    result_storage.current_recs = pd.read_csv(path, sep='\t', header=None)
+    return {'status': 'success', 'availableFilters' : options['filters']}
 
 
 ## get recommender results per user
 @results_bp.route('/result', methods=['POST'])
 def user_result():
     json = request.json
+
+    filters = json.get("filters")
+    #TODO implement backend filtering
+
     chunk_size = json.get("amount", 20)
     chunk_size = int(chunk_size)
     print(json.get("generalHeaders", []))

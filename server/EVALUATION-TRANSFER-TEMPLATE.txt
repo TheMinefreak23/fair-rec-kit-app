@@ -1,0 +1,39 @@
+{
+id,
+name,
+settings,
+runs:
+[
+    {
+        index,
+        results:
+        [
+            {
+                name,
+                dataset,
+                recommender_system,
+                evaluations:
+                [
+                    {
+                    evaluation1
+                    },
+                    {
+                    evaluation2
+                    }
+                ]
+                settings:
+                {
+                    factors,
+                    iterations,
+                    random_seed,
+                    regularization,
+                    use_cg,
+                    calculate_training_loss,
+                    etc..
+                }
+
+            }
+        ]
+    }
+]
+}

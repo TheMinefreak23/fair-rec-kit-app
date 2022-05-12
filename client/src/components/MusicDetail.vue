@@ -16,11 +16,13 @@ onMounted(async () => {
 
 // Get music detail info
 async function getInfo() {
-  tracks.value = await getSongInfo(
+  const songInfo = await getSongInfo(
     token.value,
     query.value.track,
     query.value.artist
   )
+  console.log("Song Info", songInfo)
+  tracks.value = await songInfo.Spotify
   track.value = tracks.value.items[0]
 }
 </script>
@@ -137,5 +139,3 @@ async function getInfo() {
     </template>
   </b-container>
 </template>
-
-<style></style>
