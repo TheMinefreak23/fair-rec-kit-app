@@ -22,6 +22,7 @@ In each of these subfolders is a JSON file describing the location of the result
 overview.json
 
 Each pair of dataset-algorithm, plus any results that were created using filters, has an individual entry in the JSON
+Result file locations are relative to the root folder of the server
 
 +===========================================================================================================================+
 
@@ -29,15 +30,19 @@ Each pair of dataset-algorithm, plus any results that were created using filters
     "overview": [
         {
             "name":"LMF-360K - Elliot, n=50",
-            "evaluation_path": "LFM-360K_0\\Elliot_UserKnn_0\\evaluation.json",
-            "ratings_path": "LFM-360K_0\\Elliot_UserKnn_0\\ratings_n=50.tsv",
-            "ratings_settings_path": "LFM-360K_0\\Elliot_UserKnn_0\\settings.json"
+            "dataset":"LMF-360K",
+            "recommender_system":"Elliot",
+            "evaluation_path": "mock\\1647818279_HelloWorld\\LFM-360K_0\\run_0\\LFM-360K_0\\Elliot_UserKnn_0\\evaluation.json",
+            "ratings_path": "mock\\1647818279_HelloWorld\\LFM-360K_0\\run_0\\LFM-360K_0\\Elliot_UserKnn_0\\ratings_n=50.tsv",
+            "ratings_settings_path": "mock\\1647818279_HelloWorld\\LFM-360K_0\\run_0\\LFM-360K_0\\Elliot_UserKnn_0\\settings.json"
         },
         {
             "name": "LFM-360K - Foo_ALS",
-            "evaluation_path": "LFM-360K_0\\Foo_ALS_0\\evaluation.json",
-            "ratings_path": "LFM-360K_0\\Foo_ALS_0\\ratings.tsv"
-            "ratings_settings_path": "LFM-360K_0\\Elliot_UserKnn_0\\settings.json"
+            "dataset":"LMF-360K",
+            "recommender_system":"Foo_ALS",
+            "evaluation_path": "mock\\1647818279_HelloWorld\\LFM-360K_0\\run_0\\LFM-360K_0\\Foo_ALS_0\\evaluation.json",
+            "ratings_path": "mock\\1647818279_HelloWorld\\LFM-360K_0\\run_0\\LFM-360K_0\\Foo_ALS_0\\ratings.tsv"
+            "ratings_settings_path": "mock\\1647818279_HelloWorld\\LFM-360K_0\\run_0\\Elliot_UserKnn_0\\settings.json"
         }
     ]
 }
