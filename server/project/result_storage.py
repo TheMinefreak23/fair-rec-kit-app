@@ -40,6 +40,20 @@ def save_result(experiment, result):
     print(current_result)
 
 
+def old_result_by_id(result_id):
+    results = load_results_overview()
+    global current_result
+
+    # Filter: Loop through all results and find the one with the matching ID.
+    for result in results['all_results']:
+        if 'timestamp' in result:
+            if result['timestamp']['stamp'] == result_id:
+                print('result', result)
+                current_result = result
+        else:
+            current_result = None  # If there is an incorrectly formatted result, return nothing
+
+
 def result_by_id(result_id):
     """Set the current result to a result in the results overview by its id.
 
