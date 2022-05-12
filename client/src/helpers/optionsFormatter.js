@@ -7,6 +7,7 @@ function selectionOptions(options) {
 
 function emptyFormGroup(required) {
   return {
+    visible: required, // Show option if it is required
     // For required lists the minimum amount of group items is 1.
     groupCount: required ? 1 : 0,
     main: [],

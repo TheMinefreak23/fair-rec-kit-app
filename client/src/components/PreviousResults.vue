@@ -58,7 +58,7 @@ const url = API_URL + resultsRoute
 
 // Request full result from result ID (timestamp)
 async function loadResult(resultId) {
-  console.log('Result ID:' + resultId)
+  console.log('Loading result with ID:' + resultId)
 
   const requestOptions = {
     method: 'POST',
