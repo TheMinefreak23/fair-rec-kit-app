@@ -46,7 +46,8 @@ function getCalculation() {
 
 // Add a new result to the global current shown results state
 function addResult(result) {
-  store.currentResults = [result, ...store.currentResults]
+  //store.currentResults = [result, ...store.currentResults]
+  store.currentResults.push(result)
   //console.log(store.currentResults)
 }
 

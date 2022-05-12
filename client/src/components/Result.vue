@@ -263,6 +263,7 @@ function capitalizeFirstLetter(string) {
         <!--<template v-for="data in [data]" :key="data">-->
         <div class="col-6">
           <Table
+            :key="props.result.id"
             caption="Testcaption"
             :results="data.results"
             :headers="

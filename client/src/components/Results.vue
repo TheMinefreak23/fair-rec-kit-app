@@ -21,7 +21,7 @@ watch(
   (newState, oldState) => {
     if (!newState && oldState) {
       emit('toast')
-      currentTab.value = 0
+      currentTab.value = store.currentResults.length
     }
   }
 )
