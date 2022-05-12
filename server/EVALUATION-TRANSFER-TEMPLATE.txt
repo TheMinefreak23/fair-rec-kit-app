@@ -1,6 +1,7 @@
 {
 id,
 name,
+settings,
 runs:
 [
     {
@@ -9,6 +10,8 @@ runs:
         [
             {
                 name,
+                dataset,
+                recommender_system,
                 evaluations:
                 [
                     {

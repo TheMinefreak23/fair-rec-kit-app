@@ -83,7 +83,7 @@ test('viewMetadata', async () => {
     },
   })
 
-  const button = getAllByText('View')[0]
+  const button = getAllByText('View Metadata')[0]
 
   await fireEvent.click(button)
 
