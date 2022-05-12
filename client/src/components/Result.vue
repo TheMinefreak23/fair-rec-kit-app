@@ -13,17 +13,11 @@ import { API_URL } from '../api'
 const props = defineProps({ headers: Array, result: Object })
 
 //Default headers for recommendation experiments.
-const headers_rec = ref([
+const baseHeaders = ref([
   { name: 'Rank' },
   { name: 'User' },
   { name: 'Item' },
   { name: 'Score' },
-])
-//Default headers for prediction experiments
-const headers_pre = ref([
-  { name: 'User' },
-  { name: 'Item' },
-  { name: 'Predicted Score' },
 ])
 
 const experiment_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
@@ -37,7 +31,6 @@ const ascending = ref(true)
 const entryAmount = ref(20)
 const userHeaders = ref([])
 const itemHeaders = ref([])
-const headers = ref([])
 const availableFilters = ref([])
 const filters = ref(emptyFormGroup(false))
 const generalHeaders = ref([])
@@ -104,7 +97,7 @@ async function setRecs() {
     availableFilters.value = data.availableFilters
     console.log('resultfetch', response)
     await getUserRecs()
-    getHeaders()
+    getHeaders(0, '0_Foobar/run_0/overview.json')
   }
 }
 
@@ -128,8 +121,8 @@ async function loadEvaluations() {
 async function getEvaluations() {
   const response = await fetch(API_URL + '/all-results/result-by-id')
   console.log('succesfully retrieved evaluation data.')
-  results_data = await response.json()
-  console.log(JSON.stringify(results_data))
+  results_data.value = await response.json()
+  console.log(JSON.stringify(results_data.value))
 }
 
 //POST request: Ask server for next part of user recommendation table.
@@ -152,6 +145,7 @@ async function getUserRecs() {
 
   const response = await fetch(API_URL + '/all-results/result', requestOptions)
   data.value.results = await response.json()
+  baseHeaders.value = makeHeaders(Object.keys(data.value.results[0]))
 }
 
 /**
@@ -214,7 +208,7 @@ function changeFilters(changedFilters) {
  */
 function makeHeaders(headers) {
   for (var i = 0; i < headers.length; i++) {
-    headers[i] = capitalizeFirstLetter(headers[i].replace('_', ' '))
+    headers[i] = capitalizeFirstLetter(headers[i].toString().replace('_', ' '))
   }
   return headers.map((header) => ({
     name: header,
@@ -274,7 +268,8 @@ function capitalizeFirstLetter(string) {
 
     <div class="container">
       <div class="row">
-        <h4>Recommended items per user</h4>
+        <h4 v-if="baseHeaders[0].name == 'rank'">Recommended items per user</h4>
+        <h4 v-else>Predicted rating per user</h4>
       </div>
       <div class="row">
         <!--Show recommendations for all datasets for now TODO-->
@@ -284,7 +279,7 @@ function capitalizeFirstLetter(string) {
             caption="Testcaption"
             :results="data.results"
             :headers="
-              headers_rec
+              baseHeaders
                 .concat(generalHeaders)
                 .concat(userHeaders)
                 .concat(itemHeaders)

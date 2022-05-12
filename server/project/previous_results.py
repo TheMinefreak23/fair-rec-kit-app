@@ -62,7 +62,12 @@ def set_recs():
     run_id = json.get("runid")
     pair_id = json.get("pairid")
     path = result_storage.get_rec_path(result_id, run_id, pair_id)
-    result_storage.current_recs = pd.read_csv(path, sep='\t', header=None)
+    #result_storage.current_recs = pd.read_csv(path, sep='\t', header=None)
+    result_storage.current_recs = pd.read_csv('D:/GitHub/fair-rec-kit-app/server/mock/0_Foobar/run_0/ML-100K_0/LensKit_BiasedMF_0/ratings.tsv', sep='\t', header=0)
+    result_storage.current_headers = result_storage.current_recs.columns
+    for bruh in result_storage.current_recs.columns:
+        print(bruh)
+    print(result_storage.current_headers)
     return {'status': 'success', 'availableFilters' : options['filters']}
 
 
@@ -77,7 +82,6 @@ def user_result():
     chunk_size = json.get("amount", 20)
     chunk_size = int(chunk_size)
     chosen_headers = json.get("generalHeaders", []) + json.get("userheaders", []) + json.get("itemheaders", [])
-    chosen_headers2 = []
 
     #read mock dataframe
     recs = result_storage.current_recs
@@ -109,8 +113,8 @@ def user_result():
     # return part of table that should be shown
     df_subset = df_sorted[start_rows:end_rows]
 
-    # return {'results': dfSubset.to_json(orient='records'), 'caption': 'hellofriend'}
     return df_subset.to_json(orient='records')
+    #return ({'headers': list(result_storage.current_headers),'table': df_subset.to_json(orient='records')})
 
 @results_bp.route('/headers', methods=['POST'])
 def headers():
@@ -122,5 +126,7 @@ def headers():
     dataset = overview['overview'][index]['name'].split('_')[0]
     result = headers[dataset]
     return result
+    # result = result_storage.current_recs.columns
+    # return {'headers': list(result)}
 
 

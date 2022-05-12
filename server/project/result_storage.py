@@ -15,6 +15,7 @@ import pandas as pd
 # Global current result variables
 current_result = {}
 current_recs = None
+current_headers = None
 
 # Storage paths
 RESULTS_OVERVIEW_PATH = 'results/results_overview.json'
