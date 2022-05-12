@@ -4,7 +4,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
 import Table from './Table.vue'
-import { onMounted, ref, watch } from 'vue'
+import { onActivated, onMounted, onUpdated, ref, watch } from 'vue'
 import { emptyFormGroup } from '../helpers/optionsFormatter'
 
 import mockdata from '../../../server/mock/1647818279_HelloWorld/results-table.json'
@@ -39,20 +39,12 @@ const itemHeaderOptions = ref([])
 const generalHeaderOptions = ref([])
 const results_data = ref({})
 
-watch(
-  () => props.result,
-  async (newResult) => {
-    //console.log(newResult.id)
-    setRecs()
-  }
-)
-
-onMounted(async () => {
-  await setRecs()
-  console.log('availableFilters', availableFilters.value)
+onMounted(() => {
   console.log('result', props.result)
   console.log('result id', props.result.id)
-  loadEvaluations()
+  setRecs()
+  console.log('availableFilters', availableFilters.value)
+  //loadEvaluations()
 })
 
 // GET request: Get available options for selection from server
@@ -86,16 +78,17 @@ async function setRecs() {
       pairid: mockdataPairIndex.value,
     }),
   }
+  console.log('sending to server:', requestOptions.body)
   const response = await fetch(
     API_URL + '/all-results/set-recs',
     requestOptions
   )
-  console.log('resultfetch', response)
+  //console.log('resultfetch', response)
   if (response.status == '200') {
     const data = await response.json()
-    console.log('data', data)
+    //console.log('data', data)
     availableFilters.value = data.availableFilters
-    console.log('resultfetch', response)
+    //console.log('resultfetch', response)
     await getUserRecs()
     getHeaders(0, '0_Foobar/run_0/overview.json')
   }
@@ -121,8 +114,8 @@ async function loadEvaluations() {
 async function getEvaluations() {
   const response = await fetch(API_URL + '/all-results/result-by-id')
   console.log('succesfully retrieved evaluation data.')
-  results_data.value = await response.json()
-  console.log(JSON.stringify(results_data.value))
+  const resultsData = await response.json()
+  console.log('results data', resultsData)
 }
 
 //POST request: Ask server for next part of user recommendation table.
@@ -276,6 +269,7 @@ function capitalizeFirstLetter(string) {
         <!--<template v-for="data in [data]" :key="data">-->
         <div class="col-6">
           <Table
+            :key="props.result.id"
             caption="Testcaption"
             :results="data.results"
             :headers="

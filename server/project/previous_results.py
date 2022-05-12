@@ -18,6 +18,22 @@ def results():
     return result_storage.load_results_overview()
 
 
+# TODO DEV we shouldn't need this, just for development
+@results_bp.route('/old-result-by-id', methods=['POST', 'GET'])
+def old_result_by_id():
+    if request.method == 'POST':
+        data = request.get_json()
+        result_storage.old_result_by_id(data['id'])
+        if result_storage.current_result:
+            response = {'status': 'success'}
+        else:
+            response = {'status': 'result not found'}
+        print(result_storage.current_result)
+    else:  # GET request
+        response = {'result': result_storage.current_result}
+    return response
+
+
 @results_bp.route('/result-by-id', methods=['POST', 'GET'])
 def result_by_id():
     if request.method == 'POST':    
