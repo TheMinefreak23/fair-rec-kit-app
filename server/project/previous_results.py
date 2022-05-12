@@ -6,6 +6,7 @@ Utrecht University within the Software Project course.
 
 from flask import (Blueprint, request)
 import pandas as pd
+from fairreckitlib.data.set.dataset import add_user_columns, add_item_columns
 
 from . import result_storage
 from .experiment import options
@@ -78,12 +79,7 @@ def set_recs():
     run_id = json.get("runid")
     pair_id = json.get("pairid")
     path = result_storage.get_rec_path(result_id, run_id, pair_id)
-    #result_storage.current_recs = pd.read_csv(path, sep='\t', header=None)
-    result_storage.current_recs = pd.read_csv('D:/GitHub/fair-rec-kit-app/server/mock/0_Foobar/run_0/ML-100K_0/LensKit_BiasedMF_0/ratings.tsv', sep='\t', header=0)
-    result_storage.current_headers = result_storage.current_recs.columns
-    for bruh in result_storage.current_recs.columns:
-        print(bruh)
-    print(result_storage.current_headers)
+    result_storage.current_recs = pd.read_csv(path, sep='\t', header=0)
     return {'status': 'success', 'availableFilters' : options['filters']}
 
 
@@ -113,7 +109,7 @@ def user_result():
 
     # adding extra columns to dataframe
     for chosen_header in chosen_headers:
-        df_sorted[chosen_header['name']] = chosen_header['name']
+        df_sorted[chosen_header] = chosen_header
 
     # getting only chunk of data
     start_rows = json.get("start", 0)

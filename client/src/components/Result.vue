@@ -13,7 +13,7 @@ import { API_URL } from '../api'
 const props = defineProps({ headers: Array, result: Object })
 
 //Default headers for recommendation experiments.
-const baseHeaders = ref([
+const selectedHeaders = ref([
   { name: 'Rank' },
   { name: 'User' },
   { name: 'Item' },
@@ -29,11 +29,11 @@ const startIndex = ref(0)
 const index = ref(0)
 const ascending = ref(true)
 const entryAmount = ref(20)
+const generalHeaders = ref([])
 const userHeaders = ref([])
 const itemHeaders = ref([])
 const availableFilters = ref([])
 const filters = ref(emptyFormGroup(false))
-const generalHeaders = ref([])
 const userHeaderOptions = ref([])
 const itemHeaderOptions = ref([])
 const generalHeaderOptions = ref([])
@@ -138,7 +138,7 @@ async function getUserRecs() {
 
   const response = await fetch(API_URL + '/all-results/result', requestOptions)
   data.value.results = await response.json()
-  baseHeaders.value = makeHeaders(Object.keys(data.value.results[0]))
+  selectedHeaders.value = Object.keys(data.value.results[0])
 }
 
 /**
@@ -183,9 +183,9 @@ function paginationSort(indexVar) {
  * @param {Array}   itemHeader    - list of headers that apply to the item entries.
  */
 function updateHeaders(generalHeader, userHeader, itemHeader) {
-  generalHeaders.value = makeHeaders(generalHeader)
-  userHeaders.value = makeHeaders(userHeader)
-  itemHeaders.value = makeHeaders(itemHeader)
+  generalHeaders.value = generalHeader
+  userHeaders.value = userHeader
+  itemHeaders.value = itemHeader
   getUserRecs()
 }
 
@@ -261,7 +261,7 @@ function capitalizeFirstLetter(string) {
 
     <div class="container">
       <div class="row">
-        <h4 v-if="baseHeaders[0].name == 'rank'">Recommended items per user</h4>
+        <h4 v-if="selectedHeaders[0] == 'rank'">Recommended items per user</h4>
         <h4 v-else>Predicted rating per user</h4>
       </div>
       <div class="row">
@@ -272,12 +272,7 @@ function capitalizeFirstLetter(string) {
             :key="props.result.id"
             caption="Testcaption"
             :results="data.results"
-            :headers="
-              baseHeaders
-                .concat(generalHeaders)
-                .concat(userHeaders)
-                .concat(itemHeaders)
-            "
+            :headers="makeHeaders(selectedHeaders)"
             :headerOptions="generalHeaderOptions"
             :filters="filters"
             :filterOptions="availableFilters"

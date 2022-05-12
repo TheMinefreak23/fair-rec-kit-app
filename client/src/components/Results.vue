@@ -104,7 +104,7 @@ function closeResult(index) {
               <!-- Show opened results in tabs.-->
               <b-tab v-for="(result, index) in store.currentResults">
                 <template #title>
-                  <b-spinner v-if="index == 0" type="grow" variant="info" small></b-spinner>
+                  <b-spinner v-if="index == store.currentResults.length - 1" type="grow" variant="info" small></b-spinner>
                   Result {{ result.metadata.name }}
                   <VDismissButton @click.stop="closeResult(index)" />
                 </template>
