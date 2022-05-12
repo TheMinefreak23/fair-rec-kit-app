@@ -29,7 +29,7 @@ const startIndex = ref(0)
 const index = ref(0)
 const ascending = ref(true)
 const entryAmount = ref(20)
-const generalHeaders = ref([])
+const optionalHeaders = ref([])
 const userHeaders = ref([])
 const itemHeaders = ref([])
 const availableFilters = ref([])
@@ -130,7 +130,7 @@ async function getUserRecs() {
       ascending: ascending.value,
       amount: entryAmount.value,
       filters: filters.value,
-      generalHeaders: generalHeaders.value,
+      optionalHeaders: optionalHeaders.value,
       itemheaders: itemHeaders.value,
       userheaders: userHeaders.value,
     }),
@@ -182,16 +182,13 @@ function paginationSort(indexVar) {
  * @param {Array}   userHeader    - list of headers that apply to the user entries.
  * @param {Array}   itemHeader    - list of headers that apply to the item entries.
  */
-function updateHeaders(generalHeader, userHeader, itemHeader) {
-  generalHeaders.value = generalHeader
-  userHeaders.value = userHeader
-  itemHeaders.value = itemHeader
+function updateHeaders(headers) {
+  optionalHeaders.value = headers
   getUserRecs()
 }
 
 function changeFilters(changedFilters) {
   filters.value = changedFilters
-
   getUserRecs()
 }
 
@@ -273,9 +270,9 @@ function capitalizeFirstLetter(string) {
             caption="Testcaption"
             :results="data.results"
             :headers="makeHeaders(selectedHeaders)"
-            :headerOptions="generalHeaderOptions"
             :filters="filters"
             :filterOptions="availableFilters"
+            :headerOptions="generalHeaderOptions"
             :userOptions="userHeaderOptions"
             :itemOptions="itemHeaderOptions"
             pagination
@@ -284,7 +281,7 @@ function capitalizeFirstLetter(string) {
             @loadMore="(increase, amount) => loadMore(increase, amount)"
             @changeFilters="(changedFilters) => changeFilters(changedFilters)"
             @updateHeaders="
-              (general, user, item) => updateHeaders(general, user, item)
+              (headers) => updateHeaders(headers)
             "
           />
         </div>

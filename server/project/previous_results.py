@@ -93,7 +93,7 @@ def user_result():
 
     chunk_size = json.get("amount", 20)
     chunk_size = int(chunk_size)
-    chosen_headers = json.get("generalHeaders", []) + json.get("userheaders", []) + json.get("itemheaders", [])
+    chosen_headers = json.get("optionalHeaders", [])
 
     #read mock dataframe
     recs = result_storage.current_recs
