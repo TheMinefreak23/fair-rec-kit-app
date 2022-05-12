@@ -8,6 +8,7 @@ const store = reactive({
   allResults: [],
   currentExperiment: null, // REFACTOR
   currentTab: 0,
+  currentResultTab: 0,
   resultPoll: null,
 })
 
@@ -48,6 +49,8 @@ function getCalculation() {
 function addResult(result) {
   //store.currentResults = [result, ...store.currentResults]
   store.currentResults.push(result)
+  store.currentResultTab = store.currentResults.length - 1
+  console.log('currentResultTab', store.currentResultTab)
   //console.log(store.currentResults)
 }
 
