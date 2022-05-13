@@ -21,8 +21,15 @@ watch(
   (newState, oldState) => {
     if (!newState && oldState) {
       emit('toast')
-      currentTab.value = store.currentResults.length
     }
+  }
+)
+
+watch(
+  () => store.currentResultTab,
+  // New result added
+  (newTab) => {
+    currentTab.value = newTab
   }
 )
 
@@ -92,6 +99,7 @@ function closeResult(index) {
         </div>
         <div class="border">
           <template v-if="store.currentResults.length > 0">
+            {{ currentTab.value }}
             <b-tabs v-model="currentTab" card content-class="mt-3">
               <!-- Show opened results in tabs.-->
               <b-tab v-for="(result, index) in store.currentResults">
