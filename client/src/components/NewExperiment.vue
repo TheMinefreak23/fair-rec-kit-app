@@ -5,7 +5,7 @@ Utrecht University within the Software Project course.
 import { onMounted, ref } from 'vue'
 import FormGroupList from './FormGroupList.vue'
 import { sendMockData } from '../test/mockExperimentOptions.js'
-import { store } from '../store.js'
+import { store, getCalculation } from '../store.js'
 import { API_URL } from '../api'
 import { emptyOption } from '../helpers/optionsFormatter'
 import { emptyFormGroup } from '../helpers/optionsFormatter'
@@ -52,21 +52,27 @@ async function sendToServer() {
   sendForm.metrics = reformat(sendForm.metrics)
   console.log(form.value.metrics, sendForm.metrics)
   sendForm.datasets = reformat(sendForm.datasets)
+  store.currentExperiment = { metadata: metadata.value, settings: sendForm }
 
+  // Post settings to server
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ metadata: metadata.value, settings: sendForm }),
+    body: JSON.stringify(store.currentExperiment),
   }
   console.log('sendForm', sendForm)
   const response = await fetch(
     API_URL + '/experiment/calculation',
     requestOptions
   )
-
   // Update queue
-  const data = response.json()
-  store.queue = data
+  const data = await response.json()
+  store.queue = data.queue
+  console.log('sendToServer() queue', store.queue)
+  // Switch to queue
+  store.currentTab = 1
+  const interval = 1000
+  store.resultPoll = setInterval(getCalculation, interval)
 }
 
 //Declare default values of the form

@@ -17,8 +17,8 @@ current_result = {}
 current_recs = None
 
 # Storage paths
-RESULTS_OVERVIEW_PATH = 'results/results_overview.json'
 RESULTS_ROOT_FOLDER = 'results/'
+RESULTS_OVERVIEW_PATH = RESULTS_ROOT_FOLDER + 'results_overview.json'
 
 
 def save_result(experiment, result):
@@ -40,6 +40,20 @@ def save_result(experiment, result):
     print(current_result)
 
 
+def old_result_by_id(result_id):
+    results = load_results_overview()
+    global current_result
+
+    # Filter: Loop through all results and find the one with the matching ID.
+    for result in results['all_results']:
+        if 'timestamp' in result:
+            if result['timestamp']['stamp'] == result_id:
+                print('result', result)
+                current_result = result
+        else:
+            current_result = None  # If there is an incorrectly formatted result, return nothing
+
+
 def result_by_id(result_id):
     """Set the current result to a result in the results overview by its id.
 
@@ -47,11 +61,12 @@ def result_by_id(result_id):
         result_id(int): the result id
     """
     # TODO DEV
+    results_overview = load_results_overview()
     results_root_folder = RESULTS_ROOT_FOLDER
     if result_id == 0:
         results_root_folder = 'mock/'
+        results_overview = load_json(results_root_folder + "results_overview.json")
 
-    results_overview = load_json(results_root_folder + "results_overview.json")
     #calculation_id = results_overview['all_results'][result_id]['timestamp']['stamp']
     calculation_id = result_id # TODO replace calculation_id with result_id?
     current_name = id_to_name(results_overview, calculation_id)
@@ -87,13 +102,13 @@ def result_by_id(result_id):
         data['runs'].append(run_data)
 
     global current_result
-    current_result = json.dumps(data)
+    current_result = data
 
     # print('current result',current_result)
 
 
 def get_rec_path(evaluation_id, runid, pairid):
-    results_overview = load_json(RESULTS_OVERVIEW_PATH)
+    results_overview = load_results_overview()
     # TODO DEV: Mock
     if evaluation_id == 0:
         results_overview = load_json('mock/results_overview.json')
@@ -210,6 +225,8 @@ def edit_result(index, new_name, new_tags, new_email):
 
 def create_results_overview():
     """Create a results file if it doesn't exist yet or is empty."""
+    if not os.path.exists(RESULTS_ROOT_FOLDER):
+        os.mkdir(RESULTS_ROOT_FOLDER)
     if not os.path.exists(RESULTS_OVERVIEW_PATH) or os.stat(RESULTS_OVERVIEW_PATH).st_size == 0:
         with open(RESULTS_OVERVIEW_PATH, 'w', encoding='utf-8') as file:  # Open the file in write mode.
             json.dump({'all_results': []}, file, indent=4)

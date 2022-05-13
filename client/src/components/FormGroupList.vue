@@ -48,8 +48,8 @@ onMounted(() => {
   if (props.name == 'filter' || props.name == 'dataset')
     console.log(props.name, props.options)*/
   form.value.name = props.plural
-  if (props.name == 'filter')
-    console.log(props.name,form)
+  /*if (props.name == 'filter')
+    console.log(props.name,form)*/
   //console.log(props.name, 'options', props.options)
 })
 
@@ -60,9 +60,8 @@ watch(
   },
   () => {
     // Update form if this changes
-    // TODO refactor 
-    if (props.name == 'approach' || props.name == 'metric')
-      update()
+    // TODO refactor
+    if (props.name == 'approach' || props.name == 'metric') update()
   },
   {
     // Make sure this does not trigger on initialization
