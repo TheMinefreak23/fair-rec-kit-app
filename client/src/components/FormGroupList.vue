@@ -7,6 +7,9 @@ import {
   formatMultipleItems,
 } from '../helpers/resultFormatter'
 //import { selectionOptions } from '../helpers/optionsFormatter'
+import MultiRangeSlider from "multi-range-slider-vue";
+import "../../node_modules/multi-range-slider-vue/MultiRangeSliderBlack.css";
+
 
 import { useToast } from 'bootstrap-vue-3'
 import SplitRange from './Form/SplitRange.vue'
@@ -434,7 +437,7 @@ function shortGroupDescription(i) {
                 Because of this we use a seperate setting to cover for it.-->
                                     <b-col
                                       :cols="
-                                        !value.name.includes('split')
+                                        !value.name.includes('split') && !value.name.includes('range')
                                           ? horizontalLayout
                                             ? 3
                                             : 6
@@ -457,7 +460,7 @@ function shortGroupDescription(i) {
                                         "
                                       >
                                         <b-form-input
-                                          v-if="!value.name.includes('split')"
+                                          v-if="!value.name.includes('split') && !value.name.includes('range')"
                                           v-model="
                                             form.inputs[i - 1][index].value
                                           "
@@ -484,6 +487,19 @@ function shortGroupDescription(i) {
                                           :max="value.max"
                                           :name="value.name"
                                           :step="5"
+                                        />
+                                        <!-- Use a slider with 2 sliders if a range is needed-->
+                                        <MultiRangeSlider
+                                          v-if="value.name.includes('range')"
+                                          baseClassName="multi-range-slider-black"
+                                          :min="value.min"
+                                          :max="value.max"
+                                          :step="1"
+                                          :ruler="false"
+                                          :label="true"
+                                          :minValue="value.minValue"
+                                          :maxValue="value.maxValue"
+                                          @input="(form.inputs[i-1][index].value = [$event.minValue, $event.maxValue])"
                                         />
                                         <!--Display the seed label for the seed option.-->
                                         <div
@@ -558,6 +574,7 @@ function shortGroupDescription(i) {
                                       v-if="option.options.length > 2"
                                       :label="chooseLabel(option.name)"
                                     >
+                                    <!--TODO: ADD MULTIPLE SELECT FOR FILTERS (MODAL?)-->
                                       <b-form-select
                                         v-model="
                                           form.selects[i - 1][index].value
