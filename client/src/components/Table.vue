@@ -8,6 +8,7 @@ import { API_URL } from '../api'
 import { formatMetadata } from '../helpers/metadataFormatter'
 import FormGroupList from './FormGroupList.vue'
 import { validateEmail, emptyFormGroup } from '../helpers/optionsFormatter'
+import { store } from '../store'
 
 const emit = defineEmits([
   'loadResult',
@@ -132,7 +133,8 @@ function emptyVmodels() {
 async function removeEntry() {
   //Remove an entry from the list
   let entry = selectedEntry.value
-  props.results.splice(entry, 1)
+  //props.results.splice(entry, 1)
+  store.allResults.splice(entry, 1)
   //Inform the server to remove the same entry
   const requestOptions = {
     method: 'POST',
@@ -140,7 +142,7 @@ async function removeEntry() {
     body: JSON.stringify({ index: entry }),
   }
   fetch(API_URL + props.serverFile, requestOptions).then(() => {
-    console.log('Item removed succesfully')
+    console.log('Item at', entry, 'removed succesfully')
   })
 }
 
@@ -263,7 +265,12 @@ function setsorting(i) {
   </b-modal>
 
   <!-- Shows the metadata and experiment configuration of the designated entry -->
-  <b-modal id="view-modal" v-model="viewModalShow" title="Result information" ok-only>
+  <b-modal
+    id="view-modal"
+    v-model="viewModalShow"
+    title="Result information"
+    ok-only
+  >
     <h5>Here is the metadata and experiment configuration:</h5>
     <span style="white-space: pre-wrap">{{ metadataStr }}</span>
   </b-modal>
