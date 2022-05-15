@@ -1,4 +1,5 @@
 # fair-rec-kit-app
+
 [![Pylint](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/pylint.yml/badge.svg)](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/pylint.yml)
 [![Server Pytest](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/pytest.yml/badge.svg)](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/pytest.yml)
 [![Client Vitest](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/vitest.yml/badge.svg)](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/vitest.yml)
@@ -11,6 +12,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 
 ## How to run client & server
+
 ### NOTE: These instructions are for Windows command prompt
 
 (Install Node.js first and run npm install)
@@ -33,15 +35,13 @@ Run in the terminal:
 
 ## How to run server separately
 
-The easiest way is to install the packages (flask, flask-cors) with pip. Either click the run-api batch file or run in the terminal:
+The easiest way is to install the prequisite packages with pip. In the server directory, either click the run batch file or run in the terminal:
 
-## run-api
+## run
 
 If you're using Anaconda, you need to install the package python-dotenv. Then use the Anaconda prompt and run: (Note: make sure you're in the right environment, using activate <env-name>)
 
 ### `flask run`
-
-You can also use the run-anaconda batch file from Discord.
 
 In all cases, you might want to add a configuration (to the .bat file) in PyCharm.
 
@@ -58,3 +58,14 @@ Execute the run-test batch file, or run in the terminal:
 Execute the run-test batch file, or run in the terminal:
 
 ### python -m pytest
+
+###########
+
+### Server requirements
+
+flask
+flask-cors
+requests
+pandas
+pillow
+fairreckitlib
