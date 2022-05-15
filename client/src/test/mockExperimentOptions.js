@@ -1,31 +1,41 @@
+/*This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+
 import words from 'an-array-of-english-words'
 import { API_URL } from '../api'
-import { store } from '../store'
+import { getCalculation, store } from '../store'
 import { ref, onMounted } from 'vue'
+import mockLists from './mockLists.json'
 
 var metadata = {}
 var form = {}
 
-async function sendMockData(options) {
+async function sendMockData(options, simple = false) {
   console.log('options', options)
   form = {
     recommendations: rand(100),
     //split: rand(100),
     //splitMethod: 'timesplit',
     experimentMethod: 'recommendation', // todo random
-    lists: {
+  }
+  if (simple) {
+    form.lists = mockLists
+  } else {
+    form.lists = {
       approaches: generateRandomApproach(options),
+      metrics: [], // TODO
       //metrics: generateRandomMetrics(options),
       datasets: generateRandomDatasets(options),
       //filters: toFormObject(randomWords()),
-    },
+    }
   }
   console.log('form', form)
 
   metadata = {
     name: 'Test' + rand() + '_' + randomWord(),
     email: randomWord() + '@' + randomWord() + '.com',
-    tags: randomWords(),
+    tags: randomWords().join(','),
   }
 
   const requestOptions = {
@@ -38,8 +48,14 @@ async function sendMockData(options) {
     requestOptions
   )
   // Update queue
-  const data = response.json()
-  store.queue = data
+  const data = await response.json()
+  store.queue = data.queue
+  console.log('sendToServer() queue', store.queue)
+  // Switch to queue
+  store.currentTab = 1
+  const interval = 1000
+  store.resultPoll = setInterval(getCalculation, interval)
+  store.currentExperiment = { metadata: metadata, settings: form }
 }
 
 function generateRandomApproach(options) {

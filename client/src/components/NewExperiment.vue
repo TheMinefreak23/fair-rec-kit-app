@@ -50,7 +50,6 @@ async function sendToServer() {
   sendForm.lists.metrics = reformat(sendForm.lists.metrics)
   sendForm.lists.datasets = reformat(sendForm.lists.datasets)
   console.log('sendForm', sendForm)
-  store.currentExperiment = { metadata: metadata.value, settings: sendForm }
 
   // Post settings to server
   const requestOptions = {
@@ -70,6 +69,7 @@ async function sendToServer() {
   store.currentTab = 1
   const interval = 1000
   store.resultPoll = setInterval(getCalculation, interval)
+  store.currentExperiment = { metadata: metadata.value, settings: sendForm }
 }
 
 //Declare default values of the form
@@ -348,6 +348,13 @@ function reformat(property) {
       <!--Send a plethora of mock data to the queue-->
       <b-button type="test" variant="warning" @click="sendMockData(options)"
         >Mock</b-button
+      >
+      <!--Simple version of the mock-->
+      <b-button
+        type="test"
+        variant="primary"
+        @click="sendMockData(options, true)"
+        >Simple Mock</b-button
       >
     </b-card>
   </div>

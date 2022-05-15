@@ -159,7 +159,7 @@ def config_dict_from_settings(experiment):
     for dataset in settings['datasets']:
         print(dataset)
         # TODO refactor
-        if 'conversion' in dataset:
+        if dataset['conversion'] != [] and 'conversion' in dataset:
             dataset['conversion'] = dataset['conversion'][0]
         dataset['splitting'] = dataset['splitting'][0]
         # TODO rename split param
