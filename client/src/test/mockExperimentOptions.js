@@ -7,18 +7,23 @@ var metadata = {}
 var form = {}
 
 async function sendMockData(options) {
+  console.log('options', options)
   form = {
     recommendations: rand(100),
-    split: rand(100),
-    splitMethod: 'timesplit',
-    approaches: generateRandomApproach(options),
-    metrics: generateRandomMetrics(options),
-    datasets: generateRandomDatasets(options),
-    filters: toFormObject(randomWords()),
+    //split: rand(100),
+    //splitMethod: 'timesplit',
+    experimentMethod: 'recommendation', // todo random
+    lists: {
+      approaches: generateRandomApproach(options),
+      //metrics: generateRandomMetrics(options),
+      datasets: generateRandomDatasets(options),
+      //filters: toFormObject(randomWords()),
+    },
   }
+  console.log('form', form)
 
   metadata = {
-    name: 'Test' + rand() + ': ' + randomWord(),
+    name: 'Test' + rand() + '_' + randomWord(),
     email: randomWord() + '@' + randomWord() + '.com',
     tags: randomWords(),
   }
@@ -52,18 +57,23 @@ function generateRandomApproach(options) {
     var approachName = approach.name
     var choices = approach.params.options
 
-    var randomOptionName = randomWord()
-    var randomOptionValue = randomWord()
+    console.log('selects', choices)
+
+    var randomOptionName = null //randomWord()
+    var randomOptionValue = null //randomWord()
     if (choices != (undefined || [])) {
       var randomOption = randomItems(choices, 1)[0]
+      console.log('random option', randomOption)
       randomOptionName = randomOption.name
       randomOptionValue = randomItems(randomOption.options, 1)
     }
 
     var values = approach.params.values
 
-    var randomValuesName = randomWord()
-    var randomValuesValue = rand()
+    console.log('inputs', values)
+
+    var randomValuesName = null //randomWord()
+    var randomValuesValue = null //rand()
     if (values != (undefined || [])) {
       var randomValue = randomItems(values, 1)[0]
       randomValuesName = randomValue.name
@@ -83,7 +93,7 @@ function generateRandomApproach(options) {
 
     result[i] = {
       name: approachName,
-      settings: params,
+      params: params,
     }
   }
 
@@ -102,7 +112,7 @@ function generateRandomMetrics(options) {
 
     result[i] = {
       name: randomOptionName,
-      settings: rand(20),
+      params: rand(20),
     }
   }
 
@@ -116,6 +126,7 @@ function generateRandomDatasets(options) {
   for (let i = 0; i < n; i++) {
     console.log(options.datasets)
     var randomDataset = randomItems(options.datasets, 1)[0].value
+    console.log('random dataset', randomDataset)
 
     var randomDatasetName = randomDataset.name
     var randomDatasetParams = {
@@ -123,9 +134,27 @@ function generateRandomDatasets(options) {
       value: randomDataset.params.values[0].default,
     }
 
+    const randomSplitting = randomDataset.params.dynamic[2].options[0].value
+    console.log('splitting', randomSplitting)
+
     result[i] = {
       name: randomDatasetName,
-      settings: randomDatasetParams,
+      params: [randomDatasetParams],
+      splitting: [
+        {
+          // TODO actual random choice, this is just a temp quick fix
+          name: randomDataset.params.dynamic[2].name,
+          params: [
+            {
+              name: randomSplitting.name,
+              value: getRandomInt(
+                randomSplitting.params.values[0].min,
+                randomSplitting.params.values[0].max
+              ),
+            },
+          ],
+        },
+      ],
     }
     console.log(result)
   }
@@ -157,9 +186,9 @@ function randomWords() {
 function randomItems(list = [], n = Math.floor(Math.random() * list.length)) {
   //takes a list and a number, selects a random amount of item in that list.
 
-  if (list.length == 0) {
+  /*if (list.length == 0) {
     return randomWord()
-  }
+  }*/
   let set = new Set()
   for (let i = 0; i < n; i++) {
     set.add(list[Math.floor(Math.random() * list.length)])
@@ -170,7 +199,7 @@ function randomItems(list = [], n = Math.floor(Math.random() * list.length)) {
   return [...set]
 }
 
-function toFormObject(obj) {
+/*function toFormObject(obj) {
   return obj.map((x) => ({
     name: x,
     parameter: null,
@@ -195,6 +224,6 @@ function reformat(property) {
     }
   }
   return choices
-}
+}*/
 
 export { sendMockData }
