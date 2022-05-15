@@ -10,10 +10,10 @@ from fairreckitlib.core.config_constants import TYPE_PREDICTION, TYPE_RECOMMENDA
 model_API_dict = {}
 
 # constants
-DEFAULTS = {'split': 80,
+DEFAULTS = {#'split': 80,
             'recCount': {'min': 0, 'max': 100, 'default': 10},
             }  # default values
-DEFAULT_SPLIT = {'name': 'Train/testsplit', 'default': '80', 'min': 1, 'max': 99}
+DEFAULT_SPLIT = {'name': 'Train/testsplit', 'default': 80, 'min': 1, 'max': 99}
 filters = json.load(open('parameters/filters.json'))
 
 
@@ -39,18 +39,20 @@ def create_available_options(recommender_system):
     """
     options = {}
 
-    frk_datasets = recommender_system.get_available_datasets()
-    frk_predictors = recommender_system.get_available_algorithms(TYPE_PREDICTION)
-    frk_recommenders = recommender_system.get_available_algorithms(TYPE_RECOMMENDATION)
+    datasets = recommender_system.get_available_datasets()
+    predictors = recommender_system.get_available_algorithms(TYPE_PREDICTION)
+    recommenders = recommender_system.get_available_algorithms(TYPE_RECOMMENDATION)
     # TODO different metrics for diff types
-    frk_metrics = recommender_system.get_available_metrics(TYPE_RECOMMENDATION)
-    # print('DATASETS:\n', frk_datasets)
-    # print(frk_predictors)
-    print('recs',frk_recommenders)
-    print('metrics',frk_metrics)
+    pred_metrics = recommender_system.get_available_metrics(TYPE_PREDICTION)
+    rec_metrics = recommender_system.get_available_metrics(TYPE_RECOMMENDATION)
+    converters = recommender_system.get_available_rating_converters()
+    # print('recommenders', recommenders)
+    print('rating converters', converters)
+    splits = recommender_system.get_available_splitters()
+    print('splits', splits)
 
     global model_API_dict
-    model_API_dict = create_model_api_dict(frk_predictors, frk_recommenders)
+    model_API_dict = create_model_api_dict(predictors, recommenders)
 
     def format_categorised(settings):
         formatted_settings = []
@@ -61,56 +63,76 @@ def create_available_options(recommender_system):
         # print(formatted_settings)
         return formatted_settings
 
-    # Format categorised settings
-    datasets = format_categorised(frk_datasets)
-    recommenders = format_categorised(frk_recommenders)
-    predictors = format_categorised(frk_predictors)
-    metrics = format_categorised(frk_metrics)
+    # Format categorised settings (most settings are categorised once)
+    # TODO refactor
+    datasets = format_categorised(datasets)
+    recommenders = format_categorised(recommenders)
+    predictors = format_categorised(predictors)
+    pred_metrics = format_categorised(pred_metrics)
+    rec_metrics = format_categorised(rec_metrics)
 
-    options['defaults'] = DEFAULTS
+    # Add dynamic (nested settings) settings
+    formatted_filters = reformat(filters, False)
+    formatted_converters = reformat(converters, False)
+    formatted_splits = reformat(splits, False)
 
-    # Format datasets
-    # TODO do this in backend
+    # MOCK: for now use all filters/metrics per dataset
+    filter_option = {'name': 'filter',
+                     'title': 'filters',
+                     'article': 'a',
+                     'options': formatted_filters}
+    converter_option = {'name': 'rating converter',
+                        'single': True,
+                        'title': 'conversion',
+                        'article': 'a',
+                        'options': formatted_converters}
+    # split_types = ['Random'] + (['Time'] if params['timestamp'] else [])
+    split_type_option = {'name': 'type of split',
+                         'single': True,
+                         'required': True,
+                         'title': 'splitting',
+                         'article': 'a',
+                         'default': 'Random',  # TODO use this
+                         'options': formatted_splits}
+
     for dataset in datasets:
         # TODO this is stupid because we just created the options key
         dataset['params'] = dataset['options']
         del dataset['options']
+        dataset['params']['values'] = [DEFAULT_SPLIT]
+        dataset['params']['dynamic'] = [filter_option, converter_option, split_type_option]
+        # print(dataset['params']['options'])
 
-        # Reformat and add parameters
-        params = dataset['params']
-        params['values'] = [DEFAULT_SPLIT]
-        splits = ['Random'] + (['Time'] if params['timestamp'] else [])
-        params['options'] = [{'name': 'Type of split', 'default': "Random", 'options': splits}]
-
-        dataset['params'] = params
-
-    formatted_filters = reformat(filters, False)
-    # Add dynamic (nested settings) settings
-    # MOCK: for now use all filters/metrics per dataset
-    filter_list = [{'name': 'filter',
-                    'plural': 'filters', 'article': 'a', 'options': formatted_filters}]
-
-    for dataset in datasets:
-        dataset['params']['dynamic'] = filter_list
-
-    for metric in metrics:
+    for metric in rec_metrics + pred_metrics:
         for option in metric['options']:
-            option['params']['dynamic'] = filter_list
+            option['params']['dynamic'] = [filter_option]
 
-    print(options)
-    options = reformat_all(options, datasets, recommenders, predictors, metrics)
+    # TODO refactor
+    uncategorised = [
+        ('datasets', datasets),
+    ]
+    categorised = [
+        ('predictors', predictors),
+        ('recommenders', recommenders),
+        ('recMetrics', rec_metrics),
+        ('predMetrics', pred_metrics)
+    ]
+    options = reformat_all(options, uncategorised, categorised)
+    options['defaults'] = DEFAULTS
     options['filters'] = formatted_filters
+
+    # print('datasets tests', json.dumps(datasets[0], indent=4))
+    # print('recommender tests', json.dumps(recommenders[0], indent=4))
     # print(options)
 
     return options
 
 
-def reformat_all(options, datasets, recommenders, predictors, metrics):
-    options['datasets'] = reformat(datasets, False)
-    # options['approaches'] = APPROACHES
-    options['predictors'] = reformat(predictors, True)
-    options['recommenders'] = reformat(recommenders, True)
-    options['metrics'] = reformat(metrics, True)
+def reformat_all(options, uncategorised, categorised):
+    for (option_type, inner_options) in uncategorised:
+        options[option_type] = reformat(inner_options, False)
+    for (option_type, inner_options) in categorised:
+        options[option_type] = reformat(inner_options, True)
     return options
 
 
@@ -124,16 +146,24 @@ def config_dict_from_settings(experiment):
     """
     settings = experiment['settings']
 
-    name = experiment['metadata']['name'] 
+    print('raw experiment settings:', json.dumps(settings, indent=4))
+
+    name = experiment['metadata']['name']
     experiment_id = experiment['timestamp']['stamp'] + '_' + name
 
+    form_to_data(settings)
+    print('formatted from form', json.dumps(settings, indent=4))
+
     # Format datasets
-    datasets = list(
-        map(lambda dataset: {
-            'name': dataset['name'],
-            'splitting': {'test_ratio': (100 - settings['split']) / 100,
-                          'type': settings['splitMethod']}},
-            settings['datasets']))
+    # Add generic split to all dataset
+    for dataset in settings['datasets']:
+        print(dataset)
+        # TODO refactor
+        dataset['conversion'] = dataset['conversion'][0]
+        dataset['splitting'] = dataset['splitting'][0]
+        # TODO rename split param
+        dataset['splitting']['test_ratio'] = (100 - dataset['params']['Train/testsplit']) / 100
+
 
     # Format models
     models = {}
@@ -145,7 +175,7 @@ def config_dict_from_settings(experiment):
             model_setting = approach
         models.setdefault(model_API_dict[model_name], []).append(model_setting)
 
-    #evaluation = {'metrics': list(map(lambda metric: metric['name'], settings['metrics'])), 'filters': []}
+    # evaluation = {'metrics': list(map(lambda metric: metric['name'], settings['metrics'])), 'filters': []}
 
     # TODO for now leave out the metrics
     evaluation = {'metrics': [], 'filters': []}
@@ -163,7 +193,7 @@ def config_dict_from_settings(experiment):
     print(config)"""
 
     print(name)
-    config_dict = {'datasets': datasets,
+    config_dict = {'datasets': settings['datasets'],
                    'models': models,
                    'evaluation': evaluation,
                    'name': experiment_id,
@@ -174,10 +204,31 @@ def config_dict_from_settings(experiment):
     return config_dict, experiment_id
 
 
-# Reformat an options list
+def form_to_data(settings):
+    # Format from group list form data
+    for option_name, option_list in settings['lists'].items():
+        print(option_list)
+        reformat_list(settings, option_name, option_list)
+    del settings['lists']
+
+
+# Reformat settings list from form to data
+def reformat_list(settings, option_name, option_list):
+    for option in option_list:
+        print(option)
+        option['params'] = {param['name']: param['value'] for param in option['params']}
+        # Format inner formgrouplists
+        for inner_option_name, inner_option_list in option.items():
+            if inner_option_name not in ['name', 'params']: # TODO use settings/lists key after all?
+                print(json.dumps(option, indent=4))
+                reformat_list(option, inner_option_name, inner_option_list)
+    settings[option_name] = option_list
+
+
+# Reformat an options list from data to form
 def reformat_options(options):
     # Add text and value fields
-    return list(map(lambda option: {'name': option['name'], 'value': option}, options))
+    return [{'name': option['name'], 'value': option} for option in options]
 
 
 # Reformat options for form usage
@@ -190,7 +241,7 @@ def reformat(options, nested):
             if option['name'] == ELLIOT_API:
                 for disable_option in option['options']:
                     disable_option['disabled'] = True
-                    #print(disable_option)
+                    # print(disable_option)
 
                 option['name'] = option['name'] + ' (unavailable)'
     else:
