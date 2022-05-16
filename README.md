@@ -1,5 +1,6 @@
-# fair-rec-kit-app
+# FairRecKit App
 [![Pylint](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/pylint.yml/badge.svg)](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/pylint.yml)
+[![PEP257](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/pydoctest.yml/badge.svg)](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/pydoctest.yml)
 [![Server Pytest](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/pytest.yml/badge.svg)](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/pytest.yml)
 [![Client Vitest](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/vitest.yml/badge.svg)](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/vitest.yml)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/TheMinefreak23/fair-rec-kit-app?label=Release)
