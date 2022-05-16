@@ -78,8 +78,8 @@ def set_recs():
     result_id = json.get("id")  # Result timestamp TODO use to get result
     run_id = json.get("runid")
     pair_id = json.get("pairid")
-    path = result_storage.get_rec_path(result_id, run_id, pair_id)
-    result_storage.current_recs = pd.read_csv(path, sep='\t', header=0)
+    path = result_storage.get_rec_path(result_id, run_id, pair_id)   
+    result_storage.current_recs[pair_id] = pd.read_csv(path, sep='\t', header=0)
     return {'status': 'success', 'availableFilters' : options['filters']}
 
 
@@ -87,7 +87,7 @@ def set_recs():
 @results_bp.route('/result', methods=['POST'])
 def user_result():
     json = request.json
-
+    pair_id = json.get("pairid")
     filters = json.get("filters")
     #TODO implement backend filtering
 
@@ -96,7 +96,7 @@ def user_result():
     chosen_headers = json.get("optionalHeaders", [])
 
     #read mock dataframe
-    recs = result_storage.current_recs
+    recs = result_storage.current_recs[pair_id]
     if recs is None:
         set_recs()
         recs = result_storage.current_recs

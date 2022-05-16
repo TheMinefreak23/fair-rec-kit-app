@@ -33,7 +33,7 @@ watch(
   }
 )
 
-onMounted(() => (store.currentResults = [mockResult()]))
+//onMounted(() => (store.currentResults = [mockResult()]))
 
 // Mockdata result
 function mockResult() {
