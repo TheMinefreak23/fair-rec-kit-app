@@ -1,8 +1,17 @@
 # fair-rec-kit-app
+[![Pylint](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/pylint.yml/badge.svg)](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/pylint.yml)
+[![Server Pytest](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/pytest.yml/badge.svg)](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/pytest.yml)
+[![Client Vitest](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/vitest.yml/badge.svg)](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/vitest.yml)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/TheMinefreak23/fair-rec-kit-app?label=Release)
 
-## NOTE: These instructions are for Windows command prompt
+The fairreckit application is a web-based tool intended to aid in the performing and analysing of recommender system computations. It utilises a custom library called [fairreckitlib](https://github.com/TheMinefreak23/fairreckitlib) to perform its computations.
+
+This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.  
+© Copyright Utrecht University (Department of Information and Computing Sciences)
 
 ## How to run client & server
+### NOTE: These instructions are for Windows command prompt
 
 (Install Node.js first and run npm install)
 Either click the run.bat file in the app directory, or run (in cmd):

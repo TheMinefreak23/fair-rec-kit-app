@@ -1,13 +1,16 @@
 <script setup>
+/*This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import { computed, ref } from 'vue'
 
 const emit = defineEmits(['input'])
 const props = defineProps({
-  value: { type: [String, Number], required: true },
+  value: { required: true },
   name: String,
-  min: Number,
-  max: Number,
-  step: Number,
+  min: Number | String,
+  max: Number | String,
+  step: Number | String,
 })
 
 const rightVal = computed({

@@ -11,47 +11,29 @@
     "itemHeaders": ["artist_name"]
   },
   "LFM-360K": {
-    "user_item": ["rating"],
-    "user": [
+    "headers": ["rating"],
+    "userHeaders": [
       "user_sha",
       "user_gender",
       "user_age",
       "user_country",
       "user_signup"
     ],
-    "item": ["artist_name"]
+    "itemHeaders": ["artist_name"]
   },
   "ML-25M": {
-    "user_item": ["rating"],
-    "item": ["movie_title", "movie_genres"]
+    "headers": ["rating"],
+    "itemHeaders": ["movie_title", "movie_genres"]
   },
   "ML-100K": {
-    "user_item": ["rating"],
-    "user": ["user_age", "user_gender", "user_occupation", "user_zip code"],
-    "item": [
+    "headers": ["rating"],
+    "userHeaders": ["user_age", "user_gender", "user_occupation", "user_zip code"],
+    "itemHeaders": [
       "movie_title",
       "movie_release date",
       "movie_video release date",
       "movie_imdb url",
-      "movie_unknown",
-      "movie_action",
-      "movie_adventure",
-      "movie_animation",
-      "movie_children's",
-      "movie_comedy",
-      "movie_crime",
-      "movie_documentary",
-      "movie_drama",
-      "movie_fantasy",
-      "movie_film-noir",
-      "movie_horror",
-      "movie_musical",
-      "movie_mystery",
-      "movie_romance",
-      "movie_sci-fi",
-      "movie_thriller",
-      "movie_war",
-      "movie_western"
+      "movie_genres"
     ]
   }
 }

@@ -1,4 +1,4 @@
-name: Full Pylint
+name: Pylint
 
 on:
   workflow_dispatch:
@@ -35,4 +35,4 @@ jobs:
         pip install fairreckitlib
     - name: Analysing the code with pylint
       run: |
-        pylint $(git ls-files '*.py')
+        pylint $(git ls-files '*.py') --fail-on=E --fail-under=9
