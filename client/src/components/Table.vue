@@ -280,10 +280,9 @@ function setsorting(i) {
     id="change-columns-modal"
     v-model="updateHeadersModalShow"
     title="Change columns"
-    @ok="$emit('updateHeaders', checkedColumns, userColumns, itemColumns)"
+    @ok="$emit('updateHeaders', [...checkedColumns, ...userColumns, ...itemColumns])"
   >
     <p>Select the extra headers you want to be shown</p>
-    <p>{{ headerOptions }}</p>
     <p>General:</p>
     <div
       class="form-check form-switch"
