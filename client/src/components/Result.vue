@@ -6,6 +6,7 @@ Utrecht University within the Software Project course.
 import Table from './Table.vue'
 import { onActivated, onMounted, onUpdated, ref, watch } from 'vue'
 import { emptyFormGroup } from '../helpers/optionsFormatter'
+import { capitalise } from '../helpers/resultFormatter'
 
 import mockdata from '../../../server/mock/1647818279_HelloWorld/results-table.json'
 import { API_URL } from '../api'
@@ -23,12 +24,11 @@ const selectedHeaders = ref([[
 const experiment_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
 const data = ref({results: [[]]})
-const mockdataRunIndex = ref(0)
 const startIndex = ref(0)
 const index = ref(0)
 const ascending = ref(true)
 const entryAmount = ref(20)
-const optionalHeaders = ref([])
+const optionalHeaders = ref([[]])
 const userHeaders = ref([])
 const itemHeaders = ref([])
 const availableFilters = ref([])
@@ -47,24 +47,16 @@ onMounted(() => {
   //loadEvaluations()
 })
 
-// GET request: Get available options for selection from server
-async function getHeaders(index, file) {
+// GET request: Get available header options for selection from server
+async function getHeaderOptions(index) {
   //TODO replace mock variables in body
-  const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-type': 'application/json' },
-    body: JSON.stringify({
-      index: index,
-      location: file,
-    }),
-  }
-  const response = await fetch(API_URL + '/all-results/headers', requestOptions)
+  const response = await fetch(API_URL + '/all-results/headers')
   const data = await response.json()
-  
-
-  generalHeaderOptions.value[index] = makeHeaders(data.headers)
-  itemHeaderOptions.value[index] = makeHeaders(data.itemHeaders)
-  userHeaderOptions.value[index] = makeHeaders(data.userHeaders)
+  let headerOptions = data[props.result.result[0].dataset.name]
+  console.log(headerOptions, index)
+  generalHeaderOptions.value[index] = makeHeaders(headerOptions.headers)
+  itemHeaderOptions.value[index] = makeHeaders(headerOptions.itemHeaders)
+  userHeaderOptions.value[index] = makeHeaders(headerOptions.userHeaders)
 }
 
 //POST request: Send result ID to the server to set current shown recommendations.
@@ -89,7 +81,8 @@ async function setRecs(currentTable) {
     availableFilters.value = data.availableFilters
     await getUserRecs(0), getUserRecs(1)
     //TODO remove this mock
-    getHeaders(0, '0_Foobar/run_0/overview.json')
+    getHeaderOptions(0)
+    getHeaderOptions(1)
   }
 }
 
@@ -131,7 +124,7 @@ async function getUserRecs(currentTable) {
       ascending: ascending.value,
       amount: entryAmount.value,
       filters: filters.value,
-      optionalHeaders: optionalHeaders.value,
+      optionalHeaders: optionalHeaders.value[currentTable],
       itemheaders: itemHeaders.value,
       userheaders: userHeaders.value,
     }),
@@ -185,7 +178,7 @@ function paginationSort(indexVar, pairid) {
  * @param {Int}    pairid    - Index of which result file to load (from overview.json)
  */
 function updateHeaders(headers, pairid) {
-  optionalHeaders.value = headers
+  optionalHeaders.value[pairid] = headers
   getUserRecs(pairid)
 }
 
@@ -200,25 +193,15 @@ function changeFilters(changedFilters, pairid) {
 }
 
 /**
- * convert list of header names into supported header format, capitalize and remove underscores
+ * convert list of header names into supported header format, capitalise and remove underscores
  * @param {Array}   headers  - list of headers.
  */
 function makeHeaders(headers) {
-  for (var i = 0; i < headers.length; i++) {
-    headers[i] = capitalizeFirstLetter(headers[i].toString().replace('_', ' '))
-  }
   return headers.map((header) => ({
-    name: header,
+    name: capitalise(header.toString()),
   }))
 }
 
-/**
- * Capitalize the first letter of a string
- * @param {int}   string  - the string that needs to be capitalized.
- */
-function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1)
-}
 </script>
 
 <template>
