@@ -65,7 +65,6 @@ async function getHeaders(index, file) {
   generalHeaderOptions.value[index] = makeHeaders(data.headers)
   itemHeaderOptions.value[index] = makeHeaders(data.itemHeaders)
   userHeaderOptions.value[index] = makeHeaders(data.userHeaders)
-  console.log(generalHeaderOptions.value[index])
 }
 
 //POST request: Send result ID to the server to set current shown recommendations.
@@ -75,7 +74,7 @@ async function setRecs(currentTable) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       id: props.result.id,
-      runid: 1,
+      runid: 0,
       pairid: currentTable,
     }),
   }
@@ -89,7 +88,8 @@ async function setRecs(currentTable) {
     const data = await response.json()
     availableFilters.value = data.availableFilters
     await getUserRecs(0), getUserRecs(1)
-    getHeaders(currentTable, '0_Foobar/run_0/overview.json')
+    //TODO remove this mock
+    getHeaders(0, '0_Foobar/run_0/overview.json')
   }
 }
 
