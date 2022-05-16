@@ -1,4 +1,4 @@
-name: Pytest with Coverage
+name: Server Pytest
 
 on:
   workflow_dispatch:
