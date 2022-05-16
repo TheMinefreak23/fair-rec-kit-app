@@ -24,6 +24,11 @@ const options = [
   { name: 'foo3', value: { name: 'bar3' } },
 ]
 
+/**
+ * Create mock props for a required Foo form group list
+ * @param {Object} options
+ * @return {{Object}} mock form group list props
+ */
 function getProps(options) {
   return {
     data: form,
@@ -34,6 +39,9 @@ function getProps(options) {
   }
 }
 
+/**
+ * Test the form group remove button
+ */
 test('remove button', async () => {
   const count = 2
   form.groupCount = count
@@ -59,6 +67,9 @@ test('remove button', async () => {
   expect(dropdowns.length).toBe(count - 1)
 })
 
+/**
+ * Test adding a form group
+ */
 test('required option: test labels and adding option', async () => {
   // Initialise empty form
 
@@ -98,6 +109,9 @@ test('required option: test labels and adding option', async () => {
   }*/
 })
 
+/**
+ * Test selecting a main option in a form group
+ */
 test('select main option', async () => {
   // Render FormGroupList
   const count = 1
