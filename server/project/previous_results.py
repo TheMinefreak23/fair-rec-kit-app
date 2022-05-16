@@ -3,10 +3,10 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
-import json
 
 from flask import (Blueprint, request)
 import pandas as pd
+from fairreckitlib.data.set.dataset import add_user_columns, add_item_columns
 
 from . import result_storage
 from .experiment import options
@@ -78,8 +78,8 @@ def set_recs():
     result_id = json.get("id")  # Result timestamp TODO use to get result
     run_id = json.get("runid")
     pair_id = json.get("pairid")
-    path = result_storage.get_rec_path(result_id, run_id, pair_id)
-    result_storage.current_recs = pd.read_csv(path, sep='\t', header=None)
+    path = result_storage.get_rec_path(result_id, run_id, pair_id)   
+    result_storage.current_recs[pair_id] = pd.read_csv(path, sep='\t', header=0)
     return {'status': 'success', 'availableFilters' : options['filters']}
 
 
@@ -87,18 +87,16 @@ def set_recs():
 @results_bp.route('/result', methods=['POST'])
 def user_result():
     json = request.json
-
+    pair_id = json.get("pairid")
     filters = json.get("filters")
     #TODO implement backend filtering
 
     chunk_size = json.get("amount", 20)
     chunk_size = int(chunk_size)
-    print(json.get("generalHeaders", []))
-    chosen_headers = json.get("generalHeaders", []) + json.get("userheaders", []) + json.get("itemheaders", [])
-    chosen_headers2 = []
+    chosen_headers = json.get("optionalHeaders", [])
 
     #read mock dataframe
-    recs = result_storage.current_recs
+    recs = result_storage.current_recs[pair_id]
     if recs is None:
         set_recs()
         recs = result_storage.current_recs
@@ -111,7 +109,7 @@ def user_result():
 
     # adding extra columns to dataframe
     for chosen_header in chosen_headers:
-        df_sorted[chosen_header['name']] = chosen_header['name']
+        df_sorted[chosen_header] = chosen_header
 
     # getting only chunk of data
     start_rows = json.get("start", 0)
@@ -127,19 +125,20 @@ def user_result():
     # return part of table that should be shown
     df_subset = df_sorted[start_rows:end_rows]
 
-    # return {'results': dfSubset.to_json(orient='records'), 'caption': 'hellofriend'}
     return df_subset.to_json(orient='records')
+    #return ({'headers': list(result_storage.current_headers),'table': df_subset.to_json(orient='records')})
 
-@results_bp.route('/headers', methods=['GET'])
+@results_bp.route('/headers', methods=['POST'])
 def headers():
-    with open('project/headers.json') as j:
-        jsonfile = json.load(j)
-
-    result = jsonfile['LFM-1B']
-    j.close()
-
-    print(result)
-
+    info = request.json
+    index = info.get("index", 0)
+    file = info.get("location", "")
+    headers = result_storage.load_json('project/headers.json')
+    overview = result_storage.load_json('../server/mock/' + file)    
+    dataset = overview['overview'][index]['name'].split('_')[0]
+    result = headers[dataset]
     return result
+    # result = result_storage.current_recs.columns
+    # return {'headers': list(result)}
 
 
