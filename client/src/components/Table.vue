@@ -262,9 +262,9 @@ function setsorting(i) {
     <br />-->
   </b-modal>
 
-  <!-- Shows the metadata of the designated entry -->
-  <b-modal id="view-modal" v-model="viewModalShow" title="Metadata" ok-only>
-    <h5>Here is the metadata:</h5>
+  <!-- Shows the metadata and experiment configuration of the designated entry -->
+  <b-modal id="view-modal" v-model="viewModalShow" title="Result information" ok-only>
+    <h5>Here is the metadata and experiment configuration:</h5>
     <span style="white-space: pre-wrap">{{ metadataStr }}</span>
   </b-modal>
 
@@ -414,7 +414,7 @@ function setsorting(i) {
             v-if="overview"
             pill
             @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
-            >View Metadata</b-button
+            >View Information</b-button
           >
           <template v-if="removable"> </template>
           <b-button

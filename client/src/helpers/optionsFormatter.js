@@ -10,10 +10,11 @@ function emptyFormGroup(required) {
     visible: required, // Show option if it is required
     // For required lists the minimum amount of group items is 1.
     groupCount: required ? 1 : 0,
-    main: [],
+    choices: [{}],
+    /*main: [],
     inputs: [],
     selects: [],
-    lists: [],
+    lists: [],*/
   }
 }
 

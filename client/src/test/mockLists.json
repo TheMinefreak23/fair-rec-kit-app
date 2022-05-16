@@ -1,0 +1,38 @@
+{
+  "datasets": [
+    {
+      "name": "ML-100K",
+      "params": [
+        {
+          "name": "Train/testsplit",
+          "value": 80
+        }
+      ],
+      "filters": [],
+      "conversion": [],
+      "splitting": [
+        {
+          "name": "random",
+          "params": [
+            {
+              "name": "seed",
+              "value": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metrics": [],
+  "approaches": [
+    {
+      "name": "Random",
+      "params": [
+        {
+          "name": "random_seed",
+          "value": null
+        }
+      ]
+    }
+  ]
+}
