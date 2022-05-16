@@ -184,9 +184,12 @@ function updateHeaders(generalHeader, userHeader, itemHeader) {
   getUserRecs()
 }
 
+/**
+ * Update filters shown in user recommendations
+ * @param {Array}   changedFilters  - list of filters that apply to the user-item pair, in the format {name : columnName, settings: {name: filterType, value: filterValue}}
+ */
 function changeFilters(changedFilters) {
   filters.value = changedFilters
-
   getUserRecs()
 }
 

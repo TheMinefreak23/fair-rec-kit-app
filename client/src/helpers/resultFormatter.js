@@ -22,12 +22,10 @@ export function formatResults(allResults) {
 // Format an array of strings into a comma separated string
 export function formatArray(array) {
   var string = ''
-  if (array == null){
+  if (array == null) {
     string = 'None'
   } else {
-    string = array
-    .filter(() => true)
-    .join(', ')
+    string = array.filter(() => true).join(', ')
   }
   return string
 }
