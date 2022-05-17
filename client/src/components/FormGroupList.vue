@@ -233,7 +233,6 @@ function shortGroupDescription(i) {
 
 <template>
   <b-container>
-    {{ options && options.length }}
     <b-container
       :toast="{ root: true }"
       fluid="sm"

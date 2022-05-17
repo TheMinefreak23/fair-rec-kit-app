@@ -38,10 +38,11 @@ async function sendMockData(options, simple = false) {
     tags: randomWords().join(','),
   }
 
+  store.currentExperiment = { metadata: metadata, settings: form }
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ metadata: metadata, settings: form }),
+    body: JSON.stringify(store.currentExperiment),
   }
   const response = await fetch(
     API_URL + '/experiment/calculation',
@@ -55,7 +56,6 @@ async function sendMockData(options, simple = false) {
   store.currentTab = 1
   const interval = 1000
   store.resultPoll = setInterval(getCalculation, interval)
-  store.currentExperiment = { metadata: metadata, settings: form }
 }
 
 function generateRandomApproach(options) {

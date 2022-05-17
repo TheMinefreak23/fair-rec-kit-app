@@ -4,7 +4,7 @@
 from unittest.mock import patch
 
 from project.result_storage import *
-from tests.test_result_storage import test_computation, test_id, save_mock_result, delete_test_results, \
+from tests.test_result_storage import test_experiment, test_id, save_mock_result, delete_test_results, \
     test_results_path
 
 url_prefix = '/api/all-results'
@@ -30,7 +30,7 @@ def test_result_by_id(client):
     print(response.data)
     assert b'success' in response.data  # Result found
     get_response = client.get(url)  # Check if the result we just saved can be retrieved
-    assert get_response.json.get('result', test_computation)
+    assert get_response.json.get('result', test_experiment)
 
     delete_test_results()
 

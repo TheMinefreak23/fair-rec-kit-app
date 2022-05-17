@@ -146,18 +146,18 @@ def config_dict_from_settings(experiment):
     """
     settings = experiment['settings']
 
-    print('raw experiment settings:', json.dumps(settings, indent=4))
+    #print('raw experiment settings:', json.dumps(settings, indent=4))
 
     name = experiment['metadata']['name']
     experiment_id = experiment['timestamp']['stamp'] + '_' + name
 
     form_to_data(settings)
-    print('formatted from form', json.dumps(settings, indent=4))
+    #print('formatted from form', json.dumps(settings, indent=4))
 
     # Format datasets
     # Add generic split to all dataset
     for dataset in settings['datasets']:
-        print(dataset)
+        #print(dataset)
         # TODO refactor
         if dataset['conversion'] != [] and 'conversion' in dataset:
             dataset['conversion'] = dataset['conversion'][0]
