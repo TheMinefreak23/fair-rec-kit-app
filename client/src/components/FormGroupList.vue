@@ -239,22 +239,22 @@ function shortGroupDescription(i) {
       position="position-fixed"
     ></b-container>
     <b-row>
-      <h3 class="text-center">
-        <b-card no-body class="mb-1 bg-primary">
+      <h3 class="text-center text-white mb-0">
+        <b-card no-body class="mb-0 bg-dark">
           <!--Capitalise the title.-->
           {{ title && capitalise(title) }}
           <!--Collapsable group list toggle button-->
           <b-button
             class="text-start"
             @click="form.visible = !form.visible"
-            variant="primary"
+            variant="dark"
           >
             <template v-if="form.visible">&#x25BC; | </template>
             <template v-else>&#x25BA; | </template>
           </b-button>
         </b-card>
       </h3>
-      <p>{{ description && capitalise(description) }}</p>
+      <!-- <p>{{ description && capitalise(description) }}</p> -->
     </b-row>
     <!--TODO b-collapse doesn't work-->
     <!--Collapsable group list-->
@@ -276,8 +276,8 @@ function shortGroupDescription(i) {
               <b-container class="g-0">
                 <!--Collapsable group toggle button with remove button-->
                 <b-row md="auto">
-                  <b-row>
-                    <b-col>
+                  <b-row class="pe-0">
+                    <b-col class="pe-0">
                       <b-card no-body class="mb-1">
                         <b-button
                           class="text-start"
@@ -288,7 +288,7 @@ function shortGroupDescription(i) {
                               ? (visibleGroup = -1)
                               : (visibleGroup = i)
                           "
-                          :variant="visibleGroup == i ? 'primary' : 'info'"
+                          :variant="visibleGroup == i ? 'secondary' : 'dark'"
                         >
                           <template v-if="visibleGroup == i"
                             >&#x25BC; |
@@ -299,12 +299,13 @@ function shortGroupDescription(i) {
                       </b-card>
                     </b-col>
                     <!--Remove button-->
-                    <b-col cols="1" v-if="!(i == 1 && required)">
+                    <b-col cols="1" v-if="!(i == 1 && required)" class="p-0">
                       <b-button
                         data-testid="remove-button"
                         @click="removeGroup(i - 1)"
                         variant="danger"
-                        class="mb-2 mr-sm-2 mb-sm-0"
+                        class="mb-2 mr-sm-2 mb-sm-0 float-end"
+                        style="width: 90%;"
                         >X</b-button
                       >
                     </b-col>
@@ -339,8 +340,8 @@ function shortGroupDescription(i) {
       </b-collapse>
     </b-row>
     <b-row>
-      <h3>
-        <b-card no-body class="mb-1">
+      <h3 class="m-0">
+        <b-card no-body class="mt-1">
           <b-button
             @click="
               form.groupCount++,
