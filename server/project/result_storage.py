@@ -138,8 +138,8 @@ def id_to_name(json_data, result_id):
     for iteration_id in range(len(json_data['all_results'])):
         if int(json_data['all_results'][iteration_id]['timestamp']['stamp']) == int(result_id):
             current_result_overview_id = iteration_id
-    current_name = json_data['all_results'][current_result_overview_id]['metadata']['name']
-    return current_name
+            return json_data['all_results'][current_result_overview_id]['metadata']['name']
+    return json_data['all_results'][-1]['metadata']['name']
 
 
 def load_json(path):

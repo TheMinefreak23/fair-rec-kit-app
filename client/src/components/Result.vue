@@ -38,20 +38,19 @@ const userTables = combineResults()
 onMounted(() => {
   console.log('result', props.result)
   console.log('result id', props.result.id)
-  setRecs(0)
-  setRecs(1)
-  setRecs(2)
-  setRecs(3)
+  //Load in all the user recommendation/prediction tables
+  for (let index in userTables) {
+    setRecs(parseInt(index))
+  }
   console.log('availableFilters', availableFilters.value)
   //loadEvaluations()
 })
 
 // GET request: Get available header options for selection from server
 async function getHeaderOptions(index) {
-  //TODO replace mock variables in body
   const response = await fetch(API_URL + '/all-results/headers')
   const data = await response.json()
-  let headerOptions = data[props.result.result[0].dataset.name]
+  let headerOptions = data[userTables[index].split(' ')[1].split('_')[0]]
   generalHeaderOptions.value[index] = makeHeaders(headerOptions.headers)
   itemHeaderOptions.value[index] = makeHeaders(headerOptions.itemHeaders)
   userHeaderOptions.value[index] = makeHeaders(headerOptions.userHeaders)
@@ -77,12 +76,8 @@ async function setRecs(currentTable) {
   if (response.status == '200') {
     const data = await response.json()
     availableFilters.value = data.availableFilters
-    await getUserRecs(0), getUserRecs(1), getUserRecs(2), getUserRecs(3)
-    //TODO remove this mock
-    getHeaderOptions(0)
-    getHeaderOptions(1)
-    getHeaderOptions(2)
-    getHeaderOptions(3)
+    getUserRecs(currentTable)
+    getHeaderOptions(currentTable)
   }
 }
 
@@ -151,7 +146,6 @@ function loadMore(increase, amount, pairid) {
   if (startIndex.value < 0) startIndex.value = 0
   else if (increase) startIndex.value += entryAmount.value
   else startIndex.value = 0
-  console.log(pairid)
   //Update amount to new number of entries that are shown.
   entryAmount.value = amount
   getUserRecs(pairid)
@@ -210,7 +204,6 @@ function makeHeaders(headers) {
 function combineResults() {
   let list = []
   for (let dataset in props.result.result) {
-    console.log(dataset)
     for (let approach in props.result.result[dataset].results) {
       list.push(props.result.result[dataset].caption + '_' + props.result.result[dataset].results[approach].approach)
     }
@@ -277,7 +270,7 @@ function combineResults() {
             <Table
               v-if="selectedHeaders[index]"
               :key="props.result.id"
-              :caption="entry.caption"
+              :caption="entry"
               :results="data.results[index]"
               :headers="makeHeaders(selectedHeaders[index])"
               :filters="filters"
