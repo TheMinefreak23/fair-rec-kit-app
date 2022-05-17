@@ -1,71 +1,98 @@
+/*This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+
 import words from 'an-array-of-english-words'
 import { API_URL } from '../api'
-import { store } from '../store'
+import { getCalculation, store } from '../store'
 import { ref, onMounted } from 'vue'
+import mockLists from './mockLists.json'
 
 var metadata = {}
 var form = {}
 
-async function sendMockData(options) {
+async function sendMockData(options, simple = false) {
+  console.log('options', options)
   form = {
     recommendations: rand(100),
-    split: rand(100),
-    splitMethod: 'timesplit',
-    approaches: generateRandomApproach(options),
-    metrics: generateRandomMetrics(options),
-    datasets: generateRandomDatasets(options),
-    filters: toFormObject(randomWords()),
+    //split: rand(100),
+    //splitMethod: 'timesplit',
+    experimentMethod: 'recommendation', // todo random
   }
+  if (simple) {
+    form.lists = mockLists
+  } else {
+    form.lists = {
+      approaches: generateRandomApproach(options),
+      metrics: [], // TODO
+      //metrics: generateRandomMetrics(options),
+      datasets: generateRandomDatasets(options),
+      //filters: toFormObject(randomWords()),
+    }
+  }
+  console.log('form', form)
 
   metadata = {
-    name: 'Test' + rand() + ': ' + randomWord(),
+    name: 'Test' + rand() + '_' + randomWord(),
     email: randomWord() + '@' + randomWord() + '.com',
-    tags: randomWords(),
+    tags: randomWords().join(','),
   }
 
+  store.currentExperiment = { metadata: metadata, settings: form }
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ metadata: metadata, settings: form }),
+    body: JSON.stringify(store.currentExperiment),
   }
   const response = await fetch(
     API_URL + '/experiment/calculation',
     requestOptions
   )
   // Update queue
-  const data = response.json()
-  store.queue = data
+  const data = await response.json()
+  store.queue = data.queue
+  console.log('sendToServer() queue', store.queue)
+  // Switch to queue
+  store.currentTab = 1
+  const interval = 1000
+  store.resultPoll = setInterval(getCalculation, interval)
 }
 
 function generateRandomApproach(options) {
   //generate random settings for the Approaches part of a experiment
-  let libraries = options.approaches.libraries.prediction
+  console.log(options)
+  let libraries = options.predictors
   let result = []
   var n = 1 + Math.floor(Math.random() * 3)
 
   for (let i = 0; i < n; i++) {
     var ops = randomItems(libraries, 1)[0].options
 
-    var approach = randomItems(ops, 1)[0]
+    var approach = randomItems(ops, 1)[0].value
 
-    var approachName = approach.text
+    var approachName = approach.name
     var choices = approach.params.options
 
-    var randomOptionName = randomWord()
-    var randomOptionValue = randomWord()
+    console.log('selects', choices)
+
+    var randomOptionName = null //randomWord()
+    var randomOptionValue = null //randomWord()
     if (choices != (undefined || [])) {
       var randomOption = randomItems(choices, 1)[0]
-      randomOptionName = randomOption.text
+      console.log('random option', randomOption)
+      randomOptionName = randomOption.name
       randomOptionValue = randomItems(randomOption.options, 1)
     }
 
     var values = approach.params.values
 
-    var randomValuesName = randomWord()
-    var randomValuesValue = rand()
+    console.log('inputs', values)
+
+    var randomValuesName = null //randomWord()
+    var randomValuesValue = null //rand()
     if (values != (undefined || [])) {
       var randomValue = randomItems(values, 1)[0]
-      randomValuesName = randomValue.text
+      randomValuesName = randomValue.name
       randomValuesValue = getRandomInt(randomValue.min, randomValue.max)
     }
 
@@ -82,7 +109,7 @@ function generateRandomApproach(options) {
 
     result[i] = {
       name: approachName,
-      settings: params,
+      params: params,
     }
   }
 
@@ -95,13 +122,13 @@ function generateRandomMetrics(options) {
   var n = 1 + Math.floor(Math.random() * 3)
   for (let i = 0; i < n; i++) {
     console.log(options.metrics)
-    var randomOption = randomItems(options.metrics.categories, 1)[0]
+    var randomOption = randomItems(options.metrics, 1)[0]
     var randomOptionOptions = randomOption.options
-    var randomOptionName = randomItems(randomOptionOptions, 1)[0].text
+    var randomOptionName = randomItems(randomOptionOptions, 1)[0].name
 
     result[i] = {
       name: randomOptionName,
-      settings: rand(20),
+      params: rand(20),
     }
   }
 
@@ -114,17 +141,36 @@ function generateRandomDatasets(options) {
   var n = 1 + Math.floor(Math.random() * 3)
   for (let i = 0; i < n; i++) {
     console.log(options.datasets)
-    var randomDataset = randomItems(options.datasets, 1)[0]
+    var randomDataset = randomItems(options.datasets, 1)[0].value
+    console.log('random dataset', randomDataset)
 
-    var randomDatasetName = randomDataset.text
+    var randomDatasetName = randomDataset.name
     var randomDatasetParams = {
-      name: randomDataset.params.values[0].text,
+      name: randomDataset.params.values[0].name,
       value: randomDataset.params.values[0].default,
     }
 
+    const randomSplitting = randomDataset.params.dynamic[2].options[0].value
+    console.log('splitting', randomSplitting)
+
     result[i] = {
       name: randomDatasetName,
-      settings: randomDatasetParams,
+      params: [randomDatasetParams],
+      splitting: [
+        {
+          // TODO actual random choice, this is just a temp quick fix
+          name: randomDataset.params.dynamic[2].name,
+          params: [
+            {
+              name: randomSplitting.name,
+              value: getRandomInt(
+                randomSplitting.params.values[0].min,
+                randomSplitting.params.values[0].max
+              ),
+            },
+          ],
+        },
+      ],
     }
     console.log(result)
   }
@@ -156,9 +202,9 @@ function randomWords() {
 function randomItems(list = [], n = Math.floor(Math.random() * list.length)) {
   //takes a list and a number, selects a random amount of item in that list.
 
-  if (list.length == 0) {
+  /*if (list.length == 0) {
     return randomWord()
-  }
+  }*/
   let set = new Set()
   for (let i = 0; i < n; i++) {
     set.add(list[Math.floor(Math.random() * list.length)])
@@ -169,7 +215,7 @@ function randomItems(list = [], n = Math.floor(Math.random() * list.length)) {
   return [...set]
 }
 
-function toFormObject(obj) {
+/*function toFormObject(obj) {
   return obj.map((x) => ({
     name: x,
     parameter: null,
@@ -194,6 +240,6 @@ function reformat(property) {
     }
   }
   return choices
-}
+}*/
 
 export { sendMockData }

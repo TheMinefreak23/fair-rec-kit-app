@@ -11,20 +11,29 @@ import {
   formatEvaluation,
 } from '../helpers/resultFormatter'
 
+/**
+ * Test the formatting of all results
+ */
 describe('format results', () => {
+  // Test a formatted version of an empty array to be empty
   test('empty', () => {
     expect(formatResults([]).length).toBe(0)
   })
   // TODO
 })
 
+/**
+ * Test the string formatting of an array of items
+ */
 describe('format multiple items', () => {
+  // Test that an empty array gives an empty string
   test('empty', () => {
     expect(formatMultipleItems([])).toBe('')
   })
 
+  // Test that a null array gives None
   test('undefined', () => {
-    expect(formatMultipleItems(null)).toBe('NULL')
+    expect(formatMultipleItems(null)).toBe('None')
   })
 
   const items = [{ name: 'a' }, { name: 'b' }]
@@ -37,17 +46,23 @@ describe('format multiple items', () => {
   })
 })
 
+/*
 describe('format result', () => {
   // TODO
   //test('', () => {})
-})
+})*/
 
+/**
+ * Test the short string description of a dataset
+ */
 describe('show dataset info', () => {
+  // A dataset without parmeters should just show the dataset name
   test('no parameter', () => {
     const dataset = { name: 'foo' }
     expect(showDatasetInfo(dataset)).toBe('Dataset: ' + dataset.name)
   })
 
+  // A dataset with parameters should show both name and parameters
   test('parameter', () => {
     const dataset = { name: 'foo', parameter: 'bar' }
     expect(showDatasetInfo(dataset)).toBe(
@@ -56,16 +71,22 @@ describe('show dataset info', () => {
   })
 })
 
+/*
 describe('format evaluation', () => {
   //TODO
   //test('', () => {})
-})
+})*/
 
+/**
+ * Test string formatting (new name) of a metric
+ */
 describe('format metric', () => {
+  // A metric with parameters (k) should show both name and parameters
   test('k metric', () => {
     const metric = { name: 'foo k', params: [{ value: 0 }] }
     expect(formatMetric(metric)).toBe('foo 0')
   })
+  // A metric without parameters should just show its name
   test('no parameter metric', () => {
     expect(formatMetric({ name: 'foo' })).toBe('foo')
   })

@@ -2,7 +2,7 @@
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { API_URL } from '../api'
 import Result from './Result.vue'
 import VDismissButton from './VDismissButton.vue'
@@ -14,30 +14,43 @@ const emit = defineEmits(['goToResult', 'toast'])
 const showResultModal = ref(false)
 const currentTab = ref(0)
 
-// Request latest calculation when the queue is updated
 watch(
-  () => store.queue,
-  (newQueue, oldQueue) => {
-    // Only request if the queue length has decreased
-    // (An experiment has finished)
-    if (newQueue.length < oldQueue.length) {
-      getCalculation()
-      currentTab.value = 0
+  () => store.currentExperiment,
+  // New result added
+  (newState, oldState) => {
+    if (!newState && oldState) {
+      emit('toast')
     }
   }
 )
 
-/**
- * GET request: Ask server for latest calculation
- */
-async function getCalculation() {
-  try {
-    const response = await fetch(API_URL + '/experiment/calculation')
-    const data = await response.json()
-    addResult(formatResult(data.calculation))
-    emit('toast')
-  } catch (e) {
-    console.log(e) // TODO better error handling, composable
+watch(
+  () => store.currentResultTab,
+  // New result added
+  (newTab) => {
+    currentTab.value = newTab
+  }
+)
+
+//onMounted(() => (store.currentResults = [mockResult()]))
+
+// Mockdata result
+function mockResult() {
+  const testcaption = 'Dataset: LFM-1b, Algorithm: ALS'
+
+  // Add mockdata result to current results
+  const mock = {
+    caption: testcaption,
+    results: mockdata.body,
+    headers: mockdata.headers,
+  }
+  return {
+    id: 0,
+    metadata: {
+      name: 'computation1',
+      tags: ['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '],
+    },
+    result: [mock, mock],
   }
 }
 
@@ -60,7 +73,9 @@ function closeResult(index) {
     ok-title="View new result"
     ok-variant="danger"
     cancel-title="Cancel"
-    @ok="$emit('goToResult')"
+    @ok="
+      store.currentTab = 3 //$emit('goToResult')
+    "
   >
     <p>An experiment has finished.</p>
   </b-modal>
@@ -82,18 +97,17 @@ function closeResult(index) {
           </button>
         </div>
         <div class="border">
-          <template v-if="[...store.currentResults].length > 0">
+          <template v-if="store.currentResults.length > 0">
+            {{ currentTab.value }}
             <b-tabs v-model="currentTab" card content-class="mt-3">
               <!-- Show opened results in tabs.-->
-              <b-tab
-                v-for="(result, index) in [...store.currentResults]"
-                :key="result.id"
-              >
+              <b-tab v-for="(result, index) in store.currentResults">
                 <template #title>
+                  <b-spinner v-if="index == store.currentResults.length - 1" type="grow" variant="info" small></b-spinner>
                   Result {{ result.metadata.name }}
                   <VDismissButton @click.stop="closeResult(index)" />
                 </template>
-                <Result :result="result"
+                <Result :result="result" :key="result.id"
               /></b-tab>
             </b-tabs>
           </template>
@@ -111,7 +125,7 @@ function closeResult(index) {
           id="offcanvasRight"
           aria-labelledby="offcanvasRightLabel"
         >
-          <PreviousResults @goToResult="" />
+          <PreviousResults />
         </div>
       </div>
     </div>

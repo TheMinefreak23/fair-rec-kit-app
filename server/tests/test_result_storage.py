@@ -11,13 +11,13 @@ from project.result_storage import *
 
 
 test_id = -1
-test_computation = {'result': None, 'timestamp': {'stamp': test_id}, 'metadata': {'name': 'foo'}}
+test_experiment = {'result': None, 'timestamp': {'stamp': test_id}, 'metadata': {'name': 'foo'}}
 test_results_path = 'tests/test_results.json'
 
 
 @patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 def save_mock_result():
-    save_result(test_computation, 'foo')  # Save a result with the id
+    save_result(test_experiment, 'foo')  # Save a result with the id
 
 
 # Delete all results by emptying the file
@@ -27,9 +27,9 @@ def delete_test_results():
 
 # Test saving a result to the result overview
 def test_save_result():
-    test_computation['result'] = 'foo'
+    test_experiment['result'] = 'foo'
     save_mock_result()
-    expected = test_computation
+    expected = test_experiment
     # The current result gets updated
     from project.result_storage import current_result
     assert current_result is expected
@@ -56,7 +56,7 @@ def test_no_path_json():
 def test_update_results():
     print(load_results_overview())
     old_results_length = len(load_results_overview()['all_results'])
-    add_result(test_computation)
+    add_result(test_experiment)
     new_results_length = len(load_results_overview()['all_results'])
     print(load_results_overview())
     assert new_results_length == old_results_length+1

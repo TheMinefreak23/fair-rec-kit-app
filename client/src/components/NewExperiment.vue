@@ -5,7 +5,7 @@ Utrecht University within the Software Project course.
 import { onMounted, ref } from 'vue'
 import FormGroupList from './FormGroupList.vue'
 import { sendMockData } from '../test/mockExperimentOptions.js'
-import { store } from '../store.js'
+import { store, getCalculation } from '../store.js'
 import { API_URL } from '../api'
 import { emptyOption } from '../helpers/optionsFormatter'
 import { emptyFormGroup } from '../helpers/optionsFormatter'
@@ -17,9 +17,7 @@ const options = ref()
 
 //Store the settings of the form in a reference
 const form = ref({
-  datasets: emptyFormGroup(),
-  metrics: emptyFormGroup(),
-  approaches: emptyFormGroup(),
+  lists: initLists(),
 })
 const metadata = ref({})
 const splitOptions = [
@@ -46,66 +44,83 @@ async function getOptions() {
 
 // POST request: Send form to server.
 async function sendToServer() {
-  var sendForm = { ...form.value } // clone
+  var sendForm = JSON.parse(JSON.stringify(form.value)) // clone
 
-  sendForm.approaches = reformat(sendForm.approaches)
-  sendForm.metrics = reformat(sendForm.metrics)
-  console.log(form.value.metrics, sendForm.metrics)
-  sendForm.datasets = reformat(sendForm.datasets)
+  sendForm.lists.approaches = reformat(sendForm.lists.approaches)
+  sendForm.lists.metrics = reformat(sendForm.lists.metrics)
+  sendForm.lists.datasets = reformat(sendForm.lists.datasets)
+  console.log('sendForm', sendForm)
 
+  store.currentExperiment = { metadata: metadata.value, settings: sendForm }
+  // Post settings to server
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ metadata: metadata.value, settings: sendForm }),
+    body: JSON.stringify(store.currentExperiment),
   }
-  console.log('sendForm', sendForm)
   const response = await fetch(
     API_URL + '/experiment/calculation',
     requestOptions
   )
-
   // Update queue
-  const data = response.json()
-  store.queue = data
+  const data = await response.json()
+  store.queue = data.queue
+  console.log('sendToServer() queue', store.queue)
+  // Switch to queue
+  store.currentTab = 1
+  const interval = 1000
+  store.resultPoll = setInterval(getCalculation, interval)
 }
 
 //Declare default values of the form
-async function initForm() {
-  form.value = {}
+function initForm() {
+  form.value = { lists: initLists() }
   metadata.value = {}
-  form.value.datasets = emptyFormGroup(true)
-  form.value.metrics = emptyFormGroup()
-  form.value.approaches = emptyFormGroup(true)
   form.value.recommendations = options.value.defaults.recCount.default //The default amount of recommendations per user
-  form.value.split = options.value.defaults.split //The default train-test ratio
-  form.value.splitMethod = 'random' //The default method of splitting datasets
+  //form.value.split = options.value.defaults.split //The default train-test ratio
+  //form.value.splitMethod = 'random' //The default method of splitting datasets
   form.value.experimentMethod = 'recommendation' //The default experiment type
 }
 
-// Change the form format (SoA) into a managable data format (AoS)
-// TODO just don't use SoA in the first place
+// Initialise form group list settings
+function initLists() {
+  return {
+    datasets: emptyFormGroup(true),
+    metrics: emptyFormGroup(),
+    approaches: emptyFormGroup(true),
+  }
+}
+
+// Change the form format into a data format
 function reformat(property) {
-  let choices = []
-  for (let i in property.main) {
-    let params = null
-    console.log(
-      'reformat',
-      property.main[i],
-      property.inputs[i],
-      property.selects[i]
-    )
-
-    if (property.inputs[i] != null) params = property.inputs[i]
-    else if (property.selects[i] != null) params = property.selects[i]
-    choices[i] = { name: property.main[i].name, params: params }
-
-    if (property.lists[i] != null) {
-      choices[i].settings = property.lists[i].map((setting) => ({
-        [setting.name]: reformat(setting),
-      }))
+  let formattedChoices = []
+  for (let i in property.choices) {
+    const choices = property.choices[i]
+    //console.log('reformat', choices)
+    if (choices.main) {
+      // Direct settings (inputs/selects)
+      let params = []
+      if (choices.inputs) params = params.concat(choices.inputs)
+      if (choices.selects) params = params.concat(choices.selects)
+      formattedChoices[i] = {
+        name: choices.main.name,
+        params: params,
+      }
+      // Nested formgrouplists
+      if (choices.lists != null) {
+        for (let list of choices.lists) {
+          //console.log('list', list)
+          if (list.choices[0].single) {
+            // formgroup not list
+            // TODO refactor
+            formattedChoices[i][list.choices[0].name] = reformat(list)
+          } else formattedChoices[i][list.name] = reformat(list)
+          //console.log('list', formattedChoices[i][list.name])
+        }
+      }
     }
   }
-  return choices
+  return formattedChoices
 }
 </script>
 
@@ -126,7 +141,11 @@ function reformat(property) {
     <b-card>
       <b-row class="text-center"> <h3>New Experiment</h3></b-row>
       <!--This form contains all the necessary parameters for a user to submit a request for a experiment-->
-      <b-form v-if="options" @submit="sendToServer" @reset="initForm">
+      <b-form
+        v-if="options"
+        @submit="$event.preventDefault(), sendToServer()"
+        @reset="$event.preventDefault(), initForm()"
+      >
         <b-row class="text-center">
           <b-row>
             <b-col>
@@ -190,23 +209,24 @@ function reformat(property) {
             <!--User can select a dataset.-->
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
               <FormGroupList
-                v-model:data="form.datasets"
+                v-model:data="form.lists.datasets"
                 name="dataset"
-                plural="Datasets"
+                title="Datasets"
                 :options="options.datasets"
                 required
                 :horizontalLayout="horizontalLayout"
                 id="datasets"
               />
               <!--User provides an optional rating conversion-->
+              <!-- Select a rating conversion from the options received from the server -->
+              <!--
               <b-form-group label="Select a rating conversion">
-                <!-- Select a rating conversion from the options received from the server -->
                 <b-form-select
                   v-model:data="form.conversion"
                   :options="[{ text: 'None (default)', value: null }]"
                 >
                 </b-form-select>
-              </b-form-group>
+              </b-form-group>-->
             </div>
           </b-col>
 
@@ -214,9 +234,9 @@ function reformat(property) {
             <!-- User can select any number of recommender approaches -->
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
               <FormGroupList
-                v-model:data="form.approaches"
+                v-model:data="form.lists.approaches"
                 name="approach"
-                :plural="
+                :title="
                   (form.experimentMethod == 'recommendation'
                     ? 'Recommender'
                     : 'Predictor') + ' approaches'
@@ -270,14 +290,14 @@ function reformat(property) {
               <!--User can select any number of metrics -->
               <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
                 <FormGroupList
-                  v-model:data="form.metrics"
+                  v-model:data="form.lists.metrics"
                   name="metric"
-                  plural="metrics"
+                  title="metrics"
                   :maxK="form.recommendations"
                   :options="
                     form.experimentMethod == 'recommendation'
-                      ? options.metrics
-                      : options.metrics.slice(1)
+                      ? options.recMetrics
+                      : options.predMetrics
                   "
                   :horizontalLayout="!oldMetadata"
                 /></div
@@ -328,6 +348,13 @@ function reformat(property) {
       <!--Send a plethora of mock data to the queue-->
       <b-button type="test" variant="warning" @click="sendMockData(options)"
         >Mock</b-button
+      >
+      <!--Simple version of the mock-->
+      <b-button
+        type="test"
+        variant="primary"
+        @click="sendMockData(options, true)"
+        >Simple Mock</b-button
       >
     </b-card>
   </div>

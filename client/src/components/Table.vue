@@ -5,8 +5,10 @@ Utrecht University within the Software Project course.
 import { computed, onMounted, ref } from 'vue'
 import sortBy from 'just-sort-by'
 import { API_URL } from '../api'
+import { formatMetadata } from '../helpers/metadataFormatter'
 import FormGroupList from './FormGroupList.vue'
 import { validateEmail, emptyFormGroup } from '../helpers/optionsFormatter'
+import { store } from '../store'
 
 const emit = defineEmits([
   'loadResult',
@@ -31,7 +33,7 @@ const props = defineProps({
   headerOptions: Array,
   userOptions: Array,
   itemOptions: Array,
-  filters: Array,
+  filters: Object,
   filterOptions: Array,
 })
 
@@ -74,10 +76,10 @@ const sorted = computed(() => {
   else return props.results
 })
 
-onMounted(() => {
+/*onMounted(() => {
   if (props.caption == 'Testcaption')
     console.log('filterOptions', props.filterOptions)
-})
+})*/
 /**
  * Turns a string into an array separated by comma's
  * @param {string} str the string that turns into an array
@@ -131,7 +133,8 @@ function emptyVmodels() {
 async function removeEntry() {
   //Remove an entry from the list
   let entry = selectedEntry.value
-  props.results.splice(entry, 1)
+  //props.results.splice(entry, 1)
+  store.allResults.splice(entry, 1)
   //Inform the server to remove the same entry
   const requestOptions = {
     method: 'POST',
@@ -139,7 +142,7 @@ async function removeEntry() {
     body: JSON.stringify({ index: entry }),
   }
   fetch(API_URL + props.serverFile, requestOptions).then(() => {
-    console.log('Item removed succesfully')
+    console.log('Item at', entry, 'removed succesfully')
   })
 }
 
@@ -159,7 +162,7 @@ async function getMetadata(selectedID) {
 async function getResult() {
   const response = await fetch(API_URL + props.serverFile3)
   const data = await response.json()
-  metadataStr.value = data.result
+  metadataStr.value = formatMetadata(data.result)
 }
 
 async function getNameTagsMail(selectedID) {
@@ -209,7 +212,7 @@ function setsorting(i) {
   sortindex.value = i
   emit('paginationSort', i)
 }
-console.log('propsfilteroptions', props.filterOptions)
+//console.log('propsfilteroptions', props.filterOptions)
 </script>
 
 <template>
@@ -261,10 +264,15 @@ console.log('propsfilteroptions', props.filterOptions)
     <br />-->
   </b-modal>
 
-  <!-- Shows the metadata of the designated entry -->
-  <b-modal id="view-modal" v-model="viewModalShow" title="Metadata" ok-only>
-    <h5>Here is the metadata:</h5>
-    <p>{{ metadataStr }}</p>
+  <!-- Shows the metadata and experiment configuration of the designated entry -->
+  <b-modal
+    id="view-modal"
+    v-model="viewModalShow"
+    title="Result information"
+    ok-only
+  >
+    <h5>Here is the metadata and experiment configuration:</h5>
+    <span style="white-space: pre-wrap">{{ metadataStr }}</span>
   </b-modal>
 
   <!-- Modal used for changing the headers of the user recommendations table -->
@@ -272,10 +280,9 @@ console.log('propsfilteroptions', props.filterOptions)
     id="change-columns-modal"
     v-model="updateHeadersModalShow"
     title="Change columns"
-    @ok="$emit('updateHeaders', checkedColumns, userColumns, itemColumns)"
+    @ok="$emit('updateHeaders', [...checkedColumns, ...userColumns, ...itemColumns])"
   >
     <p>Select the extra headers you want to be shown</p>
-    <p>{{ headerOptions }}</p>
     <p>General:</p>
     <div
       class="form-check form-switch"
@@ -414,7 +421,7 @@ console.log('propsfilteroptions', props.filterOptions)
             v-if="overview"
             pill
             @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
-            >View</b-button
+            >View Information</b-button
           >
           <template v-if="removable"> </template>
           <b-button

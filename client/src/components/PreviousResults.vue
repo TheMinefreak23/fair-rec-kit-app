@@ -9,6 +9,7 @@ import { formatResults, formatResult } from '../helpers/resultFormatter.js'
 import { addResult, store } from '../store.js'
 import { API_URL } from '../api'
 
+const oldResultsFormat = ref(true) // TODO DEV
 const emit = defineEmits(['goToResult'])
 
 const exResults = ref([
@@ -51,11 +52,13 @@ async function getResults() {
   store.allResults = formatResults(allResults)
 }
 
-const url = API_URL + '/all-results/result-by-id'
+const resultsRoute =
+  '/all-results/' + (oldResultsFormat ? 'old' : '') + '-result-by-id'
+const url = API_URL + resultsRoute
 
 // Request full result from result ID (timestamp)
 async function loadResult(resultId) {
-  console.log('Result ID:' + resultId)
+  console.log('Loading result with ID:' + resultId)
 
   const requestOptions = {
     method: 'POST',
@@ -80,6 +83,13 @@ async function getResult() {
   <b-card>
     <div class="text-center py-2 mx-5">
       <h3>Previous results</h3>
+      <b-row>
+        <b-col md="auto">
+          <b-form-checkbox v-model="oldResultsFormat"
+            >use old results route
+          </b-form-checkbox>
+        </b-col>
+      </b-row>
       <Table
         @loadResult="loadResult"
         @loadResults="getResults"
@@ -90,7 +100,7 @@ async function getResult() {
         :overview="true"
         serverFile="/all-results/delete"
         serverFile2="/all-results/edit"
-        serverFile3="/all-results/result-by-id"
+        :serverFile3="resultsRoute"
       />
     </div>
   </b-card>

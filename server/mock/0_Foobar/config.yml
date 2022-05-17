@@ -1,20 +1,16 @@
 datasets:
 - name: ML-100K
   splitting:
+    name: random
+    params:
+      seed: null
     test_ratio: 0.2
-    type: random
 models:
   LensKit:
-  - name: BiasedMF
+  - name: PopScore
     params:
-      damping: 5.0
-      features: 10
-      item_reg: 0.1
-      iterations: 20
-      method: cd
-      random_seed: null
-      user_reg: 0.1
-name: 0_Foobar
+      score_method: quantile
+name: 1652358264_Untitled
 rated_items_filter: true
 top_K: 10
 type: recommendation
