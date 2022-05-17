@@ -25,6 +25,8 @@ $subtle: rgb(80, 80, 80), rgb(104, 104, 104);
   background: linear-gradient($direction, $list2);
 }
 
+$offcanvas-horizontal-width: 50%;
+
 //give main button gradient color
 .btn-primary {
   @include gradient(bottom, $list2);
