@@ -51,6 +51,7 @@ async function sendToServer() {
   sendForm.lists.datasets = reformat(sendForm.lists.datasets)
   console.log('sendForm', sendForm)
 
+  store.currentExperiment = { metadata: metadata.value, settings: sendForm }
   // Post settings to server
   const requestOptions = {
     method: 'POST',
@@ -69,7 +70,6 @@ async function sendToServer() {
   store.currentTab = 1
   const interval = 1000
   store.resultPoll = setInterval(getCalculation, interval)
-  store.currentExperiment = { metadata: metadata.value, settings: sendForm }
 }
 
 //Declare default values of the form
