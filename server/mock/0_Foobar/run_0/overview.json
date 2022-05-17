@@ -1,12 +1,10 @@
 {
     "overview": [
         {
-            "name": "ML-100K_0_LensKit_BiasedMF_0",
-            "dataset": "ML-100K_0",
-            "recommender_system": "LensKit_BiasedMF_0",
-            "evaluation_path": "mock\\0_Foobar\\run_0\\ML-100K_0\\LensKit_BiasedMF_0\\evaluations.json",
-            "ratings_path": "mock\\0_Foobar\\run_0\\ML-100K_0\\LensKit_BiasedMF_0\\ratings.tsv",
-            "ratings_settings_path": "mock\\0_Foobar\\run_0\\ML-100K_0\\LensKit_BiasedMF_0\\settings.json"
+            "name": "ML-100K_0_LensKit_PopScore_0",
+            "evaluation_path": "mock\\0_Foobar\\run_0\\ML-100K_0\\LensKit_PopScore_0\\evaluations.json",
+            "ratings_path": "mock\\0_Foobar\\run_0\\ML-100K_0\\LensKit_PopScore_0\\ratings.tsv",
+            "ratings_settings_path": "mock\\0_Foobar\\run_0\\ML-100K_0\\LensKit_PopScore_0\\settings.json"
         }
     ]
 }

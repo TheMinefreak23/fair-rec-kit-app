@@ -13,11 +13,13 @@ import { onMounted, ref } from 'vue'
 import { API_URL } from './api'
 import MusicDetail from './components/MusicDetail.vue'
 import { useToast } from 'bootstrap-vue-3'
+import { store } from './store'
 import VCheckmark from './components/VCheckmark.vue'
 let toast = useToast()
 
+/*
 const activeExperiments = ref(false)
-const done = ref(false)
+const done = ref(false)*/
 
 // Ping
 onMounted(async () => {
@@ -26,11 +28,11 @@ onMounted(async () => {
   const data = await response.json()
   console.log(data)
 })
-const tabIndex = ref(0)
+//const tabIndex = ref(0)
 
 // Make result tab the active tab
 function goToResult() {
-  tabIndex.value = 3
+  store.currentTab = 3
 }
 
 function callToast() {
@@ -89,23 +91,35 @@ function callToast() {
     </div>
   </div>
   <div class="nav-center">
-    <b-tabs v-model="tabIndex" class="m-0 pt-2" align="center">
-      <b-tab title="New Experiment">
-        <NewExperiment />
-      </b-tab>
-      <b-tab :class="{ success: done }">
-        <ActiveExperiments
+    <b-tabs
+      v-model="store.currentTab"
+      class="m-0 pt-2"
+      align="center"
+      nav-class="tab-active"
+    >
+      <b-tab title="New Experiment" title-item-class="tab-title-class"
+        ><NewExperiment
+      /></b-tab>
+      <b-tab title-item-class="tab-title-class">
+        <!--<ActiveExperiments
           @computing="
             ;(activeExperiments = true), (done = false), (tabIndex = 1)
           "
           @done=";(activeExperiments = false), (done = true)"
           @stop=";(activeExperiments = false), (done = false)"
-        />
-        <template v-slot:title :class="{ success: done }">
-          <b-spinner v-if="activeExperiments" small align="center"></b-spinner>
-          <VCheckmark v-else />
-
-          Active Experiments
+        />-->
+        <ActiveExperiments />
+        <template v-slot:title>
+          <div
+            :style="{
+              color: store.currentExperiment ? 'red' : 'black',
+              backgroundColor: store.currentExperiment ? 'yellow' : 'white',
+            }"
+          >
+            <b-spinner v-if="store.currentExperiment" small></b-spinner>
+            <VCheckmark v-else />
+            Active Experiments
+          </div>
         </template>
       </b-tab>
       <b-tab title="Documentation" data-testid="DocTab">
@@ -163,7 +177,17 @@ function callToast() {
 </template>
 
 <style scoped>
-b-tab.success {
-  color: yellow;
+/* NOT WORKING
+b-tab {
+  background-color: yellow;
+}*/
+.tab-title-class {
+  font-size: 300;
+  background-color: green;
+  color: #ff0000 !important;
+}
+.tab-active {
+  background-color: #ff0000;
+  color: green;
 }
 </style>
