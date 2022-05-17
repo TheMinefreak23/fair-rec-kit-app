@@ -131,11 +131,6 @@ def user_result():
 
 @results_bp.route('/headers', methods=['GET'])
 def headers():
-    headers = result_storage.load_json('project/headers.json')   
-    #result = headers[dataset]
-    #return result
-    return headers
-    # result = result_storage.current_recs.columns
-    # return {'headers': list(result)}
+    return result_storage.load_json('project/headers.json')   
 
 

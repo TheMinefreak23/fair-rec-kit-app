@@ -14,16 +14,13 @@ import { API_URL } from '../api'
 const props = defineProps({ headers: Array, result: Object })
 
 //Default headers for recommendation experiments.
-const selectedHeaders = ref([[
-  { name: 'Rank' },
-  { name: 'User' },
-  { name: 'Item' },
-  { name: 'Score' },
-]])
+const selectedHeaders = ref([
+  [{ name: 'Rank' }, { name: 'User' }, { name: 'Item' }, { name: 'Score' }],
+])
 
 const experiment_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
-const data = ref({results: [[]]})
+const data = ref({ results: [[]] })
 const startIndex = ref(0)
 const index = ref(0)
 const ascending = ref(true)
@@ -36,13 +33,15 @@ const filters = ref(emptyFormGroup(false))
 const userHeaderOptions = ref([[]])
 const itemHeaderOptions = ref([[]])
 const generalHeaderOptions = ref([[]])
-const recTableAmount = ref(props.result.result.length * props.result.result[0].results.length)
+const userTables = combineResults()
 
 onMounted(() => {
   console.log('result', props.result)
   console.log('result id', props.result.id)
   setRecs(0)
   setRecs(1)
+  setRecs(2)
+  setRecs(3)
   console.log('availableFilters', availableFilters.value)
   //loadEvaluations()
 })
@@ -53,7 +52,6 @@ async function getHeaderOptions(index) {
   const response = await fetch(API_URL + '/all-results/headers')
   const data = await response.json()
   let headerOptions = data[props.result.result[0].dataset.name]
-  console.log(headerOptions, index)
   generalHeaderOptions.value[index] = makeHeaders(headerOptions.headers)
   itemHeaderOptions.value[index] = makeHeaders(headerOptions.itemHeaders)
   userHeaderOptions.value[index] = makeHeaders(headerOptions.userHeaders)
@@ -79,10 +77,12 @@ async function setRecs(currentTable) {
   if (response.status == '200') {
     const data = await response.json()
     availableFilters.value = data.availableFilters
-    await getUserRecs(0), getUserRecs(1)
+    await getUserRecs(0), getUserRecs(1), getUserRecs(2), getUserRecs(3)
     //TODO remove this mock
     getHeaderOptions(0)
     getHeaderOptions(1)
+    getHeaderOptions(2)
+    getHeaderOptions(3)
   }
 }
 
@@ -132,7 +132,9 @@ async function getUserRecs(currentTable) {
 
   const response = await fetch(API_URL + '/all-results/result', requestOptions)
   data.value.results[currentTable] = await response.json()
-  selectedHeaders.value[currentTable] = Object.keys(data.value.results[currentTable][0])
+  selectedHeaders.value[currentTable] = Object.keys(
+    data.value.results[currentTable][0]
+  )
 }
 
 /**
@@ -202,6 +204,19 @@ function makeHeaders(headers) {
   }))
 }
 
+/**
+ * Combine the list of approaches of each dataset
+ */
+function combineResults() {
+  let list = []
+  for (let dataset in props.result.result) {
+    console.log(dataset)
+    for (let approach in props.result.result[dataset].results) {
+      list.push(props.result.result[dataset].caption + '_' + props.result.result[dataset].results[approach].approach)
+    }
+  }
+  return list
+}
 </script>
 
 <template>
@@ -212,7 +227,6 @@ function makeHeaders(headers) {
         These are the results for experiment {{ result.metadata.name }} done at
         {{ result.metadata.datetime }}.
       </p>
-
       <div class="col">
         Tags:
         <template v-if="!result.metadata.tags">None</template>
@@ -249,35 +263,40 @@ function makeHeaders(headers) {
     <div class="container">
       <div class="row">
         <!--Type of experiment decides which label to give the section-->
-        <h4 v-if="selectedHeaders[0][0] == 'rank'">Recommended items per user</h4>
+        <h4 v-if="selectedHeaders[0][0] == 'rank'">
+          Recommended items per user
+        </h4>
         <h4 v-else>Predicted rating per user</h4>
       </div>
       <div class="row">
         <!--Show recommendations for all datasets for now TODO-->
         <!--Currently only shows the results of the first dataset-->
-        <template v-for="(entry,index) in props.result.result" :key="data">
-        <div class="col-6">
-          <Table
-          v-if="selectedHeaders[index]"
-            :key="props.result.id"
-            :caption="entry.caption"
-            :results="data.results[index]"
-            :headers="makeHeaders(selectedHeaders[index])"
-            :filters="filters"
-            :filterOptions="availableFilters"
-            :headerOptions="generalHeaderOptions[index]"
-            :userOptions="userHeaderOptions[index]"
-            :itemOptions="itemHeaderOptions[index]"
-            pagination
-            expandable
-            @paginationSort="(i) => paginationSort(i, index)"
-            @loadMore="(increase, amount) => loadMore(increase, amount, index)"
-            @changeFilters="(changedFilters) => changeFilters(changedFilters, index)"
-            @updateHeaders="
-              (headers) => updateHeaders(headers, index)
-            "
-          />
-        </div>
+        <template v-for="(entry, index) in userTables" :key="data">
+        <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
+          <div class="col-6">
+            <Table
+              v-if="selectedHeaders[index]"
+              :key="props.result.id"
+              :caption="entry.caption"
+              :results="data.results[index]"
+              :headers="makeHeaders(selectedHeaders[index])"
+              :filters="filters"
+              :filterOptions="availableFilters"
+              :headerOptions="generalHeaderOptions[index]"
+              :userOptions="userHeaderOptions[index]"
+              :itemOptions="itemHeaderOptions[index]"
+              pagination
+              expandable
+              @paginationSort="(i) => paginationSort(i, index)"
+              @loadMore="
+                (increase, amount) => loadMore(increase, amount, index)
+              "
+              @changeFilters="
+                (changedFilters) => changeFilters(changedFilters, index)
+              "
+              @updateHeaders="(headers) => updateHeaders(headers, index)"
+            />
+          </div>
         </template>
       </div>
     </div>
