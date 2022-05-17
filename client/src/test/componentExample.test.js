@@ -6,6 +6,9 @@ import { render, fireEvent, getByTestId } from '@testing-library/vue'
 import { test } from 'vitest'
 import App from '../App.vue'
 
+/**
+ * Test switching to the queue tab
+ */
 test('switchTab', async () => {
   // get utilities to query component
   const { getAllByText } = render(App)

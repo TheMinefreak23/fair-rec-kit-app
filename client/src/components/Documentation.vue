@@ -229,6 +229,7 @@ pre {
   padding: 5px;
   margin: 5px;
 }
+/*
 pre {
   counter-reset: line;
 }
@@ -241,29 +242,29 @@ code:before {
   -webkit-user-select: none;
   color: gray;
 }
-
+*/
 </style>
 
 <template>
-<div id="main">
+<div id="main" class="ps-0">
   <!-- Open-close button -->
-  <span class="position-fixed" style="font-size:30px;cursor:pointer" v-on:click="openCloseNav()">&#9776;</span>
+  <span class="position-fixed bg-dark text-white px-2 rounded-end" style="font-size:30px;cursor:pointer" v-on:click="openCloseNav()">&#9776;</span>
   <!-- Navigation sidebar -->
-  <div id="docSidenav" class="sidenav">
+  <div id="docSidenav" class="sidenav bg-dark">
     <!-- Close button -->
-    <a href="javascript:void(0)" class="closebtn position-fixed-left" v-on:click="closeNav()">&times;</a>
-    <b-link class="position-relative" :href='"#"+header.name' v-for="header in structure1D" :key="header">
+    <!--<a href="javascript:void(0)" class="closebtn float-end m-0" v-on:click="closeNav()">&times;</a>-->
+    <b-link class="position-relative text-white py-0" :href='"#"+header.name' v-for="header in structure1D" :key="header">
       <!-- Indentation to indicate items and subitems -->
       <span style="-webkit-user-select: none">{{"&nbsp;&nbsp;&nbsp;".repeat(header.depth)}}</span>{{header.name}}
     </b-link>
   </div>
 
   <!-- B-card items -->
-  <div class="text-right py-1 mx-5" v-for="header in structure1D" :key="header">
+  <div class="text-right pb-2 mx-5" v-for="header in structure1D" :key="header">
     <!-- Subitems have more margin than its parent. -->
-    <b-card :id='itemDicts[header.name]["name"]' :style='"margin-left: "+10*header.depth+"px"'>
+    <b-card :id='itemDicts[header.name]["name"]' :style='"margin-left:"+10*header.depth+"px"' class="border-end-0 border-top-0 border-bottom-0 border-5 bg-secondary">
       <!-- Subitems are smaller as well. -->
-      <b-card-title :style='"font-size: "+(25-header.depth*2)+"px"'>{{itemDicts[header.name]["name"]}}</b-card-title>
+      <b-card-title :style='"font-size: "+(22-(5*(Math.floor(header.depth/3))))+"px"'>{{itemDicts[header.name]["name"]}}</b-card-title>
       <!-- v-if because if there is no description -> undefined, which takes space. -->
       <b-card-text v-if='itemDicts[header.name]["description"]'>
         <span v-html='itemDicts[header.name]["description"]'></span>
@@ -271,7 +272,7 @@ code:before {
       <b-link :href='itemDicts[header.name]["link"]' v-if='itemDicts[header.name]["link"]'>{{ itemDicts[header.name]["link"] }}</b-link>
       <span v-if='itemDicts[header.name]["button"]'>
         <br>
-        <b-button pill variant="dark" :href='itemDicts[header.name]["button"]' v-if='itemDicts[header.name]["button"]'>
+        <b-button variant="primary" :href='itemDicts[header.name]["button"]' v-if='itemDicts[header.name]["button"]'>
           {{ itemDicts[header.name]["name"] }}
         </b-button>
       </span>
