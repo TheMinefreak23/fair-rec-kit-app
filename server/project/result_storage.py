@@ -14,7 +14,7 @@ import pandas as pd
 
 # Global current result variables
 current_result = {}
-current_recs = None
+current_recs = {}
 
 # Storage paths
 RESULTS_ROOT_FOLDER = 'results/'
@@ -125,6 +125,11 @@ def get_rec_path(evaluation_id, runid, pairid):
     run_overview = load_json(overview_path)
     rec_path = run_overview['overview'][pairid]['ratings_path']
     return rec_path
+    #rec_paths = []
+    #for index in range(0, len(run_overview['overview'])):
+    #    rec_paths[index] = run_overview['overview'][pairid]['ratings_path']
+    #return rec_paths
+        
 
 
 def id_to_name(json_data, result_id):

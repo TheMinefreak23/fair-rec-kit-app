@@ -10,12 +10,13 @@ import {
 
 import { useToast } from 'bootstrap-vue-3'
 import SplitRange from './Form/SplitRange.vue'
+import FormGroup from './Form/FormGroup.vue'
 let toast = useToast()
 
 //const emit = defineEmits(['formChange'])
 const props = defineProps({
   name: String,
-  plural: String,
+  title: String,
   description: String,
   options: Array,
   required: Boolean,
@@ -44,7 +45,8 @@ onMounted(() => {
   /*console.log(props.name)
   if (props.name == 'filter' || props.name == 'dataset')
     console.log(props.name, props.options)*/
-  form.value.name = props.plural
+  // TODO separate 1-sized formgrouplists
+  form.value.name = props.title
   /*if (props.name == 'filter')
     console.log(props.name,form)*/
   //console.log(props.name, 'options', props.options)
@@ -76,54 +78,19 @@ watch(
   })
 )*/
 
-// Set default values for the group parameters.
-function setParameter(i, option) {
-  //console.log(props.name, props.options, form.value.main)
-  //let option = form.value.main[i]
-  let choices
-  //console.log(option)
-  //console.log(option.params)
-  if (option.params) {
-    if (option.params.values && option.params.values.length > 0) {
-      choices = option.params.values
-      form.value.inputs[i] = choices.map((param) => ({
-        name: param.name,
-        value: param.default,
-      }))
-    }
-    if (option.params.options && option.params.options.length > 0) {
-      choices = option.params.options
-      form.value.selects[i] = choices.map((param) => ({
-        name: capitalise(param.name),
-        value: param.default,
-      }))
-    }
-    if (option.params.dynamic && option.params.dynamic.length > 0) {
-      choices = option.params.dynamic
-      // TODO refactor empty form group function
-      form.value.lists[i] = choices.map(() => ({
-        groupCount: 0, // For sublists there is no minimum amount of group items.
-        main: [],
-        inputs: [],
-        selects: [],
-        lists: [],
-      }))
-      //console.log(form.value.lists)
-    }
-  }
-}
-
 // Splice groups array to remove a group
 function removeGroup(i) {
   // Don't remove first required option
   if (props.required && form.value.groupCount == 1) return
-  const mainOption = form.value.main[i]
+  //const mainOption = form.value.main[i]
+  const mainOption = { ...form.value.choices[i].main }
 
   form.value.groupCount--
-  form.value.main.splice(i, 1)
+  /*form.value.main.splice(i, 1)
   form.value.inputs.splice(i, 1)
   form.value.selects.splice(i, 1)
-  form.value.lists.splice(i, 1)
+  form.value.lists.splice(i, 1)*/
+  form.value.choices.splice(i, 1)
 
   // Set visible group to last before deleted one
   visibleGroup.value = i
@@ -131,43 +98,15 @@ function removeGroup(i) {
   showToast(mainOption, 'removed')
 }
 
-// Check whether the option has values/options params (not dynamic params)
-function hasParams(index) {
-  //console.log(form.value.main)
-  const option = form.value.main[index]
-  //console.log('hasParams option at', index, ':', option)
-  return (
-    option &&
-    option.params &&
-    option.params.length != 0 &&
-    ((option.params.values && option.params.values.length != 0) ||
-      (option.params.options && option.params.options.length != 0))
-  )
-}
-
-// Check whether the option has dynamic params
-function hasDynamic(index) {
-  // TODO refactor with hasParams
-  const option = form.value.main[index]
-  return (
-    option &&
-    option.params &&
-    option.params.length != 0 &&
-    option.params.dynamic &&
-    option.params.dynamic.length != 0
-  )
-}
-
-function chooseLabel(name) {
-  return 'Choose ' + article(name) + ' ' + underscoreToSpace(name)
-}
-
 // Copies the selected item and puts it at the end of the list
 function copyItem(i) {
   form.value.groupCount++ //Add a new item
-  form.value.main[form.value.groupCount - 1] = form.value.main[i] //Copy the selected value to the new item
+  // Deep-copy the selected value to the new item
+  form.value.choices[form.value.groupCount - 1] = JSON.parse(
+    JSON.stringify(form.value.choices[i])
+  )
   visibleGroup.value = form.value.groupCount // Show newly copied item
-
+  /*
   if (form.value.inputs[i]) {
     //Copy textfield options (if applicable)
     form.value.inputs[form.value.groupCount - 1] = form.value.inputs[i].map(
@@ -197,8 +136,9 @@ function copyItem(i) {
         lists: param.lists,
       })
     )
-  }
-  showToast(form.value.main[i], 'copied')
+  }*/
+  console.log(form.value.choices[i].main)
+  showToast(form.value.choices[i].main, 'copied')
 }
 
 /**
@@ -224,30 +164,33 @@ function update() {
     .flat()
     .map((entry) => entry.name)
   const deleteEntry = 'NULL'
-  for (let i = 0; i < form.value.main.length; i++) {
-    if (!entries.includes(form.value.main[i].name)) {
+  for (let i = 0; i < form.value.choices.length; i++) {
+    const mainChoice = form.value.choices[i].main
+    if (mainChoice && !entries.includes(mainChoice.name)) {
       //every entry that does not exist in the list of option should be removed
       //Non-existing entries are replaced with a null entry
-      form.value.main[i] = deleteEntry
+      /*form.value.main[i] = deleteEntry
       form.value.selects[i] = deleteEntry
       form.value.inputs[i] = deleteEntry
-      form.value.lists[i] = deleteEntry
+      form.value.lists[i] = deleteEntry*/
+      form.value.choices[i] = deleteEntry
       if (props.required && form.value.groupCount > 1) form.value.groupCount--
     }
   }
   //console.log(form.value.main)
   // Filter null values
-  form.value.main = form.value.main.filter((x) => x != deleteEntry)
+  /*form.value.main = form.value.main.filter((x) => x != deleteEntry)
   form.value.selects = form.value.selects.filter((x) => x != deleteEntry)
   form.value.inputs = form.value.inputs.filter((x) => x != deleteEntry)
-  form.value.lists = form.value.lists.filter((x) => x != deleteEntry)
+  form.value.lists = form.value.lists.filter((x) => x != deleteEntry)*/
+  form.value.choices = form.value.choices.filter((x) => x != deleteEntry)
   //console.log(form.value.main)
 }
 
 // A brief description of the group option
 // TODO REALLY NEEDS REFACTOR
 function shortGroupDescription(i) {
-  const option = form.value.main[i]
+  const option = form.value.choices[i]
   let desc = capitalise(props.name) + ' ' + (i + 1)
   /*switch (props.name) {
     case value:
@@ -257,19 +200,19 @@ function shortGroupDescription(i) {
     default:
       break;
   }*/
-  if (!option) return desc // No choice made yet, no description
+  if (!option || !option.main) return desc // No choice made yet, no description
 
-  desc = desc + ': ' + option.name
+  desc = desc + ': ' + option.main.name
   if (visibleGroup.value == i + 1) return desc // This group is selected, only show the option name
 
   // Show first inner options as featured option
   const featuredOptions = [
-    valueOrEmptyString(form.value.selects),
-    valueOrEmptyString(form.value.inputs),
+    valueOrEmptyString(option.selects),
+    valueOrEmptyString(option.inputs),
     listNonEmpty(form.value.lists) // Display inner form list length
-      ? form.value.lists[i][0].name +
+      ? option.lists[0].name +
         ': ' +
-        (form.value.lists[i][0].main && form.value.lists[i][0].main.length)
+        (option.lists[0].main && option.lists[0].main.length)
       : '',
   ]
     .filter((x) => x != '') // remove empty slots
@@ -279,11 +222,11 @@ function shortGroupDescription(i) {
   return desc
 
   function valueOrEmptyString(list) {
-    return listNonEmpty(list) ? list[i][0].value : ''
+    return listNonEmpty(list) ? list[0].value : ''
   }
 
   function listNonEmpty(list) {
-    return list[i] && list[i].length > 0
+    return list && list.length > 0
   }
 }
 </script>
@@ -298,7 +241,8 @@ function shortGroupDescription(i) {
     <b-row>
       <h3 class="text-center text-white mb-0">
         <b-card no-body class="mb-0 bg-dark">
-          {{ capitalise(plural) }}
+          <!--Capitalise the title.-->
+          {{ title && capitalise(title) }}
           <!--Collapsable group list toggle button-->
           <b-button
             class="text-start"
@@ -307,7 +251,6 @@ function shortGroupDescription(i) {
           >
             <template v-if="form.visible">&#x25BC; | </template>
             <template v-else>&#x25BA; | </template>
-            <!--Capitalise the title.-->
           </b-button>
         </b-card>
       </h3>
@@ -319,7 +262,7 @@ function shortGroupDescription(i) {
       <b-collapse id="collapse" :visible="form.visible">
         <b-card class="g-0">
           <!--<p>
-        {{ capitalise(plural) }} selected:
+        {{ capitalise(title) }} selected:
         {{ formatMultipleItems(form.main) }}
       </p>-->
           <b-row>
@@ -375,268 +318,20 @@ function shortGroupDescription(i) {
                   :visible="visibleGroup == i"
                   role="tabpanel"
                 >
-                  <b-row class="align-items-end">
-                    <b-col>
-                      <b-col>
-                        <b-row>
-                          <b-col>
-                            <b-row>
-                              <!--Main option selection-->
-                              <b-col cols="12">
-                                <b-form-group
-                                  :label="
-                                    'Select ' + article(name) + ' ' + name
-                                  "
-                                >
-                                  <b-form-select
-                                    v-model="form.main[i - 1]"
-                                    data-testid="main-select"
-                                    :options="options"
-                                    text-field="name"
-                                    @change="setParameter(i - 1, $event)"
-                                    :required="
-                                      // If the option is needed, at least one selection must've been made
-                                      required &&
-                                      (form.main.length == 0 ||
-                                        form.main.every((x) => x == ''))
-                                    "
-                                  >
-                                    <template #first>
-                                      <b-form-select-option :value="''"
-                                        >Choose..</b-form-select-option
-                                      >
-                                    </template>
-                                  </b-form-select>
-                                  <b-button
-                                    v-if="form.main[i - 1]"
-                                    @click="copyItem(i - 1)"
-                                    variant="primary"
-                                    class="mt-1"
-                                    >Copy {{ name }}...</b-button
-                                  >
-                                  <template #first>
-                                    <b-form-select-option value="" disabled
-                                      >Choose..</b-form-select-option
-                                    >
-                                  </template>
-                                </b-form-group>
-                              </b-col>
-                              <!--Show settings for selected option.-->
-                              <b-col v-if="hasParams(i - 1)">
-                                <!--Value input options.-->
-                                <b-row>
-                                  <template
-                                    v-for="(value, index) in form.main[i - 1]
-                                      .params.values"
-                                    :key="value"
-                                  >
-                                    <!--Regular input-->
-                                    <!--The max k value is based on the amount of recommendations.
-                Because of this we use a seperate setting to cover for it.-->
-                                    <b-col
-                                      :cols="
-                                        !value.name.includes('split')
-                                          ? horizontalLayout
-                                            ? 3
-                                            : 6
-                                          : 12
-                                      "
-                                    >
-                                      <b-form-group
-                                        :label="
-                                          capitalise(
-                                            underscoreToSpace(value.name)
-                                          )
-                                        "
-                                        :description="
-                                          'Between ' +
-                                          value.min +
-                                          ' and ' +
-                                          (value.name == 'k'
-                                            ? props.maxK
-                                            : value.max)
-                                        "
-                                      >
-                                        <b-form-input
-                                          v-if="!value.name.includes('split')"
-                                          v-model="
-                                            form.inputs[i - 1][index].value
-                                          "
-                                          :state="
-                                            form.inputs[i - 1][index].value >=
-                                              value.min &&
-                                            form.inputs[i - 1][index].value <=
-                                              (value.name == 'k'
-                                                ? props.maxK
-                                                : value.max)
-                                          "
-                                          validated="true"
-                                        />
-                                        <!--Use a range slider if it's a train/test split option-->
-                                        <SplitRange
-                                          @input="
-                                            form.inputs[i - 1][index].value =
-                                              $event
-                                          "
-                                          v-model:value="
-                                            form.inputs[i - 1][index].value
-                                          "
-                                          :min="value.min"
-                                          :max="value.max"
-                                          :name="value.name"
-                                          :step="5"
-                                        />
-                                        <!--Display the seed label for the seed option.-->
-                                        <div
-                                          v-if="
-                                            value.name.includes('seed') &&
-                                            form.inputs[i - 1][index].value ==
-                                              null
-                                          "
-                                          class="text-center"
-                                        >
-                                          Seed will be randomly generated.
-                                        </div>
-                                      </b-form-group></b-col
-                                    >
-                                  </template>
-                                </b-row>
-
-                                <!--Selection options-->
-                                <b-row>
-                                  <b-col
-                                    md="auto"
-                                    v-for="(option, index) in form.main[i - 1]
-                                      .params.options"
-                                    :key="option"
-                                  >
-                                    <!--Use a radio group if there are a few options and they aren't true/false.-->
-                                    <b-form-group
-                                      :label="chooseLabel(option.name)"
-                                      v-if="
-                                        option.options.length < 3 &&
-                                        typeof option.options[0] != 'boolean'
-                                      "
-                                    >
-                                      <b-form-radio-group
-                                        v-model="
-                                          form.selects[i - 1][index].value
-                                        "
-                                        text-field="name"
-                                        :value="option.default"
-                                        :options="option.options"
-                                        required
-                                      ></b-form-radio-group>
-                                    </b-form-group>
-                                    <!--Use a checkbox if the options are of a binary (True or False) nature.-->
-                                    <b-form-group
-                                      :label="
-                                        capitalise(
-                                          underscoreToSpace(option.name + '?')
-                                        )
-                                      "
-                                      v-if="
-                                        option.options[0] == true ||
-                                        option.options[0] == false
-                                      "
-                                    >
-                                      <b-form-checkbox
-                                        v-model="
-                                          form.selects[i - 1][index].value
-                                        "
-                                        checked="option.default"
-                                        size="lg"
-                                        required
-                                        >{{
-                                          form.selects[i - 1][index].value
-                                            ? 'Yes'
-                                            : 'No'
-                                        }}</b-form-checkbox
-                                      >
-                                    </b-form-group>
-                                    <!--Use a dropdown select form otherwise-->
-                                    <b-form-group
-                                      v-if="option.options.length > 2"
-                                      :label="chooseLabel(option.name)"
-                                    >
-                                      <b-form-select
-                                        v-model="
-                                          form.selects[i - 1][index].value
-                                        "
-                                        :options="option.options"
-                                        text-field="name"
-                                        required
-                                      >
-                                        <template #first>
-                                          <b-form-select-option
-                                            :value="null"
-                                            disabled
-                                            >Choose..</b-form-select-option
-                                          >
-                                        </template>
-                                      </b-form-select>
-                                    </b-form-group>
-                                  </b-col>
-                                </b-row>
-                              </b-col>
-                            </b-row>
-                          </b-col>
-                          <!--Dynamic lists-->
-                          <b-col v-if="horizontalLayout && hasDynamic(i - 1)">
-                            <!--Nested form group list.-->
-                            <template
-                              v-for="(option, index) in form.main[i - 1].params
-                                .dynamic"
-                              :key="option"
-                            >
-                              <b-card class="mb-1 bg-secondary p-0">
-                                <FormGroupList
-                                  class="p-0"
-                                  v-model:data="form.lists[i - 1][index]"
-                                  :name="option.name"
-                                  :plural="option.plural"
-                                  :description="
-                                    option.plural +
-                                    ' for ' +
-                                    name +
-                                    ' ' +
-                                    form.main[i - 1].name
-                                  "
-                                  :options="option.options"
-                                  :required="false"
-                                />
-                              </b-card>
-                            </template>
-                          </b-col>
-                        </b-row>
-                        <!--Dynamic lists-->
-                        <b-col v-if="!horizontalLayout && hasDynamic(i - 1)">
-                          <!--Nested form group list.-->
-                          <template
-                            v-for="(option, index) in form.main[i - 1].params
-                              .dynamic"
-                            :key="option"
-                          >
-                          <FormGroupList
-                                class="p-0"
-                                v-model:data="form.lists[i - 1][index]"
-                                :name="option.name"
-                                :plural="option.plural"
-                                :description="
-                                  option.plural +
-                                  ' for ' +
-                                  name +
-                                  ' ' +
-                                  form.main[i - 1].name
-                                "
-                                :options="option.options"
-                                :required="false"
-                          />
-                          </template>
-                        </b-col>
-                      </b-col>
-                    </b-col>
-                  </b-row>
+                  <FormGroup
+                    v-model:data="form.choices[i - 1]"
+                    :name="name"
+                    :options="options"
+                    :required="
+                      // If the option is needed, at least one selection must've been made
+                      required &&
+                      (!form.choices.main ||
+                        form.choices.every((x) => x.main == ''))
+                    "
+                    :maxK="maxK"
+                    :horizontalLayout="horizontalLayout"
+                    @copy="copyItem(i - 1)"
+                  />
                 </b-collapse>
               </b-container>
             </b-col>
@@ -650,6 +345,7 @@ function shortGroupDescription(i) {
           <b-button
             @click="
               form.groupCount++,
+                form.choices.push({}),
                 (form.visible = true),
                 (visibleGroup = form.groupCount)
             "

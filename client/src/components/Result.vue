@@ -13,65 +13,69 @@ import { API_URL } from '../api'
 const props = defineProps({ headers: Array, result: Object })
 
 //Default headers for recommendation experiments.
-const headers_rec = ref([
+const selectedHeaders = ref([[
   { name: 'Rank' },
   { name: 'User' },
   { name: 'Item' },
   { name: 'Score' },
-])
-//Default headers for prediction experiments
-const headers_pre = ref([
-  { name: 'User' },
-  { name: 'Item' },
-  { name: 'Predicted Score' },
-])
+]])
 
 const experiment_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
-const data = ref([])
+const data = ref({results: [[]]})
 const mockdataRunIndex = ref(0)
-const mockdataPairIndex = ref(0)
 const startIndex = ref(0)
 const index = ref(0)
 const ascending = ref(true)
 const entryAmount = ref(20)
+const optionalHeaders = ref([])
 const userHeaders = ref([])
 const itemHeaders = ref([])
-const headers = ref([])
 const availableFilters = ref([])
 const filters = ref(emptyFormGroup(false))
-const generalHeaders = ref([])
-const userHeaderOptions = ref([])
-const itemHeaderOptions = ref([])
-const generalHeaderOptions = ref([])
+const userHeaderOptions = ref([[]])
+const itemHeaderOptions = ref([[]])
+const generalHeaderOptions = ref([[]])
+const recTableAmount = ref(props.result.result.length * props.result.result[0].results.length)
 
 onMounted(() => {
   console.log('result', props.result)
   console.log('result id', props.result.id)
-  setRecs()
+  setRecs(0)
+  setRecs(1)
   console.log('availableFilters', availableFilters.value)
   //loadEvaluations()
 })
 
 // GET request: Get available options for selection from server
-async function getHeaders() {
-  const response = await fetch(API_URL + '/all-results/headers')
+async function getHeaders(index, file) {
+  //TODO replace mock variables in body
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-type': 'application/json' },
+    body: JSON.stringify({
+      index: index,
+      location: file,
+    }),
+  }
+  const response = await fetch(API_URL + '/all-results/headers', requestOptions)
   const data = await response.json()
+  
 
-  generalHeaderOptions.value = makeHeaders(data.headers)
-  itemHeaderOptions.value = makeHeaders(data.itemHeaders)
-  userHeaderOptions.value = makeHeaders(data.userHeaders)
+  generalHeaderOptions.value[index] = makeHeaders(data.headers)
+  itemHeaderOptions.value[index] = makeHeaders(data.itemHeaders)
+  userHeaderOptions.value[index] = makeHeaders(data.userHeaders)
 }
 
 //POST request: Send result ID to the server to set current shown recommendations.
-async function setRecs() {
+async function setRecs(currentTable) {
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       id: props.result.id,
-      runid: mockdataRunIndex.value,
-      pairid: mockdataPairIndex.value,
+      runid: 0,
+      pairid: currentTable,
     }),
   }
   console.log('sending to server:', requestOptions.body)
@@ -82,15 +86,15 @@ async function setRecs() {
   //console.log('resultfetch', response)
   if (response.status == '200') {
     const data = await response.json()
-    //console.log('data', data)
     availableFilters.value = data.availableFilters
-    //console.log('resultfetch', response)
-    await getUserRecs()
-    getHeaders()
+    await getUserRecs(0), getUserRecs(1)
+    //TODO remove this mock
+    getHeaders(0, '0_Foobar/run_0/overview.json')
   }
 }
 
 //POST request: Ask server to load the evaluations of the current result
+//Currently not used, as evaluation tables are not finished
 async function loadEvaluations() {
   const requestOptions = {
     method: 'POST',
@@ -115,33 +119,36 @@ async function getEvaluations() {
 }
 
 //POST request: Ask server for next part of user recommendation table.
-async function getUserRecs() {
+async function getUserRecs(currentTable) {
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       id: props.result.id,
+      pairid: currentTable,
       start: startIndex.value,
       sortindex: index.value,
       ascending: ascending.value,
       amount: entryAmount.value,
       filters: filters.value,
-      generalHeaders: generalHeaders.value,
+      optionalHeaders: optionalHeaders.value,
       itemheaders: itemHeaders.value,
       userheaders: userHeaders.value,
     }),
   }
 
   const response = await fetch(API_URL + '/all-results/result', requestOptions)
-  data.value.results = await response.json()
+  data.value.results[currentTable] = await response.json()
+  selectedHeaders.value[currentTable] = Object.keys(data.value.results[currentTable][0])
 }
 
 /**
  * Loads more data in the table after user asks for more data.
  * @param {Bool}   increase  - Determines whether the next or previous data is required.
  * @param {Int}    amount    - Number of items that the user has requested.
+ * @param {Int}    pairid    - Index of which result file to load (from overview.json)
  */
-function loadMore(increase, amount) {
+function loadMore(increase, amount, pairid) {
   amount = parseInt(amount)
 
   //Determine the index for where the next page starts, based on how many entries were shown before.
@@ -149,17 +156,18 @@ function loadMore(increase, amount) {
   if (startIndex.value < 0) startIndex.value = 0
   else if (increase) startIndex.value += entryAmount.value
   else startIndex.value = 0
-
+  console.log(pairid)
   //Update amount to new number of entries that are shown.
   entryAmount.value = amount
-  getUserRecs()
+  getUserRecs(pairid)
 }
 
 /**
  * Handles sorting for tables that have pagination.
  * @param {int}   indexVar  - Index of the column on which is sorted.
+ * @param {Int}    pairid    - Index of which result file to load (from overview.json)
  */
-function paginationSort(indexVar) {
+function paginationSort(indexVar, pairid) {
   //When sorting on the same column twice in a row, switch to descending.
   if (index.value === indexVar) {
     ascending.value = !ascending.value
@@ -168,26 +176,27 @@ function paginationSort(indexVar) {
   //When sorting, start at startIndex 0 again to see either highest or lowest, passing on which column is sorted.
   index.value = indexVar
   startIndex.value = 0
-  getUserRecs()
+  getUserRecs(pairid)
 }
 
 /**
  * Update headers shown in user recommendations
- * @param {Array}   generalHeader  - list of headers that apply to the user-item pair.
- * @param {Array}   userHeader    - list of headers that apply to the user entries.
- * @param {Array}   itemHeader    - list of headers that apply to the item entries.
+ * @param {Array}   headers  - A list of the headers that have been selected to be shown
+ * @param {Int}    pairid    - Index of which result file to load (from overview.json)
  */
-function updateHeaders(generalHeader, userHeader, itemHeader) {
-  generalHeaders.value = makeHeaders(generalHeader)
-  userHeaders.value = makeHeaders(userHeader)
-  itemHeaders.value = makeHeaders(itemHeader)
-  getUserRecs()
+function updateHeaders(headers, pairid) {
+  optionalHeaders.value = headers
+  getUserRecs(pairid)
 }
 
-function changeFilters(changedFilters) {
+/**
+ * Update headers shown in user recommendations
+ * @param {Array}   changedFilters  - A list of filters that are selected
+ * @param {Int}    pairid    - Index of which result file to load (from overview.json)
+ */
+function changeFilters(changedFilters, pairid) {
   filters.value = changedFilters
-
-  getUserRecs()
+  getUserRecs(pairid)
 }
 
 /**
@@ -196,7 +205,7 @@ function changeFilters(changedFilters) {
  */
 function makeHeaders(headers) {
   for (var i = 0; i < headers.length; i++) {
-    headers[i] = capitalizeFirstLetter(headers[i].replace('_', ' '))
+    headers[i] = capitalizeFirstLetter(headers[i].toString().replace('_', ' '))
   }
   return headers.map((header) => ({
     name: header,
@@ -256,38 +265,37 @@ function capitalizeFirstLetter(string) {
 
     <div class="container">
       <div class="row">
-        <h4>Recommended items per user</h4>
+        <!--Type of experiment decides which label to give the section-->
+        <h4 v-if="selectedHeaders[0][0] == 'rank'">Recommended items per user</h4>
+        <h4 v-else>Predicted rating per user</h4>
       </div>
       <div class="row">
         <!--Show recommendations for all datasets for now TODO-->
-        <!--<template v-for="data in [data]" :key="data">-->
+        <!--Currently only shows the results of the first dataset-->
+        <template v-for="(entry,index) in props.result.result" :key="data">
         <div class="col-6">
           <Table
+          v-if="selectedHeaders[index]"
             :key="props.result.id"
-            caption="Testcaption"
-            :results="data.results"
-            :headers="
-              headers_rec
-                .concat(generalHeaders)
-                .concat(userHeaders)
-                .concat(itemHeaders)
-            "
-            :headerOptions="generalHeaderOptions"
+            :caption="entry.caption"
+            :results="data.results[index]"
+            :headers="makeHeaders(selectedHeaders[index])"
             :filters="filters"
             :filterOptions="availableFilters"
-            :userOptions="userHeaderOptions"
-            :itemOptions="itemHeaderOptions"
+            :headerOptions="generalHeaderOptions[index]"
+            :userOptions="userHeaderOptions[index]"
+            :itemOptions="itemHeaderOptions[index]"
             pagination
             expandable
-            @paginationSort="(i) => paginationSort(i)"
-            @loadMore="(increase, amount) => loadMore(increase, amount)"
-            @changeFilters="(changedFilters) => changeFilters(changedFilters)"
+            @paginationSort="(i) => paginationSort(i, index)"
+            @loadMore="(increase, amount) => loadMore(increase, amount, index)"
+            @changeFilters="(changedFilters) => changeFilters(changedFilters, index)"
             @updateHeaders="
-              (general, user, item) => updateHeaders(general, user, item)
+              (headers) => updateHeaders(headers, index)
             "
           />
         </div>
-        <!--</template>-->
+        </template>
       </div>
     </div>
   </div>
