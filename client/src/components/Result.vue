@@ -6,6 +6,7 @@ Utrecht University within the Software Project course.
 import Table from './Table.vue'
 import { onActivated, onMounted, onUpdated, ref, watch } from 'vue'
 import { emptyFormGroup } from '../helpers/optionsFormatter'
+import { capitalise } from '../helpers/resultFormatter'
 
 import mockdata from '../../../server/mock/1647818279_HelloWorld/results-table.json'
 import { API_URL } from '../api'
@@ -13,22 +14,18 @@ import { API_URL } from '../api'
 const props = defineProps({ headers: Array, result: Object })
 
 //Default headers for recommendation experiments.
-const selectedHeaders = ref([[
-  { name: 'Rank' },
-  { name: 'User' },
-  { name: 'Item' },
-  { name: 'Score' },
-]])
+const selectedHeaders = ref([
+  [{ name: 'Rank' }, { name: 'User' }, { name: 'Item' }, { name: 'Score' }],
+])
 
 const experiment_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
-const data = ref({results: [[]]})
-const mockdataRunIndex = ref(0)
+const data = ref({ results: [[]] })
 const startIndex = ref(0)
 const index = ref(0)
 const ascending = ref(true)
 const entryAmount = ref(20)
-const optionalHeaders = ref([])
+const optionalHeaders = ref([[]])
 const userHeaders = ref([])
 const itemHeaders = ref([])
 const availableFilters = ref([])
@@ -36,35 +33,27 @@ const filters = ref(emptyFormGroup(false))
 const userHeaderOptions = ref([[]])
 const itemHeaderOptions = ref([[]])
 const generalHeaderOptions = ref([[]])
-const recTableAmount = ref(props.result.result.length * props.result.result[0].results.length)
+const userTables = combineResults()
 
 onMounted(() => {
   console.log('result', props.result)
   console.log('result id', props.result.id)
-  setRecs(0)
-  setRecs(1)
+  //Load in all the user recommendation/prediction tables
+  for (let index in userTables) {
+    setRecs(parseInt(index))
+  }
   console.log('availableFilters', availableFilters.value)
   //loadEvaluations()
 })
 
-// GET request: Get available options for selection from server
-async function getHeaders(index, file) {
-  //TODO replace mock variables in body
-  const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-type': 'application/json' },
-    body: JSON.stringify({
-      index: index,
-      location: file,
-    }),
-  }
-  const response = await fetch(API_URL + '/all-results/headers', requestOptions)
+// GET request: Get available header options for selection from server
+async function getHeaderOptions(index) {
+  const response = await fetch(API_URL + '/all-results/headers')
   const data = await response.json()
-  
-
-  generalHeaderOptions.value[index] = makeHeaders(data.headers)
-  itemHeaderOptions.value[index] = makeHeaders(data.itemHeaders)
-  userHeaderOptions.value[index] = makeHeaders(data.userHeaders)
+  let headerOptions = data[userTables[index].split(' ')[1].split('_')[0]]
+  generalHeaderOptions.value[index] = makeHeaders(headerOptions.headers)
+  itemHeaderOptions.value[index] = makeHeaders(headerOptions.itemHeaders)
+  userHeaderOptions.value[index] = makeHeaders(headerOptions.userHeaders)
 }
 
 //POST request: Send result ID to the server to set current shown recommendations.
@@ -87,9 +76,8 @@ async function setRecs(currentTable) {
   if (response.status == '200') {
     const data = await response.json()
     availableFilters.value = data.availableFilters
-    await getUserRecs(0), getUserRecs(1)
-    //TODO remove this mock
-    getHeaders(0, '0_Foobar/run_0/overview.json')
+    getUserRecs(currentTable)
+    getHeaderOptions(currentTable)
   }
 }
 
@@ -131,7 +119,7 @@ async function getUserRecs(currentTable) {
       ascending: ascending.value,
       amount: entryAmount.value,
       filters: filters.value,
-      optionalHeaders: optionalHeaders.value,
+      optionalHeaders: optionalHeaders.value[currentTable],
       itemheaders: itemHeaders.value,
       userheaders: userHeaders.value,
     }),
@@ -139,7 +127,9 @@ async function getUserRecs(currentTable) {
 
   const response = await fetch(API_URL + '/all-results/result', requestOptions)
   data.value.results[currentTable] = await response.json()
-  selectedHeaders.value[currentTable] = Object.keys(data.value.results[currentTable][0])
+  selectedHeaders.value[currentTable] = Object.keys(
+    data.value.results[currentTable][0]
+  )
 }
 
 /**
@@ -156,7 +146,6 @@ function loadMore(increase, amount, pairid) {
   if (startIndex.value < 0) startIndex.value = 0
   else if (increase) startIndex.value += entryAmount.value
   else startIndex.value = 0
-  console.log(pairid)
   //Update amount to new number of entries that are shown.
   entryAmount.value = amount
   getUserRecs(pairid)
@@ -185,7 +174,7 @@ function paginationSort(indexVar, pairid) {
  * @param {Int}    pairid    - Index of which result file to load (from overview.json)
  */
 function updateHeaders(headers, pairid) {
-  optionalHeaders.value = headers
+  optionalHeaders.value[pairid] = headers
   getUserRecs(pairid)
 }
 
@@ -200,24 +189,26 @@ function changeFilters(changedFilters, pairid) {
 }
 
 /**
- * convert list of header names into supported header format, capitalize and remove underscores
+ * convert list of header names into supported header format, capitalise and remove underscores
  * @param {Array}   headers  - list of headers.
  */
 function makeHeaders(headers) {
-  for (var i = 0; i < headers.length; i++) {
-    headers[i] = capitalizeFirstLetter(headers[i].toString().replace('_', ' '))
-  }
   return headers.map((header) => ({
-    name: header,
+    name: capitalise(header.toString()),
   }))
 }
 
 /**
- * Capitalize the first letter of a string
- * @param {int}   string  - the string that needs to be capitalized.
+ * Combine the list of approaches of each dataset
  */
-function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1)
+function combineResults() {
+  let list = []
+  for (let dataset in props.result.result) {
+    for (let approach in props.result.result[dataset].results) {
+      list.push(props.result.result[dataset].caption + '_' + props.result.result[dataset].results[approach].approach)
+    }
+  }
+  return list
 }
 </script>
 
@@ -229,7 +220,6 @@ function capitalizeFirstLetter(string) {
         These are the results for experiment {{ result.metadata.name }} done at
         {{ result.metadata.datetime }}.
       </p>
-
       <div class="col">
         Tags:
         <template v-if="!result.metadata.tags">None</template>
@@ -266,35 +256,40 @@ function capitalizeFirstLetter(string) {
     <div class="container">
       <div class="row">
         <!--Type of experiment decides which label to give the section-->
-        <h4 v-if="selectedHeaders[0][0] == 'rank'">Recommended items per user</h4>
+        <h4 v-if="selectedHeaders[0][0] == 'rank'">
+          Recommended items per user
+        </h4>
         <h4 v-else>Predicted rating per user</h4>
       </div>
       <div class="row">
         <!--Show recommendations for all datasets for now TODO-->
         <!--Currently only shows the results of the first dataset-->
-        <template v-for="(entry,index) in props.result.result" :key="data">
-        <div class="col-6">
-          <Table
-          v-if="selectedHeaders[index]"
-            :key="props.result.id"
-            :caption="entry.caption"
-            :results="data.results[index]"
-            :headers="makeHeaders(selectedHeaders[index])"
-            :filters="filters"
-            :filterOptions="availableFilters"
-            :headerOptions="generalHeaderOptions[index]"
-            :userOptions="userHeaderOptions[index]"
-            :itemOptions="itemHeaderOptions[index]"
-            pagination
-            expandable
-            @paginationSort="(i) => paginationSort(i, index)"
-            @loadMore="(increase, amount) => loadMore(increase, amount, index)"
-            @changeFilters="(changedFilters) => changeFilters(changedFilters, index)"
-            @updateHeaders="
-              (headers) => updateHeaders(headers, index)
-            "
-          />
-        </div>
+        <template v-for="(entry, index) in userTables" :key="data">
+        <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
+          <div class="col-6">
+            <Table
+              v-if="selectedHeaders[index]"
+              :key="props.result.id"
+              :caption="entry"
+              :results="data.results[index]"
+              :headers="makeHeaders(selectedHeaders[index])"
+              :filters="filters"
+              :filterOptions="availableFilters"
+              :headerOptions="generalHeaderOptions[index]"
+              :userOptions="userHeaderOptions[index]"
+              :itemOptions="itemHeaderOptions[index]"
+              pagination
+              expandable
+              @paginationSort="(i) => paginationSort(i, index)"
+              @loadMore="
+                (increase, amount) => loadMore(increase, amount, index)
+              "
+              @changeFilters="
+                (changedFilters) => changeFilters(changedFilters, index)
+              "
+              @updateHeaders="(headers) => updateHeaders(headers, index)"
+            />
+          </div>
         </template>
       </div>
     </div>
