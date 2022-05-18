@@ -64,6 +64,7 @@ def formatted_queue():
 
 def formatted_experiment(experiment):
     # TODO refactor: shouldn't have to convert like this
+    if not experiment: return {}
     experiment.job['status'] = experiment.status.value
     return experiment.job
 
