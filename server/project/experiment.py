@@ -42,6 +42,7 @@ class Status(enum.Enum):
     Aborted = 'Aborted'
     Cancelled = 'Cancelled'
     Done = 'Done'
+    NA = 'Not Available'
 
 
 # TODO refactor job and config_dict overlap
@@ -216,7 +217,7 @@ def calculate():
     else:
         if current_experiment.status == Status.Done:
             response['calculation'] = result_storage.current_result
-        response['status'] = current_experiment.status.value
+        response['status'] = current_experiment.status.value if current_experiment else Status.NA
     # print('calculation response:', response)
     return response
 
