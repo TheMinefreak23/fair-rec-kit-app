@@ -37,7 +37,7 @@ def old_result_by_id():
 
 @results_bp.route('/result-by-id', methods=['POST', 'GET'])
 def result_by_id():
-    if request.method == 'POST':    
+    if request.method == 'POST':
         data = request.get_json()
         print('data', data)
         result_storage.result_by_id(int(data['id']))
@@ -78,40 +78,39 @@ def set_recs():
     result_id = json.get("id")  # Result timestamp TODO use to get result
     run_id = json.get("runid")
     pair_id = json.get("pairid")
-    path = result_storage.get_overview(result_id, run_id)[pair_id]['ratings_path'] 
+    path = result_storage.get_overview(result_id, run_id)[pair_id]['ratings_path']
     result_storage.current_recs[pair_id] = pd.read_csv(path, sep='\t', header=0)
-    return {'status': 'success', 'availableFilters' : options['filters']}
+    return {'status': 'success', 'availableFilters': options['filters']}
 
 
-## get recommender results per user
 @results_bp.route('/result', methods=['POST'])
 def user_result():
+    """"Get recommender results per user"""
     json = request.json
     pair_id = json.get("pairid")
     filters = json.get("filters")
-    #TODO implement backend filtering
+    # TODO implement backend filtering
 
     chunk_size = json.get("amount", 20)
     chunk_size = int(chunk_size)
     chosen_headers = json.get("optionalHeaders", [])
 
-    #read mock dataframe
+    # read mock dataframe
     recs = result_storage.current_recs[pair_id]
     if recs is None:
         set_recs()
         recs = result_storage.current_recs
 
-
-    #TODO what if sorted on column that is removed?
-    #TODO saving sorted dataframe inbetween
-    ##sort dataframe based on index and ascending or not
+    # TODO what if sorted on column that is removed?
+    # TODO saving sorted dataframe inbetween
+    # sort dataframe based on index and ascending or not
     df_sorted = recs.sort_values(by=recs.columns[json.get("sortindex", 0)], ascending=json.get("ascending"))
 
     # adding extra columns to dataframe
-    #df_sorted=add_user_columns(dataset, df_sorted, chosen_headers)
+    # df_sorted=add_user_columns(dataset, df_sorted, chosen_headers)
     for chosen_header in chosen_headers:
         df_sorted[chosen_header] = chosen_header
-    
+
     # getting only chunk of data
     start_rows = json.get("start", 0)
     start_rows = int(start_rows)
@@ -127,10 +126,10 @@ def user_result():
     df_subset = df_sorted[start_rows:end_rows]
 
     return df_subset.to_json(orient='records')
-    #return ({'headers': list(result_storage.current_headers),'table': df_subset.to_json(orient='records')})
+    # return ({'headers': list(result_storage.current_headers),'table': df_subset.to_json(orient='records')})
+
 
 @results_bp.route('/headers', methods=['GET'])
 def headers():
-    return result_storage.load_json('project/headers.json')   
-
-
+    """" Get available dataset headers """
+    return result_storage.load_json('project/headers.json')
