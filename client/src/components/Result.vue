@@ -257,9 +257,11 @@ function fillVisibleDatasets(){
           </label>
         </div>
       </p>
+
     <div>
       {{visibleDatasets}}
     </div>
+    
     
       <div class="col">
         Tags:
