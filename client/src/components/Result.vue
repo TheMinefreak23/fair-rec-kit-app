@@ -39,10 +39,8 @@ const visibleDatasets = ref([])
 onMounted(() => {
   console.log('result', props.result)
   console.log('result id', props.result.id)
-  loadEvaluations()
+  //loadEvaluations()
   fillVisibleDatasets()
-  //setRecs(0)
-  //setRecs(1)
   //Load in all the user recommendation/prediction tables
   for (let index in userTables) {
     setRecs(parseInt(index))
@@ -216,12 +214,17 @@ function combineResults() {
   return list
 }
 
+/**
+ * Fill array of datasets that are shown so that all are shown upon loading the page
+ */
 function fillVisibleDatasets(){
-  for(let i=0; i<props.result.result[1].results.length;i++){
-    visibleDatasets.value[i] = props.result.result[1].results[i].dataset
+
+  for(let i=0; i<userTables.length;i++){
+      visibleDatasets.value[i] = userTables[i].split(' ')[1].split('_')[0]
   }
+  
 
-
+   
 }
 </script>
 
@@ -236,25 +239,20 @@ function fillVisibleDatasets(){
 
       <p>
         Datasets shown:
-        <div class="form-check" v-for="dataset in result.result[0].results">
+        <div class="form-check" v-for="dataset in userTables">
           <input
             v-model = "visibleDatasets"
             class = "form-check-input"
             type="checkbox"
-            :value="dataset.dataset"
-            :id="dataset.dataset"
+            :value="dataset.split(' ')[1].split('_')[0]"
+            :id="dataset"
           />
-          <label class="form-check-label" :id="dataset.dataset">
-            {{dataset.dataset}}
+          <label class="form-check-label" :id="dataset">
+            {{dataset.split(' ')[1].split('_')[0]}}
           </label>
         </div>
       </p>
 
-    <div>
-      {{visibleDatasets}}
-    </div>
-    
-    
       <div class="col">
         Tags:
         <template v-if="!result.metadata.tags">None</template>
@@ -276,11 +274,11 @@ function fillVisibleDatasets(){
             : [result.result[0]]"
           :key="datasetResult"
         >
-          <p> HELLOOOO {{datasetResult.results[0].dataset}}</p>
+          <p> {{datasetResult.results[0].dataset}}</p>
           <div class="col-6">
-            
-            <!-- this is per dataset so should be changed to include that-->
-          <template v-if="visibleDatasets.includes(datasetResult.dataset)">
+
+          
+          <template v-if="visibleDatasets.includes(datasetResult.caption.split(' ')[1].split('_')[0])" :key="visibleDatasets">
             <Table
               :caption="datasetResult.caption"
               :results="datasetResult.results"
@@ -305,31 +303,33 @@ function fillVisibleDatasets(){
         <!--Show recommendations for all datasets for now TODO-->
         <!--Currently only shows the results of the first dataset-->
         <template v-for="(entry, index) in userTables" :key="data">
-        <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
-          <div class="col-6">
-            <Table
-              v-if="selectedHeaders[index]"
-              :key="props.result.id"
-              :caption="entry"
-              :results="data.results[index]"
-              :headers="makeHeaders(selectedHeaders[index])"
-              :filters="filters"
-              :filterOptions="availableFilters"
-              :headerOptions="generalHeaderOptions[index]"
-              :userOptions="userHeaderOptions[index]"
-              :itemOptions="itemHeaderOptions[index]"
-              pagination
-              expandable
-              @paginationSort="(i) => paginationSort(i, index)"
-              @loadMore="
-                (increase, amount) => loadMore(increase, amount, index)
-              "
-              @changeFilters="
-                (changedFilters) => changeFilters(changedFilters, index)
-              "
-              @updateHeaders="(headers) => updateHeaders(headers, index)"
-            />
-          </div>
+          <template v-if="visibleDatasets.includes(entry.split(' ')[1].split('_')[0])" :key="visibleDatasets">
+          <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
+            <div class="col-6">
+              <Table
+                v-if="selectedHeaders[index]"
+                :key="props.result.id"
+                :caption="entry"
+                :results="data.results[index]"
+                :headers="makeHeaders(selectedHeaders[index])"
+                :filters="filters"
+                :filterOptions="availableFilters"
+                :headerOptions="generalHeaderOptions[index]"
+                :userOptions="userHeaderOptions[index]"
+                :itemOptions="itemHeaderOptions[index]"
+                pagination
+                expandable
+                @paginationSort="(i) => paginationSort(i, index)"
+                @loadMore="
+                  (increase, amount) => loadMore(increase, amount, index)
+                "
+                @changeFilters="
+                  (changedFilters) => changeFilters(changedFilters, index)
+                "
+                @updateHeaders="(headers) => updateHeaders(headers, index)"
+              />
+            </div>
+          </template>
         </template>
       </div>
     </div>
