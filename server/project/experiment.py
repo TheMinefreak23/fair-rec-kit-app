@@ -173,7 +173,7 @@ def calculate():
         if not experiment_running:
             response['calculation'] = result_storage.current_result
         response['status'] = 'busy' if experiment_running else 'done'
-    print('/calculation response:', response)
+    #print('calculation response:', response)
     return response
 
 

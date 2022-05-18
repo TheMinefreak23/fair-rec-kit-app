@@ -7,37 +7,69 @@
     "name": "m"
   },
   "settings": {
-    "datasets": [
-      {
-        "name": "ML-100K",
-        "params": [
-          {
-            "name": "Train/testsplit",
-            "value": "80"
-          }
-        ],
-        "settings": [
-          {
-            "filters": []
-          }
-        ]
-      }
-    ],
-    "metrics": [],
-    "approaches": [
-      {
-        "name": "PopScore",
-        "params": [
-          {
-            "name": "Score_method",
-            "value": "quantile"
-          }
-        ]
-      }
-    ],
+    "lists": {
+      "datasets": [
+        {
+          "name": "ML-100K",
+          "params": [
+            {
+              "name": "Train/testsplit",
+              "value": 80
+            }
+          ],
+          "filters": [],
+          "conversion": [],
+          "splitting": [
+            {
+              "name": "random",
+              "params": [
+                {
+                  "name": "seed",
+                  "value": null
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "metrics": [],
+      "approaches": [
+        {
+          "name": "BiasedMF",
+          "params": [
+            {
+              "name": "features",
+              "value": 10
+            },
+            {
+              "name": "iterations",
+              "value": 20
+            },
+            {
+              "name": "user_reg",
+              "value": 0.1
+            },
+            {
+              "name": "item_reg",
+              "value": 0.1
+            },
+            {
+              "name": "damping",
+              "value": 5
+            },
+            {
+              "name": "random_seed",
+              "value": null
+            },
+            {
+              "name": "Method",
+              "value": "cd"
+            }
+          ]
+        }
+      ]
+    },
     "recommendations": 10,
-    "split": 80,
-    "splitMethod": "random",
-    "computationMethod": "recommendation"
+    "experimentMethod": "recommendation"
   }
 }
