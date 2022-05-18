@@ -66,8 +66,8 @@ def edit():
 @results_bp.route('/delete', methods=['POST'])
 def delete():
     data = request.get_json()
-    index = data.get('index')
-    result_storage.delete_result(index)
+    result_id = data.get('id')
+    result_storage.delete_result(result_id)
     return "Removed index"
 
 

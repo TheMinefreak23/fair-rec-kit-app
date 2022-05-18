@@ -31,10 +31,6 @@ def save_result(experiment, result):
     global current_result
     experiment['result'] = result
 
-    # Parse tags
-    if 'tags' in experiment['metadata']:
-        experiment['metadata']['tags'] = parse_tags(experiment['metadata']['tags'])
-
     current_result = experiment
     add_result(current_result)
     print(current_result)
@@ -188,14 +184,19 @@ def add_result(result):
     write_results_overview(file_results)
 
 
-def delete_result(index):
-    """Delete a result by its index.
+def delete_result(result_id):
+    """Delete a result by its id.
 
     Args:
         index(int): the index of the result
     """
     file_results = load_results_overview()
-    file_results['all_results'].pop(index)
+    # Remove from list
+    file_results['all_results'] = [
+        result for result in file_results['all_results']
+        if result['timestamp']['stamp'] != result_id
+    ]
+    # TODO delete actual result
     write_results_overview(file_results)
 
 

@@ -40,6 +40,7 @@ def create_available_options(recommender_system):
     options = {}
 
     datasets = recommender_system.get_available_datasets()
+    print (datasets)
     predictors = recommender_system.get_available_algorithms(TYPE_PREDICTION)
     recommenders = recommender_system.get_available_algorithms(TYPE_RECOMMENDATION)
     # TODO different metrics for diff types
@@ -47,9 +48,9 @@ def create_available_options(recommender_system):
     rec_metrics = recommender_system.get_available_metrics(TYPE_RECOMMENDATION)
     converters = recommender_system.get_available_rating_converters()
     # print('recommenders', recommenders)
-    print('rating converters', converters)
+    # print('rating converters', converters)
     splits = recommender_system.get_available_splitters()
-    print('splits', splits)
+    # print('splits', splits)
 
     global model_API_dict
     model_API_dict = create_model_api_dict(predictors, recommenders)
@@ -193,7 +194,7 @@ def config_dict_from_settings(experiment):
 
     print(config)"""
 
-    print(name)
+    #print(name)
     config_dict = {'datasets': settings['datasets'],
                    'models': models,
                    'evaluation': evaluation,
@@ -201,14 +202,14 @@ def config_dict_from_settings(experiment):
                    'top_K': settings['recommendations'],
                    'type': settings['experimentMethod']}
 
-    print(config_dict)
+    #print(config_dict)
     return config_dict, experiment_id
 
 
 def form_to_data(settings):
     # Format from group list form data
     for option_name, option_list in settings['lists'].items():
-        print(option_list)
+        #print(option_list)
         reformat_list(settings, option_name, option_list)
     del settings['lists']
 
@@ -216,12 +217,12 @@ def form_to_data(settings):
 # Reformat settings list from form to data
 def reformat_list(settings, option_name, option_list):
     for option in option_list:
-        print(option)
+        #print(option)
         option['params'] = {param['name']: param['value'] for param in option['params']}
         # Format inner formgrouplists
         for inner_option_name, inner_option_list in option.items():
             if inner_option_name not in ['name', 'params']: # TODO use settings/lists key after all?
-                print(json.dumps(option, indent=4))
+                #print(json.dumps(option, indent=4))
                 reformat_list(option, inner_option_name, inner_option_list)
     settings[option_name] = option_list
 
