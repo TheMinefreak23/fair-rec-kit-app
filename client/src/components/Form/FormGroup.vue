@@ -13,6 +13,8 @@ import {
 //import { selectionOptions } from '../helpers/optionsFormatter'
 import SplitRange from './SplitRange.vue'
 import { emptyFormGroup } from '../../helpers/optionsFormatter'
+import MultiRangeSlider from 'multi-range-slider-vue'
+import '../../../node_modules/multi-range-slider-vue/MultiRangeSliderBlack.css'
 
 const emit = defineEmits(['copy'])
 const props = defineProps({
@@ -196,6 +198,24 @@ function chooseLabel(name) {
                           :name="value.name"
                           :step="5"
                         />
+                        <!-- Use a slider with 2 sliders if a range is needed-->
+                        <MultiRangeSlider
+                          v-if="value.name.includes('range')"
+                          baseClassName="multi-range-slider-black"
+                          :min="value.min"
+                          :max="value.max"
+                          :step="1"
+                          :ruler="false"
+                          :label="true"
+                          :minValue="value.minValue"
+                          :maxValue="value.maxValue"
+                          @input="
+                            form.inputs[index].value = [
+                              $event.minValue,
+                              $event.maxValue,
+                            ]
+                          "
+                        />
                         <!--Display the seed label for the seed option.-->
                         <div
                           v-if="
@@ -256,6 +276,7 @@ function chooseLabel(name) {
                       v-if="option.options.length > 2"
                       :label="chooseLabel(option.name)"
                     >
+                      <!--TODO: ADD MULTIPLE SELECT FOR FILTERS (MODAL?)-->
                       <b-form-select
                         v-model="form.selects[index].value"
                         :options="option.options"

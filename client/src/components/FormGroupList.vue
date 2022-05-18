@@ -7,11 +7,8 @@ import {
   formatMultipleItems,
 } from '../helpers/resultFormatter'
 //import { selectionOptions } from '../helpers/optionsFormatter'
-import MultiRangeSlider from 'multi-range-slider-vue'
-import '../../node_modules/multi-range-slider-vue/MultiRangeSliderBlack.css'
 
 import { useToast } from 'bootstrap-vue-3'
-import SplitRange from './Form/SplitRange.vue'
 import FormGroup from './Form/FormGroup.vue'
 let toast = useToast()
 
