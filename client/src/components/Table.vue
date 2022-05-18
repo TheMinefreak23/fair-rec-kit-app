@@ -141,13 +141,14 @@ function emptyVmodels() {
 
 async function removeEntry() {
   //Remove an entry from the list
+  const entry = selectedEntry.value
   //props.results.splice(entry, 1)
-  //store.allResults.splice(entry, 1)
+  store.allResults = store.allResults.filter((e) => e.id != entry)
   //Inform the server to remove the same entry
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: selectedEntry.value }),
+    body: JSON.stringify({ id: entry }),
   }
   fetch(API_URL + props.serverFile, requestOptions).then(() => {
     console.log('Item', entry, 'removed succesfully')
