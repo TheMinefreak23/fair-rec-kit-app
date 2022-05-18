@@ -355,6 +355,13 @@ function reformat(property) {
         @click="sendMockData(options, true)"
         >Simple Mock</b-button
       >
+      <!--Simple version of the mock with metrics-->
+      <b-button
+        type="test"
+        variant="primary"
+        @click="sendMockData(options, true, true)"
+        >Metric Mock</b-button
+      >
     </b-card>
   </div>
 </template>
