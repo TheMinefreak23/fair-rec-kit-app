@@ -78,7 +78,7 @@ def set_recs():
     result_id = json.get("id")  # Result timestamp TODO use to get result
     run_id = json.get("runid")
     pair_id = json.get("pairid")
-    path = result_storage.get_rec_path(result_id, run_id, pair_id)   
+    path = result_storage.get_overview(result_id, run_id)[pair_id]['ratings_path'] 
     result_storage.current_recs[pair_id] = pd.read_csv(path, sep='\t', header=0)
     return {'status': 'success', 'availableFilters' : options['filters']}
 
@@ -108,9 +108,10 @@ def user_result():
     df_sorted = recs.sort_values(by=recs.columns[json.get("sortindex", 0)], ascending=json.get("ascending"))
 
     # adding extra columns to dataframe
+    #df_sorted=add_user_columns(dataset, df_sorted, chosen_headers)
     for chosen_header in chosen_headers:
         df_sorted[chosen_header] = chosen_header
-
+    
     # getting only chunk of data
     start_rows = json.get("start", 0)
     start_rows = int(start_rows)
@@ -128,17 +129,8 @@ def user_result():
     return df_subset.to_json(orient='records')
     #return ({'headers': list(result_storage.current_headers),'table': df_subset.to_json(orient='records')})
 
-@results_bp.route('/headers', methods=['POST'])
+@results_bp.route('/headers', methods=['GET'])
 def headers():
-    info = request.json
-    index = info.get("index", 0)
-    file = info.get("location", "")
-    headers = result_storage.load_json('project/headers.json')
-    overview = result_storage.load_json('../server/mock/' + file)    
-    dataset = overview['overview'][index]['name'].split('_')[0]
-    result = headers[dataset]
-    return result
-    # result = result_storage.current_recs.columns
-    # return {'headers': list(result)}
+    return result_storage.load_json('project/headers.json')   
 
 
