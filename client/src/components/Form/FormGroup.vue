@@ -116,7 +116,7 @@ function chooseLabel(name) {
             <b-row>
               <!--Main option selection-->
               <b-col cols="12">
-                <b-form-group :label="'Select ' + article(name) + ' ' + name">
+                <b-form-group :label="'Select ' + article(name) + ' ' + name + ' *'">
                   <b-form-select
                     v-model="form.main"
                     data-testid="main-select"
@@ -165,7 +165,7 @@ function chooseLabel(name) {
                       "
                     >
                       <b-form-group
-                        :label="capitalise(underscoreToSpace(value.name))"
+                        :label="capitalise(underscoreToSpace(value.name)) + ' *'"
                         :description="
                           'Between ' +
                           value.min +
@@ -174,6 +174,7 @@ function chooseLabel(name) {
                             ? props.maxK
                             : value.max)
                         "
+                        required
                       >
                         <b-form-input
                           v-if="!value.name.includes('split')"
@@ -220,7 +221,7 @@ function chooseLabel(name) {
                   >
                     <!--Use a radio group if there are a few options and they aren't true/false.-->
                     <b-form-group
-                      :label="chooseLabel(option.name)"
+                      :label="chooseLabel(option.name) + ' *'"
                       v-if="
                         option.options.length < 3 &&
                         typeof option.options[0] != 'boolean'
@@ -236,7 +237,7 @@ function chooseLabel(name) {
                     </b-form-group>
                     <!--Use a checkbox if the options are of a binary (True or False) nature.-->
                     <b-form-group
-                      :label="capitalise(underscoreToSpace(option.name + '?'))"
+                      :label="capitalise(underscoreToSpace(option.name + '?')) + ' *'"
                       v-if="
                         option.options[0] == true || option.options[0] == false
                       "
@@ -254,7 +255,7 @@ function chooseLabel(name) {
                     <!--Use a dropdown select form otherwise-->
                     <b-form-group
                       v-if="option.options.length > 2"
-                      :label="chooseLabel(option.name)"
+                      :label="chooseLabel(option.name) + ' *'"
                     >
                       <b-form-select
                         v-model="form.selects[index].value"

@@ -94,12 +94,15 @@ def user_result():
     chunk_size = json.get("amount", 20)
     chunk_size = int(chunk_size)
     chosen_headers = json.get("optionalHeaders", [])
+    dataset = json.get("dataset", "")
+    print(dataset)
 
     #read mock dataframe
     recs = result_storage.current_recs[pair_id]
     if recs is None:
         set_recs()
         recs = result_storage.current_recs
+    #TODO this part makes no sense at all
 
 
     #TODO what if sorted on column that is removed?

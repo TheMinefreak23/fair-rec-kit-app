@@ -22,7 +22,7 @@ const experiment_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
 const data = ref({ results: [[]] })
 const startIndex = ref(0)
-const index = ref(0)
+const sortIndex = ref(0)
 const ascending = ref(true)
 const entryAmount = ref(20)
 const optionalHeaders = ref([[]])
@@ -50,7 +50,7 @@ onMounted(() => {
 async function getHeaderOptions(index) {
   const response = await fetch(API_URL + '/all-results/headers')
   const data = await response.json()
-  let headerOptions = data[userTables[index].split(' ')[1].split('_')[0]]
+  let headerOptions = data[getDatasetName(index)]
   generalHeaderOptions.value[index] = makeHeaders(headerOptions.headers)
   itemHeaderOptions.value[index] = makeHeaders(headerOptions.itemHeaders)
   userHeaderOptions.value[index] = makeHeaders(headerOptions.userHeaders)
@@ -115,13 +115,14 @@ async function getUserRecs(currentTable) {
       id: props.result.id,
       pairid: currentTable,
       start: startIndex.value,
-      sortindex: index.value,
+      sortindex: sortIndex.value,
       ascending: ascending.value,
       amount: entryAmount.value,
       filters: filters.value,
       optionalHeaders: optionalHeaders.value[currentTable],
       itemheaders: itemHeaders.value,
       userheaders: userHeaders.value,
+      dataset: getDatasetName(currentTable)
     }),
   }
 
@@ -158,12 +159,12 @@ function loadMore(increase, amount, pairid) {
  */
 function paginationSort(indexVar, pairid) {
   //When sorting on the same column twice in a row, switch to descending.
-  if (index.value === indexVar) {
+  if (sortIndex.value === indexVar) {
     ascending.value = !ascending.value
   }
 
   //When sorting, start at startIndex 0 again to see either highest or lowest, passing on which column is sorted.
-  index.value = indexVar
+  sortIndex.value = indexVar
   startIndex.value = 0
   getUserRecs(pairid)
 }
@@ -199,16 +200,26 @@ function makeHeaders(headers) {
 }
 
 /**
- * Combine the list of approaches of each dataset
+ * Combines every approach with every dataset that it is being applied onto
+ * @returns {Array}   - An array of all the user recommendation tables for this run
  */
 function combineResults() {
-  let list = []
+  let tables = []
   for (let dataset in props.result.result) {
     for (let approach in props.result.result[dataset].results) {
-      list.push(props.result.result[dataset].caption + '_' + props.result.result[dataset].results[approach].approach)
+      tables.push(props.result.result[dataset].caption + '_' + props.result.result[dataset].results[approach].approach)
     }
   }
-  return list
+  return tables
+}
+
+/**
+ * Returns the name of the dataset of the requested user recommendation table
+ * @param {Int}   index   - index of the user recommendation table
+ * @returns {string}      - the name of the requested dataset
+ */
+function getDatasetName(index) {
+return userTables[index].split(' ')[1].split('_')[0]
 }
 </script>
 

@@ -256,7 +256,6 @@ function shortGroupDescription(i) {
       </h3>
       <!-- <p>{{ description && capitalise(description) }}</p> -->
     </b-row>
-    <!--TODO b-collapse doesn't work-->
     <!--Collapsable group list-->
     <b-row>
       <b-collapse id="collapse" :visible="form.visible">
