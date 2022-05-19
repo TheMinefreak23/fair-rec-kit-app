@@ -8,17 +8,24 @@ const AB_API = 'https://acousticbrainz.org/api/v1/'
 const LFM_API = 'http://ws.audioscrobbler.com/2.0/'
 const LFM_key = '5ffe852eb4ffb7e7d5d53e71981cad7f'
 
-async function getSongInfo(token, track, artist, musicbrainzId) {
-  const lastFMData = await getLastFMinfo(artist, track)
+async function getSongInfo(token, track, artist, mbid) {
+  const lastFMData = await getLastFMinfo(artist, track, mbid)
 
   //console.log('mbid', musicbrainzId)
-  if (musicbrainzId == undefined) {
-    musicbrainzId = await lastFMData.track.mbid
-    console.log('mbid', musicbrainzId)
+  var track = track
+  var artist = artist
+  if (mbid == undefined) {
+    mbid = await lastFMData.track.mbid
+    console.log('mbid', mbid)
   }
+
+  else { 
+    track = await lastFMData.track.name
+    artist = await lastFMData.track.artist.name
+   }
   return {
     Spotify: await getSpotifyInfo(token, track, artist),
-    AcousticBrainz: await getAcousticBrainzInfo(musicbrainzId),
+    AcousticBrainz: await getAcousticBrainzInfo(mbid),
     LastFM: lastFMData,
   }
 }
@@ -54,16 +61,31 @@ async function getSpotifyInfo(token, track, artist) {
 }
 
 // Request song-data from LastFM
-async function getLastFMinfo(artist, track) {
-  const url =
-    LFM_API +
-    '?method=track.getInfo&api_key=' +
-    LFM_key +
-    '&artist=' +
-    artist +
-    '&track=' +
-    track +
-    '&autocorrect=1&format=json'
+async function getLastFMinfo(artist, track, mbid) {
+
+  var url
+
+  if (mbid != (null || undefined)) {
+    url =
+      LFM_API +
+      '?method=track.getInfo&api_key=' +
+      LFM_key +
+      '&mbid=' +
+      mbid +
+      '&autocorrect=1&format=json'
+  }
+  else {
+    url =
+      LFM_API +
+      '?method=track.getInfo&api_key=' +
+      LFM_key +
+      '&artist=' +
+      artist +
+      '&track=' +
+      track +
+      '&autocorrect=1&format=json'
+
+  }
   const response = await fetch(url)
   const data = await response.json()
   console.log('LastFM', data)
