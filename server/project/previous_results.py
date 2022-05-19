@@ -126,7 +126,6 @@ def user_result():
     # return part of table that should be shown
     df_subset = df_sorted[start_rows:end_rows]
     return df_subset.to_json(orient='records')
-    #return ({'headers': list(result_storage.current_headers),'table': df_subset.to_json(orient='records')})
 
 def add_dataset_columns(dataset_name, dataframe, columns):
     dataset = recommender_system.data_registry.get_set(dataset_name)
