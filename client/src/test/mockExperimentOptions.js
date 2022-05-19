@@ -69,15 +69,16 @@ function generateRandomApproach(options) {
     var ops = randomItems(libraries, 1)[0].options
 
     var approach = randomItems(ops, 1)[0].value
+    console.log('options', ops)
 
     var approachName = approach.name
     var choices = approach.params.options
 
     console.log('selects', choices)
 
-    var randomOptionName = null //randomWord()
-    var randomOptionValue = null //randomWord()
-    if (choices != (undefined || [])) {
+    var randomOptionName = randomWord()
+    var randomOptionValue = randomWord()
+    if (choices != ([] || undefined || null)) {
       var randomOption = randomItems(choices, 1)[0]
       console.log('random option', randomOption)
       randomOptionName = randomOption.name
@@ -88,9 +89,9 @@ function generateRandomApproach(options) {
 
     console.log('inputs', values)
 
-    var randomValuesName = null //randomWord()
-    var randomValuesValue = null //rand()
-    if (values != (undefined || [])) {
+    var randomValuesName = randomWord()
+    var randomValuesValue = rand()
+    if (values != ([] || undefined || null)) {
       var randomValue = randomItems(values, 1)[0]
       randomValuesName = randomValue.name
       randomValuesValue = getRandomInt(randomValue.min, randomValue.max)
@@ -214,32 +215,5 @@ function randomItems(list = [], n = Math.floor(Math.random() * list.length)) {
   }
   return [...set]
 }
-
-/*function toFormObject(obj) {
-  return obj.map((x) => ({
-    name: x,
-    parameter: null,
-  }))
-}
-
-function reformat(property) {
-  let choices = []
-  for (let i in property.main) {
-    let parameter = null
-    if (property.lists[i] != null) {
-      choices[i] = {
-        name: property.main[i],
-        settings: property.lists[i].map((setting) => ({
-          [setting.name]: reformat(setting),
-        })),
-      }
-    } else {
-      if (property.inputs[i] != null) parameter = property.inputs[i]
-      else if (property.selects[i] != null) parameter = property.selects[i]
-      choices[i] = { name: property.main[i], parameter: parameter }
-    }
-  }
-  return choices
-}*/
 
 export { sendMockData }
