@@ -5,8 +5,8 @@
 import { API_URL } from '../api.js'
 import Table from './Table.vue'
 import { onMounted, ref, watch } from 'vue'
-import { formatResults } from '../helpers/resultFormatter.js'
-import { store } from '../store.js'
+import { formatResults, status } from '../helpers/resultFormatter.js'
+import { store, getQueue, pollForResult } from '../store.js'
 
 //const emit = defineEmits(['computing', 'done', 'stop'])
 const props = defineProps({
@@ -19,37 +19,35 @@ const headers = ref([
   { name: 'ID' },
   { name: 'Date Time' },
   { name: 'Name' },
+  { name: 'Tags' },
   { name: 'Datasets' },
   { name: 'Approaches' },
   { name: 'Metrics' },
+  { name: 'Status' }, // unique to the queue
   { name: '' },
 ])
 
 //Retrieve the queue when the page is loaded
 onMounted(() => {
   getQueue()
+  if (
+    store.currentExperiment &&
+    store.currentExperiment.status == status.active
+  ) {
+    pollForResult()
+  }
 })
 
-/*
-//Reload the queue when a new experiment is added
+//Reload the queue when the experiment is done
 watch(
-  () => store.queue,
-  (newQueue) => {
-    console.log('queue watch new queue:', newQueue)
-    //console.log('queue watch old queue:', oldQueue)
-    if (newQueue.length != 0) {
+  () => store.currentExperiment,
+  (newStatus, oldStatus) => {
+    console.log('queue watch experiment:', store.currentExperiment)
+    if (newStatus == null) {
       getQueue()
     }
   }
-)*/
-
-async function getQueue() {
-  const response = await fetch(API_URL + '/experiment/queue')
-  const data = await response.json()
-  //store.queue = formatResults(data).map(x=>x.omit(x,'ID'))
-  //store.queue = formatResults(data)
-  store.queue = data.queue
-}
+)
 </script>
 
 <template>
@@ -65,11 +63,12 @@ async function getQueue() {
         }}
       </h4>
       <Table
-        :results="formatResults(store.queue)"
+        :results="formatResults(store.queue, true)"
         :headers="headers"
         buttonText="Cancel"
         :removable="true"
-        serverFile="/experiment/queue/delete"
+        serverFile="/experiment/queue/abort"
+        :defaultSort="1"
       />
     </div>
   </b-card>
