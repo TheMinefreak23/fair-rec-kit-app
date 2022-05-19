@@ -42,7 +42,7 @@ onMounted(() => {
 watch(
   () => store.currentExperiment,
   (newStatus, oldStatus) => {
-    console.log('queue watch experiment:', store.currentExperiment)
+    //console.log('queue watch experiment:', store.currentExperiment)
     if (newStatus == null) {
       getQueue()
     }

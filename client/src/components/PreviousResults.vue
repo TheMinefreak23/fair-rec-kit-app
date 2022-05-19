@@ -39,8 +39,9 @@ onMounted(() => {
 })
 
 watch(
-  () => store.currentResults,
+  () => store.currentResults.length,
   () => {
+    //console.log('previousResults watch currentResults')
     getResults()
   }
 )
@@ -48,8 +49,8 @@ watch(
 async function getResults() {
   const response = await fetch(API_URL + '/all-results')
   const data = await response.json()
-  let allResults = data.all_results
-  store.allResults = formatResults(allResults)
+  store.allResults = formatResults(data.all_results)
+  //console.log('all results', store.allResults)
 }
 
 const resultsRoute =
@@ -101,6 +102,7 @@ async function getResult() {
         serverFile="/all-results/delete"
         serverFile2="/all-results/edit"
         :serverFile3="resultsRoute"
+        :defaultSort="1"
       />
     </div>
   </b-card>
