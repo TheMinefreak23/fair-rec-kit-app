@@ -219,9 +219,12 @@ def calculate():
 
         response = {'queue': formatted_queue()}
     else:
-        if current_experiment.status == Status.Done:
+        # TODO catch error
+        if not current_experiment: 
+            print('Current experiment should have started but is None')
+        if current_experiment and current_experiment.status == Status.Done:
             response['calculation'] = result_storage.current_result
-        response['status'] = current_experiment.status.value if current_experiment else Status.NA
+        response['status'] = current_experiment.status.value if current_experiment else Status.NA.value
     # print('calculation response:', response)
     return response
 
