@@ -6,7 +6,7 @@ Utrecht University within the Software Project course.
 import Documentation from './components/Documentation.vue'
 import Results from './components/Results.vue'
 import PreviousResults from './components/PreviousResults.vue'
-import ActiveExperiments from './components/ActiveExperiments.vue'
+import ExperimentQueue from './components/ExperimentQueue.vue'
 import NewExperiment from './components/NewExperiment.vue'
 import TestForm from './test/TestForm.vue'
 import { onMounted, ref } from 'vue'
@@ -118,7 +118,7 @@ function callToast() {
           @done=";(activeExperiments = false), (done = true)"
           @stop=";(activeExperiments = false), (done = false)"
         />-->
-          <ActiveExperiments />
+          <ExperimentQueue />
           <template v-slot:title>
             <div
               :style="{
@@ -128,7 +128,7 @@ function callToast() {
             >
               <b-spinner v-if="store.currentExperiment" small></b-spinner>
               <VCheckmark v-else />
-              Active Experiments
+              Experiment Queue
             </div>
           </template>
         </b-tab>

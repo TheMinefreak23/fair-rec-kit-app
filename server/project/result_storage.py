@@ -31,10 +31,6 @@ def save_result(experiment, result):
     global current_result
     experiment['result'] = result
 
-    # Parse tags
-    if 'tags' in experiment['metadata']:
-        experiment['metadata']['tags'] = parse_tags(experiment['metadata']['tags'])
-
     current_result = experiment
     add_result(current_result)
     print(current_result)
@@ -107,7 +103,7 @@ def result_by_id(result_id):
     # print('current result',current_result)
 
 
-def get_rec_path(evaluation_id, runid, pairid):
+def get_overview(evaluation_id, runid):
     results_overview = load_results_overview()
     # TODO DEV: Mock
     if evaluation_id == 0:
@@ -123,8 +119,7 @@ def get_rec_path(evaluation_id, runid, pairid):
     relative_path = results_root_folder + str(evaluation_id) + "_" + name + "/" + "run_" + str(runid)
     overview_path = relative_path + "/overview.json"
     run_overview = load_json(overview_path)
-    rec_path = run_overview['overview'][pairid]['ratings_path']
-    return rec_path
+    return run_overview['overview']
     #rec_paths = []
     #for index in range(0, len(run_overview['overview'])):
     #    rec_paths[index] = run_overview['overview'][pairid]['ratings_path']
@@ -134,13 +129,13 @@ def get_rec_path(evaluation_id, runid, pairid):
 
 def id_to_name(json_data, result_id):
     current_result_overview_id = -1
-    print(str(json_data))
+    #print(str(json_data))
     # Filter: Loop through all results and find the one with the matching ID.
     for iteration_id in range(len(json_data['all_results'])):
-        if int(json_data['all_results'][iteration_id]['timestamp']['stamp']) == result_id:
+        if int(json_data['all_results'][iteration_id]['timestamp']['stamp']) == int(result_id):
             current_result_overview_id = iteration_id
-    current_name = json_data['all_results'][current_result_overview_id]['metadata']['name']
-    return current_name
+            return json_data['all_results'][current_result_overview_id]['metadata']['name']
+    return json_data['all_results'][-1]['metadata']['name']
 
 
 def load_json(path):
@@ -189,14 +184,19 @@ def add_result(result):
     write_results_overview(file_results)
 
 
-def delete_result(index):
-    """Delete a result by its index.
+def delete_result(result_id):
+    """Delete a result by its id.
 
     Args:
         index(int): the index of the result
     """
     file_results = load_results_overview()
-    file_results['all_results'].pop(index)
+    # Remove from list
+    file_results['all_results'] = [
+        result for result in file_results['all_results']
+        if result['timestamp']['stamp'] != result_id
+    ]
+    # TODO delete actual result
     write_results_overview(file_results)
 
 

@@ -2,18 +2,34 @@
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
+// TODO get from server
+export const status = {
+  toDo: 'To Do',
+  active: 'Active',
+  aborted: 'Aborted',
+  cancelled: 'Cancelled',
+  done: 'Done',
+}
+
+export const statusPrefix = 'status_' // TODO hacky
+
 // Format data for a results overview
-export function formatResults(allResults) {
+// TODO refactor so headers are dynamic (no separate case for status header)
+export function formatResults(allResults, showStatus) {
   const results = []
   for (let i in allResults) {
+    const rawResult = allResults[i]
     results[i] = {
-      id: allResults[i].timestamp.stamp,
-      datetime: allResults[i].timestamp.datetime,
-      name: allResults[i].metadata.name,
-      tags: formatArray(allResults[i].metadata.tags),
-      dataset: formatMultipleItems(allResults[i].settings.datasets),
-      approach: formatMultipleItems(allResults[i].settings.approaches),
-      metric: formatMultipleItems(allResults[i].settings.metrics),
+      id: rawResult.timestamp.stamp,
+      datetime: rawResult.timestamp.datetime,
+      name: rawResult.metadata.name,
+      tags: formatArray(rawResult.metadata.tags),
+      dataset: formatMultipleItems(rawResult.settings.datasets),
+      approach: formatMultipleItems(rawResult.settings.approaches),
+      metric: formatMultipleItems(rawResult.settings.metrics),
+    }
+    if (showStatus) {
+      results[i].status = statusPrefix + rawResult.status
     }
   }
   return results
@@ -44,6 +60,23 @@ export function formatMultipleItems(items) {
   }
   //console.log(items)
   return string
+}
+
+export function statusVariant(rawStatus) {
+  const experimentStatus = rawStatus.slice(statusPrefix.length)
+  //console.log('statusVariant experimentStatus', experimentStatus)
+  switch (experimentStatus) {
+    case status.toDo:
+      return 'warning'
+    case status.active:
+      return 'danger'
+    case status.aborted:
+      return 'light'
+    case status.cancelled:
+      return 'light'
+    case status.done:
+      return 'primary'
+  }
 }
 
 // Format a result for the result tab
