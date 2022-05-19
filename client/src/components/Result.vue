@@ -10,6 +10,7 @@ import { capitalise } from '../helpers/resultFormatter'
 
 import mockdata from '../../../server/mock/1647818279_HelloWorld/results-table.json'
 import { API_URL } from '../api'
+import { store, addResult, removeResult } from '../store'
 
 const props = defineProps({ headers: Array, result: Object })
 
@@ -35,6 +36,7 @@ const itemHeaderOptions = ref([[]])
 const generalHeaderOptions = ref([[]])
 const userTables = combineResults()
 const visibleDatasets = ref([])
+const visibleMetrics = ref([])
 
 onMounted(() => {
   console.log('result', props.result)
@@ -46,6 +48,7 @@ onMounted(() => {
     setRecs(parseInt(index))
   }
   console.log('availableFilters', availableFilters.value)
+  console.log(store.allResults)
   //loadEvaluations()
 })
 
@@ -249,6 +252,19 @@ function fillVisibleDatasets(){
           />
           <label class="form-check-label" :id="dataset">
             {{dataset.split(' ')[1].split('_')[0]}}
+          </label>
+        </div>
+      </p>
+
+      <p>
+        Metrics shown:
+        <div class="form-check">
+          <input
+            v-model = "visibleMetrics"
+            class = "form-check-input"
+            type = "checkbox"
+            />
+          <label class="form-check-label">
           </label>
         </div>
       </p>
