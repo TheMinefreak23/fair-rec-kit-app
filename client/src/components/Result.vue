@@ -123,8 +123,6 @@ async function getUserRecs(currentTable) {
       amount: entryAmount.value,
       filters: filters.value,
       optionalHeaders: optionalHeaders.value[currentTable],
-      itemheaders: itemHeaders.value,
-      userheaders: userHeaders.value,
       dataset: getDatasetName(currentTable)
     }),
   }
