@@ -130,7 +130,8 @@ def run_experiment(experiment):
         # Update status
         current_experiment.status = Status.Done
 
-        result_storage.save_result(current_experiment.job, {})
+        #result_storage.save_result(current_experiment.job, {})
+        result_storage.save_result(current_experiment.job, mock_result(current_experiment.job['settings']))
 
         print('yay')
 
@@ -150,11 +151,11 @@ def run_experiment(experiment):
     # recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)
 
 
-def mock_experiment(experiment):
+def mock_experiment():
     """Mock running an experiment and save the mock result."""
     # Mock experiment duration.
     time.sleep(2.5)
-    result_storage.save_result(experiment, mock_result(experiment['settings']))
+    result_storage.save_result(current_experiment.job, mock_result(current_experiment.job['settings']))
 
 
 def mock_result(settings):
