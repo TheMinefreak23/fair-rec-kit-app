@@ -19,6 +19,7 @@ export function formatResults(allResults, showStatus) {
   const results = []
   for (let i in allResults) {
     const rawResult = allResults[i]
+    //console.log('rawResult', rawResult)
     results[i] = {
       id: rawResult.timestamp.stamp,
       datetime: rawResult.timestamp.datetime,
@@ -48,6 +49,7 @@ export function formatArray(array) {
 
 // Format an array of named objects into a comma separated string
 export function formatMultipleItems(items) {
+  //console.log('items before format', items)
   var string = ''
   if (items == null) {
     string = 'None'
