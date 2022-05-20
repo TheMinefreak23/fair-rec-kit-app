@@ -144,10 +144,29 @@ export function formatEvaluation(e, result) {
 
   // Flatten filters
   console.log(e.evaluation, e.evaluation.filtered)
+  // Add filter category (main name) to filter parameter name
+  // TODO refactor
+  const filtered = []
+  for (let filter of e.evaluation.filtered) {
+    console.log('filter', filter)
+    for (const [mainName, params] of Object.entries(filter)) {
+      console.log(mainName, params)
+      for (const param of params) {
+        for (const [paramName, paramValue] of Object.entries(param)) {
+          const filterItem = {}
+          console.log('paramValue', paramValue)
+          filterItem[mainName + ' ' + '(' + paramName + ')'] = paramValue
+          filtered.push(filterItem)
+        }
+      }
+    }
+  }
+  /*
   const filtered = e.evaluation.filtered
-    .map((filter) => Object.values(filter))
+    .map((filter) => Object.entries(filter))
+    .map(([mainName, param] => { mainName + } ))
     .flat()
-    .flat()
+    .flat()*/
   //console.log(filtered)
 
   // Get filtered values and make subheaders
@@ -175,7 +194,8 @@ export function formatMetric(evaluation) {
   const name = evaluation.name
   if (name.toLowerCase()[name.length - 1] == 'k') {
     //console.log(evaluation)
-    return name.slice(0, -1) + evaluation.params[0].value
+    // TODO refactor K condition
+    return name.slice(0, -1) + evaluation.params['K']
   } else return name
 }
 
