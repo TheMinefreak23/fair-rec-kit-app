@@ -203,6 +203,7 @@ function reformat(property) {
                       remove-on-delete
                       separator=" ,;"
                       no-add-on-enter
+                      size="lg"
                     ></b-form-tags> </b-form-group
                 ></b-col>
               </b-row>
