@@ -85,7 +85,12 @@ def set_recs():
 
 @results_bp.route('/result', methods=['POST'])
 def user_result():
-    """"Get recommender results per user"""
+    """"Get recommender results per user
+
+    Returns:
+        (JSON) user item data
+
+    """
     json = request.json
     pair_id = json.get("pairid")
     filters = json.get("filters")
