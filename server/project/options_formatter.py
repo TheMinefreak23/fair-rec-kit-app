@@ -13,8 +13,8 @@ model_API_dict = {}
 DEFAULTS = {#'split': 80,
             'recCount': {'min': 0, 'max': 100, 'default': 10},
             }  # default values
-DEFAULT_SPLIT = {'name': 'Train/testsplit', 'default': 80, 'min': 1, 'max': 99}
-filters = json.load(open('parameters/filters.json'))
+DEFAULT_SPLIT = {'name': 'Train/testsplit', 'default': '80', 'min': 1, 'max': 99}
+filters = json.load(open('parameters/resultFilter.json')) #TODO LOAD from dataset
 
 
 # TODO do this in another way

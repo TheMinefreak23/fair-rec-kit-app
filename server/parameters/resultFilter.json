@@ -41,27 +41,15 @@
         }
     },
     {
-        "name": "Minimum age",
+        "name": "Age range",
         "params": {
             "values": [
                 {
-                    "name": "threshold",
+                    "name": "range",
                     "min": 1,
-                    "max": 1000,
-                    "default": 18
-                }
-            ]
-        }
-    },
-    {
-        "name": "Maximum age",
-        "params": {
-            "values": [
-                {
-                    "name": "threshold",
-                    "min": 1,
-                    "max": 1000,
-                    "default": 18
+                    "max": 100,
+                    "minValue": 18,
+                    "maxValue" : 70
                 }
             ]
         }
