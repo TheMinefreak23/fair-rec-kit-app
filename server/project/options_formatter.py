@@ -164,7 +164,7 @@ def config_dict_from_settings(experiment):
             dataset['conversion'] = dataset['conversion'][0]
         dataset['splitting'] = dataset['splitting'][0]
         # TODO rename split param
-        dataset['splitting']['test_ratio'] = (100 - dataset['params']['Train/testsplit']) / 100
+        dataset['splitting']['test_ratio'] = (100 - int(dataset['params']['Train/testsplit'])) / 100
 
 
     # Format models
