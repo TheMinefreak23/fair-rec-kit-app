@@ -137,7 +137,8 @@ def result_by_id(result_id):
                 ratings_settings_path_full,
                 sep='\t',
                 header=None).to_dict(orient='records') # TODO ratings_settings still needs to go somewhere
-            data['result'][run_index]['recs'][pair_id]['evals'] = evaluation_data['evaluations']
+            print(evaluation_data)
+            data['result'][run_index]['recs'][pair_id]['evals'] = evaluation_data['evaluations'] if evaluation_data else []
 
 
     global current_result

@@ -130,8 +130,7 @@ def run_experiment(experiment):
         # Update status
         current_experiment.status = Status.Done
 
-        # TODO use
-        result_storage.save_result(current_experiment.job, mock_result(current_experiment.job['settings']))
+        result_storage.save_result(current_experiment.job, {})
 
         print('yay')
 
