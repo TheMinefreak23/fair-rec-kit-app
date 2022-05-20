@@ -6,7 +6,7 @@ Utrecht University within the Software Project course.
 import Table from './Table.vue'
 import { onActivated, onMounted, onUpdated, ref, watch } from 'vue'
 import { emptyFormGroup } from '../helpers/optionsFormatter'
-import { capitalise } from '../helpers/resultFormatter'
+import { makeHeader } from '../helpers/resultFormatter'
 
 import mockdata from '../../../server/mock/1647818279_HelloWorld/results-table.json'
 import { API_URL } from '../api'
@@ -54,9 +54,9 @@ async function getHeaderOptions(index) {
   const response = await fetch(API_URL + '/all-results/headers')
   const data = await response.json()
   let headerOptions = data[getDatasetName(index)]
-  generalHeaderOptions.value[index] = makeHeaders(headerOptions.headers)
-  itemHeaderOptions.value[index] = makeHeaders(headerOptions.itemHeaders)
-  userHeaderOptions.value[index] = makeHeaders(headerOptions.userHeaders)
+  generalHeaderOptions.value[index] = headerOptions.headers
+  itemHeaderOptions.value[index] = headerOptions.itemHeaders
+  userHeaderOptions.value[index] = headerOptions.userHeaders
 }
 
 //POST request: Send result ID to the server to set current shown recommendations.
@@ -191,16 +191,6 @@ function changeFilters(changedFilters, pairid) {
 }
 
 /**
- * convert list of header names into supported header format, capitalise and remove underscores
- * @param {Array}   headers  - list of headers.
- */
-function makeHeaders(headers) {
-  return headers.map((header) => ({
-    name: capitalise(header.toString()),
-  }))
-}
-
-/**
  * Combines every approach with every dataset that it is being applied onto
  * @returns {Array}   - An array of all the user recommendation tables for this run
  */
@@ -320,7 +310,7 @@ function fillVisibleDatasets(){
                 :key="props.result.id"
                 :caption="entry"
                 :results="data.results[index]"
-                :headers="makeHeaders(selectedHeaders[index])"
+                :headers="selectedHeaders[index].map(makeHeader)"
                 :filters="filters"
                 :filterOptions="availableFilters"
                 :headerOptions="generalHeaderOptions[index]"
