@@ -3,15 +3,17 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
-
+import enum
 import json
 import os
 import threading
 import time
+from dataclasses import dataclass
 from datetime import datetime
 import yaml
 from fairreckitlib.experiment.experiment_config_parsing import Parser
-from fairreckitlib.experiment.experiment_event import ON_END_EXPERIMENT, ON_END_THREAD_EXPERIMENT, ON_BEGIN_THREAD_EXPERIMENT, ON_BEGIN_EXPERIMENT
+from fairreckitlib.experiment.experiment_event import ON_END_EXPERIMENT, ON_END_THREAD_EXPERIMENT, \
+    ON_BEGIN_THREAD_EXPERIMENT, ON_BEGIN_EXPERIMENT
 
 from fairreckitlib.recommender_system import RecommenderSystem
 
@@ -30,74 +32,123 @@ RESULTS_DIR = 'results'
 recommender_system = RecommenderSystem('datasets', RESULTS_DIR)
 options = create_available_options(recommender_system)
 experiment_queue = []
-# TODO refactor
-experiment_running = False
-current_experiment_name = ''
+current_experiment = None
+
+
+# Experiment status in queue
+class Status(enum.Enum):
+    ToDo = 'To Do'
+    Active = 'Active'
+    Aborted = 'Aborted'
+    Cancelled = 'Cancelled'
+    Done = 'Done'
+    NA = 'Not Available'
+
+
+# TODO refactor job and config_dict overlap
+@dataclass
+class QueueItem:
+    """Dataclass for experiment setting items in the queue"""
+    job: dict
+    config: dict
+    status: Status
+    name: str
+
+
+def formatted_queue():
+    # Format queue to dict list
+    # TODO refactor: shouldn't have to convert like this
+    # dict_queue = [{'job': experiment.job, 'status': experiment.status.value} for experiment in experiment_queue]
+    return [formatted_experiment(experiment) for experiment in experiment_queue]
+
+
+def formatted_experiment(experiment):
+    # TODO refactor: shouldn't have to convert like this
+    if not experiment: return {}
+    experiment.job['status'] = experiment.status.value
+    return experiment.job
 
 
 def calculate_first():
     """Take the oldest settings in the queue and perform an experiment with them"""
-    # TODO We need this delay for the queue to work fsr
-    #time.sleep(0.1)
+
+    # Do one experiment at a time
+    if current_experiment and current_experiment.status == Status.Active:
+        return
+
     # Get the oldest experiment from the queue.
-    experiment = experiment_queue.pop()
+    # experiment = experiment_queue.pop()
 
-    run_experiment(experiment)
-    #mock_experiment(experiment)
+    # Get the oldest experiment from the queue that is marked to do.
+    first = next(filter(lambda item: item.status == Status.ToDo, experiment_queue), None)
+
+    # If there is a queue item to do, run it.
+    if first:
+        run_experiment(first)
+        # mock_experiment(experiment)
 
 
-#experiment_thread = threading.Thread(target=calculate_first)
+# experiment_thread = threading.Thread(target=calculate_first)
 
 
 def run_experiment(experiment):
     """Run an experiment and save the result."""
-    global experiment_running
-    experiment_running = True
 
-    print(experiment)
+    print('run experiment:', experiment)
 
-    # Create configuration dictionary.
-    config_dict, config_id = config_dict_from_settings(experiment)
-    global current_experiment_name
-    current_experiment_name = config_id
+    # Set current experiment
+    global current_experiment
+    current_experiment = experiment
 
     # Create config files directory if it doesn't exist yet.
     if not os.path.isdir(CONFIG_DIR):
         os.mkdir(CONFIG_DIR)
-        
+
     # Save configuration to yaml file.
-    config_file_path = CONFIG_DIR + '/' + config_id
+    config_file_path = CONFIG_DIR + '/' + current_experiment.name
 
     with open(config_file_path + '.yml', 'w+', encoding='utf-8') as config_file:
-        yaml.dump(config_dict, config_file)
+        yaml.dump(current_experiment.config, config_file)
 
     parser = Parser(True)
     config = parser.parse_experiment_config_from_yml(config_file_path,
                                                      recommender_system.data_registry,
                                                      recommender_system.experiment_factory)
 
+    # TODO don't use the metrics until evaluation pipeline works
+    config.evaluation = []
+
+    def on_begin_experiment(event_listener, **kwargs):
+        # Update experiment status
+        current_experiment.status = Status.Active
+
     def on_end_experiment(event_listener, **kwargs):
         # TODO get real recs&eval result
-        result_storage.save_result(experiment, mock_result(experiment['settings']))
-        global experiment_running
-        experiment_running = False
-        print('yay')
-        # Calculate next item in queue
-        if experiment_queue:
-            calculate_first()
+        # print('saving job', current_experiment.job)
+        # print('config', current_experiment.config)
 
+        # Update status
+        current_experiment.status = Status.Done
+
+        # TODO use
+        result_storage.save_result(current_experiment.job, mock_result(current_experiment.job['settings']))
+
+        print('yay')
+
+        # Calculate next item in queue
+        calculate_first()
 
     events = {
         ON_BEGIN_EXPERIMENT: lambda x, **kwargs: print('uwu'),
         ON_END_EXPERIMENT: lambda x, **kwargs: print('owo'),
-        ON_BEGIN_THREAD_EXPERIMENT: lambda x, **kwargs: print('letsgooo'),
+        ON_BEGIN_THREAD_EXPERIMENT: on_begin_experiment,
         ON_END_THREAD_EXPERIMENT: on_end_experiment
     }
 
     recommender_system.run_experiment(events, config, num_threads=4)
 
     # TODO USE THIS FUNCTION INSTEAD OF PARSING
-    #recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)
+    # recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)
 
 
 def mock_experiment(experiment):
@@ -124,7 +175,7 @@ def mock_result(settings):
                               'recommendation': recommend(dataset, approach),
                               'evals': []}
             for metric in settings['metrics']:
-                evaluation = evaluate_all(metric['settings'], approach, metric)
+                evaluation = evaluate_all(approach, metric)
                 recommendation['evals'].append(
                     {'name': metric['name'], 'evaluation': evaluation, 'params': metric['params']})
                 print(metric)
@@ -165,73 +216,44 @@ def calculate():
 
         print('queue', experiment_queue)
         # response = {'status': 'success'}
-        response = {'queue': experiment_queue }
+
+        response = {'queue': formatted_queue()}
     else:
-        # Wait until the current experiment is done.
-        #if experiment_thread.is_alive():
-        #    experiment_thread.join()
-        if not experiment_running:
+        # TODO catch error
+        if not current_experiment: 
+            print('Current experiment should have started but is None')
+        if current_experiment and current_experiment.status == Status.Done:
             response['calculation'] = result_storage.current_result
-        response['status'] = 'busy' if experiment_running else 'done'
-    #print('calculation response:', response)
+        response['status'] = current_experiment.status.value if current_experiment else Status.NA.value
+    # print('calculation response:', response)
     return response
 
 
-@compute_bp.route('/queue', methods=['GET', 'POST'])
+@compute_bp.route('/queue', methods=['GET'])
 def queue():
-    """Route: Send the queue. Handle it using a thread.
-
-    Returns:
-         (string) the queue
-    """
-    """
-    # Handle experiment thread.
-    global experiment_thread
-    # If the thread is running, wait until it's done.
-    if experiment_thread.is_alive():
-        experiment_thread.join()
-    # Else, if the queue isn't empty, start a thread to compute the oldest entry.
-    elif experiment_queue:
-        print('Starting experiment thread')
-        experiment_thread = threading.Thread(target=calculate_first)
-        experiment_thread.start()
-    else:
-        print('error') 
-    response = {}
-    #response['updated'] = False
-
-    if not experiment_running:
-        calculate_first()
-        #response['updated'] = True
-
-    print('experiment running')
-
-    print('queue:', experiment_queue)
-    response['queue'] = experiment_queue
-    return response
-    if experiment_queue and not experiment_running:
-        calculate_first()
-    """
-    return { 'queue': experiment_queue }
+    print('queue', formatted_queue())
+    return {'queue': formatted_queue(), 'current': formatted_experiment(current_experiment)}
 
 
-# Test cancel experiment
-@compute_bp.route('/cancel', methods=['GET'])
-def cancel_current():
-    recommender_system.abort_computation(current_experiment_name)
-    return "Canceled"
-
-
-@compute_bp.route('/queue/delete', methods=['POST'])
-def delete_item():
-    """Pop the selected index from the queue.
+@compute_bp.route('/queue/abort', methods=['POST'])
+def abort():
+    """Cancel the item with the ID from the queue.
 
     Returns:
          (string) a removal message
     """
     data = request.get_json()
-    index = data.get('index')
-    experiment_queue.pop(index)
+    item_id = data.get('id')
+    print('trying to cancel',item_id)
+    experiment = next(filter(lambda item: item.job['timestamp']['stamp'] == item_id, experiment_queue), None)
+    print(experiment)
+    # Cancel queued experiment
+    if experiment.status == Status.ToDo:
+        experiment.status = Status.Cancelled
+    # Abort active experiment
+    if experiment.status == Status.Active:
+        recommender_system.abort_computation(experiment.name)
+        experiment.status = Status.Aborted
     return "Removed index"
 
 
@@ -249,30 +271,28 @@ def recommend(dataset, approach):
     return dataset['name'] + approach['name'][::-1]
 
 
-def evaluate_all(settings, approach, metric):
+def evaluate_all(approach, metric):
     """
     Do a mock evaluation for all filters.
 
-    :param settings: the experiment settings
-    :param approach: the approach with a name
-    :param metric: the metric
-    :return: the evaluation dictionary containing all evaluations
+    Args:
+        approach: the approach with a name
+        metric: the metric
+    Returns:
+        the evaluation dictionary containing all evaluations
     """
     base_eval = evaluate(approach, metric)
     evaluation = {'global': round(base_eval, 2), 'filtered': []}
 
-    for setting in settings:
-        if setting['filters']:
-            # Evaluate per filter.
-            for metric_filter in setting['filters']:
-                evals = []
-                for parameter in metric_filter['params']:
-                    value = parameter['value']
-                    # Just use the value if it's a number, otherwise use the length of the word.
-                    filter_eval = value if isinstance(value, int) else len(value)
-                    val = round((base_eval * len(metric_filter['name']) / filter_eval), 2)
-                    evals.append({parameter['name'] + ' ' + str(value): val})
-                evaluation['filtered'].append({metric_filter['name']: evals})
+    for metric_filter in metric['filters']:
+        # Evaluate per filter.
+        evals = []
+        for (name, value) in metric_filter['params'].items():
+            # Just use the value if it's a number, otherwise use the length of the word.
+            filter_eval = value if isinstance(value, int) else len(value)
+            val = round((base_eval * len(metric_filter['name']) / filter_eval), 2)
+            evals.append({name + ' ' + str(value): val})
+        evaluation['filtered'].append({metric_filter['name']: evals})
 
     return evaluation
 
@@ -281,20 +301,24 @@ def evaluate(approach, metric):
     """
     Mock evaluation: Give a magic number using an approach and metric.
 
-    :param approach: an approach with a name
-    :param metric: a metric with a name and value
-    :return: the magic mock evaluation
+    Args:
+        approach: an approach with a name
+        metric: a metric with a name and value
+    Returns:
+        the magic mock evaluation
     """
     # Mock evaluation
-    value = len(approach['name']) * len(metric['name'])
+
+    result = len(approach['name']) * len(metric['name'])
     print('metric:', metric)
     # Do something with the metrics parameters.
     if metric['params']:
         print(metric['name'], 'has params', metric['params'])
-        for parameter in metric['params']:
-            value *= len(parameter['name']) * int(parameter['value'])
+        for (name, value) in metric['params'].items():
+            val = int(value) if value else 0
+            result *= len(name) * val
 
-    return value / 100
+    return result / 100
 
 
 def append_queue(metadata, settings):
@@ -311,9 +335,20 @@ def append_queue(metadata, settings):
     # Set time
     timestamp = time.time()
     now = datetime.now()
-    current_dt = now.strftime('%Y-%m-%d %H:%M:%S') #+ ('-%02d' % (now.microsecond / 10000))
-    current_request = {'timestamp': {'stamp': str(int(timestamp)),
-                                     'datetime': current_dt},
-                       'metadata': metadata,
-                       'settings': settings}
-    experiment_queue.append(current_request)
+    current_dt = now.strftime('%Y-%m-%d %H:%M:%S')  # + ('-%02d' % (now.microsecond / 10000))
+    job = {'timestamp': {'stamp': str(int(timestamp)),
+                         'datetime': current_dt},
+           'metadata': metadata,
+           'settings': settings}
+
+    # Parse tags
+    if 'tags' in metadata:
+        job['metadata']['tags'] = result_storage.parse_tags(metadata['tags'])
+
+    # Create configuration dictionary.
+    config_dict, config_id = config_dict_from_settings(job)
+
+    # TODO refactor job and config_dict overlap
+    current_job = QueueItem(job, config_dict, Status.ToDo, config_id)
+
+    experiment_queue.append(current_job)

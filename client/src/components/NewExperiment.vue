@@ -5,7 +5,7 @@ Utrecht University within the Software Project course.
 import { onMounted, ref } from 'vue'
 import FormGroupList from './FormGroupList.vue'
 import { sendMockData } from '../test/mockExperimentOptions.js'
-import { store, getCalculation } from '../store.js'
+import { store, pollForResult } from '../store.js'
 import { API_URL } from '../api'
 import { emptyOption } from '../helpers/optionsFormatter'
 import { emptyFormGroup } from '../helpers/optionsFormatter'
@@ -68,8 +68,7 @@ async function sendToServer() {
   console.log('sendToServer() queue', store.queue)
   // Switch to queue
   store.currentTab = 1
-  const interval = 1000
-  store.resultPoll = setInterval(getCalculation, interval)
+  pollForResult()
 }
 
 //Declare default values of the form
@@ -355,6 +354,13 @@ function reformat(property) {
         variant="primary"
         @click="sendMockData(options, true)"
         >Simple Mock</b-button
+      >
+      <!--Simple version of the mock with metrics-->
+      <b-button
+        type="test"
+        variant="primary"
+        @click="sendMockData(options, true, true)"
+        >Metric Mock</b-button
       >
     </b-card>
   </div>

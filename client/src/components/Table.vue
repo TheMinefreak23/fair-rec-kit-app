@@ -9,6 +9,7 @@ import { formatMetadata } from '../helpers/metadataFormatter'
 import FormGroupList from './FormGroupList.vue'
 import { validateEmail, emptyFormGroup } from '../helpers/optionsFormatter'
 import { store } from '../store'
+import { statusPrefix, statusVariant, status } from '../helpers/resultFormatter'
 
 const emit = defineEmits([
   'loadResult',
@@ -35,6 +36,7 @@ const props = defineProps({
   itemOptions: Array,
   filters: Object,
   filterOptions: Array,
+  defaultSort: Number,
 })
 
 const caption = ref('')
@@ -56,6 +58,7 @@ const metadataStr = ref('')
 const selectedEntry = ref(0)
 const sortindex = ref(0)
 const descending = ref(false)
+
 const subheaders = computed(() => {
   const result = []
 
@@ -76,10 +79,16 @@ const sorted = computed(() => {
   else return props.results
 })
 
-/*onMounted(() => {
-  if (props.caption == 'Testcaption')
-    console.log('filterOptions', props.filterOptions)
-})*/
+onMounted(() => {
+  /*if (props.caption == 'Testcaption')
+    console.log('filterOptions', props.filterOptions)*/
+  // Sort on default column if it is given
+  if (props.defaultSort) {
+    sortindex.value = props.defaultSort
+    descending.value = true // For now sort by descending on default, TODO refactor
+  }
+})
+
 /**
  * Turns a string into an array separated by comma's
  * @param {string} str the string that turns into an array
@@ -132,17 +141,17 @@ function emptyVmodels() {
 
 async function removeEntry() {
   //Remove an entry from the list
-  let entry = selectedEntry.value
+  const entry = selectedEntry.value
   //props.results.splice(entry, 1)
-  store.allResults.splice(entry, 1)
+  store.allResults = store.allResults.filter((e) => e.id != entry)
   //Inform the server to remove the same entry
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ index: entry }),
+    body: JSON.stringify({ id: entry }),
   }
   fetch(API_URL + props.serverFile, requestOptions).then(() => {
-    console.log('Item at', entry, 'removed succesfully')
+    console.log('Item', entry, 'removed succesfully')
   })
 }
 
@@ -280,7 +289,13 @@ function setsorting(i) {
     id="change-columns-modal"
     v-model="updateHeadersModalShow"
     title="Change columns"
-    @ok="$emit('updateHeaders', [...checkedColumns, ...userColumns, ...itemColumns])"
+    @ok="
+      $emit('updateHeaders', [
+        ...checkedColumns,
+        ...userColumns,
+        ...itemColumns,
+      ])
+    "
   >
     <p>Select the extra headers you want to be shown</p>
     <p>General:</p>
@@ -402,7 +417,24 @@ function setsorting(i) {
           :key="`${descending}_${sortindex}_${index}-${key}`"
         >
           <b-td>
-            {{ value }}
+            <!--Special pill format for status-->
+            <!-- TODO refactor-->
+            <template
+              v-if="typeof value === 'string' && value.startsWith(statusPrefix)"
+            >
+              <b-button
+                disabled
+                :variant="statusVariant(value)"
+                :class="
+                  value.slice(statusPrefix.length) == status.active
+                    ? 'status-blinking'
+                    : 'status'
+                "
+              >
+                {{ value.slice(statusPrefix.length) }}
+              </b-button>
+            </template>
+            <template v-else> {{ value }}</template>
           </b-td>
         </b-td>
 
@@ -423,14 +455,20 @@ function setsorting(i) {
             @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
             >View Information</b-button
           >
-          <template v-if="removable"> </template>
+          <!--REFACTOR status condition-->
           <b-button
-            v-if="removable"
+            v-if="
+              removable &&
+              (!item.status ||
+                [status.toDo, status.active].includes(
+                  item.status.slice(statusPrefix.length)
+                ))
+            "
             variant="danger"
             @click="
-              ;(deleteModalShow = !deleteModalShow), (selectedEntry = index)
+              ;(deleteModalShow = !deleteModalShow), (selectedEntry = item.id)
             "
-            >Delete</b-button
+            >{{ buttonText }}</b-button
           >
         </b-td>
       </b-tr>
@@ -461,3 +499,39 @@ function setsorting(i) {
     >20</b-form-input
   >
 </template>
+
+<style scoped>
+/*adapted from SOURCE: https://www.w3docs.com/snippets/css/how-to-create-flashing-glowing-button-using-animation-in-css3.html*/
+.status,
+.status-blinking {
+  background-color: #1c87c9;
+  -webkit-border-radius: 60px;
+  border-radius: 60px;
+  border: none;
+  color: #eeeeee;
+  cursor: pointer;
+  display: inline-block;
+  font-family: sans-serif;
+  font-size: 20px;
+  padding: 5px 15px;
+  text-align: center;
+  text-decoration: none;
+}
+@keyframes glowing {
+  0% {
+    background-color: #2ba805;
+    box-shadow: 0 0 5px #2ba805;
+  }
+  50% {
+    background-color: #49e819;
+    box-shadow: 0 0 20px #49e819;
+  }
+  100% {
+    background-color: #2ba805;
+    box-shadow: 0 0 5px #2ba805;
+  }
+}
+.status-blinking {
+  animation: glowing 1300ms infinite;
+}
+</style>

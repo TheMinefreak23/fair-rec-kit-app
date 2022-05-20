@@ -9,7 +9,6 @@ import VDismissButton from './VDismissButton.vue'
 import PreviousResults from './PreviousResults.vue'
 import { store, addResult, removeResult } from '../store'
 import { formatResult } from '../helpers/resultFormatter'
-import mockdata from '../../../server/mock/1647818279_HelloWorld/results-table.json'
 
 const emit = defineEmits(['goToResult', 'toast'])
 const showResultModal = ref(false)
