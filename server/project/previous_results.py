@@ -136,5 +136,10 @@ def user_result():
 
 @results_bp.route('/headers', methods=['GET'])
 def headers():
-    """" Get available dataset headers """
+    """Get available dataset headers
+
+    Returns:
+        (JSON) all available header options
+
+    """
     return result_storage.load_json('project/headers.json')

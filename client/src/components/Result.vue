@@ -52,7 +52,10 @@ onMounted(() => {
   //loadEvaluations()
 })
 
-// GET request: Get available header options for selection from server
+/** 
+ * GET request: Get available header options for selection from server
+ * @param {Int}  index  - index of the current result table
+ */
 async function getHeaderOptions(index) {
   const response = await fetch(API_URL + '/all-results/headers')
   const data = await response.json()
@@ -112,7 +115,10 @@ async function getEvaluations() {
   console.log('results data', resultsData)
 }
 
-//POST request: Ask server for next part of user recommendation table.
+/**
+ * POST request: Ask server for next part of user recommendation table.
+ * @param {Int}   currentTable  - Index of which result file to load (from overview.json)
+ */
 async function getUserRecs(currentTable) {
   const requestOptions = {
     method: 'POST',
