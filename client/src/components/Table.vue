@@ -222,6 +222,7 @@ function setsorting(i) {
   emit('paginationSort', i)
 }
 //console.log('propsfilteroptions', props.filterOptions)
+
 </script>
 
 <template>

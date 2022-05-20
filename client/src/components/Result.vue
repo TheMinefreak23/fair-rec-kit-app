@@ -43,6 +43,7 @@ onMounted(() => {
   console.log('result id', props.result.id)
   //loadEvaluations()
   fillVisibleDatasets()
+  fillShownMetrics()
   //Load in all the user recommendation/prediction tables
   for (let index in userTables) {
     setRecs(parseInt(index))
@@ -230,11 +231,19 @@ function fillVisibleDatasets(){
 
   for(let i=0; i<userTables.length;i++){
       visibleDatasets.value[i] = userTables[i].split(' ')[1].split('_')[0]
-  }
-  
-
-   
+  }   
 }
+
+/**
+ * Fill array of metrics that are shown so that all are shown upon loading the page
+ */
+function fillShownMetrics(){
+  for(let i=0; i<result.result.length; i++)
+    //flattening it so that it just becomes a list
+    visibleMetrics.value[i] = result.result[i].metrics.flat()
+
+}
+
 </script>
 
 <template>
