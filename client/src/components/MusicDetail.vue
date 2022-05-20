@@ -131,9 +131,12 @@ async function generateChart(highlevelFeatures) {
         >Show track
       </b-button>
       <b-modal
-        body-bg-variant="info"
-        header-bg-variant="info"
-        footer-bg-variant="info"
+        body-bg-variant="dark"
+        header-bg-variant="dark"
+        footer-bg-variant="dark"
+        body-text-variant="info"
+        header-text-variant="info"
+        footer-text-variant="info"
         v-if="track.artists"
         v-model="trackModalShow"
         :title="track.name + ' by ' + track.artists[0].name"
@@ -153,7 +156,12 @@ async function generateChart(highlevelFeatures) {
                       }}</template>
                     </p>
                     <p>Album: {{ track.album.name }}</p>
-                    <Bar :chartData="chartInfo"> </Bar>
+                    <div  :style = "{backgroundColor : 'coral', opacity: 0.9}">
+                                        <Bar :chartData="chartInfo" >
+                    </Bar>
+                    </div>
+
+
                     <div>
                       <p v-html="songInfo.LastFM.track.wiki.summary"></p>
                     </div>
