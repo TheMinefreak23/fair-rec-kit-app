@@ -37,6 +37,7 @@ const generalHeaderOptions = ref([[]])
 const userTables = combineResults()
 const visibleDatasets = ref([])
 const visibleMetrics = ref([])
+const hiddenindices = ref([])
 
 onMounted(() => {
   console.log('result', props.result)
@@ -238,11 +239,49 @@ function fillVisibleDatasets(){
  * Fill array of metrics that are shown so that all are shown upon loading the page
  */
 function fillShownMetrics(){
-  for(let i=0; i<result.result.length; i++)
+  for(let i=0; i<result.result.length; i++){
     //flattening it so that it just becomes a list
     visibleMetrics.value[i] = result.result[i].metrics.flat()
+  }
 
 }
+
+/**
+ * Return an array of filtered headers
+ * @param {Array} headers  - array of headers that have to be checked
+ */
+function hideHeaders(headers){
+  let result = []
+  for(let i=0; i<headers.length; i++){
+    if (!visibleMetrics.includes(headers[i]))
+    {
+      result.push(headers[i])
+      hiddenindices.push(i)
+    }
+  }
+
+  return result
+}
+
+//wat is de vorm van results? hele kolom eruit gooien
+// oude header lengte * indices = welke eruit moeten
+function hideColumns(results){
+  len = headers.length
+  let result = []
+  for(j=0; j<hiddenindices.length; i++)
+  {
+    for(i=0; i<result.length; i++){
+      if(i!=hiddenindices[j] && i!= hiddenindices[j] + j * len){
+        result.push(results[i])
+      }
+    }
+  }
+
+  return result
+  
+}
+
+
 
 </script>
 
