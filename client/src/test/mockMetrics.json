@@ -1,0 +1,44 @@
+{
+  "metrics": [
+    {
+      "name": "P@K",
+      "params": [
+        {
+          "name": "K",
+          "value": "10"
+        }
+      ],
+      "filters": [
+        {
+          "name": "Country user threshold",
+          "params": [
+            {
+              "name": "threshold",
+              "value": 10
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "P@K",
+      "params": [
+        {
+          "name": "K",
+          "value": "5"
+        }
+      ],
+      "filters": [
+        {
+          "name": "Artist Gender",
+          "params": [
+            {
+              "name": "Gender",
+              "value": "Female"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

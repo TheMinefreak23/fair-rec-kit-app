@@ -147,13 +147,13 @@ def config_dict_from_settings(experiment):
     """
     settings = experiment['settings']
 
-    #print('raw experiment settings:', json.dumps(settings, indent=4))
+    print('raw experiment settings:', json.dumps(settings, indent=4))
 
     name = experiment['metadata']['name']
     experiment_id = experiment['timestamp']['stamp'] + '_' + name
 
     form_to_data(settings)
-    #print('formatted from form', json.dumps(settings, indent=4))
+    print('formatted from form', json.dumps(settings, indent=4))
 
     # Format datasets
     # Add generic split to all dataset
@@ -177,13 +177,6 @@ def config_dict_from_settings(experiment):
             model_setting = approach
         models.setdefault(model_API_dict[model_name], []).append(model_setting)
 
-    # evaluation = {'metrics': list(map(lambda metric: metric['name'], settings['metrics'])), 'filters': []}
-
-    # TODO for now leave out the metrics
-    evaluation = {'metrics': [], 'filters': []}
-
-    # evaluation = list(map(lambda metric: {'name': metric['name']}, settings['metrics']))  # TODO filters
-
     """
     if settings['experimentMethod'] == 'recommendation':
         config = RecommenderExperimentConfig(datasets, models, evaluation, id,
@@ -197,7 +190,7 @@ def config_dict_from_settings(experiment):
     #print(name)
     config_dict = {'datasets': settings['datasets'],
                    'models': models,
-                   'evaluation': evaluation,
+                   'evaluation': settings['metrics'],
                    'name': experiment_id,
                    'top_K': settings['recommendations'],
                    'type': settings['experimentMethod']}
