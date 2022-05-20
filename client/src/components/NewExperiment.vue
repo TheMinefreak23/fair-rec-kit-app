@@ -196,9 +196,14 @@ function reformat(property) {
                 </b-col>
                 <b-col cols="12">
                   <b-form-group label-cols-md="2" label="Tags (optional)">
-                    <b-form-input
+                    <b-form-tags
                       v-model="metadata.tags"
-                    ></b-form-input> </b-form-group
+                      tag-pills
+                      tag-variant ="dark"
+                      remove-on-delete
+                      separator=" ,;"
+                      no-add-on-enter
+                    ></b-form-tags> </b-form-group
                 ></b-col>
               </b-row>
             </b-col>
