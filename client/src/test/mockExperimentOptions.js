@@ -7,11 +7,12 @@ import { API_URL } from '../api'
 import { getCalculation, store } from '../store'
 import { ref, onMounted } from 'vue'
 import mockLists from './mockLists.json'
+import mockMetrics from './mockMetrics.json'
 
 var metadata = {}
 var form = {}
 
-async function sendMockData(options, simple = false) {
+async function sendMockData(options, simple = false, metrics = false) {
   console.log('options', options)
   form = {
     recommendations: rand(100),
@@ -29,6 +30,9 @@ async function sendMockData(options, simple = false) {
       datasets: generateRandomDatasets(options),
       //filters: toFormObject(randomWords()),
     }
+  }
+  if (metrics) {
+    form.lists.metrics = mockMetrics.metrics
   }
   console.log('form', form)
 

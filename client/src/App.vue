@@ -48,6 +48,13 @@ function callToast() {
 </script>
 
 <template>
+  <b-container
+    :toast="{ root: true }"
+    fluid="sm"
+    position="position-fixed"
+    @click="goToResult()"
+  >
+  </b-container>
   <div class="d-flex flex-column min-vh-100">
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
