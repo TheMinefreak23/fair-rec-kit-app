@@ -36,7 +36,12 @@ function getCalculation() {
             // Update queue and progress while waiting for a result
             getQueue()
           }
-          console.log('polling status of experiment:', data.status)
+          console.log(
+            'polling experiment, status:',
+            data.status,
+            'progress:',
+            data.progress
+          )
         })
     } catch (e) {
       console.log(e) // TODO better error handling, composable

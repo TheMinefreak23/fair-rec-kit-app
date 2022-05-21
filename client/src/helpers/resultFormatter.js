@@ -11,6 +11,17 @@ export const status = {
   done: 'Done',
 }
 
+// TODO get from server
+export const progress = {
+  notAvailable: 'Not Available',
+  parsing: 'Parsing',
+  processingData: 'Processing Data',
+  filteringData: 'Filtering Data',
+  splittingData: 'Splitting Data',
+  training: 'Training',
+  evaluating: 'Evaluating',
+}
+
 export const statusPrefix = 'status_' // TODO hacky
 
 // Format data for a results overview
