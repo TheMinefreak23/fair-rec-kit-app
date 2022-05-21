@@ -12,18 +12,13 @@ from dataclasses import dataclass
 from datetime import datetime
 import yaml
 from fairreckitlib.experiment.experiment_config_parsing import Parser
-from fairreckitlib.experiment.experiment_event import ON_END_EXPERIMENT_PIPELINE, ON_END_EXPERIMENT_THREAD, \
-    ON_BEGIN_EXPERIMENT_PIPELINE, ON_BEGIN_EXPERIMENT_THREAD
-from fairreckitlib.model.pipeline.model_event import ON_BEGIN_MODEL_PIPELINE, ON_END_MODEL_PIPELINE
-from fairreckitlib.data.pipeline.data_event import ON_BEGIN_DATA_PIPELINE, \
-    ON_END_DATA_PIPELINE, ON_BEGIN_FILTER_DATASET, ON_BEGIN_SPLIT_DATASET
-from fairreckitlib.core.parsing.parse_event import ON_PARSE
 
 from fairreckitlib.recommender_system import RecommenderSystem
 
 from flask import (Blueprint, request)
 
 from . import result_storage
+from .events import ProgressStatus, Status, EventHandler
 from .options_formatter import create_available_options, config_dict_from_settings
 
 compute_bp = Blueprint('experiment', __name__, url_prefix='/api/experiment')
@@ -38,34 +33,6 @@ options = create_available_options(recommender_system)
 experiment_queue = []
 current_experiment = None
 
-
-# Experiment status in queue
-class Status(enum.Enum):
-    TODO = 'To Do'
-    ACTIVE = 'Active'
-    ABORTED = 'Aborted'
-    CANCELLED = 'Cancelled'
-    DONE = 'Done'
-    NA = 'Not Available'
-
-""" TODO send enums to client?
-def enum_to_dict(enum):
-    return {i.name: i.value for i in enum}
-
-@compute_bp.route('/statuses', methods=['GET'])
-def get_statuses():
-    return 
-    """
-
-# Experiment progress status
-class ProgressStatus(enum.Enum):
-    PARSING = 'Parsing'
-    PROCESSING_DATA = 'Processing Data'
-    FILTERING_DATA = 'Filtering Data'
-    SPLITTING_DATA = 'Splitting Data'
-    TRAINING = 'Training'
-    EVALUATING = 'Evaluating'
-    NA = 'Not Available'
 
 
 # TODO refactor job and config_dict overlap
@@ -115,6 +82,14 @@ def calculate_first():
 
 # experiment_thread = threading.Thread(target=calculate_first)
 
+def end_experiment():
+    print('yay')
+    # result_storage.save_result(current_experiment.job, {})
+    result_storage.save_result(current_experiment.job, mock_result(current_experiment.job['settings']))
+
+    # Calculate next item in queue
+    calculate_first()
+
 
 def run_experiment(experiment):
     """Run an experiment and save the result."""
@@ -143,59 +118,8 @@ def run_experiment(experiment):
     # TODO don't use the metrics until evaluation pipeline works
     config.evaluation = []
 
-    def on_begin_experiment(event_listener, **kwargs):
-        # Update experiment status
-        current_experiment.status = Status.ACTIVE
-
-    def on_end_experiment(event_listener, **kwargs):
-        # TODO get real recs&eval result
-        # print('saving job', current_experiment.job)
-        # print('config', current_experiment.config)
-
-        # Update status
-        current_experiment.status = Status.DONE
-
-        #result_storage.save_result(current_experiment.job, {})
-        result_storage.save_result(current_experiment.job, mock_result(current_experiment.job['settings']))
-
-        print('yay')
-
-        # Calculate next item in queue
-        calculate_first()
-
-    def on_parse(event_listener, **kwargs):
-        print('epic')
-        current_experiment.progress = ProgressStatus.PARSING
-
-    def on_data(event_listener, **kwargs):
-        print('super')
-        current_experiment.progress = ProgressStatus.PROCESSING_DATA
-
-    def on_filter(event_listener, **kwargs):
-        print('dangan')
-        current_experiment.progress = ProgressStatus.FILTERING_DATA
-
-    def on_split(event_listener, **kwargs):
-        print('ronpa')
-        current_experiment.progress = ProgressStatus.SPLITTING_DATA
-
-    def on_train(event_listener, **kwargs):
-        print('2')
-        current_experiment.progress = ProgressStatus.TRAINING
-
-    events = {
-        ON_BEGIN_EXPERIMENT_PIPELINE: lambda x, **kwargs: print('uwu'),
-        ON_END_EXPERIMENT_PIPELINE: lambda x, **kwargs: print('owo'),
-        ON_BEGIN_EXPERIMENT_THREAD: on_begin_experiment,
-        ON_END_EXPERIMENT_THREAD: on_end_experiment,
-        ON_PARSE: on_parse, # NOTE TODO doesn't work in backend
-        ON_BEGIN_DATA_PIPELINE: on_data,
-        ON_BEGIN_FILTER_DATASET: on_filter,
-        ON_BEGIN_SPLIT_DATASET: on_split,
-        ON_BEGIN_MODEL_PIPELINE: on_train
-    }
-
-    recommender_system.run_experiment(config, events=events)
+    event_handler = EventHandler(current_experiment, end_experiment)
+    recommender_system.run_experiment(config, events=event_handler.events)
 
     # TODO USE THIS FUNCTION INSTEAD OF PARSING
     # recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)

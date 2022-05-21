@@ -13,7 +13,7 @@ const store = reactive({
 })
 
 function pollForResult() {
-  const interval = 1000
+  const interval = 300
   store.resultPoll = setInterval(getCalculation, interval)
 }
 
@@ -40,7 +40,7 @@ function getCalculation() {
             'polling experiment, status:',
             data.status,
             'progress:',
-            data.progress
+            store.currentExperiment && store.currentExperiment.progress
           )
         })
     } catch (e) {
