@@ -39,7 +39,7 @@ async function sendMockData(options, simple = false, metrics = false) {
   metadata = {
     name: 'Test' + rand() + '_' + randomWord(),
     email: randomWord() + '@' + randomWord() + '.com',
-    tags: randomWords().join(','),
+    tags: randomWords(),
   }
 
   store.currentExperiment = { metadata: metadata, settings: form }
