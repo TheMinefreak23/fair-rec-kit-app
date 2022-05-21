@@ -12,8 +12,8 @@ from dataclasses import dataclass
 from datetime import datetime
 import yaml
 from fairreckitlib.experiment.experiment_config_parsing import Parser
-from fairreckitlib.experiment.experiment_event import ON_END_EXPERIMENT, ON_END_THREAD_EXPERIMENT, \
-    ON_BEGIN_THREAD_EXPERIMENT, ON_BEGIN_EXPERIMENT
+from fairreckitlib.experiment.experiment_event import ON_END_EXPERIMENT_PIPELINE, ON_END_EXPERIMENT_THREAD, \
+    ON_BEGIN_EXPERIMENT_PIPELINE, ON_BEGIN_EXPERIMENT_THREAD
 
 from fairreckitlib.recommender_system import RecommenderSystem
 
@@ -130,7 +130,7 @@ def run_experiment(experiment):
         # Update status
         current_experiment.status = Status.Done
 
-        # TODO use
+        #result_storage.save_result(current_experiment.job, {})
         result_storage.save_result(current_experiment.job, mock_result(current_experiment.job['settings']))
 
         print('yay')
@@ -139,23 +139,23 @@ def run_experiment(experiment):
         calculate_first()
 
     events = {
-        ON_BEGIN_EXPERIMENT: lambda x, **kwargs: print('uwu'),
-        ON_END_EXPERIMENT: lambda x, **kwargs: print('owo'),
-        ON_BEGIN_THREAD_EXPERIMENT: on_begin_experiment,
-        ON_END_THREAD_EXPERIMENT: on_end_experiment
+        ON_BEGIN_EXPERIMENT_PIPELINE: lambda x, **kwargs: print('uwu'),
+        ON_END_EXPERIMENT_PIPELINE: lambda x, **kwargs: print('owo'),
+        ON_BEGIN_EXPERIMENT_THREAD: on_begin_experiment,
+        ON_END_EXPERIMENT_THREAD: on_end_experiment
     }
 
-    recommender_system.run_experiment(events, config, num_threads=4)
+    recommender_system.run_experiment(config, events=events)
 
     # TODO USE THIS FUNCTION INSTEAD OF PARSING
     # recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)
 
 
-def mock_experiment(experiment):
+def mock_experiment():
     """Mock running an experiment and save the mock result."""
     # Mock experiment duration.
     time.sleep(2.5)
-    result_storage.save_result(experiment, mock_result(experiment['settings']))
+    result_storage.save_result(current_experiment.job, mock_result(current_experiment.job['settings']))
 
 
 def mock_result(settings):
