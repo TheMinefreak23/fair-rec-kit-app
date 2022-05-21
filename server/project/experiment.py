@@ -341,9 +341,11 @@ def append_queue(metadata, settings):
            'metadata': metadata,
            'settings': settings}
 
+    """
     # Parse tags
     if 'tags' in metadata:
         job['metadata']['tags'] = result_storage.parse_tags(metadata['tags'])
+    """
 
     # Create configuration dictionary.
     config_dict, config_id = config_dict_from_settings(job)
