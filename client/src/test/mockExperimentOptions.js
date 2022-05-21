@@ -67,50 +67,46 @@ function generateRandomApproach(options) {
   console.log(options)
   let libraries = options.predictors
   let result = []
-  var n = 1 + Math.floor(Math.random() * 3)
+  const n = 1 + Math.floor(Math.random() * 3)
 
   for (let i = 0; i < n; i++) {
-    var ops = randomItems(libraries, 1)[0].options
+    const ops = randomItems(libraries, 1)[0].options
 
-    var approach = randomItems(ops, 1)[0].value
+    const approach = randomItems(ops, 1)[0].value
     console.log('options', ops)
 
-    var approachName = approach.name
-    var choices = approach.params.options
+    const approachName = approach.name
+    const choices = approach.params.options
+
+    let params = []
 
     console.log('selects', choices)
 
-    var randomOptionName = randomWord()
-    var randomOptionValue = randomWord()
-    if (choices != ([] || undefined || null)) {
-      var randomOption = randomItems(choices, 1)[0]
+    if (Array.isArray(choices) && choices.length) {
+      console.log('selects exist', choices)
+      const randomOption = randomItems(choices, 1)[0]
       console.log('random option', randomOption)
-      randomOptionName = randomOption.name
-      randomOptionValue = randomItems(randomOption.options, 1)
+      const randomOptionName = randomOption.name
+      const randomOptionValue = randomItems(randomOption.options, 1)
+      params.push({
+        name: randomOptionName,
+        value: randomOptionValue,
+      })
     }
 
-    var values = approach.params.values
+    const values = approach.params.values
 
     console.log('inputs', values)
 
-    var randomValuesName = randomWord()
-    var randomValuesValue = rand()
-    if (values != ([] || undefined || null)) {
-      var randomValue = randomItems(values, 1)[0]
-      randomValuesName = randomValue.name
-      randomValuesValue = getRandomInt(randomValue.min, randomValue.max)
-    }
-
-    var params = [
-      {
-        name: randomOptionName,
-        value: randomOptionValue,
-      },
-      {
+    if (Array.isArray(values) && values.length) {
+      const randomValue = randomItems(values, 1)[0]
+      const randomValuesName = randomValue.name
+      const randomValuesValue = getRandomInt(randomValue.min, randomValue.max)
+      params.push({
         name: randomValuesName,
         value: randomValuesValue,
-      },
-    ]
+      })
+    }
 
     result[i] = {
       name: approachName,
@@ -155,8 +151,9 @@ function generateRandomDatasets(options) {
       value: randomDataset.params.values[0].default,
     }
 
-    const randomSplitting = randomDataset.params.dynamic[2].options[0].value
-    console.log('splitting', randomSplitting)
+    // TODO actual random choice, this is just a temp quick fix
+    const splitting = randomDataset.params.dynamic[2].options[0].value
+    console.log('splitting', splitting)
 
     result[i] = {
       name: randomDatasetName,
@@ -167,17 +164,18 @@ function generateRandomDatasets(options) {
           name: randomDataset.params.dynamic[2].name,
           params: [
             {
-              name: randomSplitting.name,
+              name: splitting.name,
               value: getRandomInt(
-                randomSplitting.params.values[0].min,
-                randomSplitting.params.values[0].max
+                splitting.params.values[0].min,
+                splitting.params.values[0].max
               ),
             },
           ],
         },
       ],
+      conversion: [],
     }
-    console.log(result)
+    console.log('dataset', result)
   }
   return result
 }
@@ -218,6 +216,11 @@ function randomItems(list = [], n = Math.floor(Math.random() * list.length)) {
     return randomItems(list)
   }
   return [...set]
+  /*const randomList = []
+  for (let i = 0; i < n; i++) {
+    randomList.push(list[Math.floor(Math.random() * list.length)])
+  }
+  return randomList*/
 }
 
 export { sendMockData }
