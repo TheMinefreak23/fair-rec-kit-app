@@ -161,7 +161,7 @@ def config_dict_from_settings(experiment):
         #print(dataset)
         # TODO refactor
         if dataset['conversion'] != [] and 'conversion' in dataset:
-            dataset['conversion'] = dataset['conversion'][0]
+            dataset['rating_converter'] = dataset['conversion'][0]
         dataset['splitting'] = dataset['splitting'][0]
         # TODO rename split param
         dataset['splitting']['test_ratio'] = (100 - int(dataset['params']['Train/testsplit'])) / 100
