@@ -6,7 +6,7 @@ Utrecht University within the Software Project course.
 import Table from './Table.vue'
 import { onActivated, onMounted, onUpdated, ref, watch } from 'vue'
 import { emptyFormGroup } from '../helpers/optionsFormatter'
-import { makeHeader } from '../helpers/resultFormatter'
+import { capitalise } from '../helpers/resultFormatter'
 
 import mockdata from '../../../server/mock/1647818279_HelloWorld/results-table.json'
 import { API_URL } from '../api'
@@ -22,7 +22,7 @@ const experiment_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
 const data = ref({ results: [[]] })
 const startIndex = ref(0)
-const sortIndex = ref(0)
+const index = ref(0)
 const ascending = ref(true)
 const entryAmount = ref(20)
 const optionalHeaders = ref([[]])
@@ -54,10 +54,10 @@ onMounted(() => {
 async function getHeaderOptions(index) {
   const response = await fetch(API_URL + '/all-results/headers')
   const data = await response.json()
-  let headerOptions = data[getDatasetName(index)]
-  generalHeaderOptions.value[index] = headerOptions.headers
-  itemHeaderOptions.value[index] = headerOptions.itemHeaders
-  userHeaderOptions.value[index] = headerOptions.userHeaders
+  let headerOptions = data[userTables[index].split(' ')[1].split('_')[0]]
+  generalHeaderOptions.value[index] = makeHeaders(headerOptions.headers)
+  itemHeaderOptions.value[index] = makeHeaders(headerOptions.itemHeaders)
+  userHeaderOptions.value[index] = makeHeaders(headerOptions.userHeaders)
 }
 
 //POST request: Send result ID to the server to set current shown recommendations.
@@ -119,12 +119,13 @@ async function getUserRecs(currentTable) {
       id: props.result.id,
       pairid: currentTable,
       start: startIndex.value,
-      sortindex: sortIndex.value,
+      sortindex: index.value,
       ascending: ascending.value,
       amount: entryAmount.value,
       filters: filters.value,
       optionalHeaders: optionalHeaders.value[currentTable],
-      dataset: getDatasetName(currentTable)
+      itemheaders: itemHeaders.value,
+      userheaders: userHeaders.value
     }),
   }
 
@@ -161,12 +162,12 @@ function loadMore(increase, amount, pairid) {
  */
 function paginationSort(indexVar, pairid) {
   //When sorting on the same column twice in a row, switch to descending.
-  if (sortIndex.value === indexVar) {
+  if (index.value === indexVar) {
     ascending.value = !ascending.value
   }
 
   //When sorting, start at startIndex 0 again to see either highest or lowest, passing on which column is sorted.
-  sortIndex.value = indexVar
+  index.value = indexVar
   startIndex.value = 0
   getUserRecs(pairid)
 }
