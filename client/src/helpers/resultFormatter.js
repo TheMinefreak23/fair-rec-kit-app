@@ -19,6 +19,7 @@ export function formatResults(allResults, showStatus) {
   const results = []
   for (let i in allResults) {
     const rawResult = allResults[i]
+    //console.log('rawResult', rawResult)
     results[i] = {
       id: rawResult.timestamp.stamp,
       datetime: rawResult.timestamp.datetime,
@@ -48,6 +49,7 @@ export function formatArray(array) {
 
 // Format an array of named objects into a comma separated string
 export function formatMultipleItems(items) {
+  //console.log('items before format', items)
   var string = ''
   if (items == null) {
     string = 'None'
@@ -144,10 +146,29 @@ export function formatEvaluation(e, result) {
 
   // Flatten filters
   console.log(e.evaluation, e.evaluation.filtered)
+  // Add filter category (main name) to filter parameter name
+  // TODO refactor
+  const filtered = []
+  for (let filter of e.evaluation.filtered) {
+    console.log('filter', filter)
+    for (const [mainName, params] of Object.entries(filter)) {
+      console.log(mainName, params)
+      for (const param of params) {
+        for (const [paramName, paramValue] of Object.entries(param)) {
+          const filterItem = {}
+          console.log('paramValue', paramValue)
+          filterItem[mainName + ' ' + '(' + paramName + ')'] = paramValue
+          filtered.push(filterItem)
+        }
+      }
+    }
+  }
+  /*
   const filtered = e.evaluation.filtered
-    .map((filter) => Object.values(filter))
+    .map((filter) => Object.entries(filter))
+    .map(([mainName, param] => { mainName + } ))
     .flat()
-    .flat()
+    .flat()*/
   //console.log(filtered)
 
   // Get filtered values and make subheaders
@@ -175,7 +196,8 @@ export function formatMetric(evaluation) {
   const name = evaluation.name
   if (name.toLowerCase()[name.length - 1] == 'k') {
     //console.log(evaluation)
-    return name.slice(0, -1) + evaluation.params[0].value
+    // TODO refactor K condition
+    return name.slice(0, -1) + evaluation.params['K']
   } else return name
 }
 

@@ -9,7 +9,6 @@ import {
 //import { selectionOptions } from '../helpers/optionsFormatter'
 
 import { useToast } from 'bootstrap-vue-3'
-import SplitRange from './Form/SplitRange.vue'
 import FormGroup from './Form/FormGroup.vue'
 let toast = useToast()
 
@@ -304,7 +303,7 @@ function shortGroupDescription(i) {
                         @click="removeGroup(i - 1)"
                         variant="danger"
                         class="mb-2 mr-sm-2 mb-sm-0 float-end"
-                        style="width: 90%;"
+                        style="width: 90%"
                         >X</b-button
                       >
                     </b-col>

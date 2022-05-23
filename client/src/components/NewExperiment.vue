@@ -196,9 +196,15 @@ function reformat(property) {
                 </b-col>
                 <b-col cols="12">
                   <b-form-group label-cols-md="2" label="Tags (optional)">
-                    <b-form-input
+                    <b-form-tags
                       v-model="metadata.tags"
-                    ></b-form-input> </b-form-group
+                      tag-pills
+                      tag-variant ="dark"
+                      remove-on-delete
+                      separator=" ,;"
+                      no-add-on-enter
+                      size="lg"
+                    ></b-form-tags> </b-form-group
                 ></b-col>
               </b-row>
             </b-col>
@@ -354,6 +360,13 @@ function reformat(property) {
         variant="primary"
         @click="sendMockData(options, true)"
         >Simple Mock</b-button
+      >
+      <!--Simple version of the mock with metrics-->
+      <b-button
+        type="test"
+        variant="primary"
+        @click="sendMockData(options, true, true)"
+        >Metric Mock</b-button
       >
     </b-card>
   </div>

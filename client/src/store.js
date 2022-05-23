@@ -22,7 +22,7 @@ function pollForResult() {
  */
 function getCalculation() {
   if (store.currentExperiment) {
-    console.log('fetching result')
+    //console.log('fetching result')
     try {
       fetch(API_URL + '/experiment/calculation')
         .then((response) => response.json())
@@ -36,7 +36,7 @@ function getCalculation() {
             // Update queue and progress while waiting for a result
             getQueue()
           }
-          console.log('polling status', data.status)
+          console.log('polling status of experiment:', data.status)
         })
     } catch (e) {
       console.log(e) // TODO better error handling, composable
@@ -50,7 +50,7 @@ async function getQueue() {
   const data = await response.json()
   //store.queue = formatResults(data).map(x=>x.omit(x,'ID'))
   //store.queue = formatResults(data)
-  console.log('queue', data.queue)
+  //console.log('queue', data.queue)
   store.queue = data.queue
   if (data.current && data.current.status == status.active) {
     store.currentExperiment = data.current
@@ -60,9 +60,17 @@ async function getQueue() {
 // Add a new result to the global current shown results state
 function addResult(result) {
   //store.currentResults = [result, ...store.currentResults]
+  /*console.log(
+    'currentResults before addResult',
+    JSON.parse(JSON.stringify(store.currentResults))
+  )*/
   store.currentResults.push(result)
+  /*console.log(
+    'currentResults after addResult',
+    JSON.parse(JSON.stringify(store.currentResults))
+  )*/
   store.currentResultTab = store.currentResults.length - 1
-  console.log('currentResultTab', store.currentResultTab)
+  //console.log('currentResultTab', store.currentResultTab)
   //console.log(store.currentResults)
 }
 

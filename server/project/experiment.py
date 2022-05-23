@@ -12,8 +12,8 @@ from dataclasses import dataclass
 from datetime import datetime
 import yaml
 from fairreckitlib.experiment.experiment_config_parsing import Parser
-from fairreckitlib.experiment.experiment_event import ON_END_EXPERIMENT, ON_END_THREAD_EXPERIMENT, \
-    ON_BEGIN_THREAD_EXPERIMENT, ON_BEGIN_EXPERIMENT
+from fairreckitlib.experiment.experiment_event import ON_END_EXPERIMENT_PIPELINE, ON_END_EXPERIMENT_THREAD, \
+    ON_BEGIN_EXPERIMENT_PIPELINE, ON_BEGIN_EXPERIMENT_THREAD
 
 from fairreckitlib.recommender_system import RecommenderSystem
 
@@ -115,6 +115,9 @@ def run_experiment(experiment):
                                                      recommender_system.data_registry,
                                                      recommender_system.experiment_factory)
 
+    # TODO don't use the metrics until evaluation pipeline works
+    config.evaluation = []
+
     def on_begin_experiment(event_listener, **kwargs):
         # Update experiment status
         current_experiment.status = Status.Active
@@ -127,7 +130,7 @@ def run_experiment(experiment):
         # Update status
         current_experiment.status = Status.Done
 
-        # TODO use
+        #result_storage.save_result(current_experiment.job, {})
         result_storage.save_result(current_experiment.job, mock_result(current_experiment.job['settings']))
 
         print('yay')
@@ -136,23 +139,23 @@ def run_experiment(experiment):
         calculate_first()
 
     events = {
-        ON_BEGIN_EXPERIMENT: lambda x, **kwargs: print('uwu'),
-        ON_END_EXPERIMENT: lambda x, **kwargs: print('owo'),
-        ON_BEGIN_THREAD_EXPERIMENT: on_begin_experiment,
-        ON_END_THREAD_EXPERIMENT: on_end_experiment
+        ON_BEGIN_EXPERIMENT_PIPELINE: lambda x, **kwargs: print('uwu'),
+        ON_END_EXPERIMENT_PIPELINE: lambda x, **kwargs: print('owo'),
+        ON_BEGIN_EXPERIMENT_THREAD: on_begin_experiment,
+        ON_END_EXPERIMENT_THREAD: on_end_experiment
     }
 
-    recommender_system.run_experiment(events, config, num_threads=4)
+    recommender_system.run_experiment(config, events=events)
 
     # TODO USE THIS FUNCTION INSTEAD OF PARSING
     # recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)
 
 
-def mock_experiment(experiment):
+def mock_experiment():
     """Mock running an experiment and save the mock result."""
     # Mock experiment duration.
     time.sleep(2.5)
-    result_storage.save_result(experiment, mock_result(experiment['settings']))
+    result_storage.save_result(current_experiment.job, mock_result(current_experiment.job['settings']))
 
 
 def mock_result(settings):
@@ -172,7 +175,7 @@ def mock_result(settings):
                               'recommendation': recommend(dataset, approach),
                               'evals': []}
             for metric in settings['metrics']:
-                evaluation = evaluate_all(metric['settings'], approach, metric)
+                evaluation = evaluate_all(approach, metric)
                 recommendation['evals'].append(
                     {'name': metric['name'], 'evaluation': evaluation, 'params': metric['params']})
                 print(metric)
@@ -216,9 +219,12 @@ def calculate():
 
         response = {'queue': formatted_queue()}
     else:
-        if current_experiment.status == Status.Done:
+        # TODO catch error
+        if not current_experiment: 
+            print('Current experiment should have started but is None')
+        if current_experiment and current_experiment.status == Status.Done:
             response['calculation'] = result_storage.current_result
-        response['status'] = current_experiment.status.value if current_experiment else Status.NA
+        response['status'] = current_experiment.status.value if current_experiment else Status.NA.value
     # print('calculation response:', response)
     return response
 
@@ -265,30 +271,28 @@ def recommend(dataset, approach):
     return dataset['name'] + approach['name'][::-1]
 
 
-def evaluate_all(settings, approach, metric):
+def evaluate_all(approach, metric):
     """
     Do a mock evaluation for all filters.
 
-    :param settings: the experiment settings
-    :param approach: the approach with a name
-    :param metric: the metric
-    :return: the evaluation dictionary containing all evaluations
+    Args:
+        approach: the approach with a name
+        metric: the metric
+    Returns:
+        the evaluation dictionary containing all evaluations
     """
     base_eval = evaluate(approach, metric)
     evaluation = {'global': round(base_eval, 2), 'filtered': []}
 
-    for setting in settings:
-        if setting['filters']:
-            # Evaluate per filter.
-            for metric_filter in setting['filters']:
-                evals = []
-                for parameter in metric_filter['params']:
-                    value = parameter['value']
-                    # Just use the value if it's a number, otherwise use the length of the word.
-                    filter_eval = value if isinstance(value, int) else len(value)
-                    val = round((base_eval * len(metric_filter['name']) / filter_eval), 2)
-                    evals.append({parameter['name'] + ' ' + str(value): val})
-                evaluation['filtered'].append({metric_filter['name']: evals})
+    for metric_filter in metric['filters']:
+        # Evaluate per filter.
+        evals = []
+        for (name, value) in metric_filter['params'].items():
+            # Just use the value if it's a number, otherwise use the length of the word.
+            filter_eval = value if isinstance(value, int) else len(value)
+            val = round((base_eval * len(metric_filter['name']) / filter_eval), 2)
+            evals.append({name + ' ' + str(value): val})
+        evaluation['filtered'].append({metric_filter['name']: evals})
 
     return evaluation
 
@@ -297,20 +301,24 @@ def evaluate(approach, metric):
     """
     Mock evaluation: Give a magic number using an approach and metric.
 
-    :param approach: an approach with a name
-    :param metric: a metric with a name and value
-    :return: the magic mock evaluation
+    Args:
+        approach: an approach with a name
+        metric: a metric with a name and value
+    Returns:
+        the magic mock evaluation
     """
     # Mock evaluation
-    value = len(approach['name']) * len(metric['name'])
+
+    result = len(approach['name']) * len(metric['name'])
     print('metric:', metric)
     # Do something with the metrics parameters.
     if metric['params']:
         print(metric['name'], 'has params', metric['params'])
-        for parameter in metric['params']:
-            value *= len(parameter['name']) * int(parameter['value'])
+        for (name, value) in metric['params'].items():
+            val = int(value) if value else 0
+            result *= len(name) * val
 
-    return value / 100
+    return result / 100
 
 
 def append_queue(metadata, settings):
@@ -333,9 +341,11 @@ def append_queue(metadata, settings):
            'metadata': metadata,
            'settings': settings}
 
+    """
     # Parse tags
     if 'tags' in metadata:
         job['metadata']['tags'] = result_storage.parse_tags(metadata['tags'])
+    """
 
     # Create configuration dictionary.
     config_dict, config_id = config_dict_from_settings(job)
