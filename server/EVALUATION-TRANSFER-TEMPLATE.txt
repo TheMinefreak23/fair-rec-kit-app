@@ -1,39 +1,91 @@
 {
-id,
-name,
-settings,
-runs:
-[
-    {
-        index,
-        results:
-        [
-            {
-                name,
-                dataset,
-                recommender_system,
-                evaluations:
-                [
+            "timestamp":{
+                "stamp"
+                "datetime"
+            },
+            "metadata": {
+                "name"
+            },
+            "settings": {
+                "recommendations"
+                "experimentMethod"
+                "datasets": [
                     {
-                    evaluation1
+                        "name"
+                        "params": {
+                            "Train/testsplit"
+                        },
+                        "filters"
+                        "conversion"
+                        "splitting": {
+                            "name":
+                            "params": {
+                                "seed"
+                            },
+                            "test_ratio"
+                        }
                     },
+                    [additional datasets]
+                ],
+                "metrics": [
                     {
-                    evaluation2
-                    }
+                        "name"
+                        "params": {
+                            "K"
+                        },
+                        "filters": []
+                    },
+                    [additional metrics]
+                ],
+                "approaches": [
+                    {
+                        "name"
+                        "params": {
+                            "seed"
+                        }
+                    },
+                    [additional approaches]
                 ]
-                settings:
+            },
+            "status"
+            "result": [
                 {
-                    factors,
-                    iterations,
-                    random_seed,
-                    regularization,
-                    use_cg,
-                    calculate_training_loss,
-                    etc..
+                    "dataset": {
+                        "name":
+                        "params": {
+                            "Train/testsplit"
+                        },
+                        "filters": [],
+                        "conversion": [],
+                        "splitting": {
+                            "name"
+                            "params": {
+                                "seed"
+                            },
+                            "test_ratio"
+                        }
+                    },
+                    "recs": [
+                        {
+                            "approach"
+                            "recommendation"
+                            "evals": [
+                                {
+                                    "name"
+                                    "evaluation": {
+                                        "global"
+                                        "filtered"
+                                    },
+                                    "params": {
+                                        "K": "10"
+                                    }
+                                }
+                                [further evaluations]
+                            ]
+                        }
+                        [further evaluations of different recommender systems (with the same dataset)]
+                    ]
                 }
-
-            }
-        ]
-    }
-]
-}
+                [further datasets]
+            ]
+        }
