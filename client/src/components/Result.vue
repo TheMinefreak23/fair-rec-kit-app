@@ -36,7 +36,7 @@ const itemHeaderOptions = ref([[]])
 const generalHeaderOptions = ref([[]])
 const userTables = combineResults()
 const visibleDatasets = ref([])
-const visibleMetrics = ref([])
+const visibleMetrics = fillShownMetrics()
 const hiddenindices = ref([])
 
 onMounted(() => {
@@ -239,10 +239,20 @@ function fillVisibleDatasets(){
  * Fill array of metrics that are shown so that all are shown upon loading the page
  */
 function fillShownMetrics(){
-  for(let i=0; i<result.result.length; i++){
-    //flattening it so that it just becomes a list
-    visibleMetrics.value[i] = result.result[i].metrics.flat()
+  let list = []
+  for(let dataset in props.result.result) {
+    console.log("result")
+    console.log(props.result.result)
+    for(let header in props.result.result.headers) {
+      console.log("name")
+      console.log(props.result.result.headers[header].name)
+      console.log("metrics test")
+      console.log(props.result.result[dataset].results[metric])
+      list = props.result.result[dataset].results[metric]
+    }
+
   }
+  return list
 
 }
 
@@ -322,6 +332,8 @@ function hideColumns(results){
           </label>
         </div>
       </p>
+
+      <p>{{visibleMetrics}}</p>
 
       <div class="col">
         Tags:
