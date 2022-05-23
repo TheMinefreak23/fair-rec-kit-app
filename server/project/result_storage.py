@@ -141,7 +141,6 @@ def result_by_id(result_id):
             approach_index = name_to_index(
                 data['result'][dataset_index]['recs'],
                 run_overview['overview'][pair_id]["recommender_approach"], 'recommendation')
-            print(evaluation_data)
             data['result'][dataset_index]['recs'][approach_index]['evals'] = evaluation_data['evaluations'] if evaluation_data else []
 
 
@@ -179,7 +178,6 @@ def id_to_name(json_data, result_id):
 
 def id_to_index(json_data, result_id):
     current_result_overview_id = -1
-    #print(str(json_data))
     # Filter: Loop through all results and find the one with the matching ID.
     for iteration_id in range(len(json_data['all_results'])):
         if int(json_data['all_results'][iteration_id]['timestamp']['stamp']) == int(result_id):
@@ -189,7 +187,7 @@ def id_to_index(json_data, result_id):
 def name_to_index(json_data, name, key):
     current_index = -1
     for i in range(len(json_data)):
-        if jsond_data[i][key] == name: current_index = i
+        if json_data[i][key] == name: current_index = i
     return current_index
 
 def load_json(path):
