@@ -6,7 +6,7 @@ Utrecht University within the Software Project course.
 import Table from './Table.vue'
 import { onActivated, onMounted, onUpdated, ref, watch } from 'vue'
 import { emptyFormGroup } from '../helpers/optionsFormatter'
-import { capitalise } from '../helpers/resultFormatter'
+import { makeHeader } from '../helpers/resultFormatter'
 
 import mockdata from '../../../server/mock/1647818279_HelloWorld/results-table.json'
 import { API_URL } from '../api'
@@ -22,17 +22,14 @@ const experiment_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
 const data = ref({ results: [[]] })
 const startIndex = ref(0)
-const index = ref(0)
+const sortIndex = ref(0)
 const ascending = ref(true)
 const entryAmount = ref(20)
 const optionalHeaders = ref([[]])
-const userHeaders = ref([])
-const itemHeaders = ref([])
 const availableFilters = ref([])
 const filters = ref(emptyFormGroup(false))
 const userHeaderOptions = ref([[]])
 const itemHeaderOptions = ref([[]])
-const generalHeaderOptions = ref([[]])
 const userTables = combineResults()
 const visibleDatasets = ref([])
 
@@ -53,10 +50,9 @@ onMounted(() => {
 async function getHeaderOptions(index) {
   const response = await fetch(API_URL + '/all-results/headers')
   const data = await response.json()
-  let headerOptions = data[userTables[index].split(' ')[1].split('_')[0]]
-  generalHeaderOptions.value[index] = makeHeaders(headerOptions.headers)
-  itemHeaderOptions.value[index] = makeHeaders(headerOptions.itemHeaders)
-  userHeaderOptions.value[index] = makeHeaders(headerOptions.userHeaders)
+  let headerOptions = data[getDatasetName(userTables[index])]
+  itemHeaderOptions.value[index] = headerOptions.itemHeaders
+  userHeaderOptions.value[index] = headerOptions.userHeaders
 }
 
 //POST request: Send result ID to the server to set current shown recommendations.
@@ -118,13 +114,12 @@ async function getUserRecs(currentTable) {
       id: props.result.id,
       pairid: currentTable,
       start: startIndex.value,
-      sortindex: index.value,
+      sortindex: sortIndex.value,
       ascending: ascending.value,
       amount: entryAmount.value,
       filters: filters.value,
       optionalHeaders: optionalHeaders.value[currentTable],
-      itemheaders: itemHeaders.value,
-      userheaders: userHeaders.value,
+      dataset: getDatasetName(userTables[currentTable])
     }),
   }
 
@@ -161,12 +156,12 @@ function loadMore(increase, amount, pairid) {
  */
 function paginationSort(indexVar, pairid) {
   //When sorting on the same column twice in a row, switch to descending.
-  if (index.value === indexVar) {
+  if (sortIndex.value === indexVar) {
     ascending.value = !ascending.value
   }
 
   //When sorting, start at startIndex 0 again to see either highest or lowest, passing on which column is sorted.
-  index.value = indexVar
+  sortIndex.value = indexVar
   startIndex.value = 0
   getUserRecs(pairid)
 }
@@ -192,35 +187,35 @@ function changeFilters(changedFilters, pairid) {
 }
 
 /**
- * convert list of header names into supported header format, capitalise and remove underscores
- * @param {Array}   headers  - list of headers.
+ * Combines every approach with every dataset that it is being applied onto
+ * @returns {Array}   - An array of all the user recommendation tables for this run
  */
-function makeHeaders(headers) {
-  return headers.map((header) => ({
-    name: capitalise(header.toString()),
-  }))
+function combineResults() {
+  let tables = []
+  for (let dataset in props.result.result) {
+    for (let approach in props.result.result[dataset].results) {
+      tables.push(props.result.result[dataset].caption + '_' + props.result.result[dataset].results[approach].approach)
+    }
+  }
+  return tables
 }
 
 /**
- * Combine the list of approaches of each dataset
+ * Returns the name of the dataset of the requested user recommendation table
+ * @param {string}   string   - the dataset-approach couple to extract the dataset from
+ * @returns {string}          - the name of the requested dataset
  */
-function combineResults() {
-  let list = []
-  for (let dataset in props.result.result) {
-    for (let approach in props.result.result[dataset].results) {
-      list.push(props.result.result[dataset].caption + '_' + props.result.result[dataset].results[approach].approach)
-    }
-  }
-  return list
+function getDatasetName(string) {
+return string.split(' ')[1].split('_')[0]
 }
 
 /**
  * Fill array of datasets that are shown so that all are shown upon loading the page
  */
-function fillVisibleDatasets(){
+function fillVisibleDatasets() {
 
   for(let i=0; i<userTables.length;i++){
-      visibleDatasets.value[i] = userTables[i].split(' ')[1].split('_')[0]
+      visibleDatasets.value[i] = getDatasetName(userTables[i])
   }
   
 
@@ -311,10 +306,9 @@ function fillVisibleDatasets(){
                 :key="props.result.id"
                 :caption="entry"
                 :results="data.results[index]"
-                :headers="makeHeaders(selectedHeaders[index])"
+                :headers="selectedHeaders[index].map(makeHeader)"
                 :filters="filters"
                 :filterOptions="availableFilters"
-                :headerOptions="generalHeaderOptions[index]"
                 :userOptions="userHeaderOptions[index]"
                 :itemOptions="itemHeaderOptions[index]"
                 pagination
