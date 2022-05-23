@@ -9,7 +9,7 @@ import pandas as pd
 from fairreckitlib.data.set.dataset import add_user_columns, add_item_columns
 
 from . import result_storage
-from .experiment import options
+from .experiment import options, recommender_system
 
 results_bp = Blueprint('results', __name__, url_prefix='/api/all-results')
 
@@ -94,23 +94,23 @@ def user_result():
     chunk_size = json.get("amount", 20)
     chunk_size = int(chunk_size)
     chosen_headers = json.get("optionalHeaders", [])
+    dataset = json.get("dataset", "")
+    sortIndex = json.get("sortindex", 0)
 
     #read mock dataframe
     recs = result_storage.current_recs[pair_id]
-    if recs is None:
-        set_recs()
-        recs = result_storage.current_recs
 
+    #Add optional columns to the dataframe (if any)
+    if (len(chosen_headers) > 0):
+      recs=add_dataset_columns(dataset, recs, chosen_headers)
 
-    #TODO what if sorted on column that is removed?
-    #TODO saving sorted dataframe inbetween
+    
+    #Make sure not to sort on a column that does not exist anymore
+    if (len(recs.columns) <= sortIndex):
+        sortIndex = 0
     ##sort dataframe based on index and ascending or not
-    df_sorted = recs.sort_values(by=recs.columns[json.get("sortindex", 0)], ascending=json.get("ascending"))
+    df_sorted = recs.sort_values(by=recs.columns[sortIndex], ascending=json.get("ascending"))
 
-    # adding extra columns to dataframe
-    #df_sorted=add_user_columns(dataset, df_sorted, chosen_headers)
-    for chosen_header in chosen_headers:
-        df_sorted[chosen_header] = chosen_header
     
     # getting only chunk of data
     start_rows = json.get("start", 0)
@@ -125,9 +125,17 @@ def user_result():
 
     # return part of table that should be shown
     df_subset = df_sorted[start_rows:end_rows]
-
     return df_subset.to_json(orient='records')
-    #return ({'headers': list(result_storage.current_headers),'table': df_subset.to_json(orient='records')})
+
+def add_dataset_columns(dataset_name, dataframe, columns):
+    dataset = recommender_system.data_registry.get_set(dataset_name)
+    if dataset is None:
+        return dataframe
+
+    result = list(map(lambda column: column.lower(), columns))
+    dataframe = add_item_columns(dataset, dataframe, result)
+    dataframe = add_user_columns(dataset, dataframe, result)
+    return dataframe
 
 @results_bp.route('/headers', methods=['GET'])
 def headers():
