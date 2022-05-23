@@ -11,6 +11,17 @@ from fairreckitlib.data.set.dataset import add_user_columns, add_item_columns
 from . import result_storage
 from .experiment import options, recommender_system
 
+#from fairreckitlib.data.filter.filter_factory import create_filter_factory
+#from fairreckitlib.data.filter.filter_constants import *
+
+"""
+filter_factory =create_filter_factory()
+filter_age = filter_factory.create(FILTER_AGE,{"min":1, "max": 20}) is in filter_constants
+filtered = filter_age.run(df)
+
+"""
+
+
 results_bp = Blueprint('results', __name__, url_prefix='/api/all-results')
 
 
