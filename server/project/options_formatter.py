@@ -13,8 +13,8 @@ model_API_dict = {}
 DEFAULTS = {#'split': 80,
             'recCount': {'min': 0, 'max': 100, 'default': 10},
             }  # default values
-DEFAULT_SPLIT = {'name': 'Train/testsplit', 'default': 80, 'min': 1, 'max': 99}
-filters = json.load(open('parameters/filters.json'))
+DEFAULT_SPLIT = {'name': 'Train/testsplit', 'default': '80', 'min': 1, 'max': 99}
+filters = json.load(open('parameters/resultFilter.json')) #TODO LOAD from dataset
 
 
 # TODO do this in another way
@@ -164,7 +164,7 @@ def config_dict_from_settings(experiment):
             dataset['conversion'] = dataset['conversion'][0]
         dataset['splitting'] = dataset['splitting'][0]
         # TODO rename split param
-        dataset['splitting']['test_ratio'] = (100 - dataset['params']['Train/testsplit']) / 100
+        dataset['splitting']['test_ratio'] = (100 - int(dataset['params']['Train/testsplit'])) / 100
 
 
     # Format models

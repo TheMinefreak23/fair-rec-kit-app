@@ -42,7 +42,7 @@ const hiddenindices = ref([])
 onMounted(() => {
   console.log('result', props.result)
   console.log('result id', props.result.id)
-  //loadEvaluations()
+  loadEvaluations()
   fillVisibleDatasets()
   fillShownMetrics()
   //Load in all the user recommendation/prediction tables
