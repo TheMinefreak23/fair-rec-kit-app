@@ -137,8 +137,12 @@ def result_by_id(result_id):
                 ratings_settings_path_full,
                 sep='\t',
                 header=None).to_dict(orient='records') # TODO ratings_settings still needs to go somewhere
+            dataset_index = name_to_index(data['result'], run_overview['overview'][pair_id]['dataset'], 'dataset')
+            approach_index = name_to_index(
+                data['result'][dataset_index]['recs'],
+                run_overview['overview'][pair_id]["recommender_approach"], 'recommendation')
             print(evaluation_data)
-            data['result'][run_index]['recs'][pair_id]['evals'] = evaluation_data['evaluations'] if evaluation_data else []
+            data['result'][dataset_index]['recs'][approach_index]['evals'] = evaluation_data['evaluations'] if evaluation_data else []
 
 
     global current_result
@@ -181,6 +185,12 @@ def id_to_index(json_data, result_id):
         if int(json_data['all_results'][iteration_id]['timestamp']['stamp']) == int(result_id):
             current_result_overview_id = iteration_id
     return current_result_overview_id
+
+def name_to_index(json_data, name, key):
+    current_index = -1
+    for i in range(len(json_data)):
+        if jsond_data[i][key] == name: current_index = i
+    return current_index
 
 def load_json(path):
     """Load a JSON file to a dictionary using its path.
