@@ -2,18 +2,35 @@
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
+// TODO get from server
+export const status = {
+  toDo: 'To Do',
+  active: 'Active',
+  aborted: 'Aborted',
+  cancelled: 'Cancelled',
+  done: 'Done',
+}
+
+export const statusPrefix = 'status_' // TODO hacky
+
 // Format data for a results overview
-export function formatResults(allResults) {
+// TODO refactor so headers are dynamic (no separate case for status header)
+export function formatResults(allResults, showStatus) {
   const results = []
   for (let i in allResults) {
+    const rawResult = allResults[i]
+    //console.log('rawResult', rawResult)
     results[i] = {
-      id: allResults[i].timestamp.stamp,
-      datetime: allResults[i].timestamp.datetime,
-      name: allResults[i].metadata.name,
-      tags: formatArray(allResults[i].metadata.tags),
-      dataset: formatMultipleItems(allResults[i].settings.datasets),
-      approach: formatMultipleItems(allResults[i].settings.approaches),
-      metric: formatMultipleItems(allResults[i].settings.metrics),
+      id: rawResult.timestamp.stamp,
+      datetime: rawResult.timestamp.datetime,
+      name: rawResult.metadata.name,
+      tags: formatArray(rawResult.metadata.tags),
+      dataset: formatMultipleItems(rawResult.settings.datasets),
+      approach: formatMultipleItems(rawResult.settings.approaches),
+      metric: formatMultipleItems(rawResult.settings.metrics),
+    }
+    if (showStatus) {
+      results[i].status = statusPrefix + rawResult.status
     }
   }
   return results
@@ -32,6 +49,7 @@ export function formatArray(array) {
 
 // Format an array of named objects into a comma separated string
 export function formatMultipleItems(items) {
+  //console.log('items before format', items)
   var string = ''
   if (items == null) {
     string = 'None'
@@ -44,6 +62,23 @@ export function formatMultipleItems(items) {
   }
   //console.log(items)
   return string
+}
+
+export function statusVariant(rawStatus) {
+  const experimentStatus = rawStatus.slice(statusPrefix.length)
+  //console.log('statusVariant experimentStatus', experimentStatus)
+  switch (experimentStatus) {
+    case status.toDo:
+      return 'warning'
+    case status.active:
+      return 'danger'
+    case status.aborted:
+      return 'light'
+    case status.cancelled:
+      return 'light'
+    case status.done:
+      return 'primary'
+  }
 }
 
 // Format a result for the result tab
@@ -111,10 +146,29 @@ export function formatEvaluation(e, result) {
 
   // Flatten filters
   console.log(e.evaluation, e.evaluation.filtered)
+  // Add filter category (main name) to filter parameter name
+  // TODO refactor
+  const filtered = []
+  for (let filter of e.evaluation.filtered) {
+    console.log('filter', filter)
+    for (const [mainName, params] of Object.entries(filter)) {
+      console.log(mainName, params)
+      for (const param of params) {
+        for (const [paramName, paramValue] of Object.entries(param)) {
+          const filterItem = {}
+          console.log('paramValue', paramValue)
+          filterItem[mainName + ' ' + '(' + paramName + ')'] = paramValue
+          filtered.push(filterItem)
+        }
+      }
+    }
+  }
+  /*
   const filtered = e.evaluation.filtered
-    .map((filter) => Object.values(filter))
+    .map((filter) => Object.entries(filter))
+    .map(([mainName, param] => { mainName + } ))
     .flat()
-    .flat()
+    .flat()*/
   //console.log(filtered)
 
   // Get filtered values and make subheaders
@@ -142,7 +196,8 @@ export function formatMetric(evaluation) {
   const name = evaluation.name
   if (name.toLowerCase()[name.length - 1] == 'k') {
     //console.log(evaluation)
-    return name.slice(0, -1) + evaluation.params[0].value
+    // TODO refactor K condition
+    return name.slice(0, -1) + evaluation.params['K']
   } else return name
 }
 
