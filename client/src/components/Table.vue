@@ -31,7 +31,6 @@ const props = defineProps({
   pagination: Boolean,
   caption: String,
   expandable: Boolean,
-  headerOptions: Array,
   userOptions: Array,
   itemOptions: Array,
   filters: Object,
@@ -298,24 +297,6 @@ function setsorting(i) {
     "
   >
     <p>Select the extra headers you want to be shown</p>
-    <p>General:</p>
-    <div
-      class="form-check form-switch"
-      v-for="(header, index) in headerOptions"
-      :key="header"
-    >
-      <input
-        v-model="checkedColumns"
-        class="form-check-input"
-        type="checkbox"
-        :value="header"
-        :id="header"
-      />
-      <label class="form-check-label" :id="header">
-        {{ makeHeader(header).name }}
-      </label>
-    </div>
-
     <p>User specific:</p>
     <div
       class="form-check form-switch"

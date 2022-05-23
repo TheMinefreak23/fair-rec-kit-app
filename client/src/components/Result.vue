@@ -26,13 +26,10 @@ const sortIndex = ref(0)
 const ascending = ref(true)
 const entryAmount = ref(20)
 const optionalHeaders = ref([[]])
-const userHeaders = ref([])
-const itemHeaders = ref([])
 const availableFilters = ref([])
 const filters = ref(emptyFormGroup(false))
 const userHeaderOptions = ref([[]])
 const itemHeaderOptions = ref([[]])
-const generalHeaderOptions = ref([[]])
 const userTables = combineResults()
 const visibleDatasets = ref([])
 
@@ -53,8 +50,7 @@ onMounted(() => {
 async function getHeaderOptions(index) {
   const response = await fetch(API_URL + '/all-results/headers')
   const data = await response.json()
-  let headerOptions = data[getDatasetName(index)]
-  generalHeaderOptions.value[index] = headerOptions.headers
+  let headerOptions = data[getDatasetName(userTables[index])]
   itemHeaderOptions.value[index] = headerOptions.itemHeaders
   userHeaderOptions.value[index] = headerOptions.userHeaders
 }
@@ -123,7 +119,7 @@ async function getUserRecs(currentTable) {
       amount: entryAmount.value,
       filters: filters.value,
       optionalHeaders: optionalHeaders.value[currentTable],
-      dataset: getDatasetName(currentTable)
+      dataset: getDatasetName(userTables[currentTable])
     }),
   }
 
@@ -206,20 +202,20 @@ function combineResults() {
 
 /**
  * Returns the name of the dataset of the requested user recommendation table
- * @param {Int}   index   - index of the user recommendation table
- * @returns {string}      - the name of the requested dataset
+ * @param {string}   string   - the dataset-approach couple to extract the dataset from
+ * @returns {string}          - the name of the requested dataset
  */
-function getDatasetName(index) {
-return userTables[index].split(' ')[1].split('_')[0]
+function getDatasetName(string) {
+return string.split(' ')[1].split('_')[0]
 }
 
 /**
  * Fill array of datasets that are shown so that all are shown upon loading the page
  */
-function fillVisibleDatasets(){
+function fillVisibleDatasets() {
 
   for(let i=0; i<userTables.length;i++){
-      visibleDatasets.value[i] = userTables[i].split(' ')[1].split('_')[0]
+      visibleDatasets.value[i] = getDatasetName(userTables[i])
   }
   
 
@@ -313,7 +309,6 @@ function fillVisibleDatasets(){
                 :headers="selectedHeaders[index].map(makeHeader)"
                 :filters="filters"
                 :filterOptions="availableFilters"
-                :headerOptions="generalHeaderOptions[index]"
                 :userOptions="userHeaderOptions[index]"
                 :itemOptions="itemHeaderOptions[index]"
                 pagination
