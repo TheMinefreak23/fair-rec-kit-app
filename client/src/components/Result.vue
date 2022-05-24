@@ -214,6 +214,7 @@ return string.split(' ')[1].split('_')[0]
  * Fill array of datasets that are shown so that all are shown upon loading the page
  */
 function fillVisibleDatasets(){
+  console.log(findUniqueDatasets[0])
   visibleDatasets.value = findUniqueDatasets()
    
 }
@@ -226,7 +227,7 @@ function findUniqueDatasets(){
       datasetnames[i] = getDatasetName(userTables[i])
   }
 
-  return Set(datasetnames)
+  return new Set(datasetnames)
 
 }
 
@@ -248,11 +249,11 @@ function findUniqueDatasets(){
             v-model = "visibleDatasets"
             class = "form-check-input"
             type="checkbox"
-            :value="dataset.split(' ')[1].split('_')[0]"
+            :value="dataset"
             :id="dataset"
           />
           <label class="form-check-label" :id="dataset">
-            {{dataset.split(' ')[1].split('_')[0]}}
+            {{dataset}}
           </label>
         </div>
       </p>
@@ -282,14 +283,14 @@ function findUniqueDatasets(){
           <div class="col-6">
 
           
-          <template v-if="visibleDatasets.includes(datasetResult.caption.split(' ')[1].split('_')[0])" :key="visibleDatasets">
+          <!-- <template v-if="visibleDatasets.includes(datasetResult.caption.split(' ')[1].split('_')[0])" :key="visibleDatasets"> -->
             <Table
               :caption="datasetResult.caption"
               :results="datasetResult.results"
               :headers="datasetResult.headers"
               :removable="false"
             />
-          </template>
+          <!-- </template> -->
           </div>
         </template>
       </div>
@@ -307,7 +308,7 @@ function findUniqueDatasets(){
         <!--Show recommendations for all datasets for now TODO-->
         <!--Currently only shows the results of the first dataset-->
         <template v-for="(entry, index) in userTables" :key="data">
-          <template v-if="visibleDatasets.includes(entry.split(' ')[1].split('_')[0])" :key="visibleDatasets">
+          <!-- <template v-if="visibleDatasets.includes(entry.split(' ')[1].split('_')[0])" :key="visibleDatasets"> -->
           <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
             <div class="col-6">
               <Table
@@ -332,7 +333,7 @@ function findUniqueDatasets(){
                 @updateHeaders="(headers) => updateHeaders(headers, index)"
               />
             </div>
-          </template>
+          <!-- </template> -->
         </template>
       </div>
     </div>
