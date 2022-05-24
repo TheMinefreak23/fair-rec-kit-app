@@ -33,7 +33,7 @@ const userHeaderOptions = ref([[]])
 const itemHeaderOptions = ref([[]])
 const userTables = combineResults()
 const visibleDatasets = ref([])
-const visibleMetrics = fillShownMetrics()
+const visibleMetrics = ref([])
 const hiddenindices = ref([])
 
 onMounted(() => {
@@ -227,30 +227,19 @@ function fillVisibleDatasets() {
 
   for(let i=0; i<userTables.length;i++){
       visibleDatasets.value[i] = getDatasetName(userTables[i])
-  }
-  
-
-   
+  }   
 }
 
 /**
  * Fill array of metrics that are shown so that all are shown upon loading the page
  */
 function fillShownMetrics(){
-  let list = []
-  for(let dataset in props.result.result) {
-    console.log("result")
-    console.log(props.result.result)
-    for(let header in props.result.result.headers) {
-      console.log("name")
-      console.log(props.result.result.headers[header].name)
-      console.log("metrics test")
-      console.log(props.result.result[dataset].results[metric])
-      list = props.result.result[dataset].results[metric]
-    }
-
-  }
-  return list
+  let result = props.result.result
+  for(let dataset in result) {
+    for(let metric in result[dataset].headers)
+      if (!(result[dataset].headers[metric].name.includes("Approach")) )
+          visibleMetrics.value[metric] = result[dataset].headers[metric].name
+  } 
 
 }
 
@@ -320,13 +309,16 @@ function hideColumns(results){
 
       <p>
         Metrics shown:
-        <div class="form-check">
+        <div class="form-check" v-for="metric in visibleMetrics">
           <input
             v-model = "visibleMetrics"
             class = "form-check-input"
             type = "checkbox"
+            :value="metric"
+            :id="metric"
             />
-          <label class="form-check-label">
+          <label class="form-check-label" :id="metric">
+            {{metric}}
           </label>
         </div>
       </p>
