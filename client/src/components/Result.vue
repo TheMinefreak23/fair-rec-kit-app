@@ -219,7 +219,9 @@ function fillVisibleDatasets(){
    
 }
 
-
+/**
+ * Create an array that has all unique datasets in the result
+ */
 function findUniqueDatasets(){
   let datasetnames = []
 
@@ -227,7 +229,7 @@ function findUniqueDatasets(){
       datasetnames[i] = getDatasetName(userTables[i])
   }
 
-  return new Set(datasetnames)
+  return Array.from(new Set(datasetnames))
 
 }
 
@@ -243,7 +245,7 @@ function findUniqueDatasets(){
       </p>
 
       <p>
-        Datasets shown:
+        Datasets showing items per user:
         <div class="form-check" v-for="dataset in uniqueDatasets">
           <input
             v-model = "visibleDatasets"
@@ -282,15 +284,12 @@ function findUniqueDatasets(){
           <p> {{datasetResult.results[0].dataset}}</p>
           <div class="col-6">
 
-          
-          <!-- <template v-if="visibleDatasets.includes(datasetResult.caption.split(' ')[1].split('_')[0])" :key="visibleDatasets"> -->
             <Table
               :caption="datasetResult.caption"
               :results="datasetResult.results"
               :headers="datasetResult.headers"
               :removable="false"
             />
-          <!-- </template> -->
           </div>
         </template>
       </div>
@@ -308,7 +307,7 @@ function findUniqueDatasets(){
         <!--Show recommendations for all datasets for now TODO-->
         <!--Currently only shows the results of the first dataset-->
         <template v-for="(entry, index) in userTables" :key="data">
-          <!-- <template v-if="visibleDatasets.includes(entry.split(' ')[1].split('_')[0])" :key="visibleDatasets"> -->
+          <template v-if="visibleDatasets.includes(getDatasetName(entry))" :key="visibleDatasets">
           <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
             <div class="col-6">
               <Table
@@ -333,7 +332,7 @@ function findUniqueDatasets(){
                 @updateHeaders="(headers) => updateHeaders(headers, index)"
               />
             </div>
-          <!-- </template> -->
+            </template>
         </template>
       </div>
     </div>
