@@ -420,7 +420,7 @@ function setsorting(i) {
             <template v-else> {{ value }}</template>
           </b-td>
         </b-td>
-          <b-td class="vertical-align-middle" v-if="overview || removable">
+          <b-td class="align-middle" v-if="overview || removable">
             <div class="m-0 float-end" style="width: 160px;">
             <b-button
               v-if="overview"
