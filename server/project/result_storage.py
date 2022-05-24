@@ -1,4 +1,22 @@
-"""
+"""This module contains functions to load & modify data from evaluation results.
+
+methods:
+    save_result
+    old_result_by_id
+    result_by_id
+    get_overview
+    id_to_name
+    id_to_index
+    name_to_index
+    load_json
+    load_results_overview
+    write_results_overview
+    add_result
+    delete_result
+    edit_result
+    create_results_overview
+    parse_tags
+
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
@@ -20,8 +38,8 @@ def save_result(experiment, result):
     """Save result to overview.
 
     Args:
-        experiment(dict): the experiment settings
-        result(dict): the computed result
+    experiment(dict): the experiment settings
+    result(dict): the computed result
     """
     global current_result
     experiment['result'] = result
@@ -32,14 +50,15 @@ def save_result(experiment, result):
 
 
 def old_result_by_id(result_id):
-    """Sets the current result to a result in the mock data.
-        This function is from a time where backend results were not ready to be processed.
-        Its use was to provide testable data without actual results being present.
-        This function is here as a fallback only, and should not be called upon.
+    """Set the current result to a result in the mock data.
 
-        Args:
-            result_id(int): the result id
-        """
+    This function is from a time where backend results were not ready to be processed.
+    Its use was to provide testable data without actual results being present.
+    This function is here as a fallback only, and should not be called upon.
+
+    Args:
+    result_id(int): the result id
+    """
     results = load_results_overview()
     global current_result
 
@@ -57,7 +76,7 @@ def result_by_id(result_id):
     """Set the current result to a result in the results overview by its id.
 
     Args:
-        result_id(int): the result id
+    result_id(int): the result id
     """
     # TODO DEV
     results_overview = load_results_overview()
@@ -99,12 +118,12 @@ def result_by_id(result_id):
 
 
 def get_overview(evaluation_id, runid):
-    """Returns a specific entry (corresponding to a specific dataset-recommender approach pair)
-    from a specific overview.json (from to a specific calculation)
+    """Return a specific entry from a specific overview.json.
 
     Args:
-        evaluation_id(int): the calculation id of the evaluation
-        runid(int): the id of the specific dataset-recommender approach pair"""
+    evaluation_id(int): the calculation id of the evaluation
+    runid(int): the id of the specific dataset-recommender approach pair
+    """
     results_overview = load_results_overview()
     # TODO DEV: Mock
     if evaluation_id == 0:
@@ -129,20 +148,22 @@ def get_overview(evaluation_id, runid):
 
 
 def id_to_name(json_data, result_id):
-    """"Returns the name of a specific evaluation.
+    """Return the name of a specific evaluation.
 
     args:
     json_data(dict): loaded json data from results_overview
-    result_id(int): the id of the evaluation"""
+    result_id(int): the id of the evaluation
+    """
     return json_data['all_results'][id_to_index(json_data, result_id)]['metadata']['name']
 
 
 def id_to_index(json_data, result_id):
-    """Returns the index of the entry in results_overview of a specific evaluation.
+    """Return the index of the entry in results_overview of a specific evaluation.
 
     args:
     json_data(dict): loaded json data from results_overview
-    result_id(int): the id of the evaluation"""
+    result_id(int): the id of the evaluation
+    """
     current_result_overview_id = -1
     # Filter: Loop through all results and find the one with the matching ID.
     for iteration_id, data in enumerate(json_data['all_results']):
@@ -152,13 +173,13 @@ def id_to_index(json_data, result_id):
 
 
 def name_to_index(json_data, name, key):
-    """returns the index of the entry in results_overview
-    of a specific dataset-recommender approach pair.
+    """Return the index of the entry in results_overview of a specific dataset-recommender approach pair.
 
     args:
     json_data(dict): the loaded json data from results_overview
     name(str): the name of the dataset or the name of the approach
-    key(str): the object that the function should match on (either 'dataset' or 'recommender_system')"""
+    key(str): the object that the function should match on (either 'dataset' or 'recommender_system')
+    """
     current_index = -1
     for i, data in enumerate(json_data):
         if data[key] == name:
@@ -268,7 +289,7 @@ def create_results_overview():
 
 
 def parse_tags(tags_string):
-    """Parse result tags (given by user as metadata)
+    """Parse result tags (given by user as metadata).
 
     Args:
         tags_string(string): the tags as raw string input (comma-separated)
