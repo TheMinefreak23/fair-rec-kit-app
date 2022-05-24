@@ -141,4 +141,18 @@ def add_dataset_columns(dataset_name, dataframe, columns):
 def headers():
     return result_storage.load_json('project/headers.json')   
 
+@results_bp.route('/export', methods=['POST'])
+def export(): 
+    #Load results from json
+    json = request.json
+    results = json.get('results', '{}')
+    name = json.get('filename', '{}')
+    
+    #Create path to save the file
+    import os  
+    os.makedirs('project/exports', exist_ok=True) 
 
+    #Export the results to csv
+    df = pd.DataFrame(results)
+    df.to_csv('project/exports/' + name + '.csv', index=False)
+    return "Exported file"

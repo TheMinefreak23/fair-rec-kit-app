@@ -144,7 +144,7 @@ def result_by_id(result_id):
     global current_result
     current_result = data
 
-    # print('current result',current_result)
+    print('current result', current_result)
 
 def get_overview(evaluation_id, runid):
     results_overview = load_results_overview()

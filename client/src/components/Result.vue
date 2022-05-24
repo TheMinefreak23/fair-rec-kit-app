@@ -21,6 +21,7 @@ const selectedHeaders = ref([
 const experiment_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
 const data = ref({ results: [[]] })
+const runID = ref(0)
 const startIndex = ref(0)
 const sortIndex = ref(0)
 const ascending = ref(true)
@@ -30,13 +31,13 @@ const availableFilters = ref([])
 const filters = ref(emptyFormGroup(false))
 const userHeaderOptions = ref([[]])
 const itemHeaderOptions = ref([[]])
-const userTables = combineResults()
+const userTables = combineResults(props.result.result)
 const visibleDatasets = ref([])
 
 onMounted(() => {
   console.log('result', props.result)
   console.log('result id', props.result.id)
-  loadEvaluations()
+  //loadEvaluations()
   fillVisibleDatasets()
   //Load in all the user recommendation/prediction tables
   for (let index in userTables) {
@@ -62,7 +63,7 @@ async function setRecs(currentTable) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       id: props.result.id,
-      runid: 0,
+      runid: runID.value,
       pairid: currentTable,
     }),
   }
@@ -82,28 +83,30 @@ async function setRecs(currentTable) {
 
 //POST request: Ask server to load the evaluations of the current result
 //Currently not used, as evaluation tables are not finished
-async function loadEvaluations() {
-  const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-type': 'application/json' },
-    body: JSON.stringify({ id: props.result.id }),
-  }
-  const response = await fetch(
-    API_URL + '/all-results/result-by-id',
-    requestOptions
-  ).then(() => {
-    console.log('succesful POST request to API to retrieve evaluation data')
-    getEvaluations()
-  })
-}
+// async function loadEvaluations() {
+//   const requestOptions = {
+//     method: 'POST',
+//     headers: { 'Content-type': 'application/json' },
+//     body: JSON.stringify({ id: props.result.id }),
+//   }
+//   const response = await fetch(
+//     API_URL + '/all-results/result-by-id',
+//     requestOptions
+//   ).then(() => {
+//     console.log('succesful POST request to API to retrieve evaluation data')
+//     const resultsData = await response.json()
+//     console.log('results data', resultsData)
+//     getEvaluations()
+//   })
+// }
 
-//GET request: Ask server for currently loaded evaluations
-async function getEvaluations() {
-  const response = await fetch(API_URL + '/all-results/result-by-id')
-  console.log('succesfully retrieved evaluation data.')
-  const resultsData = await response.json()
-  console.log('results data', resultsData)
-}
+// //GET request: Ask server for currently loaded evaluations
+// async function getEvaluations() {
+//   const response = await fetch(API_URL + '/all-results/result-by-id')
+//   console.log('succesfully retrieved evaluation data.')
+//   const resultsData = await response.json()
+//   console.log('results data', resultsData)
+// }
 
 //POST request: Ask server for next part of user recommendation table.
 async function getUserRecs(currentTable) {
@@ -128,6 +131,20 @@ async function getUserRecs(currentTable) {
   selectedHeaders.value[currentTable] = Object.keys(
     data.value.results[currentTable][0]
   )
+}
+
+async function exportTable() {
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-type': 'application/json' },
+    body: JSON.stringify({ results: props.result.result[0].results}),
+  }
+  const response = await fetch(
+    API_URL + '/all-results/export',
+    requestOptions
+  ).then(() => {
+    console.log('exported succesfully')
+  })
 }
 
 /**
@@ -188,13 +205,15 @@ function changeFilters(changedFilters, pairid) {
 
 /**
  * Combines every approach with every dataset that it is being applied onto
+ * @param {Array}     - A list of the results (the same as props.results.result)
  * @returns {Array}   - An array of all the user recommendation tables for this run
  */
-function combineResults() {
+function combineResults(results) {
+  console.log(results)
   let tables = []
-  for (let dataset in props.result.result) {
-    for (let approach in props.result.result[dataset].results) {
-      tables.push(props.result.result[dataset].caption + '_' + props.result.result[dataset].results[approach].approach)
+  for (let dataset in results) {
+    for (let approach in results[dataset].results) {
+      tables.push(results[dataset].caption + '_' + results[dataset].results[approach].approach + '_' + runID.value)
     }
   }
   return tables
@@ -239,11 +258,11 @@ function fillVisibleDatasets() {
             v-model = "visibleDatasets"
             class = "form-check-input"
             type="checkbox"
-            :value="dataset.split(' ')[1].split('_')[0]"
+            :value="getDatasetName(dataset)"
             :id="dataset"
           />
           <label class="form-check-label" :id="dataset">
-            {{dataset.split(' ')[1].split('_')[0]}}
+            {{getDatasetName(dataset)}}
           </label>
         </div>
       </p>
@@ -273,13 +292,14 @@ function fillVisibleDatasets() {
           <div class="col-6">
 
           
-          <template v-if="visibleDatasets.includes(datasetResult.caption.split(' ')[1].split('_')[0])" :key="visibleDatasets">
+          <template v-if="visibleDatasets.includes(getDatasetName(datasetResult.caption))" :key="visibleDatasets">
             <Table
-              :caption="datasetResult.caption"
+              :caption="datasetResult.dataset"
               :results="datasetResult.results"
               :headers="datasetResult.headers"
               :removable="false"
             />
+            <b-button @click="exportTable()">Export table</b-button>
           </template>
           </div>
         </template>
@@ -298,7 +318,7 @@ function fillVisibleDatasets() {
         <!--Show recommendations for all datasets for now TODO-->
         <!--Currently only shows the results of the first dataset-->
         <template v-for="(entry, index) in userTables" :key="data">
-          <template v-if="visibleDatasets.includes(entry.split(' ')[1].split('_')[0])" :key="visibleDatasets">
+          <template v-if="visibleDatasets.includes(getDatasetName(entry))" :key="visibleDatasets">
           <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
             <div class="col-6">
               <Table

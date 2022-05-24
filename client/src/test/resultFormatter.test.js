@@ -9,6 +9,7 @@ import {
   showDatasetInfo,
   formatMetric,
   formatEvaluation,
+  makeHeader,
 } from '../helpers/resultFormatter'
 
 /**
@@ -83,11 +84,36 @@ describe('format evaluation', () => {
 describe('format metric', () => {
   // A metric with parameters (k) should show both name and parameters
   test('k metric', () => {
-    const metric = { name: 'foo k', params: [{ value: 0 }] }
-    expect(formatMetric(metric)).toBe('foo 0')
+    const metric = {
+      name: 'P@K',
+      params: [
+        {
+          name: 'K',
+          value: '10',
+        },
+      ],
+    }
+    expect(formatMetric(metric)).toBe('P@10')
   })
   // A metric without parameters should just show its name
   test('no parameter metric', () => {
     expect(formatMetric({ name: 'foo' })).toBe('foo')
+  })
+})
+
+/**
+ * Test correct header configuration
+ */
+describe('configure header', () => {
+  test('multiple words', () => {
+    const header = 'a_b_c_d'
+    expect(makeHeader(header).name).toBe('A b c d')
+    expect(makeHeader('these_are_multiple_words').name).toBe(
+      'These are multiple words'
+    )
+  })
+  test('starts with number', () => {
+    const header = '2_isanumber'
+    expect(makeHeader(header).name).toBe('2 isanumber')
   })
 })
