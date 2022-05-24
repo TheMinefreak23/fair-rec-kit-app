@@ -393,7 +393,7 @@ function setsorting(i) {
     <b-tbody>
       <b-tr v-for="(item, index) in sorted" :key="item"
         ><b-td v-if="overview">
-          <b-button @click="$emit('loadResult', item.id)">View result</b-button>
+          <b-button variant="outline-dark fw-bold" @click="$emit('loadResult', item.id)">View result</b-button>
         </b-td>
         <b-td
           v-for="[key, value] in Object.entries(item)"
@@ -420,43 +420,44 @@ function setsorting(i) {
             <template v-else> {{ value }}</template>
           </b-td>
         </b-td>
-
-        <b-td v-if="overview || removable">
-          <b-button
-            v-if="overview"
-            variant="primary"
-            class="mx-1"
-            @click="
-              ;(editModalShow = !editModalShow),
-                (selectedEntry = index),
-                getNameTagsMail(item.id)
-            "
-            ><i class="bi bi-pencil-square"></i></b-button
-          >
-          <b-button
-            v-if="overview"
-            variant="primary"
-            class="mx-1"
-            @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
-            ><i class="bi bi-info-circle"></i></b-button
-          >
-          <!--REFACTOR status condition-->
-          <b-button
-            v-if="
-              removable &&
-              (!item.status ||
-                [status.toDo, status.active].includes(
-                  item.status.slice(statusPrefix.length)
-                ))
-            "
-            variant="danger"
-            class="mx-1"
-            @click="
-              ;(deleteModalShow = !deleteModalShow), (selectedEntry = item.id)
-            "
-            ><i class="bi bi-trash"></i></b-button
-          >
-        </b-td>
+          <b-td class="vertical-align-middle" v-if="overview || removable">
+            <div class="m-0 float-end" style="width: 160px;">
+            <b-button
+              v-if="overview"
+              variant="primary"
+              class="mx-1"
+              @click="
+                ;(editModalShow = !editModalShow),
+                  (selectedEntry = index),
+                  getNameTagsMail(item.id)
+              "
+              ><i class="bi bi-pencil-square"></i></b-button
+            >
+            <b-button
+              v-if="overview"
+              variant="primary"
+              class="mx-1"
+              @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
+              ><i class="bi bi-info-circle"></i></b-button
+            >
+            <!--REFACTOR status condition-->
+            <b-button
+              v-if="
+                removable &&
+                (!item.status ||
+                  [status.toDo, status.active].includes(
+                    item.status.slice(statusPrefix.length)
+                  ))
+              "
+              variant="danger"
+              class="mx-1"
+              @click="
+                ;(deleteModalShow = !deleteModalShow), (selectedEntry = item.id)
+              "
+              ><i class="bi bi-trash"></i></b-button
+            >
+            </div>
+          </b-td>
       </b-tr>
     </b-tbody>
   </b-table-simple>
