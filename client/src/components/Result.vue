@@ -34,6 +34,7 @@ const itemHeaderOptions = ref([[]])
 const userTables = combineResults()
 const visibleDatasets = ref([])
 const visibleMetrics = ref([])
+const availableMetrics =ref([])
 const hiddenindices = ref([])
 
 onMounted(() => {
@@ -235,10 +236,15 @@ function fillVisibleDatasets() {
  */
 function fillShownMetrics(){
   let result = props.result.result
+  let i=0
   for(let dataset in result) {
-    for(let metric in result[dataset].headers)
-      if (!(result[dataset].headers[metric].name.includes("Approach")) )
-          visibleMetrics.value[metric] = result[dataset].headers[metric].name
+     for(let metric in result[dataset].headers)
+      
+       if (!(result[dataset].headers[metric].name.includes("Approach"))) {
+             visibleMetrics.value[i] = result[dataset].headers[metric].name
+              availableMetrics.value[i] = result[dataset].headers[metric].name
+              i++
+     }        
   } 
 
 }
@@ -309,7 +315,7 @@ function hideColumns(results){
 
       <p>
         Metrics shown:
-        <div class="form-check" v-for="metric in visibleMetrics">
+        <div class="form-check" v-for="metric in availableMetrics">
           <input
             v-model = "visibleMetrics"
             class = "form-check-input"
