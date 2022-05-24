@@ -11,18 +11,52 @@ from fairreckitlib.data.set.dataset import add_user_columns, add_item_columns
 from . import result_storage
 from .experiment import options, recommender_system
 
-#from fairreckitlib.data.filter.filter_factory import create_filter_factory
-#from fairreckitlib.data.filter.filter_constants import *
-
-"""
-filter_factory =create_filter_factory()
-filter_age = filter_factory.create(FILTER_AGE,{"min":1, "max": 20}) is in filter_constants
-filtered = filter_age.run(df)
-
-"""
+from fairreckitlib.data.filter.filter_factory import create_filter_factory
+from fairreckitlib.data.filter.filter_constants import *
 
 
 results_bp = Blueprint('results', __name__, url_prefix='/api/all-results')
+
+
+def filter_results(dataframe, filters):
+    """Filter a dataframe with results using specified filters
+
+    Args:
+        dataframe: a dataframe containing results that need to be filtered
+        filters: an array that contains filters
+
+    Returns:
+        results after filtering
+    """
+    filter_factory = create_filter_factory()
+
+    # Generate the filters we will use, currently they have parameters??
+    age_filter = filter_factory.create(FILTER_AGE)
+    country_filter = filter_factory.create(FILTER_COUNTRY)
+    gender_filter = filter_factory.create(FILTER_GENDER)
+
+    process_filters = []
+    for filter in filters:
+        match(filter.name):
+            case "Age Range":
+                process_filters.append(age_filter({
+                    "min": filter.params[0].value[0], "max": filter.params[0].value[1]}))
+            case "Artist Gender":
+                process_filters.append(gender_filter(
+                    filter.params.value, "artist"))
+
+            case "User Gender":
+                process_filters.append(gender_filter(
+                    filter.params.value, "user"))
+
+            case "Countries":
+                process_filters.append(country_filter(filter.params.value))
+
+    for process in process_filters:
+        dataframe = process.run(dataframe)
+
+    return dataframe
+
 
 
 @results_bp.route('/', methods=['GET'])
@@ -48,7 +82,7 @@ def old_result_by_id():
 
 @results_bp.route('/result-by-id', methods=['POST', 'GET'])
 def result_by_id():
-    if request.method == 'POST':    
+    if request.method == 'POST':
         data = request.get_json()
         print('data', data)
         result_storage.result_by_id(int(data['id']))
@@ -89,18 +123,19 @@ def set_recs():
     result_id = json.get("id")  # Result timestamp TODO use to get result
     run_id = json.get("runid")
     pair_id = json.get("pairid")
-    path = result_storage.get_overview(result_id, run_id)[pair_id]['ratings_path'] 
-    result_storage.current_recs[pair_id] = pd.read_csv(path, sep='\t', header=0)
-    return {'status': 'success', 'availableFilters' : options['filters']}
+    path = result_storage.get_overview(result_id, run_id)[
+        pair_id]['ratings_path']
+    result_storage.current_recs[pair_id] = pd.read_csv(
+        path, sep='\t', header=0)
+    return {'status': 'success', 'availableFilters': options['filters']}
 
 
-## get recommender results per user
+# get recommender results per user
 @results_bp.route('/result', methods=['POST'])
 def user_result():
     json = request.json
     pair_id = json.get("pairid")
     filters = json.get("filters")
-    #TODO implement backend filtering
 
     chunk_size = json.get("amount", 20)
     chunk_size = int(chunk_size)
@@ -108,21 +143,23 @@ def user_result():
     dataset = json.get("dataset", "")
     sortIndex = json.get("sortindex", 0)
 
-    #read mock dataframe
+    # read mock dataframe
     recs = result_storage.current_recs[pair_id]
 
-    #Add optional columns to the dataframe (if any)
-    if (len(chosen_headers) > 0):
-      recs=add_dataset_columns(dataset, recs, chosen_headers)
+    #filter recs
+    recs = filter_results(recs, filters)
 
-    
-    #Make sure not to sort on a column that does not exist anymore
+    # Add optional columns to the dataframe (if any)
+    if (len(chosen_headers) > 0):
+        recs = add_dataset_columns(dataset, recs, chosen_headers)
+
+    # Make sure not to sort on a column that does not exist anymore
     if (len(recs.columns) <= sortIndex):
         sortIndex = 0
-    ##sort dataframe based on index and ascending or not
-    df_sorted = recs.sort_values(by=recs.columns[sortIndex], ascending=json.get("ascending"))
+    # sort dataframe based on index and ascending or not
+    df_sorted = recs.sort_values(
+        by=recs.columns[sortIndex], ascending=json.get("ascending"))
 
-    
     # getting only chunk of data
     start_rows = json.get("start", 0)
     start_rows = int(start_rows)
@@ -138,6 +175,7 @@ def user_result():
     df_subset = df_sorted[start_rows:end_rows]
     return df_subset.to_json(orient='records')
 
+
 def add_dataset_columns(dataset_name, dataframe, columns):
     dataset = recommender_system.data_registry.get_set(dataset_name)
     if dataset is None:
@@ -148,8 +186,7 @@ def add_dataset_columns(dataset_name, dataframe, columns):
     dataframe = add_user_columns(dataset, dataframe, result)
     return dataframe
 
+
 @results_bp.route('/headers', methods=['GET'])
 def headers():
-    return result_storage.load_json('project/headers.json')   
-
-
+    return result_storage.load_json('project/headers.json')
