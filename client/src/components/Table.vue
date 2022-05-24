@@ -355,6 +355,8 @@ function setsorting(i) {
       }}
 
       <template v-if="expandable">
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" rel="stylesheet">
+
         <div class="float-end">
           <b-button
             @click="updateHeadersModalShow = !updateHeadersModalShow"
@@ -422,19 +424,21 @@ function setsorting(i) {
         <b-td v-if="overview || removable">
           <b-button
             v-if="overview"
-            pill
+            variant="primary"
+            class="mx-1"
             @click="
               ;(editModalShow = !editModalShow),
                 (selectedEntry = index),
                 getNameTagsMail(item.id)
             "
-            >Edit</b-button
+            ><i class="bi bi-pencil-square"></i></b-button
           >
           <b-button
             v-if="overview"
-            pill
+            variant="primary"
+            class="mx-1"
             @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
-            >View Information</b-button
+            ><i class="bi bi-info-circle"></i></b-button
           >
           <!--REFACTOR status condition-->
           <b-button
@@ -446,10 +450,11 @@ function setsorting(i) {
                 ))
             "
             variant="danger"
+            class="mx-1"
             @click="
               ;(deleteModalShow = !deleteModalShow), (selectedEntry = item.id)
             "
-            >{{ buttonText }}</b-button
+            ><i class="bi bi-trash"></i></b-button
           >
         </b-td>
       </b-tr>

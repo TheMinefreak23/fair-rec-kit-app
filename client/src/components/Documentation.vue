@@ -164,6 +164,7 @@ function closeNav() {
 // XML Documentation attempt //
 // ------------------------- //
 
+/* 
 function displayItem(i) {
   var xmlhttp = new XMLHttpRequest();
   xmlhttp.onreadystatechange = function() {
@@ -178,9 +179,8 @@ function displayItem(i) {
 function myFunction(xml, i) {
   var xmlDoc = xml.responseXML;
   x = xmlDoc.getElementsByTagName("item");
-  x[i].getElementsBy
 }
-
+*/
 
 </script>
 
