@@ -133,21 +133,26 @@ def result_by_id(result_id):
             evaluation_data = {}
             if os.path.exists(evaluation_path_full):
                 evaluation_data = load_json(evaluation_path_full)
+            print('evaluation data', evaluation_data)
             ratings_settings_data = pd.read_csv(
                 ratings_settings_path_full,
                 sep='\t',
                 header=None).to_dict(orient='records') # TODO ratings_settings still needs to go somewhere
-            dataset_index = name_to_index(data['result'], run_overview['overview'][pair_id]['dataset'], 'dataset')
+            dataset_index = name_to_index(data['result'], run_overview['overview'][pair_id]['dataset'], 'dataset', True)
+            #print('name from overview', run_overview['overview'][pair_id]['dataset'])
+            #print('dataset index', dataset_index)
             approach_index = name_to_index(
                 data['result'][dataset_index]['recs'],
-                run_overview['overview'][pair_id]['recommender_system'], 'recommendation')
+                run_overview['overview'][pair_id]['recommender_system'], 'approach')
+            #print('name from overview', run_overview['overview'][pair_id]['recommender_system'])
+            #print('approach index', approach_index)
             data['result'][dataset_index]['recs'][approach_index]['evals'] = evaluation_data['evaluations'] if evaluation_data else []
 
 
     global current_result
     current_result = data
+    #print('current result', json.dumps(current_result, indent=4))
 
-    # print('current result',current_result)
 
 def get_overview(evaluation_id, runid):
     results_overview = load_results_overview()
@@ -184,10 +189,14 @@ def id_to_index(json_data, result_id):
             current_result_overview_id = iteration_id
     return current_result_overview_id
 
-def name_to_index(json_data, name, key):
+def name_to_index(json_data, name, key, by_name = False):
     current_index = -1
+    #print('json_data',json_data)
     for i in range(len(json_data)):
-        if json_data[i][key] == name: current_index = i
+        #print(json_data[i][key],'==',name,'?',json_data[i][key] == name)
+        result_value = json_data[i][key]
+        if by_name and result_value['name'] == name or result_value == name:
+            current_index = i
     return current_index
 
 def load_json(path):
