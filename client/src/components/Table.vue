@@ -9,7 +9,7 @@ import { formatMetadata } from '../helpers/metadataFormatter'
 import FormGroupList from './FormGroupList.vue'
 import { validateEmail, emptyFormGroup } from '../helpers/optionsFormatter'
 import { store } from '../store'
-import { statusPrefix, statusVariant, status } from '../helpers/resultFormatter'
+import { statusPrefix, statusVariant, status, makeHeader } from '../helpers/resultFormatter'
 
 const emit = defineEmits([
   'loadResult',
@@ -31,7 +31,6 @@ const props = defineProps({
   pagination: Boolean,
   caption: String,
   expandable: Boolean,
-  headerOptions: Array,
   userOptions: Array,
   itemOptions: Array,
   filters: Object,
@@ -298,24 +297,6 @@ function setsorting(i) {
     "
   >
     <p>Select the extra headers you want to be shown</p>
-    <p>General:</p>
-    <div
-      class="form-check form-switch"
-      v-for="(header, index) in headerOptions"
-      :key="header"
-    >
-      <input
-        v-model="checkedColumns"
-        class="form-check-input"
-        type="checkbox"
-        :value="header.name"
-        :id="header.name"
-      />
-      <label class="form-check-label" :id="header.name">
-        {{ header.name }}
-      </label>
-    </div>
-
     <p>User specific:</p>
     <div
       class="form-check form-switch"
@@ -326,11 +307,11 @@ function setsorting(i) {
         v-model="userColumns"
         class="form-check-input"
         type="checkbox"
-        :value="header.name"
-        :id="header.name"
+        :value="header"
+        :id="header"
       />
-      <label class="form-check-label" :id="header.name">
-        {{ header.name }}
+      <label class="form-check-label" :id="header">
+        {{ makeHeader(header).name }}
       </label>
     </div>
 
@@ -344,11 +325,11 @@ function setsorting(i) {
         v-model="itemColumns"
         class="form-check-input"
         type="checkbox"
-        :value="header.name"
-        :id="header.name"
+        :value="header"
+        :id="header"
       />
-      <label class="form-check-label" :id="header.name">
-        {{ header.name }}
+      <label class="form-check-label" :id="header">
+        {{ makeHeader(header).name }}
       </label>
     </div>
   </b-modal>
