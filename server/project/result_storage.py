@@ -85,7 +85,7 @@ def result_by_id(result_id):
                 sep='\t',
                 header=None).to_dict(orient='records')
             dataset_index = name_to_index(data['result'],
-                run_overview['overview'][pair_id]['dataset'], 'dataset')
+                run_overview['overview'][pair_id]['dataset'], 'dataset', True)
             approach_index = name_to_index(
                 data['result'][dataset_index]['recs'],
                 run_overview['overview'][pair_id]['recommender_system'], 'recommendation')
@@ -94,8 +94,8 @@ def result_by_id(result_id):
 
     global current_result
     current_result = data
+    #print('current result', json.dumps(current_result, indent=4))
 
-    # print('current result',current_result)
 
 
 def get_overview(evaluation_id, runid):
@@ -150,8 +150,7 @@ def id_to_index(json_data, result_id):
             current_result_overview_id = iteration_id
     return current_result_overview_id
 
-
-def name_to_index(json_data, name, key):
+def name_to_index(json_data, name, key, by_name = False):
     """returns the index of the entry in results_overview
     of a specific dataset-recommender approach pair.
 
@@ -161,7 +160,8 @@ def name_to_index(json_data, name, key):
     key(str): the object that the function should match on (either 'dataset' or 'recommender_system')"""
     current_index = -1
     for i, data in enumerate(json_data):
-        if data[key] == name:
+        result_value = json_data[i][key]
+        if by_name and result_value['name'] == name or result_value == name:
             current_index = i
     return current_index
 
