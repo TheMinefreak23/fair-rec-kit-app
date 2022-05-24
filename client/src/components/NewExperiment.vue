@@ -5,7 +5,7 @@ Utrecht University within the Software Project course.
 import { onMounted, ref } from 'vue'
 import FormGroupList from './FormGroupList.vue'
 import { sendMockData } from '../test/mockExperimentOptions.js'
-import { store, getCalculation } from '../store.js'
+import { store, pollForResult } from '../store.js'
 import { API_URL } from '../api'
 import { emptyOption } from '../helpers/optionsFormatter'
 import { emptyFormGroup } from '../helpers/optionsFormatter'
@@ -68,8 +68,7 @@ async function sendToServer() {
   console.log('sendToServer() queue', store.queue)
   // Switch to queue
   store.currentTab = 1
-  const interval = 1000
-  store.resultPoll = setInterval(getCalculation, interval)
+  pollForResult()
 }
 
 //Declare default values of the form
@@ -197,9 +196,15 @@ function reformat(property) {
                 </b-col>
                 <b-col cols="12">
                   <b-form-group label-cols-md="2" label="Tags (optional)">
-                    <b-form-input
+                    <b-form-tags
                       v-model="metadata.tags"
-                    ></b-form-input> </b-form-group
+                      tag-pills
+                      tag-variant ="dark"
+                      remove-on-delete
+                      separator=" ,;"
+                      no-add-on-enter
+                      size="lg"
+                    ></b-form-tags> </b-form-group
                 ></b-col>
               </b-row>
             </b-col>
@@ -251,12 +256,12 @@ function reformat(property) {
               />
 
               <b-row>
-                <b-row>
+                <b-row v-if="form.experimentMethod == 'recommendation'">
                   <b-col md="auto">
                     <!--User can select the amount of recommendations per user -->
                     <b-form-group
-                      v-if="form.experimentMethod == 'recommendation'"
-                      label="Select number of recommendations per user:"
+                      
+                      label="Select number of recommendations per user: *"
                     >
                       <b-form-input
                         type="range"
@@ -355,6 +360,13 @@ function reformat(property) {
         variant="primary"
         @click="sendMockData(options, true)"
         >Simple Mock</b-button
+      >
+      <!--Simple version of the mock with metrics-->
+      <b-button
+        type="test"
+        variant="primary"
+        @click="sendMockData(options, true, true)"
+        >Metric Mock</b-button
       >
     </b-card>
   </div>

@@ -9,7 +9,6 @@ import {
 //import { selectionOptions } from '../helpers/optionsFormatter'
 
 import { useToast } from 'bootstrap-vue-3'
-import SplitRange from './Form/SplitRange.vue'
 import FormGroup from './Form/FormGroup.vue'
 let toast = useToast()
 
@@ -102,41 +101,14 @@ function removeGroup(i) {
 function copyItem(i) {
   form.value.groupCount++ //Add a new item
   // Deep-copy the selected value to the new item
-  form.value.choices[form.value.groupCount - 1] = JSON.parse(
+  // form.value.choices[form.value.groupCount - 1] = JSON.parse(
+  //   JSON.stringify(form.value.choices[i])
+  // )
+  let item = JSON.parse(
     JSON.stringify(form.value.choices[i])
   )
-  visibleGroup.value = form.value.groupCount // Show newly copied item
-  /*
-  if (form.value.inputs[i]) {
-    //Copy textfield options (if applicable)
-    form.value.inputs[form.value.groupCount - 1] = form.value.inputs[i].map(
-      (param) => ({
-        name: param.name,
-        value: param.value,
-      })
-    )
-  }
-  if (form.value.selects[i]) {
-    //Copy select options (if applicable)
-    form.value.selects[form.value.groupCount - 1] = form.value.selects[i].map(
-      (param) => ({
-        name: param.name,
-        value: param.value,
-      })
-    )
-  }
-  if (form.value.lists[i]) {
-    //Copy nested option list (if applicable)
-    form.value.lists[form.value.groupCount - 1] = form.value.lists[i].map(
-      (param) => ({
-        groupCount: param.groupCount,
-        main: param.main,
-        inputs: param.inputs,
-        selects: param.selects,
-        lists: param.lists,
-      })
-    )
-  }*/
+  form.value.choices.splice(i, 0, item)
+  visibleGroup.value = i + 2 // Show newly copied item
   console.log(form.value.choices[i].main)
   showToast(form.value.choices[i].main, 'copied')
 }
@@ -256,7 +228,6 @@ function shortGroupDescription(i) {
       </h3>
       <!-- <p>{{ description && capitalise(description) }}</p> -->
     </b-row>
-    <!--TODO b-collapse doesn't work-->
     <!--Collapsable group list-->
     <b-row>
       <b-collapse id="collapse" :visible="form.visible">
@@ -305,7 +276,7 @@ function shortGroupDescription(i) {
                         @click="removeGroup(i - 1)"
                         variant="danger"
                         class="mb-2 mr-sm-2 mb-sm-0 float-end"
-                        style="width: 90%;"
+                        style="width: 90%"
                         >X</b-button
                       >
                     </b-col>

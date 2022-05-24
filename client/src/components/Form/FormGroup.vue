@@ -13,6 +13,8 @@ import {
 //import { selectionOptions } from '../helpers/optionsFormatter'
 import SplitRange from './SplitRange.vue'
 import { emptyFormGroup } from '../../helpers/optionsFormatter'
+import MultiRangeSlider from 'multi-range-slider-vue'
+import '../../../node_modules/multi-range-slider-vue/MultiRangeSliderBlack.css'
 
 const emit = defineEmits(['copy'])
 const props = defineProps({
@@ -116,7 +118,7 @@ function chooseLabel(name) {
             <b-row>
               <!--Main option selection-->
               <b-col cols="12">
-                <b-form-group :label="'Select ' + article(name) + ' ' + name">
+                <b-form-group :label="'Select ' + article(name) + ' ' + name + ' *'">
                   <b-form-select
                     v-model="form.main"
                     data-testid="main-select"
@@ -165,7 +167,7 @@ function chooseLabel(name) {
                       "
                     >
                       <b-form-group
-                        :label="capitalise(underscoreToSpace(value.name))"
+                        :label="capitalise(underscoreToSpace(value.name)) + ' *'"
                         :description="
                           'Between ' +
                           value.min +
@@ -174,6 +176,7 @@ function chooseLabel(name) {
                             ? props.maxK
                             : value.max)
                         "
+                        required
                       >
                         <b-form-input
                           v-if="!value.name.includes('split')"
@@ -195,6 +198,24 @@ function chooseLabel(name) {
                           :max="value.max"
                           :name="value.name"
                           :step="5"
+                        />
+                        <!-- Use a slider with 2 sliders if a range is needed-->
+                        <MultiRangeSlider
+                          v-if="value.name.includes('range')"
+                          baseClassName="multi-range-slider-black"
+                          :min="value.min"
+                          :max="value.max"
+                          :step="1"
+                          :ruler="false"
+                          :label="true"
+                          :minValue="value.minValue"
+                          :maxValue="value.maxValue"
+                          @input="
+                            form.inputs[index].value = [
+                              $event.minValue,
+                              $event.maxValue,
+                            ]
+                          "
                         />
                         <!--Display the seed label for the seed option.-->
                         <div
@@ -220,7 +241,7 @@ function chooseLabel(name) {
                   >
                     <!--Use a radio group if there are a few options and they aren't true/false.-->
                     <b-form-group
-                      :label="chooseLabel(option.name)"
+                      :label="chooseLabel(option.name) + ' *'"
                       v-if="
                         option.options.length < 3 &&
                         typeof option.options[0] != 'boolean'
@@ -236,7 +257,7 @@ function chooseLabel(name) {
                     </b-form-group>
                     <!--Use a checkbox if the options are of a binary (True or False) nature.-->
                     <b-form-group
-                      :label="capitalise(underscoreToSpace(option.name + '?'))"
+                      :label="capitalise(underscoreToSpace(option.name + '?')) + ' *'"
                       v-if="
                         option.options[0] == true || option.options[0] == false
                       "
@@ -254,8 +275,9 @@ function chooseLabel(name) {
                     <!--Use a dropdown select form otherwise-->
                     <b-form-group
                       v-if="option.options.length > 2"
-                      :label="chooseLabel(option.name)"
+                      :label="chooseLabel(option.name) + ' *'"
                     >
+                      <!--TODO: ADD MULTIPLE SELECT FOR FILTERS (MODAL?)-->
                       <b-form-select
                         v-model="form.selects[index].value"
                         :options="option.options"

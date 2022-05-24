@@ -9,7 +9,7 @@ import pandas as pd
 from fairreckitlib.data.set.dataset import add_user_columns, add_item_columns
 
 from . import result_storage
-from .experiment import options
+from .experiment import options, recommender_system
 
 results_bp = Blueprint('results', __name__, url_prefix='/api/all-results')
 
@@ -66,8 +66,8 @@ def edit():
 @results_bp.route('/delete', methods=['POST'])
 def delete():
     data = request.get_json()
-    index = data.get('index')
-    result_storage.delete_result(index)
+    result_id = data.get('id')
+    result_storage.delete_result(result_id)
     return "Removed index"
 
 
@@ -78,7 +78,7 @@ def set_recs():
     result_id = json.get("id")  # Result timestamp TODO use to get result
     run_id = json.get("runid")
     pair_id = json.get("pairid")
-    path = result_storage.get_rec_path(result_id, run_id, pair_id)   
+    path = result_storage.get_overview(result_id, run_id)[pair_id]['ratings_path'] 
     result_storage.current_recs[pair_id] = pd.read_csv(path, sep='\t', header=0)
     return {'status': 'success', 'availableFilters' : options['filters']}
 
@@ -94,23 +94,24 @@ def user_result():
     chunk_size = json.get("amount", 20)
     chunk_size = int(chunk_size)
     chosen_headers = json.get("optionalHeaders", [])
+    dataset = json.get("dataset", "")
+    sortIndex = json.get("sortindex", 0)
 
     #read mock dataframe
     recs = result_storage.current_recs[pair_id]
-    if recs is None:
-        set_recs()
-        recs = result_storage.current_recs
 
+    #Add optional columns to the dataframe (if any)
+    if (len(chosen_headers) > 0):
+      recs=add_dataset_columns(dataset, recs, chosen_headers)
 
-    #TODO what if sorted on column that is removed?
-    #TODO saving sorted dataframe inbetween
+    
+    #Make sure not to sort on a column that does not exist anymore
+    if (len(recs.columns) <= sortIndex):
+        sortIndex = 0
     ##sort dataframe based on index and ascending or not
-    df_sorted = recs.sort_values(by=recs.columns[json.get("sortindex", 0)], ascending=json.get("ascending"))
+    df_sorted = recs.sort_values(by=recs.columns[sortIndex], ascending=json.get("ascending"))
 
-    # adding extra columns to dataframe
-    for chosen_header in chosen_headers:
-        df_sorted[chosen_header] = chosen_header
-
+    
     # getting only chunk of data
     start_rows = json.get("start", 0)
     start_rows = int(start_rows)
@@ -124,21 +125,20 @@ def user_result():
 
     # return part of table that should be shown
     df_subset = df_sorted[start_rows:end_rows]
-
     return df_subset.to_json(orient='records')
-    #return ({'headers': list(result_storage.current_headers),'table': df_subset.to_json(orient='records')})
 
-@results_bp.route('/headers', methods=['POST'])
+def add_dataset_columns(dataset_name, dataframe, columns):
+    dataset = recommender_system.data_registry.get_set(dataset_name)
+    if dataset is None:
+        return dataframe
+
+    result = list(map(lambda column: column.lower(), columns))
+    dataframe = add_item_columns(dataset, dataframe, result)
+    dataframe = add_user_columns(dataset, dataframe, result)
+    return dataframe
+
+@results_bp.route('/headers', methods=['GET'])
 def headers():
-    info = request.json
-    index = info.get("index", 0)
-    file = info.get("location", "")
-    headers = result_storage.load_json('project/headers.json')
-    overview = result_storage.load_json('../server/mock/' + file)    
-    dataset = overview['overview'][index]['name'].split('_')[0]
-    result = headers[dataset]
-    return result
-    # result = result_storage.current_recs.columns
-    # return {'headers': list(result)}
+    return result_storage.load_json('project/headers.json')   
 
 

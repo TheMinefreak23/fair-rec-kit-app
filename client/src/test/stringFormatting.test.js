@@ -56,7 +56,7 @@ describe('capitalise', () => {
     // Test that the first letter of the string is capitalised
     expect(firstLetter == testWord.toUpperCase()[0]).toBe(true)
     // Test that the rest of the string is the same
-    expect(rest == restOriginal).toBe(true)
+    expect(JSON.stringify(rest) == JSON.stringify(restOriginal)).toBe(true)
   })
 })
 

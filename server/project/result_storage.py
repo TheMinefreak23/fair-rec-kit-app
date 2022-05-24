@@ -31,10 +31,6 @@ def save_result(experiment, result):
     global current_result
     experiment['result'] = result
 
-    # Parse tags
-    if 'tags' in experiment['metadata']:
-        experiment['metadata']['tags'] = parse_tags(experiment['metadata']['tags'])
-
     current_result = experiment
     add_result(current_result)
     print(current_result)
@@ -54,7 +50,7 @@ def old_result_by_id(result_id):
             current_result = None  # If there is an incorrectly formatted result, return nothing
 
 
-def result_by_id(result_id):
+def old_result_by_id2(result_id):
     """Set the current result to a result in the results overview by its id.
 
     Args:
@@ -79,14 +75,12 @@ def result_by_id(result_id):
         run_data = {'index': run_overview_name, 'results': []}
         # loops through individual results
         for run_result in run_overview['overview']:
-            evaluation_path_full = run_result['evaluation_path']
-            ratings_settings_path_full = run_result['ratings_settings_path']
+            evaluation_path_full = os.getcwd() + "\\" + run_result['evaluation_path']
+            ratings_settings_path_full = os.getcwd() + "\\" + run_result['ratings_settings_path']
+            print(evaluation_path_full)
             evaluation_data = {}
             if os.path.exists(evaluation_path_full):
-                evaluation_data = pd.read_csv(
-                    evaluation_path_full,
-                    sep='\t',
-                    header=None).to_dict(orient='records')
+                evaluation_data = load_json(evaluation_path_full)
             ratings_settings_data = pd.read_csv(
                 ratings_settings_path_full,
                 sep='\t',
@@ -106,8 +100,53 @@ def result_by_id(result_id):
 
     # print('current result',current_result)
 
+def result_by_id(result_id):
+    """Set the current result to a result in the results overview by its id.
 
-def get_rec_path(evaluation_id, runid, pairid):
+    Args:
+        result_id(int): the result id
+    """
+    # TODO DEV
+    results_overview = load_results_overview()
+    results_root_folder = RESULTS_ROOT_FOLDER
+    if result_id == 0:
+        results_root_folder = 'mock/'
+        results_overview = load_json(results_root_folder + "results_overview.json")
+
+    #calculation_id = results_overview['all_results'][result_id]['timestamp']['stamp']
+    calculation_id = result_id # TODO replace calculation_id with result_id?
+    current_name = id_to_name(results_overview, calculation_id)
+    current_index = id_to_index(results_overview, calculation_id)
+    relative_path = results_root_folder + str(calculation_id) + "_" + current_name
+    data = results_overview['all_results'][current_index]
+    print(data)
+    # loops through all the subdirectories, and thus - runs, of a certain calculation
+    for subdir in [f.path for f in os.scandir(relative_path) if f.is_dir()]:
+        run_overview_name = os.path.basename(os.path.normpath(subdir))
+        run_index = int(run_overview_name[-1])
+        run_overview = load_json(subdir + "/overview.json")
+        # loops through individual results
+        for pair_id in range(len(run_overview['overview'])):
+            evaluation_path_full = os.getcwd() + "\\" + run_overview['overview'][pair_id]['evaluation_path']
+            ratings_settings_path_full = os.getcwd() + "\\" + run_overview['overview'][pair_id]['ratings_settings_path']
+            print(evaluation_path_full)
+            evaluation_data = {}
+            if os.path.exists(evaluation_path_full):
+                evaluation_data = load_json(evaluation_path_full)
+            ratings_settings_data = pd.read_csv(
+                ratings_settings_path_full,
+                sep='\t',
+                header=None).to_dict(orient='records') # TODO ratings_settings still needs to go somewhere
+            print(evaluation_data)
+            data['result'][run_index]['recs'][pair_id]['evals'] = evaluation_data['evaluations'] if evaluation_data else []
+
+
+    global current_result
+    current_result = data
+
+    # print('current result',current_result)
+
+def get_overview(evaluation_id, runid):
     results_overview = load_results_overview()
     # TODO DEV: Mock
     if evaluation_id == 0:
@@ -123,8 +162,7 @@ def get_rec_path(evaluation_id, runid, pairid):
     relative_path = results_root_folder + str(evaluation_id) + "_" + name + "/" + "run_" + str(runid)
     overview_path = relative_path + "/overview.json"
     run_overview = load_json(overview_path)
-    rec_path = run_overview['overview'][pairid]['ratings_path']
-    return rec_path
+    return run_overview['overview']
     #rec_paths = []
     #for index in range(0, len(run_overview['overview'])):
     #    rec_paths[index] = run_overview['overview'][pairid]['ratings_path']
@@ -133,15 +171,16 @@ def get_rec_path(evaluation_id, runid, pairid):
 
 
 def id_to_name(json_data, result_id):
+    return json_data['all_results'][id_to_index(json_data, result_id)]['metadata']['name']
+
+def id_to_index(json_data, result_id):
     current_result_overview_id = -1
-    print(str(json_data))
+    #print(str(json_data))
     # Filter: Loop through all results and find the one with the matching ID.
     for iteration_id in range(len(json_data['all_results'])):
-        if int(json_data['all_results'][iteration_id]['timestamp']['stamp']) == result_id:
+        if int(json_data['all_results'][iteration_id]['timestamp']['stamp']) == int(result_id):
             current_result_overview_id = iteration_id
-    current_name = json_data['all_results'][current_result_overview_id]['metadata']['name']
-    return current_name
-
+    return current_result_overview_id
 
 def load_json(path):
     """Load a JSON file to a dictionary using its path.
@@ -189,14 +228,19 @@ def add_result(result):
     write_results_overview(file_results)
 
 
-def delete_result(index):
-    """Delete a result by its index.
+def delete_result(result_id):
+    """Delete a result by its id.
 
     Args:
         index(int): the index of the result
     """
     file_results = load_results_overview()
-    file_results['all_results'].pop(index)
+    # Remove from list
+    file_results['all_results'] = [
+        result for result in file_results['all_results']
+        if result['timestamp']['stamp'] != result_id
+    ]
+    # TODO delete actual result
     write_results_overview(file_results)
 
 
