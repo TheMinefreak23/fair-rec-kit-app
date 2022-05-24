@@ -140,7 +140,7 @@ def result_by_id(result_id):
             dataset_index = name_to_index(data['result'], run_overview['overview'][pair_id]['dataset'], 'dataset')
             approach_index = name_to_index(
                 data['result'][dataset_index]['recs'],
-                run_overview['overview'][pair_id]["recommender_approach"], 'recommendation')
+                run_overview['overview'][pair_id]['recommender_system'], 'recommendation')
             data['result'][dataset_index]['recs'][approach_index]['evals'] = evaluation_data['evaluations'] if evaluation_data else []
 
 
