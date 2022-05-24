@@ -329,8 +329,6 @@ function hideColumns(results){
         </div>
       </p>
 
-      <p>{{visibleMetrics}}</p>
-
       <div class="col">
         Tags:
         <template v-if="!result.metadata.tags">None</template>
