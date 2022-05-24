@@ -66,7 +66,7 @@ def result_by_id(result_id):
         results_root_folder = 'mock/'
         results_overview = load_json(results_root_folder + "results_overview.json")
     relative_path = results_root_folder + str(result_id) + "_" + \
-        id_to_name(results_overview, result_id)
+                    id_to_name(results_overview, result_id)
     data = results_overview['all_results'][id_to_index(results_overview, result_id)]
     # loops through all the subdirectories, and thus - runs, of a certain calculation
     for subdir in [f.path for f in os.scandir(relative_path) if f.is_dir()]:
@@ -74,28 +74,29 @@ def result_by_id(result_id):
         # loops through individual results by looping through each entry in the overview.json
         for pair_id, pair_data in enumerate(run_overview['overview']):
             evaluation_path_full = os.getcwd() + "\\" + \
-                pair_data['evaluation_path']
+                                   pair_data['evaluation_path']
             ratings_settings_path_full = os.getcwd() + "\\" + \
-                pair_data['ratings_settings_path']
+                                         pair_data['ratings_settings_path']
+
             if os.path.exists(evaluation_path_full):
                 evaluation_data = load_json(evaluation_path_full)
                 # TODO ratings_settings still needs to go somewhere
-            ratings_settings_data = pd.read_csv(
-                ratings_settings_path_full,
-                sep='\t',
-                header=None).to_dict(orient='records')
-            dataset_index = name_to_index(data['result'],
-                run_overview['overview'][pair_id]['dataset'], 'dataset', True)
-            approach_index = name_to_index(
-                data['result'][dataset_index]['recs'],
-                run_overview['overview'][pair_id]['recommender_system'], 'recommendation')
-            data['result'][dataset_index]['recs'][approach_index]['evals'] = evaluation_data[
-                'evaluations'] if evaluation_data else []
+                ratings_settings_data = pd.read_csv(
+                    ratings_settings_path_full,
+                    sep='\t',
+                    header=None).to_dict(orient='records')
+                dataset_index = name_to_index(data['result'],
+                                              run_overview['overview'][pair_id]['dataset'],
+                                              'dataset', True)
+                approach_index = name_to_index(
+                    data['result'][dataset_index]['recs'],
+                    run_overview['overview'][pair_id]['recommender_system'], 'approach')
+                data['result'][dataset_index]['recs'][approach_index]['evals'] = evaluation_data[
+                    'evaluations'] if evaluation_data else []
 
     global current_result
     current_result = data
-    #print('current result', json.dumps(current_result, indent=4))
-
+    # print('current result', json.dumps(current_result, indent=4))
 
 
 def get_overview(evaluation_id, runid):
@@ -118,7 +119,7 @@ def get_overview(evaluation_id, runid):
         results_root_folder = 'mock/'
 
     relative_path = results_root_folder + str(evaluation_id) + \
-        "_" + name + "/" + "run_" + str(runid)
+                    "_" + name + "/" + "run_" + str(runid)
     overview_path = relative_path + "/overview.json"
     run_overview = load_json(overview_path)
     return run_overview['overview']
@@ -150,7 +151,8 @@ def id_to_index(json_data, result_id):
             current_result_overview_id = iteration_id
     return current_result_overview_id
 
-def name_to_index(json_data, name, key, by_name = False):
+
+def name_to_index(json_data, name, key, by_name=False):
     """returns the index of the entry in results_overview
     of a specific dataset-recommender approach pair.
 
