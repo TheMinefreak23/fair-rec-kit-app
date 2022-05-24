@@ -201,6 +201,17 @@ export function formatMetric(evaluation) {
   } else return name
 }
 
+/**
+ * convert list of header names into supported header format, capitalise and remove underscores
+ * @param {string}   header  - list of headers.
+ * @returns {string}         - the name of the requested dataset
+ */
+export function makeHeader(header) {
+  return {
+    name: underscoreToSpace(capitalise(header.toString())),
+  }
+}
+
 export function article(word) {
   return ['a', 'i', 'u', 'e', 'o'].includes(word[0]) ? 'an' : 'a'
 }
