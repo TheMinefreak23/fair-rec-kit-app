@@ -9,7 +9,7 @@ import { formatMetadata } from '../helpers/metadataFormatter'
 import FormGroupList from './FormGroupList.vue'
 import { validateEmail, emptyFormGroup } from '../helpers/optionsFormatter'
 import { store } from '../store'
-import { statusPrefix, statusVariant, status } from '../helpers/resultFormatter'
+import { statusPrefix, statusVariant, status, makeHeader } from '../helpers/resultFormatter'
 
 const emit = defineEmits([
   'loadResult',
@@ -31,7 +31,6 @@ const props = defineProps({
   pagination: Boolean,
   caption: String,
   expandable: Boolean,
-  headerOptions: Array,
   userOptions: Array,
   itemOptions: Array,
   filters: Object,
@@ -298,24 +297,6 @@ function setsorting(i) {
     "
   >
     <p>Select the extra headers you want to be shown</p>
-    <p>General:</p>
-    <div
-      class="form-check form-switch"
-      v-for="(header, index) in headerOptions"
-      :key="header"
-    >
-      <input
-        v-model="checkedColumns"
-        class="form-check-input"
-        type="checkbox"
-        :value="header.name"
-        :id="header.name"
-      />
-      <label class="form-check-label" :id="header.name">
-        {{ header.name }}
-      </label>
-    </div>
-
     <p>User specific:</p>
     <div
       class="form-check form-switch"
@@ -326,11 +307,11 @@ function setsorting(i) {
         v-model="userColumns"
         class="form-check-input"
         type="checkbox"
-        :value="header.name"
-        :id="header.name"
+        :value="header"
+        :id="header"
       />
-      <label class="form-check-label" :id="header.name">
-        {{ header.name }}
+      <label class="form-check-label" :id="header">
+        {{ makeHeader(header).name }}
       </label>
     </div>
 
@@ -344,11 +325,11 @@ function setsorting(i) {
         v-model="itemColumns"
         class="form-check-input"
         type="checkbox"
-        :value="header.name"
-        :id="header.name"
+        :value="header"
+        :id="header"
       />
-      <label class="form-check-label" :id="header.name">
-        {{ header.name }}
+      <label class="form-check-label" :id="header">
+        {{ makeHeader(header).name }}
       </label>
     </div>
   </b-modal>
@@ -374,6 +355,8 @@ function setsorting(i) {
       }}
 
       <template v-if="expandable">
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" rel="stylesheet">
+
         <div class="float-end">
           <b-button
             @click="updateHeadersModalShow = !updateHeadersModalShow"
@@ -409,14 +392,14 @@ function setsorting(i) {
     </b-thead>
     <b-tbody>
       <b-tr v-for="(item, index) in sorted" :key="item"
-        ><b-td v-if="overview">
-          <b-button @click="$emit('loadResult', item.id)">View result</b-button>
+        ><b-td class="align-middle" v-if="overview">
+          <b-button variant="outline-primary fw-bold" @click="$emit('loadResult', item.id)">View result</b-button>
         </b-td>
         <b-td
           v-for="[key, value] in Object.entries(item)"
           :key="`${descending}_${sortindex}_${index}-${key}`"
+          class="text-center"
         >
-          <b-td>
             <!--Special pill format for status-->
             <!-- TODO refactor-->
             <template
@@ -430,47 +413,51 @@ function setsorting(i) {
                     ? 'status-blinking'
                     : 'status'
                 "
+                class="fw-bold"
               >
                 {{ value.slice(statusPrefix.length) }}
               </b-button>
             </template>
             <template v-else> {{ value }}</template>
+        </b-td>
+          <b-td class="align-middle" v-if="overview || removable">
+            <div class="m-0 float-end" style="width: 150px;">
+            <b-button
+              v-if="overview"
+              variant="primary"
+              class="mx-1"
+              @click="
+                ;(editModalShow = !editModalShow),
+                  (selectedEntry = index),
+                  getNameTagsMail(item.id)
+              "
+              ><i class="bi bi-pencil-square"></i></b-button
+            >
+            <b-button
+              v-if="overview"
+              variant="primary"
+              class="mx-1"
+              @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
+              ><i class="bi bi-info-circle"></i></b-button
+            >
+            <!--REFACTOR status condition-->
+            <b-button
+              v-if="
+                removable &&
+                (!item.status ||
+                  [status.toDo, status.active].includes(
+                    item.status.slice(statusPrefix.length)
+                  ))
+              "
+              variant="danger"
+              class="mx-1 float-end"
+              @click="
+                ;(deleteModalShow = !deleteModalShow), (selectedEntry = item.id)
+              "
+              ><i class="bi bi-trash"></i></b-button
+            >
+            </div>
           </b-td>
-        </b-td>
-
-        <b-td v-if="overview || removable">
-          <b-button
-            v-if="overview"
-            pill
-            @click="
-              ;(editModalShow = !editModalShow),
-                (selectedEntry = index),
-                getNameTagsMail(item.id)
-            "
-            >Edit</b-button
-          >
-          <b-button
-            v-if="overview"
-            pill
-            @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
-            >View Information</b-button
-          >
-          <!--REFACTOR status condition-->
-          <b-button
-            v-if="
-              removable &&
-              (!item.status ||
-                [status.toDo, status.active].includes(
-                  item.status.slice(statusPrefix.length)
-                ))
-            "
-            variant="danger"
-            @click="
-              ;(deleteModalShow = !deleteModalShow), (selectedEntry = item.id)
-            "
-            >{{ buttonText }}</b-button
-          >
-        </b-td>
       </b-tr>
     </b-tbody>
   </b-table-simple>
@@ -504,31 +491,20 @@ function setsorting(i) {
 /*adapted from SOURCE: https://www.w3docs.com/snippets/css/how-to-create-flashing-glowing-button-using-animation-in-css3.html*/
 .status,
 .status-blinking {
-  background-color: #1c87c9;
-  -webkit-border-radius: 60px;
-  border-radius: 60px;
-  border: none;
-  color: #eeeeee;
-  cursor: pointer;
-  display: inline-block;
-  font-family: sans-serif;
-  font-size: 20px;
-  padding: 5px 15px;
-  text-align: center;
-  text-decoration: none;
+  background-color: #28a745;
 }
 @keyframes glowing {
   0% {
-    background-color: #2ba805;
-    box-shadow: 0 0 5px #2ba805;
+    background-color: #28a745;
+    box-shadow: 0 0 5px #28a745;
   }
   50% {
-    background-color: #49e819;
-    box-shadow: 0 0 20px #49e819;
+    background-color: #28a745;
+    box-shadow: 0 0 20px #28a745;
   }
   100% {
-    background-color: #2ba805;
-    box-shadow: 0 0 5px #2ba805;
+    background-color: #28a745;
+    box-shadow: 0 0 5px #28a745;
   }
 }
 .status-blinking {

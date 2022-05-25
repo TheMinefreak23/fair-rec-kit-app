@@ -3,9 +3,7 @@
 //custom color-scheme:
 $customprimary:#3c6e71;
 $customsecondary:#eee;
-$customdark: #1c2541;
-$danger: #df4759;
-$darkdanger: shade-color($danger, 50);
+$customdark: #017C8E;
 //$secondary: #121212;
 
 @function shade-color($color, $weight) {
@@ -15,7 +13,6 @@ $darkdanger: shade-color($danger, 50);
 //$list: $blue, $green, $orange;
 $list: #0aa4ca, #111, rgb(70, 70, 70);
 $list2: $customdark, $customprimary;
-$dangergradient: $darkdanger, $danger;
 $subtle: rgb(80, 80, 80), rgb(104, 104, 104);
 
 @mixin gradient($direction, $list2) {
@@ -25,32 +22,31 @@ $subtle: rgb(80, 80, 80), rgb(104, 104, 104);
   background: linear-gradient($direction, $list2);
 }
 
+$offcanvas-horizontal-width: 50%;
+
 //give main button gradient color
 .btn-primary {
   @include gradient(bottom, $list2);
 }
+.btn-outline-primary {
+  //@include gradient(bottom, $list2);
+}
+$darkencustomdark: shade-color($customdark, 15%);
+$darkencustomprimary: shade-color($customprimary, 15%);
+$darkenlist2: $darkencustomdark, $darkencustomprimary;
+.btn-primary:hover {
+  @include gradient(bottom, $darkenlist2);
+  transition: background .15s ease-in-out, border-color .15s ease-in-out;
+}
+.btn-outline-primary:hover {
+  @include gradient(bottom, $list2);
+  transition: background .15s ease-in-out, border-color .15s ease-in-out;
+}
 //give danger button gradient color
-//.btn-danger {
-//  @include gradient(bottom, $dangergradient);
-//}
-
 // Override default variables.
 $primary: $customprimary;
 $secondary: $customsecondary;
 $dark: $customdark;
-
-//$danger: #ffffff;
-
-
-:root {
-  --color-background: #fff;
-  --color-text: #000;
-}
-
-:root.dark {
-  --color-background: #212121;
-  --color-text: #fff;
-}
 
 
 
@@ -62,73 +58,5 @@ body {
   background-color:  var(--color-background);
   color: var(--color-text);
 }
-
-/*
-
-// -- Themes -- //
-
-// Default Theme Variables //
-$bg-light: #fff;
-$text-light: #000;
-$secondary-light: #eee;
-$card-light: #fff;
-$form-light: #fff;
-
-// Dark Mode Variables //
-$bg-dark: #121212;
-$text-dark: #fff;
-$secondary-dark: #313131;
-$card-dark: #212121;
-$form-dark: #414141;
-
-// Darkmode test
-$secondary: t($secon);
-$body-color: t($text);
-$body-bg: t($bg);
-$card-bg: t($card);
-$input-bg: t($inputbg);
-$input-border-color: t($inputbordercolor);
-$input-color: t($inputcolor);
-$nav-tabs-link-active-color: t($navtabslinkactivecolor);
-$nav-tabs-link-active-bg: t($navtabslinkactivebg);
-$nav-tabs-border-color: t($navtabsbordercolor);
-$nav-tabs-link-active-border-color: t($navtabslinkactivebordercolor);
-$dropdown-bg: t($dropdownbg);
-
-$bg: 'bg';
-
-$themes: (
-  default: (
-    bg: $bg-light,
-    text: $text-light,
-    secon: $secondary-light,
-    card: $card-light,
-    inputbg: $form-light,
-    inputbordercolor: $form-light,
-    inputcolor: $text-light,
-    navtabslinkactivecolor: $text-light,
-    navtabslinkactivebg: $card-light,
-    navtabsbordercolor: $card-light,
-    navtabslinkactivebordercolor: $card-light,
-    dropdown-bg: $card-light
-  ),
-
-  dark: (
-    bg: $bg-dark,
-    text: $text-dark,
-    secon: $secondary-dark,
-    card: $card-dark,
-    inputbg: $form-dark,
-    inputbordercolor: $form-dark,
-    inputcolor: $text-dark,
-    navtabslinkactivecolor: $text-dark,
-    navtabslinkactivebg: $card-dark,
-    navtabsbordercolor: $card-dark,
-    navtabslinkactivebordercolor: $card-dark,
-    dropdownbg: $card-dark
-  ),
-);
-
-*/
 
 @import 'bootstrap/scss/bootstrap';
