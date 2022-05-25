@@ -131,7 +131,9 @@ def run_experiment(experiment):
         current_experiment.status = Status.Done
 
         #result_storage.save_result(current_experiment.job, {})
-        result_storage.save_result(current_experiment.job, mock_result(current_experiment.job['settings']))
+        print('=====CONFIG=====', current_experiment.config)
+
+        result_storage.save_result(current_experiment.job, format_result(current_experiment.config))
 
         print('yay')
 
@@ -155,10 +157,10 @@ def mock_experiment():
     """Mock running an experiment and save the mock result."""
     # Mock experiment duration.
     time.sleep(2.5)
-    result_storage.save_result(current_experiment.job, mock_result(current_experiment.job['settings']))
+    result_storage.save_result(current_experiment.job, format_result(current_experiment.config))
 
 
-def mock_result(settings):
+def format_result(settings):
     """Mock result experiment.
 
     Args:
@@ -166,20 +168,26 @@ def mock_result(settings):
 
     Returns: (list) the mock result
     """
+    print('== settings ==', settings)
     result = []
     datasets = settings['datasets']
-    for dataset in datasets:
+    for (dataset_index, dataset) in enumerate(datasets):
+        # Add dataset identifier to name
+        dataset['name'] = dataset['name'] + '_' + str(dataset_index)
         recs = []
-        for approach in settings['approaches']:
-            recommendation = {'approach': approach['name'],
-                              'recommendation': recommend(dataset, approach),
-                              'evals': []}
-            for metric in settings['metrics']:
-                evaluation = evaluate_all(approach, metric)
-                recommendation['evals'].append(
-                    {'name': metric['name'], 'evaluation': evaluation, 'params': metric['params']})
-                print(metric)
-            recs.append(recommendation)
+        for (api, approaches) in settings['models'].items():
+            for (approach_index, approach) in enumerate(approaches):
+                # Add approach, with index as identifier in the name
+                recommendation = {'approach': api + '_' + approach['name'] + '_' + str(approach_index),
+                                  #'recommendation': mock_recommend(dataset, approach),
+                                  'evals': []}
+                """
+                for metric in settings['metrics']:
+                    evaluation = mock_evaluate_all(approach, metric)
+                    recommendation['evals'].append(
+                        {'name': metric['name'], 'evaluation': evaluation, 'params': metric['params']})
+                    print(metric)"""
+                recs.append(recommendation)
         result.append({'dataset': dataset, 'recs': recs})
     return result
 
@@ -257,7 +265,7 @@ def abort():
     return "Removed index"
 
 
-def recommend(dataset, approach):
+def mock_recommend(dataset, approach):
     """Mock recommendation.
 
     Args:
@@ -271,7 +279,7 @@ def recommend(dataset, approach):
     return dataset['name'] + approach['name'][::-1]
 
 
-def evaluate_all(approach, metric):
+def mock_evaluate_all(approach, metric):
     """
     Do a mock evaluation for all filters.
 
@@ -281,7 +289,7 @@ def evaluate_all(approach, metric):
     Returns:
         the evaluation dictionary containing all evaluations
     """
-    base_eval = evaluate(approach, metric)
+    base_eval = mock_evaluate(approach, metric)
     evaluation = {'global': round(base_eval, 2), 'filtered': []}
 
     for metric_filter in metric['filters']:
@@ -297,7 +305,7 @@ def evaluate_all(approach, metric):
     return evaluation
 
 
-def evaluate(approach, metric):
+def mock_evaluate(approach, metric):
     """
     Mock evaluation: Give a magic number using an approach and metric.
 

@@ -3,6 +3,7 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
+import json
 
 from flask import (Blueprint, request)
 import pandas as pd
@@ -39,7 +40,7 @@ def old_result_by_id():
 def result_by_id():
     if request.method == 'POST':
         data = request.get_json()
-        print('data', data)
+        print('result_by_id data', data)
         result_storage.result_by_id(int(data['id']))
         if result_storage.current_result:
             response = {'status': 'success'}
@@ -47,6 +48,7 @@ def result_by_id():
             response = {'status': 'result not found'}
 
     else:  # GET request
+        print('current result', json.dumps(result_storage.current_result, indent=4))
         response = {'result': result_storage.current_result}
 
     return response
