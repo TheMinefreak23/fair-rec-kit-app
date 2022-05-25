@@ -3,13 +3,16 @@ from flask import (Blueprint, request)
 from flask_mail import Mail, Message
 
 mail = {}
-
+mail_app = {}
 mail_bp = Blueprint('mail', __name__, url_prefix='/api/mail')
 
 
 def make_mail(app):
     global mail
+    global mail_app
+    mail_app = app
     mail = Mail(app)
+
 
 def send_mail(adress, name, timestamp):
     global mail
@@ -17,7 +20,8 @@ def send_mail(adress, name, timestamp):
             body='Hello! \n Your calculation with name ' + name + ' and time ' + timestamp + " is done!",
             sender='farreckit@noreply.com',
             recipients=[adress])
-    mail.send(msg)
+    with mail_app.app_context():
+        mail.send(msg)
 
 @mail_bp.route('/test')
 def index():
