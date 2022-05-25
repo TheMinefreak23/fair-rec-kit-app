@@ -4,6 +4,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 import enum
+from .mail import mail
 
 from fairreckitlib.experiment.experiment_event import ON_END_EXPERIMENT_PIPELINE, ON_END_EXPERIMENT_THREAD, \
     ON_BEGIN_EXPERIMENT_PIPELINE, ON_BEGIN_EXPERIMENT_THREAD
@@ -112,6 +113,7 @@ class EventHandler():
         # Update status
         self.experiment.status = Status.DONE
         self.experiment.progress = ProgressStatus.FINISHED
+        print(self.experiment.config)
 
         self.end_experiment()
 
