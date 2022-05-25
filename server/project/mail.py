@@ -11,7 +11,13 @@ def make_mail(app):
     global mail
     mail = Mail(app)
 
-def send_tweet()
+def send_mail(adress, name, timestamp):
+    global mail
+    msg = Message(subject='Your calculation ' + name + ' is ready!',
+            body='Hello! \n Your calculation with name ' + name + ' and time ' + timestamp + " is done!",
+            sender='farreckit@noreply.com',
+            recipients=[adress])
+    mail.send(msg)
 
 @mail_bp.route('/test')
 def index():

@@ -114,6 +114,6 @@ class EventHandler():
         self.experiment.status = Status.DONE
         self.experiment.progress = ProgressStatus.FINISHED
         print(self.experiment.config)
-
+        
         self.end_experiment()
 
