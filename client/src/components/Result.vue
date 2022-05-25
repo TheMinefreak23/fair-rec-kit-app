@@ -4,11 +4,9 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
 import Table from './Table.vue'
-import { onActivated, onMounted, onUpdated, ref, watch } from 'vue'
+import { onMounted, ref} from 'vue'
 import { emptyFormGroup } from '../helpers/optionsFormatter'
 import { makeHeader } from '../helpers/resultFormatter'
-
-import mockdata from '../../../server/mock/1647818279_HelloWorld/results-table.json'
 import { API_URL } from '../api'
 
 const props = defineProps({ headers: Array, result: Object })
@@ -44,7 +42,6 @@ onMounted(() => {
     setRecs(parseInt(index))
   }
   console.log('availableFilters', availableFilters.value)
-  //loadEvaluations()
 })
 
 // GET request: Get available header options for selection from server
