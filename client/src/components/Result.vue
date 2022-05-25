@@ -241,14 +241,13 @@ function combineResults(results) {
  * @returns {string}          - the name of the requested dataset
  */
 function getDatasetName(string) {
-return string.split(' ')[1].split('_')[0]
+  return string.split(' ')[1].split('_')[0]
 }
 
 /**
  * Fill array of datasets that are shown so that all are shown upon loading the page
  */
 function fillVisibleDatasets(){
-  console.log(findUniqueDatasets[0])
   visibleDatasets.value = findUniqueDatasets()
    
 }
@@ -257,14 +256,8 @@ function fillVisibleDatasets(){
  * Create an array that has all unique datasets in the result
  */
 function findUniqueDatasets(){
-  let datasetnames = []
-
-  for(let i=0; i<userTables.length;i++){
-      datasetnames[i] = getDatasetName(userTables[i])
-  }
-
+  let datasetnames = userTables.map(getDatasetName)
   return Array.from(new Set(datasetnames))
-
 }
 
 </script>
@@ -285,11 +278,11 @@ function findUniqueDatasets(){
             v-model = "visibleDatasets"
             class = "form-check-input"
             type="checkbox"
-            :value="getDatasetName(dataset)"
+            :value="dataset"
             :id="dataset"
           />
           <label class="form-check-label" :id="dataset">
-            {{getDatasetName(dataset)}}
+            {{dataset}}
           </label>
         </div>
       </p>

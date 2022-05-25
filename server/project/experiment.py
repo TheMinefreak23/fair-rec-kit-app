@@ -10,6 +10,8 @@ import threading
 import time
 from dataclasses import dataclass
 from datetime import datetime
+from tkinter.ttk import Progressbar
+from click import progressbar
 import yaml
 from fairreckitlib.experiment.experiment_config_parsing import Parser
 
@@ -100,33 +102,7 @@ def run_experiment(experiment):
     global current_experiment
     current_experiment = experiment
 
-    def on_begin_experiment(event_listener, **kwargs):
-        # Update experiment status
-        current_experiment.status = Status.Active
-
-    def on_end_experiment(event_listener, **kwargs):
-        # TODO get real recs&eval result
-        # print('saving job', current_experiment.job)
-        # print('config', current_experiment.config)
-
-        # Update status
-        current_experiment.status = Status.Done
-
-        #result_storage.save_result(current_experiment.job, {})
-        result_storage.save_result(current_experiment.job, mock_result(current_experiment.job['settings']))
-
-        print('yay')
-
-        # Calculate next item in queue
-        calculate_first()
-
-    events = {
-        ON_BEGIN_EXPERIMENT_PIPELINE: lambda x, **kwargs: print('uwu'),
-        ON_END_EXPERIMENT_PIPELINE: lambda x, **kwargs: print('owo'),
-        ON_BEGIN_EXPERIMENT_THREAD: on_begin_experiment,
-        ON_END_EXPERIMENT_THREAD: on_end_experiment
-    }
-    return events
+    return EventHandler(current_experiment, end_experiment).events
 
 def run_new_experiment(experiment):    
     events = run_experiment(experiment)
@@ -148,14 +124,13 @@ def run_new_experiment(experiment):
     # TODO don't use the metrics until evaluation pipeline works
     config.evaluation = []
 
-    event_handler = EventHandler(current_experiment, end_experiment)
-    recommender_system.run_experiment(config, events=event_handler.events)
+    recommender_system.run_experiment(config, events=events)
 
     # TODO USE THIS FUNCTION INSTEAD OF PARSING
     # recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)
 
 def validate_experiment(filepath):
-    experiment = QueueItem(job={}, config={}, name='',status=Status.Done)
+    experiment = QueueItem(job={}, config={}, name='',status=Status.DONE, progress=ProgressStatus.NA)
     print(experiment)
     events = run_experiment(experiment)
     recommender_system.validate_experiment(result_dir=filepath, num_runs=1, events=events)
