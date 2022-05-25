@@ -13,7 +13,7 @@ from .music_detail import detail_bp
 from .previous_results import results_bp
 from .result_storage import create_results_overview
 
-
+mail = {}
 def create_app():
     """Instantiate the app."""
     app = Flask(__name__)
