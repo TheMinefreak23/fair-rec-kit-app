@@ -43,7 +43,7 @@ const props = defineProps({
   defaultSort: Number,
 })
 
-const colWidth = '5vw'
+const colWidth = '3vw'
 const colItemStyle = {
   minWidth: colWidth,
   width: colWidth,
@@ -451,7 +451,7 @@ function setsorting(i) {
           :style="colItemStyle"
         >
           <b-row>
-            <b-col>
+            <b-col md="auto" class="mx-0 px-0">
               <b-button
                 v-if="overview"
                 variant="primary"
@@ -465,7 +465,7 @@ function setsorting(i) {
               ></b-button>
             </b-col>
 
-            <b-col>
+            <b-col md="auto" class="mx-0 px-0">
               <b-button
                 v-if="overview"
                 variant="primary"
@@ -475,7 +475,7 @@ function setsorting(i) {
               ></b-button>
             </b-col>
             <!--REFACTOR status condition-->
-            <b-col>
+            <b-col md="auto" class="mx-0 px-0">
               <b-button
                 v-if="
                   removable &&
