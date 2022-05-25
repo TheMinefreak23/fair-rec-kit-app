@@ -28,11 +28,18 @@ $offcanvas-horizontal-width: 50%;
 .btn-primary {
   @include gradient(bottom, $list2);
 }
+.btn-outline-primary {
+  //@include gradient(bottom, $list2);
+}
 $darkencustomdark: shade-color($customdark, 15%);
 $darkencustomprimary: shade-color($customprimary, 15%);
 $darkenlist2: $darkencustomdark, $darkencustomprimary;
 .btn-primary:hover {
   @include gradient(bottom, $darkenlist2);
+  transition: background .15s ease-in-out, border-color .15s ease-in-out;
+}
+.btn-outline-primary:hover {
+  @include gradient(bottom, $list2);
   transition: background .15s ease-in-out, border-color .15s ease-in-out;
 }
 //give danger button gradient color
