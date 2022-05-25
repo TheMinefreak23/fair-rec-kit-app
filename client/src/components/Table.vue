@@ -393,14 +393,14 @@ function setsorting(i) {
     </b-thead>
     <b-tbody>
       <b-tr v-for="(item, index) in sorted" :key="item"
-        ><b-td v-if="overview">
-          <b-button variant="outline-dark fw-bold" @click="$emit('loadResult', item.id)">View result</b-button>
+        ><b-td class="align-middle" v-if="overview">
+          <b-button variant="outline-primary fw-bold" @click="$emit('loadResult', item.id)">View result</b-button>
         </b-td>
         <b-td
           v-for="[key, value] in Object.entries(item)"
           :key="`${descending}_${sortindex}_${index}-${key}`"
+          class="text-center"
         >
-          <b-td>
             <!--Special pill format for status-->
             <!-- TODO refactor-->
             <template
@@ -414,15 +414,15 @@ function setsorting(i) {
                     ? 'status-blinking'
                     : 'status'
                 "
+                class="fw-bold"
               >
                 {{ value.slice(statusPrefix.length) }}
               </b-button>
             </template>
             <template v-else> {{ value }}</template>
-          </b-td>
         </b-td>
-          <b-td class="vertical-align-middle" v-if="overview || removable">
-            <div class="m-0 float-end" style="width: 160px;">
+          <b-td class="align-middle" v-if="overview || removable">
+            <div class="m-0 float-end" style="width: 150px;">
             <b-button
               v-if="overview"
               variant="primary"
@@ -451,7 +451,7 @@ function setsorting(i) {
                   ))
               "
               variant="danger"
-              class="mx-1"
+              class="mx-1 float-end"
               @click="
                 ;(deleteModalShow = !deleteModalShow), (selectedEntry = item.id)
               "
@@ -492,31 +492,20 @@ function setsorting(i) {
 /*adapted from SOURCE: https://www.w3docs.com/snippets/css/how-to-create-flashing-glowing-button-using-animation-in-css3.html*/
 .status,
 .status-blinking {
-  background-color: #1c87c9;
-  -webkit-border-radius: 60px;
-  border-radius: 60px;
-  border: none;
-  color: #eeeeee;
-  cursor: pointer;
-  display: inline-block;
-  font-family: sans-serif;
-  font-size: 20px;
-  padding: 5px 15px;
-  text-align: center;
-  text-decoration: none;
+  background-color: #28a745;
 }
 @keyframes glowing {
   0% {
-    background-color: #2ba805;
-    box-shadow: 0 0 5px #2ba805;
+    background-color: #28a745;
+    box-shadow: 0 0 5px #28a745;
   }
   50% {
-    background-color: #49e819;
-    box-shadow: 0 0 20px #49e819;
+    background-color: #28a745;
+    box-shadow: 0 0 20px #28a745;
   }
   100% {
-    background-color: #2ba805;
-    box-shadow: 0 0 5px #2ba805;
+    background-color: #28a745;
+    box-shadow: 0 0 5px #28a745;
   }
 }
 .status-blinking {
