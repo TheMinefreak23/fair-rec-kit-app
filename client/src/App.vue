@@ -55,6 +55,23 @@ function callToast() {
     @click="goToResult()"
   >
   </b-container>
+  <b-table-simple responsive style="max-width: 30%">
+    <b-thead head-variant="dark">
+      <b-tr>
+        <b-th
+          v-for="i in 3"
+          style="max-width: 0.3vw; overflow-wrap: break-word"
+        >
+          foooooooooooooooooooooooooo
+        </b-th>
+      </b-tr>
+    </b-thead>
+    <b-tr>
+      <b-td v-for="i in 3" style="max-width: 0.3vw; overflow-wrap: break-word">
+        baaaaaaaaaaaaaaaaaaaaaar
+      </b-td>
+    </b-tr>
+  </b-table-simple>
   <div class="d-flex flex-column min-vh-100">
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
@@ -263,6 +280,7 @@ function callToast() {
 b-tab {
   background-color: yellow;
 }*/
+
 .tab-title-class {
   font-size: 300;
   background-color: green;

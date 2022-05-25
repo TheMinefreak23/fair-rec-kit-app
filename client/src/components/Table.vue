@@ -9,7 +9,12 @@ import { formatMetadata } from '../helpers/metadataFormatter'
 import FormGroupList from './FormGroupList.vue'
 import { validateEmail, emptyFormGroup } from '../helpers/optionsFormatter'
 import { store } from '../store'
-import { statusPrefix, statusVariant, status, makeHeader } from '../helpers/resultFormatter'
+import {
+  statusPrefix,
+  statusVariant,
+  status,
+  makeHeader,
+} from '../helpers/resultFormatter'
 
 const emit = defineEmits([
   'loadResult',
@@ -38,6 +43,14 @@ const props = defineProps({
   defaultSort: Number,
 })
 
+const colWidth = '5vw'
+const colItemStyle = {
+  minWidth: colWidth,
+  width: colWidth,
+  maxWidth: colWidth,
+  inlineSize: colWidth,
+  overflowWrap: 'break-word',
+}
 const caption = ref('')
 const entryAmount = ref(20)
 const deleteModalShow = ref(false)
@@ -355,7 +368,10 @@ function setsorting(i) {
       }}
 
       <template v-if="expandable">
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" rel="stylesheet">
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
+          rel="stylesheet"
+        />
 
         <div class="float-end">
           <b-button
@@ -372,92 +388,113 @@ function setsorting(i) {
     </caption>
     <b-thead head-variant="dark">
       <b-tr>
-        <b-th v-if="overview"></b-th>
+        <b-th v-if="overview" :style="colItemStyle"></b-th>
         <b-th
           v-for="(header, index) in headers"
           :key="header"
           :colspan="header.subheaders ? header.subheaders.length : 1"
-          style="cursor: pointer"
+          :style="{ ...colItemStyle, cursor: 'pointer' }"
           @click="setsorting(index)"
         >
           {{ header.name }}
         </b-th>
       </b-tr>
       <b-tr>
-        <b-th v-if="overview"></b-th>
-        <b-th v-for="subheader in subheaders" :key="subheader">
+        <b-th v-if="overview" :style="colItemStyle"></b-th>
+        <b-th
+          v-for="subheader in subheaders"
+          :key="subheader"
+          :style="colItemStyle"
+        >
           {{ subheader }}
         </b-th>
       </b-tr>
     </b-thead>
     <b-tbody>
       <b-tr v-for="(item, index) in sorted" :key="item"
-        ><b-td class="align-middle" v-if="overview">
-          <b-button variant="outline-primary fw-bold" @click="$emit('loadResult', item.id)">View result</b-button>
+        ><b-td class="align-middle" v-if="overview" :style="colItemStyle">
+          <b-button
+            variant="outline-primary fw-bold"
+            @click="$emit('loadResult', item.id)"
+            >View result</b-button
+          >
         </b-td>
         <b-td
           v-for="[key, value] in Object.entries(item)"
           :key="`${descending}_${sortindex}_${index}-${key}`"
           class="text-center"
+          :style="colItemStyle"
         >
-            <!--Special pill format for status-->
-            <!-- TODO refactor-->
-            <template
-              v-if="typeof value === 'string' && value.startsWith(statusPrefix)"
+          <!--Special pill format for status-->
+          <!-- TODO refactor-->
+          <template
+            v-if="typeof value === 'string' && value.startsWith(statusPrefix)"
+          >
+            <b-button
+              disabled
+              :variant="statusVariant(value)"
+              :class="
+                value.slice(statusPrefix.length) == status.active
+                  ? 'status-blinking'
+                  : 'status'
+              "
+              class="fw-bold"
             >
-              <b-button
-                disabled
-                :variant="statusVariant(value)"
-                :class="
-                  value.slice(statusPrefix.length) == status.active
-                    ? 'status-blinking'
-                    : 'status'
-                "
-                class="fw-bold"
-              >
-                {{ value.slice(statusPrefix.length) }}
-              </b-button>
-            </template>
-            <template v-else> {{ value }}</template>
+              {{ value.slice(statusPrefix.length) }}
+            </b-button>
+          </template>
+          <template v-else> {{ value }}</template>
         </b-td>
-          <b-td class="align-middle" v-if="overview || removable">
-            <div class="m-0 float-end" style="width: 150px;">
-            <b-button
-              v-if="overview"
-              variant="primary"
-              class="mx-1"
-              @click="
-                ;(editModalShow = !editModalShow),
-                  (selectedEntry = index),
-                  getNameTagsMail(item.id)
-              "
-              ><i class="bi bi-pencil-square"></i></b-button
-            >
-            <b-button
-              v-if="overview"
-              variant="primary"
-              class="mx-1"
-              @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
-              ><i class="bi bi-info-circle"></i></b-button
-            >
+        <b-td
+          class="align-middle"
+          v-if="overview || removable"
+          :style="colItemStyle"
+        >
+          <b-row>
+            <b-col>
+              <b-button
+                v-if="overview"
+                variant="primary"
+                class="mx-1"
+                @click="
+                  ;(editModalShow = !editModalShow),
+                    (selectedEntry = index),
+                    getNameTagsMail(item.id)
+                "
+                ><i class="bi bi-pencil-square"></i
+              ></b-button>
+            </b-col>
+
+            <b-col>
+              <b-button
+                v-if="overview"
+                variant="primary"
+                class="mx-1"
+                @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
+                ><i class="bi bi-info-circle"></i
+              ></b-button>
+            </b-col>
             <!--REFACTOR status condition-->
-            <b-button
-              v-if="
-                removable &&
-                (!item.status ||
-                  [status.toDo, status.active].includes(
-                    item.status.slice(statusPrefix.length)
-                  ))
-              "
-              variant="danger"
-              class="mx-1 float-end"
-              @click="
-                ;(deleteModalShow = !deleteModalShow), (selectedEntry = item.id)
-              "
-              ><i class="bi bi-trash"></i></b-button
-            >
-            </div>
-          </b-td>
+            <b-col>
+              <b-button
+                v-if="
+                  removable &&
+                  (!item.status ||
+                    [status.toDo, status.active].includes(
+                      item.status.slice(statusPrefix.length)
+                    ))
+                "
+                variant="danger"
+                class="mx-1"
+                @click="
+                  ;(deleteModalShow = !deleteModalShow),
+                    (selectedEntry = item.id)
+                "
+                ><i class="bi bi-trash"></i
+              ></b-button>
+            </b-col>
+          </b-row>
+        </b-td>
       </b-tr>
     </b-tbody>
   </b-table-simple>
