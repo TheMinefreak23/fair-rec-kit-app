@@ -61,8 +61,10 @@ function callToast() {
       rel="stylesheet"
     />
     <!--<TestForm :useTestOptions="true" />-->
-    <div class="bg-dark nav justify-content-center py-2">
-      <img src="/RecCoonLogo.png" style="height: 50px" class="ms-auto" />
+    
+  <div class="bg-dark">
+    <div class=" wrap bg-dark nav justify-content-center py-2 " >
+      <img src="/RecCoonLogo.png" style="height: 50px;" class="ms-auto" />
       <h1 class="text-white my-0 p-0">FairRecKit</h1>
 
       <div class="dropdown my-auto ms-auto me-3">
@@ -100,6 +102,8 @@ function callToast() {
         </ul>
       </div>
     </div>
+    
+  </div>
     <div class="nav-center">
       <b-tabs
         v-model="store.currentTab"
@@ -271,5 +275,17 @@ b-tab {
 .tab-active {
   background-color: #ff0000;
   color: green;
+}
+
+.bg {
+  background-color: blue;
+}
+
+
+.wrap {
+  opacity: 0.5;
+  background-image: url("public/background.png");
+  background-repeat: repeat;
+  background-size: 30%;
 }
 </style>
