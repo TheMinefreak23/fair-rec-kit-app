@@ -12,14 +12,13 @@ from dataclasses import dataclass
 from datetime import datetime
 import yaml
 from fairreckitlib.experiment.experiment_config_parsing import Parser
-from fairreckitlib.experiment.experiment_event import ON_END_EXPERIMENT_PIPELINE, ON_END_EXPERIMENT_THREAD, \
-    ON_BEGIN_EXPERIMENT_PIPELINE, ON_BEGIN_EXPERIMENT_THREAD
 
 from fairreckitlib.recommender_system import RecommenderSystem
 
 from flask import (Blueprint, request)
 
 from . import result_storage
+from .events import ProgressStatus, Status, EventHandler
 from .options_formatter import create_available_options, config_dict_from_settings
 
 compute_bp = Blueprint('experiment', __name__, url_prefix='/api/experiment')
@@ -35,15 +34,6 @@ experiment_queue = []
 current_experiment = None
 
 
-# Experiment status in queue
-class Status(enum.Enum):
-    ToDo = 'To Do'
-    Active = 'Active'
-    Aborted = 'Aborted'
-    Cancelled = 'Cancelled'
-    Done = 'Done'
-    NA = 'Not Available'
-
 
 # TODO refactor job and config_dict overlap
 @dataclass
@@ -52,6 +42,7 @@ class QueueItem:
     job: dict
     config: dict
     status: Status
+    progress: ProgressStatus
     name: str
 
 
@@ -66,6 +57,7 @@ def formatted_experiment(experiment):
     # TODO refactor: shouldn't have to convert like this
     if not experiment: return {}
     experiment.job['status'] = experiment.status.value
+    experiment.job['progress'] = experiment.progress.value
     return experiment.job
 
 
@@ -73,14 +65,14 @@ def calculate_first():
     """Take the oldest settings in the queue and perform an experiment with them"""
 
     # Do one experiment at a time
-    if current_experiment and current_experiment.status == Status.Active:
+    if current_experiment and current_experiment.status == Status.ACTIVE:
         return
 
     # Get the oldest experiment from the queue.
     # experiment = experiment_queue.pop()
 
     # Get the oldest experiment from the queue that is marked to do.
-    first = next(filter(lambda item: item.status == Status.ToDo, experiment_queue), None)
+    first = next(filter(lambda item: item.status == Status.TODO, experiment_queue), None)
 
     # If there is a queue item to do, run it.
     if first:
@@ -89,6 +81,14 @@ def calculate_first():
 
 
 # experiment_thread = threading.Thread(target=calculate_first)
+
+def end_experiment():
+    print('yay')
+    # result_storage.save_result(current_experiment.job, {})
+    result_storage.save_result(current_experiment.job, format_result(current_experiment.config))
+
+    # Calculate next item in queue
+    calculate_first()
 
 
 def run_experiment(experiment):
@@ -118,36 +118,8 @@ def run_experiment(experiment):
     # TODO don't use the metrics until evaluation pipeline works
     config.evaluation = []
 
-    def on_begin_experiment(event_listener, **kwargs):
-        # Update experiment status
-        current_experiment.status = Status.Active
-
-    def on_end_experiment(event_listener, **kwargs):
-        # TODO get real recs&eval result
-        # print('saving job', current_experiment.job)
-        # print('config', current_experiment.config)
-
-        # Update status
-        current_experiment.status = Status.Done
-
-        #result_storage.save_result(current_experiment.job, {})
-        print('=====CONFIG=====', current_experiment.config)
-
-        result_storage.save_result(current_experiment.job, format_result(current_experiment.config))
-
-        print('yay')
-
-        # Calculate next item in queue
-        calculate_first()
-
-    events = {
-        ON_BEGIN_EXPERIMENT_PIPELINE: lambda x, **kwargs: print('uwu'),
-        ON_END_EXPERIMENT_PIPELINE: lambda x, **kwargs: print('owo'),
-        ON_BEGIN_EXPERIMENT_THREAD: on_begin_experiment,
-        ON_END_EXPERIMENT_THREAD: on_end_experiment
-    }
-
-    recommender_system.run_experiment(config, events=events)
+    event_handler = EventHandler(current_experiment, end_experiment)
+    recommender_system.run_experiment(config, events=event_handler.events)
 
     # TODO USE THIS FUNCTION INSTEAD OF PARSING
     # recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)
@@ -230,7 +202,7 @@ def calculate():
         # TODO catch error
         if not current_experiment: 
             print('Current experiment should have started but is None')
-        if current_experiment and current_experiment.status == Status.Done:
+        if current_experiment and current_experiment.status == Status.DONE:
             response['calculation'] = result_storage.current_result
         response['status'] = current_experiment.status.value if current_experiment else Status.NA.value
     # print('calculation response:', response)
@@ -256,12 +228,12 @@ def abort():
     experiment = next(filter(lambda item: item.job['timestamp']['stamp'] == item_id, experiment_queue), None)
     print(experiment)
     # Cancel queued experiment
-    if experiment.status == Status.ToDo:
-        experiment.status = Status.Cancelled
+    if experiment.status == Status.TODO:
+        experiment.status = Status.CANCELLED
     # Abort active experiment
-    if experiment.status == Status.Active:
+    if experiment.status == Status.ACTIVE:
         recommender_system.abort_computation(experiment.name)
-        experiment.status = Status.Aborted
+        experiment.status = Status.ABORTED
     return "Removed index"
 
 
@@ -359,6 +331,6 @@ def append_queue(metadata, settings):
     config_dict, config_id = config_dict_from_settings(job)
 
     # TODO refactor job and config_dict overlap
-    current_job = QueueItem(job, config_dict, Status.ToDo, config_id)
+    current_job = QueueItem(job, config_dict, Status.TODO, ProgressStatus.NA, config_id)
 
     experiment_queue.append(current_job)
