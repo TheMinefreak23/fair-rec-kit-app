@@ -261,12 +261,12 @@ function reformat(property) {
               />
 
               <b-row>
-                <b-row>
+                <b-row v-if="form.experimentMethod == 'recommendation'">
                   <b-col md="auto">
                     <!--User can select the amount of recommendations per user -->
                     <b-form-group
-                      v-if="form.experimentMethod == 'recommendation'"
-                      label="Select number of recommendations per user:"
+                      
+                      label="Select number of recommendations per user: *"
                     >
                       <b-form-input
                         type="range"

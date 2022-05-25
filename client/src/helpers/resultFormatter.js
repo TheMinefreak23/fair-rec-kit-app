@@ -157,22 +157,24 @@ export function showDatasetInfo(dataset) {
 
 // Format evaluations (including filtered ones)
 export function formatEvaluation(e, result) {
-  result[formatMetric(e)] = e.evaluation.global
+  // TODO refactor and/or give option to set decimal precision in UI
+  result[formatMetric(e)] = e.evaluation.global.toFixed(2)
 
   // Flatten filters
-  console.log(e.evaluation, e.evaluation.filtered)
+  //console.log(e.evaluation, e.evaluation.filtered)
   // Add filter category (main name) to filter parameter name
   // TODO refactor
   const filtered = []
   for (let filter of e.evaluation.filtered) {
-    console.log('filter', filter)
+    //console.log('filter', filter)
     for (const [mainName, params] of Object.entries(filter)) {
-      console.log(mainName, params)
+      //console.log(mainName, params)
       for (const param of params) {
         for (const [paramName, paramValue] of Object.entries(param)) {
           const filterItem = {}
-          console.log('paramValue', paramValue)
-          filterItem[mainName + ' ' + '(' + paramName + ')'] = paramValue
+          //console.log('paramValue', paramValue.toFixed(2))
+          filterItem[mainName + ' ' + '(' + paramName + ')'] =
+            paramValue.toFixed(2)
           filtered.push(filterItem)
         }
       }
@@ -214,6 +216,17 @@ export function formatMetric(evaluation) {
     // TODO refactor K condition
     return name.slice(0, -1) + evaluation.params['K']
   } else return name
+}
+
+/**
+ * convert list of header names into supported header format, capitalise and remove underscores
+ * @param {string}   header  - list of headers.
+ * @returns {string}         - the name of the requested dataset
+ */
+export function makeHeader(header) {
+  return {
+    name: underscoreToSpace(capitalise(header.toString())),
+  }
 }
 
 export function article(word) {
