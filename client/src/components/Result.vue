@@ -7,8 +7,6 @@ import Table from './Table.vue'
 import { onActivated, onMounted, onUpdated, ref, watch } from 'vue'
 import { emptyFormGroup } from '../helpers/optionsFormatter'
 import { makeHeader } from '../helpers/resultFormatter'
-
-import mockdata from '../../../server/mock/1647818279_HelloWorld/results-table.json'
 import { API_URL } from '../api'
 import { store, addResult, removeResult } from '../store'
 
@@ -19,7 +17,6 @@ const selectedHeaders = ref([
   [{ name: 'Rank' }, { name: 'User' }, { name: 'Item' }, { name: 'Score' }],
 ])
 
-const experiment_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
 const data = ref({ results: [[]] })
 const startIndex = ref(0)
@@ -35,7 +32,6 @@ const userTables = combineResults()
 const visibleDatasets = ref([])
 const visibleMetrics = ref([])
 const availableMetrics =ref([])
-const hiddenindices = ref([])
 const uniqueDatasets = findUniqueDatasets()
 
 onMounted(() => {
@@ -269,34 +265,16 @@ function fillShownMetrics(){
  */
 function hideHeaders(headers){
   let result = []
-  for(let i=0; i<headers.length; i++){
-    if (!visibleMetrics.includes(headers[i]))
-    {
-      result.push(headers[i])
-      hiddenindices.push(i)
-    }
-  }
-
-  return result
-}
-
-//wat is de vorm van results? hele kolom eruit gooien
-// oude header lengte * indices = welke eruit moeten
-function hideColumns(results){
-  len = headers.length
-  let result = []
-  for(j=0; j<hiddenindices.length; i++)
-  {
-    for(i=0; i<result.length; i++){
-      if(i!=hiddenindices[j] && i!= hiddenindices[j] + j * len){
-        result.push(results[i])
+     for(let i=0; i<headers.length; i++){
+        if (visibleMetrics.value.includes(headers[i].name) || headers[i].name == "Approach")
+        {
+          result.push(headers[i])
+        }
       }
-    }
-  }
 
   return result
-  
 }
+
 
 </script>
 
@@ -368,11 +346,16 @@ function hideColumns(results){
             <Table
               :caption="datasetResult.caption"
               :results="datasetResult.results"
-              :headers="datasetResult.headers"
+              :headers="hideHeaders(datasetResult.headers)"
               :removable="false"
             />
-          </div>
-        </template>
+          
+           <p> {{ hideHeaders(datasetResult.headers)}} </p>
+           <p> {{ typeof(visibleMetrics) == typeof([])}} </p>
+           <p> {{datasetResult.headers}} </p>
+           <p> {{datasetResult.results}} </p>
+           </div>
+        </template>      
       </div>
     </div>
 
