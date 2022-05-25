@@ -115,9 +115,6 @@ def run_experiment(experiment):
                                                      recommender_system.data_registry,
                                                      recommender_system.experiment_factory)
 
-    # TODO don't use the metrics until evaluation pipeline works
-    config.evaluation = []
-
     event_handler = EventHandler(current_experiment, end_experiment)
     recommender_system.run_experiment(config, events=event_handler.events)
 
@@ -142,10 +139,10 @@ def format_result(settings):
     """
     print('== settings ==', settings)
     result = []
-    datasets = settings['datasets']
+    datasets = settings['data']
     for (dataset_index, dataset) in enumerate(datasets):
         # Add dataset identifier to name
-        dataset['name'] = dataset['name'] + '_' + str(dataset_index)
+        dataset['name'] = dataset['dataset'] + '_' + dataset['matrix'] + '_' + str(dataset_index)
         recs = []
         for (api, approaches) in settings['models'].items():
             for (approach_index, approach) in enumerate(approaches):
