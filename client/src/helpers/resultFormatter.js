@@ -84,15 +84,15 @@ export function statusVariant(rawStatus) {
   //console.log('statusVariant experimentStatus', experimentStatus)
   switch (experimentStatus) {
     case status.toDo:
-      return 'warning'
+      return 'outline-warning'
     case status.active:
-      return 'danger'
+      return 'success'
     case status.aborted:
       return 'light'
     case status.cancelled:
       return 'light'
     case status.done:
-      return 'primary'
+      return 'outline-success'
   }
 }
 

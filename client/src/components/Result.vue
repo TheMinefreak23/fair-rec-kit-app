@@ -33,6 +33,7 @@ const userHeaderOptions = ref([[]])
 const itemHeaderOptions = ref([[]])
 const userTables = combineResults(props.result.result)
 const visibleDatasets = ref([])
+const uniqueDatasets = findUniqueDatasets()
 
 onMounted(() => {
   console.log('result', props.result)
@@ -246,15 +247,26 @@ return string.split(' ')[1].split('_')[0]
 /**
  * Fill array of datasets that are shown so that all are shown upon loading the page
  */
-function fillVisibleDatasets() {
-
-  for(let i=0; i<userTables.length;i++){
-      visibleDatasets.value[i] = getDatasetName(userTables[i])
-  }
-  
-
+function fillVisibleDatasets(){
+  console.log(findUniqueDatasets[0])
+  visibleDatasets.value = findUniqueDatasets()
    
 }
+
+/**
+ * Create an array that has all unique datasets in the result
+ */
+function findUniqueDatasets(){
+  let datasetnames = []
+
+  for(let i=0; i<userTables.length;i++){
+      datasetnames[i] = getDatasetName(userTables[i])
+  }
+
+  return Array.from(new Set(datasetnames))
+
+}
+
 </script>
 
 <template>
@@ -267,8 +279,8 @@ function fillVisibleDatasets() {
       </p>
       <b-button @click="validate()">Validate run</b-button>
       <p>
-        Datasets shown:
-        <div class="form-check" v-for="dataset in userTables">
+        Datasets showing items per user:
+        <div class="form-check" v-for="dataset in uniqueDatasets">
           <input
             v-model = "visibleDatasets"
             class = "form-check-input"
@@ -356,7 +368,7 @@ function fillVisibleDatasets() {
                 @updateHeaders="(headers) => updateHeaders(headers, index)"
               />
             </div>
-          </template>
+            </template>
         </template>
       </div>
     </div>
