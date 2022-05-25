@@ -84,7 +84,7 @@ def calculate_first():
 
     # If there is a queue item to do, run it.
     if first:
-        run_experiment(first)
+        run_new_experiment(first)
         # mock_experiment(experiment)
 
 
@@ -99,24 +99,6 @@ def run_experiment(experiment):
     # Set current experiment
     global current_experiment
     current_experiment = experiment
-
-    # Create config files directory if it doesn't exist yet.
-    if not os.path.isdir(CONFIG_DIR):
-        os.mkdir(CONFIG_DIR)
-
-    # Save configuration to yaml file.
-    config_file_path = CONFIG_DIR + '/' + current_experiment.name
-
-    with open(config_file_path + '.yml', 'w+', encoding='utf-8') as config_file:
-        yaml.dump(current_experiment.config, config_file)
-
-    parser = Parser(True)
-    config = parser.parse_experiment_config_from_yml(config_file_path,
-                                                     recommender_system.data_registry,
-                                                     recommender_system.experiment_factory)
-
-    # TODO don't use the metrics until evaluation pipeline works
-    config.evaluation = []
 
     def on_begin_experiment(event_listener, **kwargs):
         # Update experiment status
@@ -144,12 +126,38 @@ def run_experiment(experiment):
         ON_BEGIN_EXPERIMENT_THREAD: on_begin_experiment,
         ON_END_EXPERIMENT_THREAD: on_end_experiment
     }
+    return events
 
+def run_new_experiment(experiment):    
+    events = run_experiment(experiment)
+    # Create config files directory if it doesn't exist yet.
+    if not os.path.isdir(CONFIG_DIR):
+        os.mkdir(CONFIG_DIR)
+
+    # Save configuration to yaml file.
+    config_file_path = CONFIG_DIR + '/' + current_experiment.name
+
+    with open(config_file_path + '.yml', 'w+', encoding='utf-8') as config_file:
+        yaml.dump(current_experiment.config, config_file)
+
+    parser = Parser(True)
+    config = parser.parse_experiment_config_from_yml(config_file_path,
+                                                    recommender_system.data_registry,
+                                                    recommender_system.experiment_factory)
+
+    # TODO don't use the metrics until evaluation pipeline works
+    config.evaluation = []
+    
     recommender_system.run_experiment(config, events=events)
-
+        
     # TODO USE THIS FUNCTION INSTEAD OF PARSING
     # recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)
 
+def validate_experiment(filepath):
+    experiment = QueueItem(job={}, config={}, name='',status=Status.Done)
+    print(experiment)
+    events = run_experiment(experiment)
+    recommender_system.validate_experiment(result_dir=filepath, num_runs=1, events=events)
 
 def mock_experiment():
     """Mock running an experiment and save the mock result."""

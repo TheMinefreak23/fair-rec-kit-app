@@ -147,6 +147,21 @@ async function exportTable() {
   })
 }
 
+async function validate() {
+  let file = props.result.id + '_' + props.result.metadata.name
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-type': 'application/json' },
+    body: JSON.stringify({ filepath: file }),
+  }
+  const response = await fetch(
+    API_URL + '/all-results/validate',
+    requestOptions
+  ).then(() => {
+    console.log('Experiment validated succesfully')
+  })
+}
+
 /**
  * Loads more data in the table after user asks for more data.
  * @param {Bool}   increase  - Determines whether the next or previous data is required.
@@ -250,7 +265,7 @@ function fillVisibleDatasets() {
         These are the results for experiment {{ result.metadata.name }} done at
         {{ result.metadata.datetime }}.
       </p>
-
+      <b-button @click="validate()">Validate run</b-button>
       <p>
         Datasets shown:
         <div class="form-check" v-for="dataset in userTables">
@@ -276,7 +291,6 @@ function fillVisibleDatasets() {
         </template>
       </div>
     </div>
-
     <div class="container">
       <div class="row">
         <h4>Metrics</h4>
@@ -290,7 +304,6 @@ function fillVisibleDatasets() {
         >
           <p> {{datasetResult.results[0].dataset}}</p>
           <div class="col-6">
-
           
           <template v-if="visibleDatasets.includes(getDatasetName(datasetResult.caption))" :key="visibleDatasets">
             <Table

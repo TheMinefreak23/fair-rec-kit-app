@@ -9,7 +9,7 @@ import pandas as pd
 from fairreckitlib.data.set.dataset import add_user_columns, add_item_columns
 
 from . import result_storage
-from .experiment import options, recommender_system
+from .experiment import options, recommender_system, validate_experiment
 
 results_bp = Blueprint('results', __name__, url_prefix='/api/all-results')
 
@@ -156,3 +156,10 @@ def export():
     df = pd.DataFrame(results)
     df.to_csv('project/exports/' + name + '.csv', index=False)
     return "Exported file"
+
+@results_bp.route('/validate', methods=['POST'])
+def validate(): 
+    json = request.json
+    filepath = json.get('filepath')
+    validate_experiment(filepath)
+    return "Validated"
