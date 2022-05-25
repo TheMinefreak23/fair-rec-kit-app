@@ -398,7 +398,7 @@ function setsorting(i) {
         <b-td
           v-for="[key, value] in Object.entries(item)"
           :key="`${descending}_${sortindex}_${index}-${key}`"
-          class="text-center"
+          class="text-center align-middle"
         >
             <!--Special pill format for status-->
             <!-- TODO refactor-->

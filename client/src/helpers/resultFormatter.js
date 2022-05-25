@@ -73,9 +73,9 @@ export function statusVariant(rawStatus) {
     case status.active:
       return 'success'
     case status.aborted:
-      return 'light'
+      return 'secondary'
     case status.cancelled:
-      return 'light'
+      return 'secondary'
     case status.done:
       return 'outline-success'
   }

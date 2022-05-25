@@ -198,12 +198,11 @@ function reformat(property) {
                   <b-form-group label-cols-md="2" label="Tags (optional)">
                     <b-form-tags
                       v-model="metadata.tags"
-                      tag-pills
+                      input-id="tags-basic"
                       tag-variant ="dark"
                       remove-on-delete
                       separator=" ,;"
                       no-add-on-enter
-                      size="lg"
                     ></b-form-tags> </b-form-group
                 ></b-col>
               </b-row>
@@ -340,10 +339,10 @@ function reformat(property) {
             </b-col>
             <!-- Buttons to submit or reset an experiment-->
             <div class="d-flex justify-content-center">
-              <b-button class="mx-1" size="lg" type="reset" variant="danger"
+              <b-button class="mx-1" type="reset" variant="danger"
                 >Reset</b-button
               >
-              <b-button class="mx-1" size="lg" type="submit" variant="primary"
+              <b-button class="mx-1" type="submit" variant="primary"
                 >Send</b-button
               >
             </div>
