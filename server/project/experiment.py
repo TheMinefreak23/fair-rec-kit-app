@@ -20,6 +20,7 @@ from fairreckitlib.recommender_system import RecommenderSystem
 from flask import (Blueprint, request)
 
 from . import result_storage
+from __init__.py import mail
 from .options_formatter import create_available_options, config_dict_from_settings
 
 compute_bp = Blueprint('experiment', __name__, url_prefix='/api/experiment')
@@ -133,8 +134,14 @@ def run_experiment(experiment):
         #result_storage.save_result(current_experiment.job, {})
         print('=====CONFIG=====', current_experiment.config)
 
-        result_storage.save_result(current_experiment.job, format_result(current_experiment.config))
 
+        mock_results = format_result(current_experiment.config)
+        if 'email' in mock_results['metadata'].keys():
+            send_email(mock_results['metadata'], mock_results['timestamp']['datetime'])
+
+        result_storage.save_result(current_experiment.job, mock_results)
+        global experiment_running
+        experiment_running = False
         print('yay')
 
         # Calculate next item in queue
@@ -151,6 +158,12 @@ def run_experiment(experiment):
 
     # TODO USE THIS FUNCTION INSTEAD OF PARSING
     # recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)
+
+def send_email(metadata, timestamp):
+    print("llanfairpwlchfairgwyngychgogerychchwryrndrwbwchllantisiligogogoch")
+    print(metadata["name"])
+    print(metadata["email"])
+    print(timestamp)
 
 
 def mock_experiment():
