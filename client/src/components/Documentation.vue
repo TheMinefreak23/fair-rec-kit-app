@@ -158,6 +158,30 @@ function closeNav() {
   document.getElementById("docSidenav").style.width = "0";
   document.getElementById("main").style.marginLeft= "0";
 }
+
+
+// ------------------------- //
+// XML Documentation attempt //
+// ------------------------- //
+
+/* 
+function displayItem(i) {
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      myFunction(this, i);
+    }
+  };
+  xmlhttp.open("GET", "documentation_items.xml", true);
+  xmlhttp.send();
+}
+
+function myFunction(xml, i) {
+  var xmlDoc = xml.responseXML;
+  x = xmlDoc.getElementsByTagName("item");
+}
+*/
+
 </script>
 
 <style>
