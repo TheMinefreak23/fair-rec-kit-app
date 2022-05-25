@@ -94,7 +94,7 @@ function progressNumber(progressStatus) {
             ? store.currentExperiment.metadata.name
             : 'None'
         }}
-        {{ store.currentExperiment }}
+        <!--{{ store.currentExperiment }}-->
       </h4>
       <b-progress :max="progressMax" height="2rem" show-progress animated>
         <b-progress-bar

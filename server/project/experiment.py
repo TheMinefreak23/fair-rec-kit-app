@@ -85,7 +85,7 @@ def calculate_first():
 def end_experiment():
     print('yay')
     # result_storage.save_result(current_experiment.job, {})
-    result_storage.save_result(current_experiment.job, mock_result(current_experiment.job['settings']))
+    result_storage.save_result(current_experiment.job, format_result(current_experiment.config))
 
     # Calculate next item in queue
     calculate_first()
