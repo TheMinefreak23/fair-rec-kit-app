@@ -413,6 +413,7 @@ function setsorting(i) {
                     ? 'status-blinking'
                     : 'status'
                 "
+                class="fw-bold"
               >
                 {{ value.slice(statusPrefix.length) }}
               </b-button>
