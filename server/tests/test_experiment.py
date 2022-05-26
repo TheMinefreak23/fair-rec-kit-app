@@ -83,29 +83,31 @@ def test_form(client):
 
     #delete_test_results(RESULTS_DIR)
 
-
+# TODO this test is kind of redundant, use fixtures?
+"""
 @patch('project.experiment.RESULTS_DIR', TEST_RESULTS_PATH)
 def test_calculate():
-    # from project.experiment import experiment_queue
-    # experiment_queue.append(get_test_options())
-    # old_queue_length = len(experiment_queue)
+    from project.experiment import experiment_queue
+    experiment_queue.append(get_test_options())
+    old_queue_length = len(experiment_queue)
 
-    # from project.experiment import experiment_queue
-    # calculate_first()
-    # assert len(experiment_queue) == old_queue_length - 1
+    from project.experiment import experiment_queue
+    calculate_first()
+    assert len(experiment_queue) == old_queue_length - 1
 
-    # delete_test_results()
-    assert True  # TODO this test is kind of redundant, use fixtures?
+    delete_test_results()
+"""
 
-
+# TODO this test is kind of redundant, use fixtures?
+"""
 @patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 def test_run_experiment():
-    # print(get_test_options())
-    # run_experiment(get_test_options())
-    # from project.result_storage import current_result
-    # assert current_result['metadata']['name'] == test_options['metadata']['name']
-    # delete_test_results()
-    assert True  # TODO this test is kind of redundant, use fixtures?
+    print(get_test_options())
+    run_experiment(get_test_options())
+    from project.result_storage import current_result
+    assert current_result['metadata']['name'] == test_options['metadata']['name']
+    delete_test_results()
+"""
 
 
 def test_params(client):
@@ -138,10 +140,10 @@ def test_queue(client):
     assert get_response.status_code == 200
     assert json.loads(get_response.data)['queue'] == formatted_queue()
 
-
+# TODO
+"""
 def test_cancel(client):
-    # TODO
-    assert True
+"""
 
 
 def test_append():
