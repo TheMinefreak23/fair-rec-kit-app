@@ -4,6 +4,7 @@ Utrecht University within the Software Project course.
 
 // TODO get from server
 export const status = {
+  notAvailable: 'Not Available',
   toDo: 'To Do',
   active: 'Active',
   aborted: 'Aborted',

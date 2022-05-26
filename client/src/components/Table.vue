@@ -9,7 +9,13 @@ import { formatMetadata } from '../helpers/metadataFormatter'
 import FormGroupList from './FormGroupList.vue'
 import { validateEmail, emptyFormGroup } from '../helpers/optionsFormatter'
 import { store } from '../store'
-import { statusPrefix, statusVariant, status, makeHeader } from '../helpers/resultFormatter'
+import {
+  statusPrefix,
+  statusVariant,
+  status,
+  makeHeader,
+} from '../helpers/resultFormatter'
+import RemoveButtonModal from './Table/RemoveButtonModal.vue'
 
 const emit = defineEmits([
   'loadResult',
@@ -25,7 +31,6 @@ const props = defineProps({
   headers: Array,
   buttonText: String,
   removable: Boolean,
-  serverFile: String,
   serverFile2: String,
   serverFile3: String,
   pagination: Boolean,
@@ -40,7 +45,6 @@ const props = defineProps({
 
 const caption = ref('')
 const entryAmount = ref(20)
-const deleteModalShow = ref(false)
 const editModalShow = ref(false)
 const viewModalShow = ref(false)
 const filtersModalShow = ref(false)
@@ -138,22 +142,6 @@ function emptyVmodels() {
   newEmail.value = ''
 }
 
-async function removeEntry() {
-  //Remove an entry from the list
-  const entry = selectedEntry.value
-  //props.results.splice(entry, 1)
-  store.allResults = store.allResults.filter((e) => e.id != entry)
-  //Inform the server to remove the same entry
-  const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: entry }),
-  }
-  fetch(API_URL + props.serverFile, requestOptions).then(() => {
-    console.log('Item', entry, 'removed succesfully')
-  })
-}
-
 async function getMetadata(selectedID) {
   //request the metadata of the specified entry
   const requestOptions = {
@@ -224,19 +212,6 @@ function setsorting(i) {
 </script>
 
 <template>
-  <!--Shows when the user wants to delete an entry-->
-  <b-modal
-    id="deletion-modal"
-    v-model="deleteModalShow"
-    title="Remove entry?"
-    ok-title="Yes"
-    ok-variant="danger"
-    cancel-title="No"
-    @ok="removeEntry()"
-  >
-    <p>Are you sure you want to remove this entry from the list?</p>
-  </b-modal>
-
   <!--Shows when the user wants to edit an entry-->
   <b-modal
     id="edit-modal"
@@ -355,7 +330,10 @@ function setsorting(i) {
       }}
 
       <template v-if="expandable">
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" rel="stylesheet">
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
+          rel="stylesheet"
+        />
 
         <div class="float-end">
           <b-button
@@ -393,35 +371,39 @@ function setsorting(i) {
     <b-tbody>
       <b-tr v-for="(item, index) in sorted" :key="item"
         ><b-td class="align-middle" v-if="overview">
-          <b-button variant="outline-primary fw-bold" @click="$emit('loadResult', item.id)">View result</b-button>
+          <b-button
+            variant="outline-primary fw-bold"
+            @click="$emit('loadResult', item.id)"
+            >View result</b-button
+          >
         </b-td>
         <b-td
           v-for="[key, value] in Object.entries(item)"
           :key="`${descending}_${sortindex}_${index}-${key}`"
           class="text-center"
         >
-            <!--Special pill format for status-->
-            <!-- TODO refactor-->
-            <template
-              v-if="typeof value === 'string' && value.startsWith(statusPrefix)"
+          <!--Special pill format for status-->
+          <!-- TODO refactor-->
+          <template
+            v-if="typeof value === 'string' && value.startsWith(statusPrefix)"
+          >
+            <b-button
+              disabled
+              :variant="statusVariant(value)"
+              :class="
+                value.slice(statusPrefix.length) == status.active
+                  ? 'status-blinking'
+                  : 'status'
+              "
+              class="fw-bold"
             >
-              <b-button
-                disabled
-                :variant="statusVariant(value)"
-                :class="
-                  value.slice(statusPrefix.length) == status.active
-                    ? 'status-blinking'
-                    : 'status'
-                "
-                class="fw-bold"
-              >
-                {{ value.slice(statusPrefix.length) }}
-              </b-button>
-            </template>
-            <template v-else> {{ value }}</template>
+              {{ value.slice(statusPrefix.length) }}
+            </b-button>
+          </template>
+          <template v-else> {{ value }}</template>
         </b-td>
-          <b-td class="align-middle" v-if="overview || removable">
-            <div class="m-0 float-end" style="width: 150px;">
+        <b-td class="align-middle" v-if="overview || removable">
+          <div class="m-0 float-end" style="width: 150px">
             <b-button
               v-if="overview"
               variant="primary"
@@ -431,33 +413,54 @@ function setsorting(i) {
                   (selectedEntry = index),
                   getNameTagsMail(item.id)
               "
-              ><i class="bi bi-pencil-square"></i></b-button
-            >
+              ><i class="bi bi-pencil-square"></i
+            ></b-button>
             <b-button
-              v-if="overview"
+              v-if="
+                overview ||
+                (item.status &&
+                  item.status.slice(statusPrefix.length) == status.done)
+              "
               variant="primary"
               class="mx-1"
               @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
-              ><i class="bi bi-info-circle"></i></b-button
-            >
+              ><i class="bi bi-info-circle"></i
+            ></b-button>
             <!--REFACTOR status condition-->
-            <b-button
-              v-if="
-                removable &&
-                (!item.status ||
-                  [status.toDo, status.active].includes(
-                    item.status.slice(statusPrefix.length)
-                  ))
+            <RemoveButtonModal
+              v-if="removable && !item.status"
+              title="Remove entry?"
+              showButton
+              :entry="item.id"
+              deleteURL="/all-results/delete"
+              ><i class="bi bi-trash"></i
+            ></RemoveButtonModal>
+            <RemoveButtonModal
+              v-if="item.status"
+              :title="
+                item.status.slice(statusPrefix.length) == status.toDo
+                  ? 'Cancel experiment?'
+                  : 'Abort active experiment?'
               "
-              variant="danger"
-              class="mx-1 float-end"
-              @click="
-                ;(deleteModalShow = !deleteModalShow), (selectedEntry = item.id)
+              :showButton="
+                item.status &&
+                [status.toDo, status.active].includes(
+                  item.status.slice(statusPrefix.length)
+                )
               "
-              ><i class="bi bi-trash"></i></b-button
+              :entry="item.id"
+              deleteURL="/experiment/queue/abort"
             >
-            </div>
-          </b-td>
+              <i
+                :class="
+                  item.status.slice(statusPrefix.length) == status.toDo
+                    ? 'bi bi-x-lg'
+                    : 'bi bi-x-octagon-fill'
+                "
+              />
+            </RemoveButtonModal>
+          </div>
+        </b-td>
       </b-tr>
     </b-tbody>
   </b-table-simple>

@@ -225,8 +225,9 @@ def abort():
     data = request.get_json()
     item_id = data.get('id')
     print('trying to cancel',item_id)
+    # Find the first experiment with the ID in the queue
     experiment = next(filter(lambda item: item.job['timestamp']['stamp'] == item_id, experiment_queue), None)
-    print(experiment)
+    #print(experiment)
     # Cancel queued experiment
     if experiment.status == Status.TODO:
         experiment.status = Status.CANCELLED

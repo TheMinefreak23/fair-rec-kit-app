@@ -90,15 +90,20 @@ function progressNumber(progressStatus) {
       <h4>
         Current experiment:
         {{
-          store.currentExperiment
+          store.currentExperiment.status != status.notAvailable
             ? store.currentExperiment.metadata.name
             : 'None'
         }}
         <!--{{ store.currentExperiment }}-->
       </h4>
-      <b-progress :max="progressMax" height="2rem" show-progress animated>
+      <b-progress
+        v-if="store.currentExperiment.status == status.active"
+        :max="progressMax"
+        height="2rem"
+        show-progress
+        animated
+      >
         <b-progress-bar
-          v-if="store.currentExperiment"
           :value="progressNumber(store.currentExperiment.progress)"
         >
           <span>
@@ -115,8 +120,8 @@ function progressNumber(progressStatus) {
         :headers="headers"
         buttonText="Cancel"
         :removable="true"
-        serverFile="/experiment/queue/abort"
         :defaultSort="1"
+        serverFile3="/all-results/result-by-id"
       />
     </div>
   </b-card>
