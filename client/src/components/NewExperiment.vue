@@ -148,6 +148,7 @@ function reformat(property) {
       <b-form
         v-if="options"
         @submit="$event.preventDefault(), sendToServer()"
+        @keydown.enter.prevent
         @reset="$event.preventDefault(), initForm()"
       >
         <b-row class="text-center">
@@ -207,7 +208,6 @@ function reformat(property) {
                       tag-variant="dark"
                       remove-on-delete
                       separator=" ,;"
-                      no-add-on-enter
                       size="lg"
                     ></b-form-tags> </b-form-group
                 ></b-col>
@@ -265,7 +265,6 @@ function reformat(property) {
                   <b-col md="auto">
                     <!--User can select the amount of recommendations per user -->
                     <b-form-group
-                      
                       label="Select number of recommendations per user: *"
                     >
                       <b-form-input
