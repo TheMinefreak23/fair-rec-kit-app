@@ -13,7 +13,7 @@ const store = reactive({
 })
 
 function pollForResult() {
-  const interval = 1000
+  const interval = 300
   store.resultPoll = setInterval(getCalculation, interval)
 }
 
@@ -36,7 +36,12 @@ function getCalculation() {
             // Update queue and progress while waiting for a result
             getQueue()
           }
-          console.log('polling status of experiment:', data.status)
+          console.log(
+            'polling experiment, status:',
+            data.status,
+            'progress:',
+            store.currentExperiment && store.currentExperiment.progress
+          )
         })
     } catch (e) {
       console.log(e) // TODO better error handling, composable

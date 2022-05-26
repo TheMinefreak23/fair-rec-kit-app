@@ -8,8 +8,8 @@ import { sendMockData } from '../test/mockExperimentOptions.js'
 import { store, pollForResult } from '../store.js'
 import { API_URL } from '../api'
 import { emptyOption } from '../helpers/optionsFormatter'
-import { emptyFormGroup } from '../helpers/optionsFormatter'
-import { validateEmail } from '../helpers/optionsFormatter'
+import { emptyFormGroup, validateEmail } from '../helpers/optionsFormatter'
+import { progress } from '../helpers/resultFormatter'
 
 const horizontalLayout = ref(false)
 const oldMetadata = ref(false)
@@ -51,7 +51,12 @@ async function sendToServer() {
   sendForm.lists.datasets = reformat(sendForm.lists.datasets)
   console.log('sendForm', sendForm)
 
-  store.currentExperiment = { metadata: metadata.value, settings: sendForm }
+  // TODO get from server?
+  store.currentExperiment = {
+    metadata: metadata.value,
+    settings: sendForm,
+    progress: progress.notAvailable,
+  }
   // Post settings to server
   const requestOptions = {
     method: 'POST',
@@ -199,7 +204,7 @@ function reformat(property) {
                     <b-form-tags
                       v-model="metadata.tags"
                       tag-pills
-                      tag-variant ="dark"
+                      tag-variant="dark"
                       remove-on-delete
                       separator=" ,;"
                       no-add-on-enter

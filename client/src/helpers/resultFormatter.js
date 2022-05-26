@@ -11,6 +11,21 @@ export const status = {
   done: 'Done',
 }
 
+// TODO get from server
+export const progress = {
+  notAvailable: 'Not Available',
+  started: 'Started',
+  parsing: 'Parsing',
+  processingData: 'Processing Data',
+  filteringData: 'Filtering Data',
+  splittingData: 'Splitting Data',
+  model: 'Starting approach',
+  modelLoad: 'Loading train set',
+  training: 'Training',
+  evaluating: 'Evaluating',
+  finished: 'Finished',
+}
+
 export const statusPrefix = 'status_' // TODO hacky
 
 // Format data for a results overview
@@ -69,15 +84,15 @@ export function statusVariant(rawStatus) {
   //console.log('statusVariant experimentStatus', experimentStatus)
   switch (experimentStatus) {
     case status.toDo:
-      return 'warning'
+      return 'outline-warning'
     case status.active:
-      return 'danger'
+      return 'success'
     case status.aborted:
       return 'light'
     case status.cancelled:
       return 'light'
     case status.done:
-      return 'primary'
+      return 'outline-success'
   }
 }
 
@@ -94,10 +109,11 @@ export function formatResult(result) {
           const headers = [{ name: 'Approach' }]
 
           // Use metric names as headers
-          result.evals.map((e) => {
-            headers.push(formatEvaluation(e, result))
+          for (let [index, evaluation] of result.evals.entries()) {
+            headers.push(formatEvaluation(evaluation, index, result))
             //console.log(result)
-          })
+          }
+
           // Omit recommendation and evals (old properties)
           const { recommendation, evals, ...rest } = result
           datasetResult.headers = headers // TODO headers can be computed in outer loop
@@ -141,9 +157,10 @@ export function showDatasetInfo(dataset) {
 }
 
 // Format evaluations (including filtered ones)
-export function formatEvaluation(e, result) {
+export function formatEvaluation(e, index, result) {
   // TODO refactor and/or give option to set decimal precision in UI
-  result[formatMetric(e)] = e.evaluation.global.toFixed(2)
+  // Add index for unique metric key
+  result[formatMetric(e) + '_' + index] = e.evaluation.global.toFixed(2)
 
   // Flatten filters
   //console.log(e.evaluation, e.evaluation.filtered)
@@ -182,8 +199,9 @@ export function formatEvaluation(e, result) {
       // Mock: get first entry for now
       const [name, val] = Object.entries(filter)[0]
       //const filterName = e.name + ' ' + name
-      const filterName = e.name + name
+      const filterName = formatMetric(e) + name
       result[filterName] = val
+      //console.log(result)
       subheaders.push(capitalise(name))
       //console.log(subheaders)
     })
