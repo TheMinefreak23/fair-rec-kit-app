@@ -104,9 +104,7 @@ function copyItem(i) {
   // form.value.choices[form.value.groupCount - 1] = JSON.parse(
   //   JSON.stringify(form.value.choices[i])
   // )
-  let item = JSON.parse(
-    JSON.stringify(form.value.choices[i])
-  )
+  let item = JSON.parse(JSON.stringify(form.value.choices[i]))
   form.value.choices.splice(i, 0, item)
   visibleGroup.value = i + 2 // Show newly copied item
   console.log(form.value.choices[i].main)
@@ -221,8 +219,10 @@ function shortGroupDescription(i) {
             @click="form.visible = !form.visible"
             variant="dark"
           >
-            <template v-if="form.visible">&#x25BC; | </template>
-            <template v-else>&#x25BA; | </template>
+            <template v-if="form.visible"
+              ><i class="bi bi-caret-down" /> |
+            </template>
+            <template v-else><i class="bi bi-caret-up" /> | </template>
           </b-button>
         </b-card>
       </h3>
@@ -261,10 +261,13 @@ function shortGroupDescription(i) {
                           "
                           :variant="visibleGroup == i ? 'secondary' : 'dark'"
                         >
+                          <!-- TODO refactor-->
                           <template v-if="visibleGroup == i"
-                            >&#x25BC; |
+                            ><i class="bi bi-caret-down" /> |
                           </template>
-                          <template v-else>&#x25BA; | </template>
+                          <template v-else
+                            ><i class="bi bi-caret-up" /> |
+                          </template>
                           {{ shortGroupDescription(i - 1) }}
                         </b-button>
                       </b-card>
