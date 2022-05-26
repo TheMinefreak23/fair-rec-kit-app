@@ -1,10 +1,14 @@
-import { render, fireEvent } from '@testing-library/vue'
+/*This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+
+import { render, fireEvent, getByTestId } from '@testing-library/vue'
 import { test } from 'vitest'
 import Table from '../components/Table.vue'
 
 test('deleteTableItem', async () => {
   // get utilities to query component
-  const { getByText, getByTitle } = render(Table, {
+  const { getByTestId, getByTitle } = render(Table, {
     props: {
       overview: false,
       results: [{ foo: 1, bar: 1 }],
@@ -15,7 +19,7 @@ test('deleteTableItem', async () => {
   })
 
   // get deletion button
-  const button = getByText('Delete')
+  const button = getByTestId('delete')
 
   await fireEvent.click(button)
 
@@ -24,7 +28,7 @@ test('deleteTableItem', async () => {
 })
 
 test('editTableItem', async () => {
-  const { getByText, getByTitle } = render(Table, {
+  const { getByTestId, getByTitle } = render(Table, {
     props: {
       overview: true,
       results: [{ foo: 2, bar: 2 }],
@@ -34,7 +38,7 @@ test('editTableItem', async () => {
     },
   })
 
-  const button = getByText('Edit')
+  const button = getByTestId('edit')
 
   await fireEvent.click(button)
 
@@ -42,7 +46,7 @@ test('editTableItem', async () => {
 })
 
 test('userItemTable', async () => {
-  const { getByText, getByTitle, getByPlaceholderText } = render(Table, {
+  const { getByText, getByTitle } = render(Table, {
     props: {
       caption: 'testcaption',
       results: [{ foo: 2, bar: 2 }],
@@ -55,21 +59,21 @@ test('userItemTable', async () => {
     },
   })
 
-  getByTitle(/select/)
+  //getByTitle(/select/)
 
-  const prevbutton = getByText(/previous/)
-  const nextbutton = getByText(/next/)
-  const headerbutton = getByText('change headers')
+  const prevbutton = getByText(/previous/i)
+  const nextbutton = getByText(/next/i)
+  const headerbutton = getByText('change headers', { exact: false })
 
   await fireEvent.click(prevbutton)
   await fireEvent.click(nextbutton)
   await fireEvent.click(headerbutton)
 
-  getByPlaceholderText('20')
+  getByText('20')
 })
 
 test('viewMetadata', async () => {
-  const { getAllByText, getByTitle } = render(Table, {
+  const { getByTestId, getByTitle } = render(Table, {
     props: {
       overview: true,
       results: [{ foo: 3, bar: 3 }],
@@ -80,10 +84,10 @@ test('viewMetadata', async () => {
     },
   })
 
-  const button = getAllByText('View Metadata')[0]
+  const button = getByTestId('view-meta')
 
   await fireEvent.click(button)
 
   // check if the modal shows up
-  getByTitle('Metadata')
+  getByTitle('Result information')
 })

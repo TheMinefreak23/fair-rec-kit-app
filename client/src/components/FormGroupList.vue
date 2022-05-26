@@ -317,6 +317,7 @@ function shortGroupDescription(i) {
                 (visibleGroup = form.groupCount)
             "
             variant="primary"
+            data-testid="add-button"
             >Add {{ name }}...
           </b-button>
         </b-card>

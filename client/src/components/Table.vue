@@ -9,7 +9,12 @@ import { formatMetadata } from '../helpers/metadataFormatter'
 import FormGroupList from './FormGroupList.vue'
 import { validateEmail, emptyFormGroup } from '../helpers/optionsFormatter'
 import { store } from '../store'
-import { statusPrefix, statusVariant, status, makeHeader } from '../helpers/resultFormatter'
+import {
+  statusPrefix,
+  statusVariant,
+  status,
+  makeHeader,
+} from '../helpers/resultFormatter'
 
 const emit = defineEmits([
   'loadResult',
@@ -355,7 +360,10 @@ function setsorting(i) {
       }}
 
       <template v-if="expandable">
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" rel="stylesheet">
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
+          rel="stylesheet"
+        />
 
         <div class="float-end">
           <b-button
@@ -393,35 +401,39 @@ function setsorting(i) {
     <b-tbody>
       <b-tr v-for="(item, index) in sorted" :key="item"
         ><b-td class="align-middle" v-if="overview">
-          <b-button variant="outline-primary fw-bold" @click="$emit('loadResult', item.id)">View result</b-button>
+          <b-button
+            variant="outline-primary fw-bold"
+            @click="$emit('loadResult', item.id)"
+            >View result</b-button
+          >
         </b-td>
         <b-td
           v-for="[key, value] in Object.entries(item)"
           :key="`${descending}_${sortindex}_${index}-${key}`"
           class="text-center"
         >
-            <!--Special pill format for status-->
-            <!-- TODO refactor-->
-            <template
-              v-if="typeof value === 'string' && value.startsWith(statusPrefix)"
+          <!--Special pill format for status-->
+          <!-- TODO refactor-->
+          <template
+            v-if="typeof value === 'string' && value.startsWith(statusPrefix)"
+          >
+            <b-button
+              disabled
+              :variant="statusVariant(value)"
+              :class="
+                value.slice(statusPrefix.length) == status.active
+                  ? 'status-blinking'
+                  : 'status'
+              "
+              class="fw-bold"
             >
-              <b-button
-                disabled
-                :variant="statusVariant(value)"
-                :class="
-                  value.slice(statusPrefix.length) == status.active
-                    ? 'status-blinking'
-                    : 'status'
-                "
-                class="fw-bold"
-              >
-                {{ value.slice(statusPrefix.length) }}
-              </b-button>
-            </template>
-            <template v-else> {{ value }}</template>
+              {{ value.slice(statusPrefix.length) }}
+            </b-button>
+          </template>
+          <template v-else> {{ value }}</template>
         </b-td>
-          <b-td class="align-middle" v-if="overview || removable">
-            <div class="m-0 float-end" style="width: 150px;">
+        <b-td class="align-middle" v-if="overview || removable">
+          <div class="m-0 float-end" style="width: 150px">
             <b-button
               v-if="overview"
               variant="primary"
@@ -431,15 +443,17 @@ function setsorting(i) {
                   (selectedEntry = index),
                   getNameTagsMail(item.id)
               "
-              ><i class="bi bi-pencil-square"></i></b-button
-            >
+              data-testid="edit"
+              ><i class="bi bi-pencil-square"></i
+            ></b-button>
             <b-button
               v-if="overview"
               variant="primary"
               class="mx-1"
               @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
-              ><i class="bi bi-info-circle"></i></b-button
-            >
+              data-testid="view-meta"
+              ><i class="bi bi-info-circle"></i
+            ></b-button>
             <!--REFACTOR status condition-->
             <b-button
               v-if="
@@ -454,10 +468,11 @@ function setsorting(i) {
               @click="
                 ;(deleteModalShow = !deleteModalShow), (selectedEntry = item.id)
               "
-              ><i class="bi bi-trash"></i></b-button
-            >
-            </div>
-          </b-td>
+              data-testid="delete"
+              ><i class="bi bi-trash"></i
+            ></b-button>
+          </div>
+        </b-td>
       </b-tr>
     </b-tbody>
   </b-table-simple>

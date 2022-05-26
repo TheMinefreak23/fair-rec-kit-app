@@ -15,6 +15,7 @@ import MusicDetail from './components/MusicDetail.vue'
 import { useToast } from 'bootstrap-vue-3'
 import { store } from './store'
 import VCheckmark from './components/VCheckmark.vue'
+import TestSelect from './test/TestSelect.vue'
 let toast = useToast()
 
 /*
@@ -55,6 +56,7 @@ function callToast() {
 </script>
 
 <template>
+  <TestSelect />
   <b-container
     :toast="{ root: true }"
     fluid="sm"
