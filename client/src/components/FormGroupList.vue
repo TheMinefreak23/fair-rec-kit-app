@@ -8,9 +8,8 @@ import {
 } from '../helpers/resultFormatter'
 //import { selectionOptions } from '../helpers/optionsFormatter'
 
-import { useToast } from 'bootstrap-vue-3'
 import FormGroup from './Form/FormGroup.vue'
-let toast = useToast()
+import { showToast } from '../store'
 
 //const emit = defineEmits(['formChange'])
 const props = defineProps({
@@ -94,7 +93,7 @@ function removeGroup(i) {
   // Set visible group to last before deleted one
   visibleGroup.value = i
 
-  showToast(mainOption, 'removed')
+  showFormToast(mainOption, 'removed')
 }
 
 // Copies the selected item and puts it at the end of the list
@@ -104,28 +103,25 @@ function copyItem(i) {
   // form.value.choices[form.value.groupCount - 1] = JSON.parse(
   //   JSON.stringify(form.value.choices[i])
   // )
-  let item = JSON.parse(
-    JSON.stringify(form.value.choices[i])
-  )
+  let item = JSON.parse(JSON.stringify(form.value.choices[i]))
   form.value.choices.splice(i, 0, item)
   visibleGroup.value = i + 2 // Show newly copied item
   console.log(form.value.choices[i].main)
-  showToast(form.value.choices[i].main, 'copied')
+  showFormToast(form.value.choices[i].main, 'copied')
 }
 
 /**
- *
+ * TODO document
  */
-function showToast(object, actionMessage) {
+function showFormToast(object, actionMessage) {
   // Show toast
   // TODO delay and variant don't work?
-  toast.show(
-    {
-      title:
-        capitalise(props.name) + ' ' + object.name + ' ' + actionMessage + '!',
-    },
-    { pos: 'top-right', delay: 800, variant: 'warning' }
-  )
+  const mainOptions = {
+    title:
+      capitalise(props.name) + ' ' + object.name + ' ' + actionMessage + '!',
+  }
+  const otherOptions = { pos: 'top-right', delay: 800, variant: 'warning' }
+  showToast(mainOptions, otherOptions)
 }
 
 //Update the options that cannot be be submitted due to changing experiment type (

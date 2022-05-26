@@ -9,7 +9,7 @@ import PreviousResults from './components/PreviousResults.vue'
 import ExperimentQueue from './components/ExperimentQueue.vue'
 import NewExperiment from './components/NewExperiment.vue'
 import TestForm from './test/TestForm.vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { API_URL } from './api'
 import MusicDetail from './components/MusicDetail.vue'
 import { useToast } from 'bootstrap-vue-3'
@@ -29,6 +29,13 @@ onMounted(async () => {
   console.log(data)
 })
 //const tabIndex = ref(0)
+
+watch(
+  () => store.toast,
+  () => {
+    toast.show(store.toast.mainOptions, store.toast.otherOptions)
+  }
+)
 
 // Make result tab the active tab
 function goToResult() {

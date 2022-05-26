@@ -24,11 +24,11 @@ test('deleteTableItem', async () => {
 })
 
 test('editTableItem', async () => {
-  const {getByText, getByTitle} = render(Table, {
+  const { getByText, getByTitle } = render(Table, {
     props: {
       overview: true,
-      results: [{foo: 2, bar: 2}],
-      headers: [{ name: 'hello'}, { name: 'world'}],
+      results: [{ foo: 2, bar: 2 }],
+      headers: [{ name: 'hello' }, { name: 'world' }],
       buttonText: 'button',
       removable: false,
     },
@@ -42,18 +42,17 @@ test('editTableItem', async () => {
 })
 
 test('userItemTable', async () => {
-  const {getByText, getByTitle, getByPlaceholderText} = render(Table, {
+  const { getByText, getByTitle, getByPlaceholderText } = render(Table, {
     props: {
-    caption: 'testcaption',
-    results: [{foo: 2, bar: 2}],
-    headers: [{ name: 'hello'}, { name: 'world'}],
-    headerOptions: [{ name: 'hello'}, { name: 'world'}],
-    userOptions: [{ name: 'hello'}, { name: 'world'}],
-    itemOptions: [{ name: 'hello'}, { name: 'world'}],
-    pagination: true,
-    expandable: true
+      caption: 'testcaption',
+      results: [{ foo: 2, bar: 2 }],
+      headers: [{ name: 'hello' }, { name: 'world' }],
+      headerOptions: [{ name: 'hello' }, { name: 'world' }],
+      userOptions: [{ name: 'hello' }, { name: 'world' }],
+      itemOptions: [{ name: 'hello' }, { name: 'world' }],
+      pagination: true,
+      expandable: true,
     },
-
   })
 
   getByTitle(/select/)
@@ -67,18 +66,16 @@ test('userItemTable', async () => {
   await fireEvent.click(headerbutton)
 
   getByPlaceholderText('20')
-
-  
-  
 })
 
 test('viewMetadata', async () => {
-  const {getAllByText, getByTitle} = render(Table, {
+  const { getAllByText, getByTitle } = render(Table, {
     props: {
       overview: true,
-      results: [{foo: 3, bar: 3}],
-      headers: [{ name: 'whats'}, { name: 'up'}],
-      buttonText: 'this part doesnt matter so I could put anything here and no-one will ever notice hehehe',
+      results: [{ foo: 3, bar: 3 }],
+      headers: [{ name: 'whats' }, { name: 'up' }],
+      buttonText:
+        'this part doesnt matter so I could put anything here and no-one will ever notice hehehe',
       removable: false,
     },
   })
