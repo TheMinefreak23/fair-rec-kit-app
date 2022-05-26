@@ -83,7 +83,7 @@ def calculate_first():
 # experiment_thread = threading.Thread(target=calculate_first)
 
 def end_experiment():
-    print('yay')
+    #print('yay')
     # result_storage.save_result(current_experiment.job, {})
     result_storage.save_result(current_experiment.job, format_result(current_experiment.config))
 
@@ -94,7 +94,7 @@ def end_experiment():
 def run_experiment(experiment):
     """Run an experiment and save the result."""
 
-    print('run experiment:', experiment)
+    #print('run experiment:', experiment)
 
     # Set current experiment
     global current_experiment
@@ -140,7 +140,7 @@ def format_result(settings):
 
     Returns: (list) the mock result
     """
-    print('== settings ==', settings)
+    #print('== settings ==', settings)
     result = []
     datasets = settings['datasets']
     for (dataset_index, dataset) in enumerate(datasets):
@@ -189,12 +189,12 @@ def calculate():
     if request.method == 'POST':
         data = request.get_json()
         settings = data.get('settings')
-        # print(data)
+        #print('==/calculation POST==', json.dumps(data,indent=4))
         append_queue(data.get('metadata'), settings)
 
         calculate_first()
 
-        print('queue', experiment_queue)
+        #print('queue', experiment_queue)
         # response = {'status': 'success'}
 
         response = {'queue': formatted_queue()}
@@ -211,7 +211,7 @@ def calculate():
 
 @compute_bp.route('/queue', methods=['GET'])
 def queue():
-    print('queue', formatted_queue())
+    #print('queue', formatted_queue())
     return {'queue': formatted_queue(), 'current': formatted_experiment(current_experiment)}
 
 
@@ -290,10 +290,10 @@ def mock_evaluate(approach, metric):
     # Mock evaluation
 
     result = len(approach['name']) * len(metric['name'])
-    print('metric:', metric)
+    #print('metric:', metric)
     # Do something with the metrics parameters.
     if metric['params']:
-        print(metric['name'], 'has params', metric['params'])
+        #print(metric['name'], 'has params', metric['params'])
         for (name, value) in metric['params'].items():
             val = int(value) if value else 0
             result *= len(name) * val
