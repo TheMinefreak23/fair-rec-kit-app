@@ -201,12 +201,13 @@ def calculate():
         if not current_experiment: 
             print('Current experiment should have started but is None')
         response['status'] = current_experiment.status.value if current_experiment else Status.NA.value
-        if current_experiment and current_experiment.status == Status.DONE:
-            # Set current result, TODO hacky
-            result_storage.result_by_id(current_experiment.job['timestamp']['stamp'])
-            response['calculation'] = result_storage.current_result
-        if current_experiment.status == Status.DONE or current_experiment.status == Status.ABORTED:
-            current_experiment = None
+        if current_experiment:
+            if current_experiment.status == Status.DONE:
+                # Set current result, TODO hacky
+                result_storage.result_by_id(current_experiment.job['timestamp']['stamp'])
+                response['calculation'] = result_storage.current_result
+            if current_experiment.status == Status.DONE or current_experiment.status == Status.ABORTED:
+                current_experiment = None
     # print('calculation response:', response)
     return response
 

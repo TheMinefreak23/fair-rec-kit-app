@@ -78,6 +78,7 @@ async function setRecs(currentTable) {
   }
 }
 
+/*
 //POST request: Ask server to load the evaluations of the current result
 //Currently not used, as evaluation tables are not finished
 async function loadEvaluations() {
@@ -101,7 +102,7 @@ async function getEvaluations() {
   console.log('succesfully retrieved evaluation data.')
   const resultsData = await response.json()
   console.log('results data', resultsData)
-}
+}*/
 
 //POST request: Ask server for next part of user recommendation table.
 async function getUserRecs(currentTable) {
@@ -235,20 +236,12 @@ function findUniqueDatasets(){
 <template>
   <div>
     <div class="container">
-      <p class="lead" > Results for </p>
-      <h1 class="display-3"> {{ result.metadata.name }}    </h1>
-      <h3 class="text-muted"> {{ result.metadata.datetime}} </h3>
-      <!-- TODO more human readable date time-->
+      <h1 class="display-2">Results</h1>
       <p class="lead">
-        Tags:
-        <template v-if="!result.metadata.tags">None</template>
-        <template v-for="tag in result.metadata.tags">
-          <b-button disabled> {{ tag }} </b-button
-          >
-        </template>
+        These are the results for experiment {{ result.metadata.name }} done at
+        {{ result.metadata.datetime }}.
       </p>
 
-      <p>&nbsp;</p> 
       <p>
         Datasets showing items per user:
         <div class="form-check" v-for="dataset in uniqueDatasets">
@@ -265,7 +258,14 @@ function findUniqueDatasets(){
         </div>
       </p>
 
-      
+      <div class="col">
+        Tags:
+        <template v-if="!result.metadata.tags">None</template>
+        <template v-for="tag in result.metadata.tags">
+          <b-button disabled> {{ tag }} </b-button
+          >
+        </template>
+      </div>
     </div>
 
     <div class="container">
@@ -292,7 +292,6 @@ function findUniqueDatasets(){
         </template>
       </div>
     </div>
-
 
     <div class="container">
       <div class="row">

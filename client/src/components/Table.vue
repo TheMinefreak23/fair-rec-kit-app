@@ -11,9 +11,10 @@ import { validateEmail, emptyFormGroup } from '../helpers/optionsFormatter'
 import { store } from '../store'
 import { makeHeader } from '../helpers/resultFormatter'
 import { statusPrefix, statusVariant, status } from '../helpers/queueFormatter'
+import { loadResult } from '../helpers/resultRequests'
 
 const emit = defineEmits([
-  'loadResult',
+  'viewResult',
   'loadResults',
   'loadMore',
   'paginationSort',
@@ -24,11 +25,11 @@ const props = defineProps({
   overview: Boolean,
   results: Array,
   headers: Array,
-  buttonText: String,
+  removeText: String,
   removable: Boolean,
+  editable: Boolean,
   serverFile: String,
   serverFile2: String,
-  serverFile3: String,
   pagination: Boolean,
   caption: String,
   expandable: Boolean,
@@ -164,38 +165,12 @@ async function removeEntry() {
 }
 
 async function getMetadata(selectedID) {
-  //request the metadata of the specified entry
-  const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: selectedID }),
-  }
-  fetch(API_URL + props.serverFile3, requestOptions).then(() => {
-    console.log('Metadata succesfully requested')
-    getResult()
-  })
-}
-
-async function getResult() {
-  const response = await fetch(API_URL + props.serverFile3)
-  const data = await response.json()
+  const data = await loadResult(selectedID)
   metadataStr.value = formatMetadata(data.result)
 }
 
 async function getNameTagsMail(selectedID) {
-  const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: selectedID }),
-  }
-  fetch(API_URL + props.serverFile3, requestOptions).then(() => {
-    console.log('Metadata succesfully requested')
-    getOldValues()
-  })
-}
-async function getOldValues() {
-  const response = await fetch(API_URL + props.serverFile3)
-  const data = await response.json()
+  const data = await loadResult(selectedID)
   newName.value = data.result.metadata.name
   newTags.value = data.result.metadata.tags.toString()
   newEmail.value = data.result.metadata.email
@@ -442,7 +417,7 @@ function getCancelIcon(item) {
         ><b-td class="align-middle" v-if="overview">
           <b-button
             variant="outline-primary fw-bold"
-            @click="$emit('loadResult', item.id)"
+            @click="$emit('viewResult', item.id)"
             >View result</b-button
           >
         </b-td>
@@ -474,7 +449,7 @@ function getCancelIcon(item) {
         <b-td class="align-middle" v-if="overview || removable">
           <div class="m-0 float-end" style="width: 150px">
             <b-button
-              v-if="overview"
+              v-if="editable"
               variant="primary"
               class="mx-1"
               @click="
@@ -485,11 +460,6 @@ function getCancelIcon(item) {
               ><i class="bi bi-pencil-square"></i
             ></b-button>
             <b-button
-              v-if="
-                overview ||
-                (item.status &&
-                  item.status.slice(statusPrefix.length) == status.done)
-              "
               variant="primary"
               class="mx-1"
               @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"

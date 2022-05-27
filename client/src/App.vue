@@ -29,11 +29,6 @@ onMounted(async () => {
 })
 //const tabIndex = ref(0)
 
-// Make result tab the active tab
-function goToResult() {
-  store.currentTab = 3
-}
-
 // Change UI on new result
 function onNewResult() {
   done.value = store.currentExperiment.status == status.done
