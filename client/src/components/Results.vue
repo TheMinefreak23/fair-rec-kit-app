@@ -3,12 +3,11 @@
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import { onMounted, ref, watch } from 'vue'
-import { API_URL } from '../api'
 import Result from './Result.vue'
 import VDismissButton from './VDismissButton.vue'
 import PreviousResults from './PreviousResults.vue'
-import { store, addResult, removeResult } from '../store'
-import { formatResult, status } from '../helpers/resultFormatter'
+import { store, removeResult } from '../store'
+import { status } from '../helpers/queueFormatter'
 
 const emit = defineEmits(['goToResult', 'toast'])
 const showResultModal = ref(false)
@@ -18,8 +17,8 @@ watch(
   () => store.currentExperiment.status,
   // New result added
   (newStatus, oldStatus) => {
-    if (newStatus == status.done) emit('toast')
     if (newStatus == status.done || newStatus == status.aborted) {
+      emit('toast')
       store.currentExperiment.status = status.notAvailable
     }
   }

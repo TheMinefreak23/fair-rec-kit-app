@@ -1,6 +1,7 @@
 import { reactive } from 'vue'
 import { API_URL } from './api'
-import { formatResult, status } from './helpers/resultFormatter'
+import { formatResult } from './helpers/resultFormatter'
+import { status } from './helpers/queueFormatter'
 
 const store = reactive({
   currentResults: [],

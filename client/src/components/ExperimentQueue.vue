@@ -5,7 +5,8 @@
 import { API_URL } from '../api.js'
 import Table from './Table.vue'
 import { onMounted, ref, watch } from 'vue'
-import { formatResults, status, progress } from '../helpers/resultFormatter.js'
+import { formatResults } from '../helpers/resultFormatter.js'
+import { status, progress } from '../helpers/queueFormatter.js'
 import { store, getQueue, pollForResult } from '../store.js'
 
 //const emit = defineEmits(['computing', 'done', 'stop'])
@@ -33,20 +34,17 @@ const previousNumber = ref(0)
 //Retrieve the queue when the page is loaded
 onMounted(() => {
   getQueue()
-  if (
-    store.currentExperiment &&
-    store.currentExperiment.status == status.active
-  ) {
+  if (store.currentExperiment.status == status.active) {
     pollForResult()
   }
 })
 
 //Reload the queue when the experiment is done
 watch(
-  () => store.currentExperiment,
+  () => store.currentExperiment.status,
   (newStatus, oldStatus) => {
     //console.log('queue watch experiment:', store.currentExperiment)
-    if (newStatus == null) {
+    if (newStatus == status.notAvailable) {
       getQueue()
     }
   }
@@ -121,6 +119,7 @@ function progressNumber(progressStatus) {
         buttonText="Cancel"
         :removable="true"
         :defaultSort="1"
+        serverFile="/experiment/queue/abort"
         serverFile3="/all-results/result-by-id"
       />
     </div>

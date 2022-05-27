@@ -14,13 +14,10 @@ import { API_URL } from './api'
 import MusicDetail from './components/MusicDetail.vue'
 import { useToast } from 'bootstrap-vue-3'
 import { store } from './store'
-import { status } from './helpers/resultFormatter'
+import { status } from './helpers/queueFormatter'
 import VCheckmark from './components/VCheckmark.vue'
 let toast = useToast()
-
-/*
-const activeExperiments = ref(false)
-const done = ref(false)*/
+const done = ref(false) // TODO refactor
 
 // Ping
 onMounted(async () => {
@@ -33,12 +30,18 @@ onMounted(async () => {
 
 // Make result tab the active tab
 function goToResult() {
-  store.currentTab = 3
+  if (done.value) store.currentTab = 3
 }
 
 function callToast() {
+  done.value = store.currentExperiment.status == status.done
   toast.show(
-    { title: 'An experiment has finished! View here' },
+    {
+      title:
+        store.currentExperiment.status == status.done
+          ? 'An experiment has finished! View here'
+          : 'Experiment aborted',
+    },
     {
       pos: 'top-right',
       delay: 800,
@@ -53,7 +56,7 @@ function callToast() {
     :toast="{ root: true }"
     fluid="sm"
     position="position-fixed"
-    @click="goToResult()"
+    @click="goToResult"
   >
   </b-container>
   <div class="d-flex flex-column min-vh-100">

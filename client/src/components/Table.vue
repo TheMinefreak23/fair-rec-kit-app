@@ -9,12 +9,8 @@ import { formatMetadata } from '../helpers/metadataFormatter'
 import FormGroupList from './FormGroupList.vue'
 import { validateEmail, emptyFormGroup } from '../helpers/optionsFormatter'
 import { store } from '../store'
-import {
-  statusPrefix,
-  statusVariant,
-  status,
-  makeHeader,
-} from '../helpers/resultFormatter'
+import { makeHeader } from '../helpers/resultFormatter'
+import { statusPrefix, statusVariant, status } from '../helpers/queueFormatter'
 
 const emit = defineEmits([
   'loadResult',
@@ -30,6 +26,7 @@ const props = defineProps({
   headers: Array,
   buttonText: String,
   removable: Boolean,
+  serverFile: String,
   serverFile2: String,
   serverFile3: String,
   pagination: Boolean,
@@ -44,6 +41,7 @@ const props = defineProps({
 
 const caption = ref('')
 const entryAmount = ref(20)
+const deleteModalShow = ref(false)
 const editModalShow = ref(false)
 const viewModalShow = ref(false)
 const filtersModalShow = ref(false)
