@@ -9,7 +9,7 @@ import { store, pollForResult } from '../store.js'
 import { API_URL } from '../api'
 import { emptyOption } from '../helpers/optionsFormatter'
 import { emptyFormGroup, validateEmail } from '../helpers/optionsFormatter'
-import { progress } from '../helpers/resultFormatter'
+import { progress } from '../helpers/queueFormatter'
 
 const horizontalLayout = ref(false)
 const oldMetadata = ref(false)
