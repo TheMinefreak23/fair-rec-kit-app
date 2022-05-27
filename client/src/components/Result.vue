@@ -278,17 +278,10 @@ function hideHeaders(headers){
 function hideResults(results){
   let result = []
     for(let i=0; i<results.length; i++) {
-      for(const [key,value] of Object.entries(results[i])){
-        console.log(key)
-        console.log(value)
-        console.log(contains(key, visibleMetrics.value))
-        if(contains(key, visibleMetrics.value)) {
-          console.log(key)
-          result.push[key,value]
-        }
-
-        
-      }
+      const object_as_array = Object.entries(results[i]).filter(([property, value]) => {
+        return !property.startsWith('P@') || contains(property, visibleMetrics.value)
+      })
+      result.push(Object.fromEntries(object_as_array))
     }
 
   return result
@@ -369,14 +362,10 @@ function contains(string, array){
 
             <Table
               :caption="datasetResult.caption"
-              :results="datasetResult.results"
+              :results="hideResults(datasetResult.results)"
               :headers="hideHeaders(datasetResult.headers)"
               :removable="false"
             />
-          
-            <p> {{visibleMetrics}} </p>
-           <p> {{datasetResult.results}} </p>
-           <p> {{hideResults(datasetResult.results)}}</p>
            </div>
         </template>      
       </div>
