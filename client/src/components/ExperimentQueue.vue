@@ -39,16 +39,17 @@ onMounted(() => {
   }
 })
 
+/*
 //Reload the queue when the experiment is done
 watch(
   () => store.currentExperiment.status,
   (newStatus, oldStatus) => {
-    //console.log('queue watch experiment:', store.currentExperiment)
-    if (newStatus == status.notAvailable) {
+    console.log('queue watch experiment:', store.currentExperiment)
+    if (newStatus) {
       getQueue()
     }
   }
-)
+)*/
 
 // Return a progress number based on the progress status
 function progressNumber(progressStatus) {

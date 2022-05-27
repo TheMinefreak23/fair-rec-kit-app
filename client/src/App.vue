@@ -111,20 +111,8 @@ function callToast() {
         align="center"
         nav-class="tab-active"
       >
-        <b-tab title="New Experiment" title-item-class="tab-title-class"
-          ><NewExperiment
-        /></b-tab>
-        <b-tab
-          title-item-class="tab-title-class"
-          :style="{
-            color:
-              store.currentExperiment.status == status.active ? 'red' : 'black',
-            backgroundColor:
-              store.currentExperiment.status == status.active
-                ? 'yellow'
-                : 'white',
-          }"
-        >
+        <b-tab title="New Experiment"><NewExperiment /></b-tab>
+        <b-tab title-item-class="tab-title-class">
           <!--<ActiveExperiments
           @computing="
             ;(activeExperiments = true), (done = false), (tabIndex = 1)

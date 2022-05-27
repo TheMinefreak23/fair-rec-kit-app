@@ -139,12 +139,20 @@ function emptyVmodels() {
   newEmail.value = ''
 }
 
+// Remove an entry from the list
 async function removeEntry() {
-  //Remove an entry from the list
   const entry = selectedEntry.value
-  //props.results.splice(entry, 1)
-  store.allResults = store.allResults.filter((e) => e.id != entry.id)
-  //Inform the server to remove the same entry
+
+  if (entry.remove) {
+    // Remove first matching item from store
+    const list = entry.fromQueue ? store.allResults : store.queue
+    for (let i in list) {
+      if (list[i].id == entry.id) list.splice(i, 1)
+      break
+    }
+  }
+
+  // Inform the server to remove the same entry
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -227,17 +235,27 @@ function setsorting(i) {
 function setEntryRemoval(item) {
   let title = ''
   let description = ''
+  let removeFromStore = true
+  let fromQueue = true
   if (!item.status) {
+    fromQueue = false
     title = 'Remove entry?'
     description = `Are you sure you want to remove result ${item.name}?`
   } else if (status == status.toDo) {
     title = 'Cancel experiment?'
     description = `Are you sure you want to cancel scheduled experiment ${item.name}?`
   } else {
+    removeFromStore = false
     title = 'Abort experiment?'
     description = `Are you sure you want to abort active experiment ${item.name}?`
   }
-  selectedEntry.value = { id: item.id, title: title, description: description }
+  selectedEntry.value = {
+    id: item.id,
+    title: title,
+    description: description,
+    removeFromStore: removeFromStore,
+    fromQueue: fromQueue,
+  }
   deleteModalShow.value = !deleteModalShow.value
 }
 

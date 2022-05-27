@@ -22,21 +22,22 @@ function pollForResult() {
  * GET request: Ask server for latest calculation
  */
 function getCalculation() {
-  if (store.currentExperiment) {
+  if (store.currentExperiment.status != status.notAvailable) {
     //console.log('fetching result')
     try {
       fetch(API_URL + '/experiment/calculation')
         .then((response) => response.json())
         .then((data) => {
           store.currentExperiment.status = data.status
-          if (data.status == status.done || data.status == status.aborted) {
+          if ([status.done, status.aborted].includes(data.status)) {
             clearInterval(store.resultPoll)
             if (data.status == status.done)
               addResult(formatResult(data.calculation))
-          } else if (data.status == status.active) {
-            // Update queue and progress while waiting for a result
-            getQueue()
+            console.log('DONE or ABORTED!!')
           }
+
+          // Update queue and progress while waiting for a result
+          getQueue()
           console.log(
             'polling experiment, status:',
             data.status,
@@ -56,11 +57,14 @@ async function getQueue() {
   const data = await response.json()
   //store.queue = formatResults(data).map(x=>x.omit(x,'ID'))
   //store.queue = formatResults(data)
-  //console.log('queue', data.queue)
-  store.queue = data.queue
-  if (data.current && data.current.status == status.active) {
+  //console.log('queue latest', data.current)
+  // Update latest experiment (queue item)
+  if (data.current && data.current.status != status.notAvailable) {
+    //console.log(data.current)
     store.currentExperiment = data.current
+    //store.queue[store.queue.length - 1] = data.current
   }
+  store.queue = data.queue
 }
 
 // Add a new result to the global current shown results state
