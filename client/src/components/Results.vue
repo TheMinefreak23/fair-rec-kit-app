@@ -8,18 +8,19 @@ import Result from './Result.vue'
 import VDismissButton from './VDismissButton.vue'
 import PreviousResults from './PreviousResults.vue'
 import { store, addResult, removeResult } from '../store'
-import { formatResult } from '../helpers/resultFormatter'
+import { formatResult, status } from '../helpers/resultFormatter'
 
 const emit = defineEmits(['goToResult', 'toast'])
 const showResultModal = ref(false)
 const currentTab = ref(0)
 
 watch(
-  () => store.currentExperiment,
+  () => store.currentExperiment.status,
   // New result added
-  (newState, oldState) => {
-    if (!newState && oldState) {
-      emit('toast')
+  (newStatus, oldStatus) => {
+    if (newStatus == status.done) emit('toast')
+    if (newStatus == status.done || newStatus == status.aborted) {
+      store.currentExperiment.status = status.notAvailable
     }
   }
 )
@@ -103,7 +104,12 @@ function closeResult(index) {
               <!-- Show opened results in tabs.-->
               <b-tab v-for="(result, index) in store.currentResults">
                 <template #title>
-                  <b-spinner v-if="index == store.currentResults.length - 1" type="grow" variant="info" small></b-spinner>
+                  <b-spinner
+                    v-if="index == store.currentResults.length - 1"
+                    type="grow"
+                    variant="info"
+                    small
+                  ></b-spinner>
                   Result {{ result.metadata.name }}
                   <VDismissButton @click.stop="closeResult(index)" />
                 </template>

@@ -6,7 +6,7 @@ const store = reactive({
   currentResults: [],
   queue: [],
   allResults: [],
-  currentExperiment: null, // REFACTOR
+  currentExperiment: { status: status.notAvailable }, // REFACTOR
   currentTab: 0,
   currentResultTab: 0,
   resultPoll: null, // polls when there is an active experiment (result, queue, progress)
@@ -27,8 +27,8 @@ function getCalculation() {
       fetch(API_URL + '/experiment/calculation')
         .then((response) => response.json())
         .then((data) => {
+          store.currentExperiment.status = data.status
           if (data.status == status.done || data.status == status.aborted) {
-            store.currentExperiment = null
             clearInterval(store.resultPoll)
             if (data.status == status.done)
               addResult(formatResult(data.calculation))

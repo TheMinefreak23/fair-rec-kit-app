@@ -14,6 +14,7 @@ import { API_URL } from './api'
 import MusicDetail from './components/MusicDetail.vue'
 import { useToast } from 'bootstrap-vue-3'
 import { store } from './store'
+import { status } from './helpers/resultFormatter'
 import VCheckmark from './components/VCheckmark.vue'
 let toast = useToast()
 
@@ -110,7 +111,17 @@ function callToast() {
         <b-tab title="New Experiment" title-item-class="tab-title-class"
           ><NewExperiment
         /></b-tab>
-        <b-tab title-item-class="tab-title-class">
+        <b-tab
+          title-item-class="tab-title-class"
+          :style="{
+            color:
+              store.currentExperiment.status == status.active ? 'red' : 'black',
+            backgroundColor:
+              store.currentExperiment.status == status.active
+                ? 'yellow'
+                : 'white',
+          }"
+        >
           <!--<ActiveExperiments
           @computing="
             ;(activeExperiments = true), (done = false), (tabIndex = 1)
@@ -122,11 +133,20 @@ function callToast() {
           <template v-slot:title>
             <div
               :style="{
-                color: store.currentExperiment ? 'red' : 'black',
-                backgroundColor: store.currentExperiment ? 'yellow' : 'white',
+                color:
+                  store.currentExperiment.status == status.active
+                    ? 'red'
+                    : 'black',
+                backgroundColor:
+                  store.currentExperiment.status == status.active
+                    ? 'yellow'
+                    : 'white',
               }"
             >
-              <b-spinner v-if="store.currentExperiment" small></b-spinner>
+              <b-spinner
+                v-if="store.currentExperiment.status == status.active"
+                small
+              ></b-spinner>
               <VCheckmark v-else />
               Experiment Queue
             </div>

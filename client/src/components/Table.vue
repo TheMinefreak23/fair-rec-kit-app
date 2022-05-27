@@ -30,7 +30,6 @@ const props = defineProps({
   headers: Array,
   buttonText: String,
   removable: Boolean,
-  serverFile: String,
   serverFile2: String,
   serverFile3: String,
   pagination: Boolean,
@@ -45,7 +44,6 @@ const props = defineProps({
 
 const caption = ref('')
 const entryAmount = ref(20)
-const deleteModalShow = ref(false)
 const editModalShow = ref(false)
 const viewModalShow = ref(false)
 const filtersModalShow = ref(false)
@@ -471,20 +469,31 @@ function getCancelIcon(item) {
               ><i class="bi bi-pencil-square"></i
             ></b-button>
             <b-button
-              v-if="overview"
+              v-if="
+                overview ||
+                (item.status &&
+                  item.status.slice(statusPrefix.length) == status.done)
+              "
               variant="primary"
               class="mx-1"
               @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
               ><i class="bi bi-info-circle"></i
             ></b-button>
             <!--REFACTOR status condition-->
-            <b-button
-              v-if="
-                removable &&
-                (!item.status ||
-                  [status.toDo, status.active].includes(
-                    item.status.slice(statusPrefix.length)
-                  ))
+            <RemoveButtonModal
+              v-if="removable && !item.status"
+              title="Remove entry?"
+              showButton
+              :entry="item.id"
+              deleteURL="/all-results/delete"
+              ><i class="bi bi-trash"></i
+            ></RemoveButtonModal>
+            <RemoveButtonModal
+              v-if="item.status"
+              :title="
+                item.status.slice(statusPrefix.length) == status.toDo
+                  ? 'Cancel experiment?'
+                  : 'Abort active experiment?'
               "
               variant="danger"
               class="mx-1 float-end"
