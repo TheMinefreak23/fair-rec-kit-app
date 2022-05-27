@@ -12,6 +12,7 @@ import { store } from '../store'
 import { makeHeader } from '../helpers/resultFormatter'
 import { statusPrefix, statusVariant, status } from '../helpers/queueFormatter'
 import { loadResult } from '../helpers/resultRequests'
+import SettingsModal from './Table/SettingsModal.vue'
 
 const emit = defineEmits([
   'viewResult',
@@ -43,6 +44,7 @@ const props = defineProps({
 const caption = ref('')
 const entryAmount = ref(20)
 const deleteModalShow = ref(false)
+const settingsModalShow = ref(false)
 const editModalShow = ref(false)
 const viewModalShow = ref(false)
 const filtersModalShow = ref(false)
@@ -167,10 +169,12 @@ async function removeEntry() {
 async function getMetadata(selectedID) {
   const data = await loadResult(selectedID)
   metadataStr.value = formatMetadata(data.result)
+  console.log('Metadata succesfully requested')
 }
 
 async function getNameTagsMail(selectedID) {
   const data = await loadResult(selectedID)
+  console.log('Metadata succesfully requested')
   newName.value = data.result.metadata.name
   newTags.value = data.result.metadata.tags.toString()
   newEmail.value = data.result.metadata.email
@@ -404,12 +408,14 @@ function getCancelIcon(item) {
         >
           {{ header.name }}
         </b-th>
+        <b-th v-if="overview"></b-th>
       </b-tr>
       <b-tr>
         <b-th v-if="overview"></b-th>
         <b-th v-for="subheader in subheaders" :key="subheader">
           {{ subheader }}
         </b-th>
+        <b-th v-if="overview"></b-th>
       </b-tr>
     </b-thead>
     <b-tbody>
@@ -481,6 +487,9 @@ function getCancelIcon(item) {
               <i :class="'bi ' + getCancelIcon(item)"></i>
             </b-button>
           </div>
+        </b-td>
+        <b-td class="align-middle" v-if="overview">
+          <SettingsModal :resultId="item.id" />
         </b-td>
       </b-tr>
     </b-tbody>

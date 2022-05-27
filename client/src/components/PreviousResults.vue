@@ -11,7 +11,7 @@ import { API_URL } from '../api'
 import { viewResult } from '../helpers/resultRequests.js'
 
 const oldResultsFormat = ref(true) // TODO DEV
-const emit = defineEmits(['goToResult'])
+//const emit = defineEmits(['goToResult'])
 
 const exResults = ref([
   { id: 1, age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },

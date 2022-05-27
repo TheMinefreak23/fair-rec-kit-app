@@ -8,6 +8,8 @@ import { onMounted, ref} from 'vue'
 import { emptyFormGroup } from '../helpers/optionsFormatter'
 import { makeHeader } from '../helpers/resultFormatter'
 import { API_URL } from '../api'
+import { loadResult } from '../helpers/resultRequests'
+import SettingsModal from './Table/SettingsModal.vue'
 
 const props = defineProps({ headers: Array, result: Object })
 
@@ -35,7 +37,8 @@ const uniqueDatasets = findUniqueDatasets()
 onMounted(() => {
   console.log('result', props.result)
   console.log('result id', props.result.id)
-  loadEvaluations()
+  //loadEvaluations()
+  //loadResult(props.result.id)
   fillVisibleDatasets()
   //Load in all the user recommendation/prediction tables
   for (let index in userTables) {
@@ -236,7 +239,16 @@ function findUniqueDatasets(){
 <template>
   <div>
     <div class="container">
+      <b-row>
+        <b-col>
       <h1 class="display-2">Results</h1>
+      </b-col>
+      <b-col>
+        <div class="float-end">
+          <SettingsModal :resultId="result.id"/>
+            </div>
+      </b-col>
+      </b-row>
       <p class="lead">
         These are the results for experiment {{ result.metadata.name }} done at
         {{ result.metadata.datetime }}.

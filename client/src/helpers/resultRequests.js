@@ -36,7 +36,7 @@ export async function viewResult(resultId) {
   viewResultTab()
 }
 
-function viewResultTab() {
+export function viewResultTab() {
   // Make result tab the active tab
   store.currentTab = 3
 }

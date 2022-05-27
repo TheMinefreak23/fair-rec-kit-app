@@ -4,6 +4,7 @@ import { formatResult } from './helpers/resultFormatter'
 import { status } from './helpers/queueFormatter'
 
 const store = reactive({
+  settings: {}, // experiment settings (NOTE: only used for copying settings for now)
   currentResults: [],
   queue: [],
   allResults: [],
