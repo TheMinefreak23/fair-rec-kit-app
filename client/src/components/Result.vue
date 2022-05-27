@@ -275,6 +275,30 @@ function hideHeaders(headers){
   return result
 }
 
+function hideResults(results){
+  let result = []
+    for(let i=0; i<results.length; i++) {
+      for(const [key,value] of Object.entries(results[i])){
+        console.log(key)
+        console.log(value)
+        console.log(contains(key, visibleMetrics.value))
+        if(contains(key, visibleMetrics.value)) {
+          console.log(key)
+          result.push[key,value]
+        }
+
+        
+      }
+    }
+
+  return result
+}
+
+//SOURCE: https://bobbyhadz.com/blog/javascript-check-if-string-contains-substring-from-array
+function contains(string, array){
+  return array.some(element => string.startsWith(element))
+}
+
 
 </script>
 
@@ -350,10 +374,9 @@ function hideHeaders(headers){
               :removable="false"
             />
           
-           <p> {{ hideHeaders(datasetResult.headers)}} </p>
-           <p> {{ typeof(visibleMetrics) == typeof([])}} </p>
-           <p> {{datasetResult.headers}} </p>
+            <p> {{visibleMetrics}} </p>
            <p> {{datasetResult.results}} </p>
+           <p> {{hideResults(datasetResult.results)}}</p>
            </div>
         </template>      
       </div>
