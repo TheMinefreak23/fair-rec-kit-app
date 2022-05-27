@@ -241,6 +241,7 @@ function findUniqueDatasets(){
       <p class="lead" > Results for </p>
       <h1 class="display-3"> {{ result.metadata.name }}    </h1>
       <h3 class="text-muted"> {{ result.metadata.datetime}} </h3>
+      <!-- TODO more human readable date time-->
       <p class="lead">
         Tags:
         <template v-if="!result.metadata.tags">None</template>

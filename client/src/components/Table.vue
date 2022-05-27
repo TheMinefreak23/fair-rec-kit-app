@@ -9,7 +9,8 @@ import { formatMetadata } from '../helpers/metadataFormatter'
 import FormGroupList from './FormGroupList.vue'
 import { validateEmail, emptyFormGroup } from '../helpers/optionsFormatter'
 import { store } from '../store'
-import { statusPrefix, statusVariant, status, makeHeader } from '../helpers/resultFormatter'
+import { makeHeader } from '../helpers/resultFormatter'
+import { statusPrefix, statusVariant, status } from '../helpers/queueFormatter'
 
 const emit = defineEmits([
   'loadResult',
@@ -138,19 +139,27 @@ function emptyVmodels() {
   newEmail.value = ''
 }
 
+// Remove an entry from the list
 async function removeEntry() {
-  //Remove an entry from the list
   const entry = selectedEntry.value
-  //props.results.splice(entry, 1)
-  store.allResults = store.allResults.filter((e) => e.id != entry)
-  //Inform the server to remove the same entry
+
+  if (entry.remove) {
+    // Remove first matching item from store
+    const list = entry.fromQueue ? store.allResults : store.queue
+    for (let i in list) {
+      if (list[i].id == entry.id) list.splice(i, 1)
+      break
+    }
+  }
+
+  // Inform the server to remove the same entry
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: entry }),
+    body: JSON.stringify({ id: entry.id }),
   }
   fetch(API_URL + props.serverFile, requestOptions).then(() => {
-    console.log('Item', entry, 'removed succesfully')
+    console.log('Item', entry.id, 'removed succesfully')
   })
 }
 
@@ -221,6 +230,41 @@ function setsorting(i) {
   emit('paginationSort', i)
 }
 //console.log('propsfilteroptions', props.filterOptions)
+
+// TODO refactor
+function setEntryRemoval(item) {
+  let title = ''
+  let description = ''
+  let removeFromStore = true
+  let fromQueue = true
+  if (!item.status) {
+    fromQueue = false
+    title = 'Remove entry?'
+    description = `Are you sure you want to remove result ${item.name}?`
+  } else if (status == status.toDo) {
+    title = 'Cancel experiment?'
+    description = `Are you sure you want to cancel scheduled experiment ${item.name}?`
+  } else {
+    removeFromStore = false
+    title = 'Abort experiment?'
+    description = `Are you sure you want to abort active experiment ${item.name}?`
+  }
+  selectedEntry.value = {
+    id: item.id,
+    title: title,
+    description: description,
+    removeFromStore: removeFromStore,
+    fromQueue: fromQueue,
+  }
+  deleteModalShow.value = !deleteModalShow.value
+}
+
+function getCancelIcon(item) {
+  if (!item.status) return 'bi-trash'
+  const status = item.status.slice(statusPrefix.length)
+  if (status == status.toDo) return 'bi-x-lg'
+  else return 'bi-x-octagon-fill'
+}
 </script>
 
 <template>
@@ -228,13 +272,13 @@ function setsorting(i) {
   <b-modal
     id="deletion-modal"
     v-model="deleteModalShow"
-    title="Remove entry?"
+    :title="selectedEntry.title"
     ok-title="Yes"
     ok-variant="danger"
     cancel-title="No"
     @ok="removeEntry()"
   >
-    <p>Are you sure you want to remove this entry from the list?</p>
+    <p>{{ selectedEntry.description }}</p>
   </b-modal>
 
   <!--Shows when the user wants to edit an entry-->
@@ -355,7 +399,10 @@ function setsorting(i) {
       }}
 
       <template v-if="expandable">
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" rel="stylesheet">
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
+          rel="stylesheet"
+        />
 
         <div class="float-end">
           <b-button
@@ -393,35 +440,39 @@ function setsorting(i) {
     <b-tbody>
       <b-tr v-for="(item, index) in sorted" :key="item"
         ><b-td class="align-middle" v-if="overview">
-          <b-button variant="outline-primary fw-bold" @click="$emit('loadResult', item.id)">View result</b-button>
+          <b-button
+            variant="outline-primary fw-bold"
+            @click="$emit('loadResult', item.id)"
+            >View result</b-button
+          >
         </b-td>
         <b-td
           v-for="[key, value] in Object.entries(item)"
           :key="`${descending}_${sortindex}_${index}-${key}`"
           class="text-center"
         >
-            <!--Special pill format for status-->
-            <!-- TODO refactor-->
-            <template
-              v-if="typeof value === 'string' && value.startsWith(statusPrefix)"
+          <!--Special pill format for status-->
+          <!-- TODO refactor-->
+          <template
+            v-if="typeof value === 'string' && value.startsWith(statusPrefix)"
+          >
+            <b-button
+              disabled
+              :variant="statusVariant(value)"
+              :class="
+                value.slice(statusPrefix.length) == status.active
+                  ? 'status-blinking'
+                  : 'status'
+              "
+              class="fw-bold"
             >
-              <b-button
-                disabled
-                :variant="statusVariant(value)"
-                :class="
-                  value.slice(statusPrefix.length) == status.active
-                    ? 'status-blinking'
-                    : 'status'
-                "
-                class="fw-bold"
-              >
-                {{ value.slice(statusPrefix.length) }}
-              </b-button>
-            </template>
-            <template v-else> {{ value }}</template>
+              {{ value.slice(statusPrefix.length) }}
+            </b-button>
+          </template>
+          <template v-else> {{ value }}</template>
         </b-td>
-          <b-td class="align-middle" v-if="overview || removable">
-            <div class="m-0 float-end" style="width: 150px;">
+        <b-td class="align-middle" v-if="overview || removable">
+          <div class="m-0 float-end" style="width: 150px">
             <b-button
               v-if="overview"
               variant="primary"
@@ -431,15 +482,19 @@ function setsorting(i) {
                   (selectedEntry = index),
                   getNameTagsMail(item.id)
               "
-              ><i class="bi bi-pencil-square"></i></b-button
-            >
+              ><i class="bi bi-pencil-square"></i
+            ></b-button>
             <b-button
-              v-if="overview"
+              v-if="
+                overview ||
+                (item.status &&
+                  item.status.slice(statusPrefix.length) == status.done)
+              "
               variant="primary"
               class="mx-1"
               @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
-              ><i class="bi bi-info-circle"></i></b-button
-            >
+              ><i class="bi bi-info-circle"></i
+            ></b-button>
             <!--REFACTOR status condition-->
             <b-button
               v-if="
@@ -451,13 +506,12 @@ function setsorting(i) {
               "
               variant="danger"
               class="mx-1 float-end"
-              @click="
-                ;(deleteModalShow = !deleteModalShow), (selectedEntry = item.id)
-              "
-              ><i class="bi bi-trash"></i></b-button
+              @click="setEntryRemoval(item)"
             >
-            </div>
-          </b-td>
+              <i :class="'bi ' + getCancelIcon(item)"></i>
+            </b-button>
+          </div>
+        </b-td>
       </b-tr>
     </b-tbody>
   </b-table-simple>

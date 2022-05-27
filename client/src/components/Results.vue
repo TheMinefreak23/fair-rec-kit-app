@@ -3,23 +3,24 @@
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import { onMounted, ref, watch } from 'vue'
-import { API_URL } from '../api'
 import Result from './Result.vue'
 import VDismissButton from './VDismissButton.vue'
 import PreviousResults from './PreviousResults.vue'
-import { store, addResult, removeResult } from '../store'
-import { formatResult } from '../helpers/resultFormatter'
+import { store, removeResult } from '../store'
+import { status } from '../helpers/queueFormatter'
+import { shortResultDescription } from '../helpers/resultFormatter'
 
 const emit = defineEmits(['goToResult', 'toast'])
 const showResultModal = ref(false)
 const currentTab = ref(0)
 
 watch(
-  () => store.currentExperiment,
+  () => store.currentExperiment.status,
   // New result added
-  (newState, oldState) => {
-    if (!newState && oldState) {
+  (newStatus, oldStatus) => {
+    if (newStatus == status.done || newStatus == status.aborted) {
       emit('toast')
+      store.currentExperiment.status = status.notAvailable
     }
   }
 )
@@ -85,7 +86,10 @@ function closeResult(index) {
       <div class="border-top-0 p-0">
         <!--Open previous results sidebar on button press-->
         <div class="p-3 m-0 container-fluid">
-          <h3 class="d-inline">Results</h3>
+          <!--<div class="text-center">
+            <h3 class="d-inline">Results</h3>
+          </div>-->
+          <h3 class="d-inline">Current results</h3>
           <button
             class="d-inline btn btn-primary float-end"
             type="button"
@@ -98,14 +102,24 @@ function closeResult(index) {
         </div>
         <div class="border">
           <template v-if="store.currentResults.length > 0">
-            {{ currentTab.value }}
             <b-tabs v-model="currentTab" card content-class="mt-3">
               <!-- Show opened results in tabs.-->
               <b-tab v-for="(result, index) in store.currentResults">
-                <template #title>
-                  <b-spinner v-if="index == store.currentResults.length - 1" type="grow" variant="info" small></b-spinner>
-                  Result {{ result.metadata.name }}
-                  <VDismissButton @click.stop="closeResult(index)" />
+                <template #title
+                  ><b-button
+                    variant="light"
+                    v-b-tooltip.hover
+                    :title="shortResultDescription(result)"
+                  >
+                    <b-spinner
+                      v-if="index == store.currentResults.length - 1"
+                      type="grow"
+                      variant="info"
+                      small
+                    ></b-spinner>
+                    Result {{ result.metadata.name }}
+                    <VDismissButton @click.stop="closeResult(index)" />
+                  </b-button>
                 </template>
                 <Result :result="result" :key="result.id"
               /></b-tab>
