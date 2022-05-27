@@ -238,7 +238,9 @@ function findUniqueDatasets(){
 <template>
   <div>
     <div class="container">
-      <h1 class="display-2">Results</h1>
+      <!--<h1 class="display-2">Result</h1>-->
+      <h2>Result: {{ result.metadata.name }}</h2>
+      <!-- TODO more human readable date time-->
       <p class="lead">
         These are the results for experiment {{ result.metadata.name }} done at
         {{ result.metadata.datetime }}.
