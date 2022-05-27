@@ -105,6 +105,32 @@ function omitRecommendation(arr) {
   )
 }*/
 
+// Short result description, e.g. for a result tab
+export function shortResultDescription(result) {
+  console.log(result)
+  const datasets = []
+  const approaches = []
+  for (const datasetResult of result.result) {
+    datasets.push(datasetResult.dataset.name)
+    for (const rec of datasetResult.recs) {
+      approaches.push(rec.approach)
+    }
+  }
+  const datetime = result.metadata.datetime
+
+  function formatNames(list) {
+    console.log(Array.from(new Set(list)))
+    const formattedList = []
+    for (const name of Array.from(new Set(list))) {
+      const lastIndex = name.lastIndexOf('_')
+      formattedList.push(name.slice(0, lastIndex))
+    }
+    return formattedList
+  }
+
+  return [datetime, formatNames(datasets), formatNames(approaches)].join(' | ')
+}
+
 // Show dataset info as formatted caption
 export function showDatasetInfo(dataset) {
   return (

@@ -31,9 +31,7 @@ onMounted(async () => {
 
 // Make result tab the active tab
 function goToResult() {
-  if (done.value) {
-    store.currentTab = 3
-  }
+  store.currentTab = 3
 }
 
 // Change UI on new result
@@ -73,7 +71,7 @@ function callToast() {
     :toast="{ root: true }"
     fluid="sm"
     position="position-fixed"
-    @click="goToResult"
+    @click="done ? goToResult() : () => {}"
   >
   </b-container>
   <div class="d-flex flex-column min-vh-100">
