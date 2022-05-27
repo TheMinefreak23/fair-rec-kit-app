@@ -480,20 +480,13 @@ function getCancelIcon(item) {
               ><i class="bi bi-info-circle"></i
             ></b-button>
             <!--REFACTOR status condition-->
-            <RemoveButtonModal
-              v-if="removable && !item.status"
-              title="Remove entry?"
-              showButton
-              :entry="item.id"
-              deleteURL="/all-results/delete"
-              ><i class="bi bi-trash"></i
-            ></RemoveButtonModal>
-            <RemoveButtonModal
-              v-if="item.status"
-              :title="
-                item.status.slice(statusPrefix.length) == status.toDo
-                  ? 'Cancel experiment?'
-                  : 'Abort active experiment?'
+            <b-button
+              v-if="
+                removable &&
+                (!item.status ||
+                  [status.toDo, status.active].includes(
+                    item.status.slice(statusPrefix.length)
+                  ))
               "
               variant="danger"
               class="mx-1 float-end"

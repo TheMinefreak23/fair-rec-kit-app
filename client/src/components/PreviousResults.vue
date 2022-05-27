@@ -91,6 +91,7 @@ async function getResult() {
         buttonText="Remove"
         :removable="true"
         :overview="true"
+        serverFile="/all-results/delete"
         serverFile2="/all-results/edit"
         :serverFile3="resultsRoute"
         :defaultSort="1"
