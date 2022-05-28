@@ -2,21 +2,17 @@
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
-import { render, fireEvent, getByTestId } from '@testing-library/vue'
+import { render } from '@testing-library/vue'
 import { test } from 'vitest'
-import App from '../App.vue'
+import ExperimentQueue from '../components/ExperimentQueue.vue'
 
 /**
- * Test switching to the queue tab
+ * Test queue tab content
  */
-test('switchTab', async () => {
+test('Queue', async () => {
   // get utilities to query component
-  const { getAllByText } = render(App)
+  const { getByText } = render(ExperimentQueue)
 
-  const tab = getAllByText('Active Experiments')[2]
-
-  await fireEvent.click(tab)
-
-  // throws error if the view that appears on press does not have this text
-  getAllByText('Queue')
+  getByText('Queue')
+  getByText('Current experiment: None')
 })
