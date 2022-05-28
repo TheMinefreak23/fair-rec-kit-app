@@ -83,9 +83,9 @@ def calculate_first():
 # experiment_thread = threading.Thread(target=calculate_first)
 
 def end_experiment():
-    #print('yay')
-    # result_storage.save_result(current_experiment.job, {})
-    result_storage.save_result(current_experiment.job, format_result(current_experiment.config))
+    if current_experiment.status is not Status.ABORTED:
+        # result_storage.save_result(current_experiment.job, {})
+        result_storage.save_result(current_experiment.job, format_result(current_experiment.config))
 
     # Calculate next item in queue
     calculate_first()
@@ -200,19 +200,22 @@ def calculate():
         response = {'queue': formatted_queue()}
     else:
         # TODO catch error
+        global current_experiment
         if not current_experiment: 
             print('Current experiment should have started but is None')
+        response['status'] = current_experiment.status.value if current_experiment else Status.NA.value
         if current_experiment and current_experiment.status == Status.DONE:
             response['calculation'] = result_storage.current_result
-        response['status'] = current_experiment.status.value if current_experiment else Status.NA.value
+        if current_experiment.status == Status.DONE or current_experiment.status == Status.ABORTED:
+            current_experiment = None
     # print('calculation response:', response)
     return response
 
 
 @compute_bp.route('/queue', methods=['GET'])
 def queue():
-    #print('queue', formatted_queue())
-    return {'queue': formatted_queue(), 'current': formatted_experiment(current_experiment)}
+    #print('queue', json.dumps(formatted_queue(),indent=4))
+    return {'queue': formatted_queue(), 'current': formatted_experiment(current_experiment) if current_experiment else None}
 
 
 @compute_bp.route('/queue/abort', methods=['POST'])
@@ -225,8 +228,9 @@ def abort():
     data = request.get_json()
     item_id = data.get('id')
     print('trying to cancel',item_id)
+    # Find the first experiment with the ID in the queue
     experiment = next(filter(lambda item: item.job['timestamp']['stamp'] == item_id, experiment_queue), None)
-    print(experiment)
+    #print(experiment)
     # Cancel queued experiment
     if experiment.status == Status.TODO:
         experiment.status = Status.CANCELLED

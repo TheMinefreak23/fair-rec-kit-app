@@ -8,7 +8,7 @@ import { getCalculation, store } from '../store'
 import { ref, onMounted } from 'vue'
 import mockLists from './mockLists.json'
 import mockMetrics from './mockMetrics.json'
-import { progress } from '../helpers/resultFormatter'
+import { progress } from '../helpers/queueFormatter'
 
 var metadata = {}
 var form = {}

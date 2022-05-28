@@ -106,7 +106,8 @@ class EventHandler():
         # print('config', current_experiment.config)
 
         # Update status
-        self.experiment.status = Status.DONE
-        self.experiment.progress = ProgressStatus.FINISHED
+        if self.experiment.status is not Status.ABORTED:
+            self.experiment.status = Status.DONE
+            self.experiment.progress = ProgressStatus.FINISHED
 
         self.end_experiment()
