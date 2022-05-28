@@ -268,10 +268,17 @@ function setEntryRemoval(item) {
 }
 
 function getCancelIcon(item) {
-  if (!item.status) return 'bi-trash'
+  if (!item.status) return 'bi-trash-fill'
   const status = item.status.slice(statusPrefix.length)
   if (status == status.toDo) return 'bi-x-lg'
   else return 'bi-x-octagon-fill'
+}
+
+function getTooltipText(item) {
+  if (!item.status) return 'Delete'
+  const status = item.status.slice(statusPrefix.length)
+  if (status == status.toDo) return 'Cancel'
+  else return 'Cancel'
 }
 </script>
 
@@ -452,16 +459,12 @@ function getCancelIcon(item) {
     <b-tbody>
       <b-tr v-for="(item, index) in sorted" :key="item"
         ><b-td class="align-middle" v-if="overview" :style="colItemStyle">
-          <b-button
-            variant="outline-primary fw-bold"
-            @click="$emit('loadResult', item.id)"
-            >View result</b-button
-          >
+          
         </b-td>
         <b-td
           v-for="[key, value] in Object.entries(item)"
           :key="`${descending}_${sortindex}_${index}-${key}`"
-          class="text-center"
+          class="text-center align-middle"
           :style="colItemStyle"
         >
           <!--Special pill format for status-->
@@ -484,13 +487,23 @@ function getCancelIcon(item) {
           </template>
           <template v-else> {{ value }}</template>
         </b-td>
-        <b-td class="align-middle" v-if="overview || removable">
-          <b-row class="m-0 float-end">
-            <b-col md="auto" class="mx-0 px-0">
+        <b-td class="align-middle" style="width:150px;" v-if="overview || removable">
+          <b-row class="m-0 float-end d-block">
               <b-button
                 v-if="overview"
                 variant="primary"
+                @click="$emit('loadResult', item.id)"
+                class="m-1"
+                style="width:142px;"
+                >View result
+              </b-button>
+            <div class="p-0" style="width:150px;">
+            <b-col md="auto" class="mx-0 px-0 d-inline">
+              <b-button
+                v-if="overview"
+                variant="outline-primary"
                 class="mx-1"
+                v-b-tooltip.hover title="Edit data"
                 @click="
                   ;(editModalShow = !editModalShow),
                     (selectedEntry = index),
@@ -500,21 +513,22 @@ function getCancelIcon(item) {
                 ><i class="bi bi-pencil-square"></i
               ></b-button>
             </b-col>
-            <b-col md="auto" class="mx-0 px-0">
+            <b-col md="auto" class="mx-0 px-0 d-inline">
               <b-button
                 v-if="
                   overview ||
                   (item.status &&
                     item.status.slice(statusPrefix.length) == status.done)
                 "
-                variant="primary"
+                variant="outline-primary"
                 class="mx-1"
+                v-b-tooltip.hover title="Show information"
                 @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
                 data-testid="view-meta"
-                ><i class="bi bi-info-circle"></i
+                ><i class="bi bi-info-circle-fill"></i
               ></b-button>
             </b-col>
-            <b-col md="auto" class="mx-0 px-0">
+            <b-col md="auto" class="mx-0 px-0 d-inline">
               <!--REFACTOR status condition-->
               <b-button
                 v-if="
@@ -524,14 +538,16 @@ function getCancelIcon(item) {
                       item.status.slice(statusPrefix.length)
                     ))
                 "
-                variant="danger"
+                variant="outline-danger"
                 class="mx-1 float-end"
+                v-b-tooltip.hover :title= "getTooltipText(item)"
                 @click="setEntryRemoval(item)"
                 data-testid="delete"
               >
                 <i :class="'bi ' + getCancelIcon(item)"></i>
               </b-button>
             </b-col>
+            </div>
           </b-row>
         </b-td>
       </b-tr>
