@@ -56,6 +56,7 @@ function correctValue() {
       data-testid="split-input"
       id="customRange"
       v-model="value"
+      number
     ></b-form-input>
     <b-row>
       <b-col cols="5">

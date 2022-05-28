@@ -204,7 +204,7 @@ def config_dict_from_settings(experiment):
         'models': models,
         'evaluation': settings['metrics'],
         'name': experiment_id,
-        'top_K': settings['recommendations'],
+        'top_K': int(settings['recommendations']),
         'type': settings['experimentMethod']}
 
     # print(config_dict)
@@ -218,12 +218,25 @@ def form_to_data(settings):
         reformat_list(settings, option_name, option_list)
     del settings['lists']
 
+def parse_if_number(string):
+    if string:
+        if isinstance(string, float) or isinstance(string,int):
+            return string
+        if string.isnumeric():
+            return int(string)
+        try:
+            number = float(string)
+            return number
+        except ValueError:
+            return string
+    return None
+
 
 # Reformat settings list from form to data
 def reformat_list(settings, option_name, option_list):
     for option in option_list:
         # print(option)
-        option['params'] = {param['name']: param['value'] for param in option['params']}
+        option['params'] = {param['name']: parse_if_number(param['value']) for param in option['params']}
         # Format inner formgrouplists
         for inner_option_name, inner_option_list in option.items():
             if inner_option_name not in ['name', 'params']:  # TODO use settings/lists key after all?

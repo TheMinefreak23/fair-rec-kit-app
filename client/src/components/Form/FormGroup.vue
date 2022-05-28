@@ -15,6 +15,8 @@ import SplitRange from './SplitRange.vue'
 import { emptyFormGroup } from '../../helpers/optionsFormatter'
 import MultiRangeSlider from 'multi-range-slider-vue'
 import '../../../node_modules/multi-range-slider-vue/MultiRangeSliderBlack.css'
+import FormInput from './FormInput.vue'
+import FormSelect from './FormSelect.vue'
 
 const emit = defineEmits(['copy'])
 const props = defineProps({
@@ -64,6 +66,7 @@ watch(
     // Watch for the changing of max K (recommendations) value
     props.maxK,
   (newK, oldK) => {
+    if (!form.value.inputs) return
     for (const input of form.value.inputs) {
       if (
         (!input.value || input.value == oldK) &&
@@ -92,7 +95,7 @@ function setParameter(option) {
     if (option.params.options && option.params.options.length > 0) {
       choices = option.params.options
       form.value.selects = choices.map((param) => ({
-        name: capitalise(param.name),
+        name: param.name,
         value: param.default,
       }))
     }
@@ -129,10 +132,6 @@ function hasDynamic() {
     option.params.dynamic &&
     option.params.dynamic.length != 0
   )
-}
-
-function chooseLabel(name) {
-  return 'Choose ' + article(name) + ' ' + underscoreToSpace(name)
 }
 </script>
 
@@ -179,156 +178,30 @@ function chooseLabel(name) {
               <!--Show settings for selected option.-->
               <b-col v-if="hasParams()">
                 <!--Value input options.-->
-                <b-row>
+                <b-row v-if="form.main.params.values">
                   <template
                     v-for="(value, index) in form.main.params.values"
                     :key="value"
                   >
-                    <!--Regular input-->
-                    <!--The max k value is based on the amount of recommendations.
-                Because of this we use a seperate setting to cover for it.-->
-                    <b-col
-                      :cols="
-                        !value.name.includes('split')
-                          ? horizontalLayout
-                            ? 3
-                            : 6
-                          : 12
-                      "
-                    >
-                      <b-form-group
-                        :label="
-                          capitalise(underscoreToSpace(value.name)) + ' *'
-                        "
-                        :description="
-                          'Between ' +
-                          value.min +
-                          ' and ' +
-                          (value.name.toLowerCase() == 'k'
-                            ? props.maxK
-                            : value.max)
-                        "
-                        required
-                      >
-                        <!--v-model="form.inputs[index].value"-->
-                        <b-form-input
-                          v-if="!value.name.includes('split')"
-                          v-model="form.inputs[index].value"
-                          :state="
-                            form.inputs[index].value >= value.min &&
-                            form.inputs[index].value <=
-                              (value.name.toLowerCase() == 'k'
-                                ? props.maxK
-                                : value.max)
-                          "
-                          type="number"
-                          number
-                          :placeholder="
-                            'Enter ' + underscoreToSpace(value.name)
-                          "
-                          validated="true"
-                        />
-                        <!--Use a range slider if it's a train/test split option-->
-                        <SplitRange
-                          @input="form.inputs[index].value = $event"
-                          v-model:value="form.inputs[index].value"
-                          :min="value.min"
-                          :max="value.max"
-                          :name="value.name"
-                          :step="5"
-                        />
-                        <!-- Use a slider with 2 sliders if a range is needed-->
-                        <MultiRangeSlider
-                          v-if="value.name.includes('range')"
-                          baseClassName="multi-range-slider-black"
-                          :min="value.min"
-                          :max="value.max"
-                          :step="1"
-                          :ruler="false"
-                          :label="true"
-                          :minValue="value.minValue"
-                          :maxValue="value.maxValue"
-                          @input="
-                            form.inputs[index].value = [
-                              $event.minValue,
-                              $event.maxValue,
-                            ]
-                          "
-                        />
-                        <!--Display the seed label for the seed option.-->
-                        <div
-                          v-if="
-                            value.name.includes('seed') &&
-                            form.inputs[index].value == null
-                          "
-                          class="text-center"
-                        >
-                          <b>Seed will be randomly generated.</b>
-                        </div>
-                      </b-form-group></b-col
-                    >
+                    <FormInput
+                      :value="value"
+                      v-model:formValue="form.inputs[index]"
+                      :maxK="maxK"
+                    />
                   </template>
                 </b-row>
 
                 <!--Selection options-->
-                <b-row>
+                <b-row v-if="form.main.params.options">
                   <b-col
                     md="auto"
                     v-for="(option, index) in form.main.params.options"
                     :key="option"
                   >
-                    <!--Use a radio group if there are a few options and they aren't true/false.-->
-                    <b-form-group
-                      :label="chooseLabel(option.name) + ' *'"
-                      v-if="
-                        option.options.length < 3 &&
-                        typeof option.options[0] != 'boolean'
-                      "
-                    >
-                      <b-form-radio-group
-                        v-model="form.selects[index].value"
-                        text-field="name"
-                        :options="option.options"
-                        required
-                      ></b-form-radio-group>
-                    </b-form-group>
-                    <!--Use a checkbox if the options are of a binary (True or False) nature.-->
-                    <b-form-group
-                      :label="
-                        capitalise(underscoreToSpace(option.name + '?')) + ' *'
-                      "
-                      v-if="
-                        option.options[0] == true || option.options[0] == false
-                      "
-                    >
-                      <b-form-checkbox
-                        v-model="form.selects[index].value"
-                        size="lg"
-                        required
-                        >{{
-                          form.selects[index].value ? 'Yes' : 'No'
-                        }}</b-form-checkbox
-                      >
-                    </b-form-group>
-                    <!--Use a dropdown select form otherwise-->
-                    <b-form-group
-                      v-if="option.options.length > 2"
-                      :label="chooseLabel(option.name) + ' *'"
-                    >
-                      <!--TODO: ADD MULTIPLE SELECT FOR FILTERS (MODAL?)-->
-                      <b-form-select
-                        v-model="form.selects[index].value"
-                        :options="option.options"
-                        text-field="name"
-                        required
-                      >
-                        <template #first>
-                          <b-form-select-option :value="null" disabled
-                            >Choose..</b-form-select-option
-                          >
-                        </template>
-                      </b-form-select>
-                    </b-form-group>
+                    <FormSelect
+                      :option="option"
+                      v-model:formValue="form.selects[index]"
+                    />
                   </b-col>
                 </b-row>
               </b-col>
