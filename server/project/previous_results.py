@@ -7,7 +7,7 @@ import json
 
 from flask import (Blueprint, request)
 import pandas as pd
-from fairreckitlib.data.set.dataset import add_user_columns, add_item_columns
+from fairreckitlib.data.set.dataset import add_dataset_columns
 
 from . import result_storage
 from .experiment import options, recommender_system
@@ -135,8 +135,10 @@ def add_dataset_columns(dataset_name, dataframe, columns):
         return dataframe
 
     result = list(map(lambda column: column.lower(), columns))
-    dataframe = add_item_columns(dataset, dataframe, result)
-    dataframe = add_user_columns(dataset, dataframe, result)
+    matrix_name = 'movies' # TODO
+    dataframe = add_dataset_columns(dataset, matrix_name, dataframe, result)
+    #dataframe = add_item_columns(dataset, dataframe, result)
+    #dataframe = add_user_columns(dataset, dataframe, result)
     return dataframe
 
 @results_bp.route('/headers', methods=['GET'])

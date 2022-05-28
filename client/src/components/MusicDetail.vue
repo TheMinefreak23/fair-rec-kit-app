@@ -1,8 +1,11 @@
 <script setup>
-import { onMounted, ref } from "vue";
-import { API_URL } from "../api";
-import { getSpotifyToken, getSongInfo } from "../helpers/songInfo";
-import { Bar } from "vue-chartjs";
+/*This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+import { onMounted, ref } from 'vue'
+import { API_URL } from '../api'
+import { getSpotifyToken, getSongInfo } from '../helpers/songInfo'
+import { Bar } from 'vue-chartjs'
 import {
   Chart as ChartJS,
   Title,
@@ -11,29 +14,22 @@ import {
   BarElement,
   CategoryScale,
   LinearScale,
-} from "chart.js";
+} from 'chart.js'
 
-ChartJS.register(
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  CategoryScale,
-  LinearScale
-);
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
-const token = ref("test");
-const tracks = ref([]);
-const track = ref({});
-const trackModalShow = ref(false);
-const query = ref({ track: "orion", artist: "metallica" });
-const songInfo = ref();
-const chartInfo = ref({ labels: [], datasets: [] });
+const token = ref('test')
+const tracks = ref([])
+const track = ref({})
+const trackModalShow = ref(false)
+const query = ref({ track: 'orion', artist: 'metallica' })
+const songInfo = ref()
+const chartInfo = ref({ labels: [], datasets: [] })
 
 onMounted(async () => {
-  token.value = await getSpotifyToken();
-  getInfo();
-});
+  token.value = await getSpotifyToken()
+  getInfo()
+})
 
 // Get music detail info
 async function getInfo() {
@@ -41,47 +37,47 @@ async function getInfo() {
     token.value,
     query.value.track,
     query.value.artist
-  );
+  )
 
-  tracks.value = await songInfo.value.Spotify;
-  track.value = tracks.value.items[0];
+  tracks.value = await songInfo.value.Spotify
+  track.value = tracks.value.items[0]
   //get AcousticBrainz highlevel features using LastFM's mbid
   const highlevelFeatures = await songInfo.value.AcousticBrainz[
     songInfo.value.LastFM.track.mbid
-  ][0]["highlevel"];
+  ][0]['highlevel']
 
-  await generateChart(await highlevelFeatures);
+  await generateChart(await highlevelFeatures)
 }
 
 //Generate the data for the audiofeatures Bar-chart
 async function generateChart(highlevelFeatures) {
   //available moods from AcousticBrainz
   const moods = [
-    "acoustic",
-    "aggressive",
-    "electronic",
-    "happy",
-    "party",
-    "relaxed",
-    "sad",
-  ];
+    'acoustic',
+    'aggressive',
+    'electronic',
+    'happy',
+    'party',
+    'relaxed',
+    'sad',
+  ]
   //also include danceability seperately
-  const danceability = highlevelFeatures["danceability"]["all"]["danceable"];
-  const data = [danceability];
+  const danceability = highlevelFeatures['danceability']['all']['danceable']
+  const data = [danceability]
   for (const mood of moods) {
-    const tagname = "mood_" + mood;
-    const feature = highlevelFeatures[tagname];
-    console.log("value", feature);
-    data.push(feature.all[mood]);
+    const tagname = 'mood_' + mood
+    const feature = highlevelFeatures[tagname]
+    console.log('value', feature)
+    data.push(feature.all[mood])
   }
   chartInfo.value.datasets[0] = {
-    label: "Attributes",
-    backgroundColor: "#000080",
+    label: 'Attributes',
+    backgroundColor: '#000080',
     data: data,
-  };
-  chartInfo.value.labels = ["danceability"].concat(
-    moods.map((mood) => mood + "-ness")
-  );
+  }
+  chartInfo.value.labels = ['danceability'].concat(
+    moods.map((mood) => mood + '-ness')
+  )
 }
 </script>
 
@@ -156,11 +152,9 @@ async function generateChart(highlevelFeatures) {
                       }}</template>
                     </p>
                     <p>Album: {{ track.album.name }}</p>
-                    <div  :style = "{backgroundColor : 'coral', opacity: 0.9}">
-                                        <Bar :chartData="chartInfo" >
-                    </Bar>
+                    <div :style="{ backgroundColor: 'coral', opacity: 0.9 }">
+                      <Bar :chartData="chartInfo"> </Bar>
                     </div>
-
 
                     <div>
                       <p v-html="songInfo.LastFM.track.wiki.summary"></p>
@@ -222,7 +216,7 @@ async function generateChart(highlevelFeatures) {
 }
 
 .wrap:before {
-  content: " ";
+  content: ' ';
   display: block;
   position: absolute;
   left: 0;
@@ -231,7 +225,7 @@ async function generateChart(highlevelFeatures) {
   height: 100%;
   opacity: 0.3;
   filter: blur(1px);
-  background-image: url("public/background.png");
+  background-image: url('public/background.png');
   background-repeat: repeat;
   background-position: 50% 0;
   background-size: 100%;

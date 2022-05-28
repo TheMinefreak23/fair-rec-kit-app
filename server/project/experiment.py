@@ -83,9 +83,9 @@ def calculate_first():
 # experiment_thread = threading.Thread(target=calculate_first)
 
 def end_experiment():
-    print('yay')
-    # result_storage.save_result(current_experiment.job, {})
-    result_storage.save_result(current_experiment.job, format_result(current_experiment.config))
+    if current_experiment.status is not Status.ABORTED:
+        # result_storage.save_result(current_experiment.job, {})
+        result_storage.save_result(current_experiment.job, format_result(current_experiment.config))
 
     # Calculate next item in queue
     calculate_first()
@@ -94,7 +94,7 @@ def end_experiment():
 def run_experiment(experiment):
     """Run an experiment and save the result."""
 
-    print('run experiment:', experiment)
+    #print('run experiment:', experiment)
 
     # Set current experiment
     global current_experiment
@@ -114,9 +114,6 @@ def run_experiment(experiment):
     config = parser.parse_experiment_config_from_yml(config_file_path,
                                                      recommender_system.data_registry,
                                                      recommender_system.experiment_factory)
-
-    # TODO don't use the metrics until evaluation pipeline works
-    config.evaluation = []
 
     event_handler = EventHandler(current_experiment, end_experiment)
     recommender_system.run_experiment(config, events=event_handler.events)
@@ -140,12 +137,12 @@ def format_result(settings):
 
     Returns: (list) the mock result
     """
-    print('== settings ==', settings)
+    #print('== settings ==', settings)
     result = []
-    datasets = settings['datasets']
+    datasets = settings['data']
     for (dataset_index, dataset) in enumerate(datasets):
         # Add dataset identifier to name
-        dataset['name'] = dataset['name'] + '_' + str(dataset_index)
+        dataset['name'] = dataset['dataset'] + '_' + dataset['matrix'] + '_' + str(dataset_index)
         recs = []
         for (api, approaches) in settings['models'].items():
             for (approach_index, approach) in enumerate(approaches):
@@ -189,30 +186,36 @@ def calculate():
     if request.method == 'POST':
         data = request.get_json()
         settings = data.get('settings')
-        # print(data)
+        #print('==/calculation POST==', json.dumps(data,indent=4))
         append_queue(data.get('metadata'), settings)
 
         calculate_first()
 
-        print('queue', experiment_queue)
+        #print('queue', experiment_queue)
         # response = {'status': 'success'}
 
         response = {'queue': formatted_queue()}
     else:
         # TODO catch error
+        global current_experiment
         if not current_experiment: 
             print('Current experiment should have started but is None')
-        if current_experiment and current_experiment.status == Status.DONE:
-            response['calculation'] = result_storage.current_result
         response['status'] = current_experiment.status.value if current_experiment else Status.NA.value
+        if current_experiment:
+            if current_experiment.status == Status.DONE:
+                # Set current result, TODO hacky
+                result_storage.result_by_id(current_experiment.job['timestamp']['stamp'])
+                response['calculation'] = result_storage.current_result
+            if current_experiment.status == Status.DONE or current_experiment.status == Status.ABORTED:
+                current_experiment = None
     # print('calculation response:', response)
     return response
 
 
 @compute_bp.route('/queue', methods=['GET'])
 def queue():
-    print('queue', formatted_queue())
-    return {'queue': formatted_queue(), 'current': formatted_experiment(current_experiment)}
+    #print('queue', json.dumps(formatted_queue(),indent=4))
+    return {'queue': formatted_queue(), 'current': formatted_experiment(current_experiment) if current_experiment else None}
 
 
 @compute_bp.route('/queue/abort', methods=['POST'])
@@ -225,8 +228,9 @@ def abort():
     data = request.get_json()
     item_id = data.get('id')
     print('trying to cancel',item_id)
+    # Find the first experiment with the ID in the queue
     experiment = next(filter(lambda item: item.job['timestamp']['stamp'] == item_id, experiment_queue), None)
-    print(experiment)
+    #print(experiment)
     # Cancel queued experiment
     if experiment.status == Status.TODO:
         experiment.status = Status.CANCELLED
@@ -290,10 +294,10 @@ def mock_evaluate(approach, metric):
     # Mock evaluation
 
     result = len(approach['name']) * len(metric['name'])
-    print('metric:', metric)
+    #print('metric:', metric)
     # Do something with the metrics parameters.
     if metric['params']:
-        print(metric['name'], 'has params', metric['params'])
+        #print(metric['name'], 'has params', metric['params'])
         for (name, value) in metric['params'].items():
             val = int(value) if value else 0
             result *= len(name) * val
