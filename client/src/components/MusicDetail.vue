@@ -1,4 +1,7 @@
 <script setup>
+/*This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)*/
 import { onMounted, ref } from 'vue'
 import { API_URL } from '../api'
 import { getSpotifyToken, getSongInfo } from '../helpers/songInfo'
@@ -21,7 +24,7 @@ async function getInfo() {
     query.value.track,
     query.value.artist
   )
-  console.log("Song Info", songInfo)
+  console.log('Song Info', songInfo)
   tracks.value = await songInfo.Spotify
   track.value = tracks.value.items[0]
 }
