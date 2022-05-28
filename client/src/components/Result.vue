@@ -260,7 +260,7 @@ function fillShownMetrics(){
 }
 
 /**
- * Return an array of filtered headers
+ * Return an array of filtered headers, so that only those selected are shown
  * @param {Array} headers  - array of headers that have to be checked
  */
 function hideHeaders(headers){
@@ -275,6 +275,11 @@ function hideHeaders(headers){
   return result
 }
 
+/**
+ * Return an array of filtered results, so that only results for the selected
+ * headers are shown
+ * @param {Array} results  - array of results that have to be filtered
+ */
 function hideResults(results){
   let result = []
     for(let i=0; i<results.length; i++) {
@@ -287,7 +292,12 @@ function hideResults(results){
   return result
 }
 
-//SOURCE: https://bobbyhadz.com/blog/javascript-check-if-string-contains-substring-from-array
+/**
+ * Check if input string starts with any of the array elements, 
+ * return a boolean
+ * @param {String} string - string that might start with element of array
+ * @param {Array} array - array of strings that might be part of the string
+ */
 function contains(string, array){
   return array.some(element => string.startsWith(element))
 }
