@@ -298,12 +298,20 @@ function contains(string, array){
 <template>
   <div>
     <div class="container">
-      <h1 class="display-2">Results</h1>
+      <p class="lead" > Results for </p>
+      <h1 class="display-3"> {{ result.metadata.name }}    </h1>
+      <h3 class="text-muted"> {{ result.metadata.datetime}} </h3>
+      <!-- TODO more human readable date time-->
       <p class="lead">
-        These are the results for experiment {{ result.metadata.name }} done at
-        {{ result.metadata.datetime }}.
+        Tags:
+        <template v-if="!result.metadata.tags">None</template>
+        <template v-for="tag in result.metadata.tags">
+          <b-button disabled> {{ tag }} </b-button
+          >
+        </template>
       </p>
 
+      <p>&nbsp;</p> 
       <p>
         Datasets showing items per user:
         <div class="form-check" v-for="dataset in uniqueDatasets">
@@ -370,6 +378,7 @@ function contains(string, array){
         </template>      
       </div>
     </div>
+
 
     <div class="container">
       <div class="row">

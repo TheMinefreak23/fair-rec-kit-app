@@ -9,17 +9,17 @@ import PreviousResults from './components/PreviousResults.vue'
 import ExperimentQueue from './components/ExperimentQueue.vue'
 import NewExperiment from './components/NewExperiment.vue'
 import TestForm from './test/TestForm.vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { API_URL } from './api'
 import MusicDetail from './components/MusicDetail.vue'
 import { useToast } from 'bootstrap-vue-3'
 import { store } from './store'
+import { status } from './helpers/queueFormatter'
 import VCheckmark from './components/VCheckmark.vue'
+import TestSelect from './test/TestSelect.vue'
 let toast = useToast()
-
-/*
-const activeExperiments = ref(false)
-const done = ref(false)*/
+const done = ref(false) // TODO refactor
+const blink = ref(false)
 
 // Ping
 onMounted(async () => {
@@ -30,14 +30,41 @@ onMounted(async () => {
 })
 //const tabIndex = ref(0)
 
+watch(
+  () => store.toast,
+  () => {
+    toast.show(store.toast.mainOptions, store.toast.otherOptions)
+  }
+)
+
 // Make result tab the active tab
 function goToResult() {
   store.currentTab = 3
 }
 
+// Change UI on new result
+function onNewResult() {
+  done.value = store.currentExperiment.status == status.done
+  if (done.value) {
+    // Make result tab blink
+    blink.value = true
+    const timeoutMs = 1500
+    setTimeout(() => {
+      blink.value = false
+    }, timeoutMs)
+  }
+  // Notify user with toast
+  callToast()
+}
+
 function callToast() {
   toast.show(
-    { title: 'An experiment has finished! View here' },
+    {
+      title:
+        store.currentExperiment.status == status.done
+          ? 'An experiment has finished! View here'
+          : 'Experiment aborted',
+    },
     {
       pos: 'top-right',
       delay: 800,
@@ -48,11 +75,12 @@ function callToast() {
 </script>
 
 <template>
+  <!--<TestSelect />-->
   <b-container
     :toast="{ root: true }"
     fluid="sm"
     position="position-fixed"
-    @click="goToResult()"
+    @click="done ? goToResult() : () => {}"
   >
   </b-container>
   <div class="d-flex flex-column min-vh-100">
@@ -106,27 +134,17 @@ function callToast() {
         class="m-0 pt-2"
         align="center"
         nav-class="tab-active"
+        active-nav-item-class="bg-secondary text-danger"
       >
-        <b-tab title="New Experiment" title-item-class="tab-title-class"
-          ><NewExperiment
-        /></b-tab>
-        <b-tab title-item-class="tab-title-class">
-          <!--<ActiveExperiments
-          @computing="
-            ;(activeExperiments = true), (done = false), (tabIndex = 1)
-          "
-          @done=";(activeExperiments = false), (done = true)"
-          @stop=";(activeExperiments = false), (done = false)"
-        />-->
+        <b-tab title="New Experiment"><NewExperiment /></b-tab>
+        <b-tab>
           <ExperimentQueue />
-          <template v-slot:title>
-            <div
-              :style="{
-                color: store.currentExperiment ? 'red' : 'black',
-                backgroundColor: store.currentExperiment ? 'yellow' : 'white',
-              }"
-            >
-              <b-spinner v-if="store.currentExperiment" small></b-spinner>
+          <template #title>
+            <div>
+              <b-spinner
+                v-if="store.currentExperiment.status == status.active"
+                small
+              ></b-spinner>
               <VCheckmark v-else />
               Experiment Queue
             </div>
@@ -135,8 +153,8 @@ function callToast() {
         <b-tab title="Documentation" data-testid="DocTab">
           <Documentation
         /></b-tab>
-        <b-tab title="Results">
-          <Results @goToResult="goToResult" @toast="callToast"
+        <b-tab :title-item-class="blink ? 'blink' : ''" title="Results">
+          <Results @goToResult="goToResult" @toast="onNewResult"
         /></b-tab>
         <b-tab title="All results">
           <PreviousResults @goToResult="goToResult" />
@@ -258,18 +276,31 @@ function callToast() {
   </div>
 </template>
 
-<style scoped>
-/* NOT WORKING
-b-tab {
+<style>
+.blink {
   background-color: yellow;
-}*/
-.tab-title-class {
-  font-size: 300;
-  background-color: green;
-  color: #ff0000 !important;
+  color: red;
+  animation: glowing 1300ms infinite;
 }
-.tab-active {
-  background-color: #ff0000;
-  color: green;
+
+@keyframes glowing {
+  0% {
+    background-color: #ffffffd6;
+    box-shadow: 0px 0px 0 #28a745;
+  }
+  50% {
+    background-color: #ecf5aed7;
+    box-shadow: 0 -5px 0 #28a745;
+  }
+  70% {
+    background-color: #f1e562d7;
+  }
+  50% {
+    background-color: #ecf5aed7;
+  }
+  100% {
+    background-color: #ffffffd6;
+    box-shadow: 0 0 0 #28a745;
+  }
 }
 </style>
