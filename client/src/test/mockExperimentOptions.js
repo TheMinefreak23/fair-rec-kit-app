@@ -8,6 +8,7 @@ import { getCalculation, store } from '../store'
 import { ref, onMounted } from 'vue'
 import mockLists from './mockLists.json'
 import mockMetrics from './mockMetrics.json'
+import { progress } from '../helpers/queueFormatter'
 
 var metadata = {}
 var form = {}
@@ -42,7 +43,12 @@ async function sendMockData(options, simple = false, metrics = false) {
     tags: randomWords(),
   }
 
-  store.currentExperiment = { metadata: metadata, settings: form }
+  // TODO get from server?
+  store.currentExperiment = {
+    metadata: metadata,
+    settings: form,
+    progress: progress.notAvailable,
+  }
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

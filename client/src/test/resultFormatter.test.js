@@ -83,7 +83,7 @@ describe('format evaluation', () => {
 describe('format metric', () => {
   // A metric with parameters (k) should show both name and parameters
   test('k metric', () => {
-    const metric = { name: 'foo k', params: [{ value: 0 }] }
+    const metric = { name: 'foo k', params: { K: 0 } }
     expect(formatMetric(metric)).toBe('foo 0')
   })
   // A metric without parameters should just show its name

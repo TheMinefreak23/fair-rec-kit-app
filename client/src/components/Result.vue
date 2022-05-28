@@ -32,6 +32,7 @@ const userHeaderOptions = ref([[]])
 const itemHeaderOptions = ref([[]])
 const userTables = combineResults()
 const visibleDatasets = ref([])
+const uniqueDatasets = findUniqueDatasets()
 
 onMounted(() => {
   console.log('result', props.result)
@@ -212,50 +213,62 @@ return string.split(' ')[1].split('_')[0]
 /**
  * Fill array of datasets that are shown so that all are shown upon loading the page
  */
-function fillVisibleDatasets() {
-
-  for(let i=0; i<userTables.length;i++){
-      visibleDatasets.value[i] = getDatasetName(userTables[i])
-  }
-  
-
+function fillVisibleDatasets(){
+  console.log(findUniqueDatasets[0])
+  visibleDatasets.value = findUniqueDatasets()
    
 }
+
+/**
+ * Create an array that has all unique datasets in the result
+ */
+function findUniqueDatasets(){
+  let datasetnames = []
+
+  for(let i=0; i<userTables.length;i++){
+      datasetnames[i] = getDatasetName(userTables[i])
+  }
+
+  return Array.from(new Set(datasetnames))
+
+}
+
 </script>
 
 <template>
   <div>
     <div class="container">
-      <h1 class="display-2">Results</h1>
+      <p class="lead" > Results for </p>
+      <h1 class="display-3"> {{ result.metadata.name }}    </h1>
+      <h3 class="text-muted"> {{ result.metadata.datetime}} </h3>
+      <!-- TODO more human readable date time-->
       <p class="lead">
-        These are the results for experiment {{ result.metadata.name }} done at
-        {{ result.metadata.datetime }}.
-      </p>
-
-      <p>
-        Datasets shown:
-        <div class="form-check" v-for="dataset in userTables">
-          <input
-            v-model = "visibleDatasets"
-            class = "form-check-input"
-            type="checkbox"
-            :value="dataset.split(' ')[1].split('_')[0]"
-            :id="dataset"
-          />
-          <label class="form-check-label" :id="dataset">
-            {{dataset.split(' ')[1].split('_')[0]}}
-          </label>
-        </div>
-      </p>
-
-      <div class="col">
         Tags:
         <template v-if="!result.metadata.tags">None</template>
         <template v-for="tag in result.metadata.tags">
           <b-button disabled> {{ tag }} </b-button
           >
         </template>
-      </div>
+      </p>
+
+      <p>&nbsp;</p> 
+      <p>
+        Datasets showing items per user:
+        <div class="form-check" v-for="dataset in uniqueDatasets">
+          <input
+            v-model = "visibleDatasets"
+            class = "form-check-input"
+            type="checkbox"
+            :value="dataset"
+            :id="dataset"
+          />
+          <label class="form-check-label" :id="dataset">
+            {{dataset}}
+          </label>
+        </div>
+      </p>
+
+      
     </div>
 
     <div class="container">
@@ -272,19 +285,17 @@ function fillVisibleDatasets() {
           <p> {{datasetResult.results[0].dataset}}</p>
           <div class="col-6">
 
-          
-          <template v-if="visibleDatasets.includes(datasetResult.caption.split(' ')[1].split('_')[0])" :key="visibleDatasets">
             <Table
               :caption="datasetResult.caption"
               :results="datasetResult.results"
               :headers="datasetResult.headers"
               :removable="false"
             />
-          </template>
           </div>
         </template>
       </div>
     </div>
+
 
     <div class="container">
       <div class="row">
@@ -298,7 +309,7 @@ function fillVisibleDatasets() {
         <!--Show recommendations for all datasets for now TODO-->
         <!--Currently only shows the results of the first dataset-->
         <template v-for="(entry, index) in userTables" :key="data">
-          <template v-if="visibleDatasets.includes(entry.split(' ')[1].split('_')[0])" :key="visibleDatasets">
+          <template v-if="visibleDatasets.includes(getDatasetName(entry))" :key="visibleDatasets">
           <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
             <div class="col-6">
               <Table
@@ -323,7 +334,7 @@ function fillVisibleDatasets() {
                 @updateHeaders="(headers) => updateHeaders(headers, index)"
               />
             </div>
-          </template>
+            </template>
         </template>
       </div>
     </div>

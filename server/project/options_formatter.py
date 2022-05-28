@@ -40,7 +40,7 @@ def create_available_options(recommender_system):
     options = {}
 
     datasets = recommender_system.get_available_datasets()
-    print (datasets)
+    #print(datasets)
     predictors = recommender_system.get_available_algorithms(TYPE_PREDICTION)
     recommenders = recommender_system.get_available_algorithms(TYPE_RECOMMENDATION)
     # TODO different metrics for diff types
@@ -147,13 +147,13 @@ def config_dict_from_settings(experiment):
     """
     settings = experiment['settings']
 
-    print('raw experiment settings:', json.dumps(settings, indent=4))
+    #print('raw experiment settings:', json.dumps(settings, indent=4))
 
     name = experiment['metadata']['name']
     experiment_id = experiment['timestamp']['stamp'] + '_' + name
 
     form_to_data(settings)
-    print('formatted from form', json.dumps(settings, indent=4))
+    #print('formatted from form', json.dumps(settings, indent=4))
 
     # Format datasets
     # Add generic split to all dataset

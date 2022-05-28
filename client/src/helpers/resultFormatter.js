@@ -1,17 +1,7 @@
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
-
-// TODO get from server
-export const status = {
-  toDo: 'To Do',
-  active: 'Active',
-  aborted: 'Aborted',
-  cancelled: 'Cancelled',
-  done: 'Done',
-}
-
-export const statusPrefix = 'status_' // TODO hacky
+import { statusPrefix } from './queueFormatter'
 
 // Format data for a results overview
 // TODO refactor so headers are dynamic (no separate case for status header)
@@ -94,10 +84,11 @@ export function formatResult(result) {
           const headers = [{ name: 'Approach' }]
 
           // Use metric names as headers
-          result.evals.map((e) => {
-            headers.push(formatEvaluation(e, result))
+          for (let [index, evaluation] of result.evals.entries()) {
+            headers.push(formatEvaluation(evaluation, index, result))
             //console.log(result)
-          })
+          }
+
           // Omit recommendation and evals (old properties)
           const { recommendation, evals, ...rest } = result
           datasetResult.headers = headers // TODO headers can be computed in outer loop
@@ -131,6 +122,32 @@ function omitRecommendation(arr) {
   )
 }*/
 
+// Short result description, e.g. for a result tab
+export function shortResultDescription(result) {
+  console.log(result)
+  const datasets = []
+  const approaches = []
+  for (const datasetResult of result.result) {
+    datasets.push(datasetResult.dataset.name)
+    for (const rec of datasetResult.recs) {
+      approaches.push(rec.approach)
+    }
+  }
+  const datetime = result.metadata.datetime
+
+  function formatNames(list) {
+    console.log(Array.from(new Set(list)))
+    const formattedList = []
+    for (const name of Array.from(new Set(list))) {
+      const lastIndex = name.lastIndexOf('_')
+      formattedList.push(name.slice(0, lastIndex))
+    }
+    return formattedList
+  }
+
+  return [datetime, formatNames(datasets), formatNames(approaches)].join(' | ')
+}
+
 // Show dataset info as formatted caption
 export function showDatasetInfo(dataset) {
   return (
@@ -141,23 +158,26 @@ export function showDatasetInfo(dataset) {
 }
 
 // Format evaluations (including filtered ones)
-export function formatEvaluation(e, result) {
-  result[formatMetric(e)] = e.evaluation.global
+export function formatEvaluation(e, index, result) {
+  // TODO refactor and/or give option to set decimal precision in UI
+  // Add index for unique metric key
+  result[formatMetric(e) + '_' + index] = e.evaluation.global.toFixed(2)
 
   // Flatten filters
-  console.log(e.evaluation, e.evaluation.filtered)
+  //console.log(e.evaluation, e.evaluation.filtered)
   // Add filter category (main name) to filter parameter name
   // TODO refactor
   const filtered = []
   for (let filter of e.evaluation.filtered) {
-    console.log('filter', filter)
+    //console.log('filter', filter)
     for (const [mainName, params] of Object.entries(filter)) {
-      console.log(mainName, params)
+      //console.log(mainName, params)
       for (const param of params) {
         for (const [paramName, paramValue] of Object.entries(param)) {
           const filterItem = {}
-          console.log('paramValue', paramValue)
-          filterItem[mainName + ' ' + '(' + paramName + ')'] = paramValue
+          //console.log('paramValue', paramValue.toFixed(2))
+          filterItem[mainName + ' ' + '(' + paramName + ')'] =
+            paramValue.toFixed(2)
           filtered.push(filterItem)
         }
       }
@@ -180,8 +200,9 @@ export function formatEvaluation(e, result) {
       // Mock: get first entry for now
       const [name, val] = Object.entries(filter)[0]
       //const filterName = e.name + ' ' + name
-      const filterName = e.name + name
+      const filterName = formatMetric(e) + name
       result[filterName] = val
+      //console.log(result)
       subheaders.push(capitalise(name))
       //console.log(subheaders)
     })
