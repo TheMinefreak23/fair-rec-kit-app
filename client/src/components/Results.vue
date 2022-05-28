@@ -10,7 +10,7 @@ import { store, removeResult } from '../store'
 import { status } from '../helpers/queueFormatter'
 import { shortResultDescription } from '../helpers/resultFormatter'
 
-const emit = defineEmits(['goToResult', 'toast'])
+const emit = defineEmits(['toast'])
 const showResultModal = ref(false)
 const currentTab = ref(0)
 

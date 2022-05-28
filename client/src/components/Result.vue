@@ -4,11 +4,11 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
 import Table from './Table.vue'
-import { onActivated, onMounted, onUpdated, ref, watch } from 'vue'
+import { onMounted, ref} from 'vue'
 import { emptyFormGroup } from '../helpers/optionsFormatter'
 import { makeHeader } from '../helpers/resultFormatter'
 import { API_URL } from '../api'
-import { store, addResult, removeResult } from '../store'
+import SettingsModal from './Table/SettingsModal.vue'
 
 const props = defineProps({ headers: Array, result: Object })
 
@@ -37,7 +37,8 @@ const uniqueDatasets = findUniqueDatasets()
 onMounted(() => {
   console.log('result', props.result)
   console.log('result id', props.result.id)
-  loadEvaluations()
+  //loadEvaluations()
+  //loadResult(props.result.id)
   fillVisibleDatasets()
   fillShownMetrics()
   //Load in all the user recommendation/prediction tables
@@ -45,8 +46,6 @@ onMounted(() => {
     setRecs(parseInt(index))
   }
   console.log('availableFilters', availableFilters.value)
-  console.log(store.allResults)
-  //loadEvaluations()
 })
 
 /** 
@@ -86,6 +85,7 @@ async function setRecs(currentTable) {
   }
 }
 
+/*
 //POST request: Ask server to load the evaluations of the current result
 //Currently not used, as evaluation tables are not finished
 async function loadEvaluations() {
@@ -109,7 +109,7 @@ async function getEvaluations() {
   console.log('succesfully retrieved evaluation data.')
   const resultsData = await response.json()
   console.log('results data', resultsData)
-}
+}*/
 
 /**
  * POST request: Ask server for next part of user recommendation table.
@@ -308,20 +308,21 @@ function contains(string, array){
 <template>
   <div>
     <div class="container">
-      <p class="lead" > Results for </p>
-      <h1 class="display-3"> {{ result.metadata.name }}    </h1>
-      <h3 class="text-muted"> {{ result.metadata.datetime}} </h3>
-      <!-- TODO more human readable date time-->
+      <b-row>
+        <b-col>
+      <h1 class="display-2">Results</h1>
+      </b-col>
+      <b-col>
+        <div class="float-end">
+          <SettingsModal :resultId="result.id"/>
+            </div>
+      </b-col>
+      </b-row>
       <p class="lead">
-        Tags:
-        <template v-if="!result.metadata.tags">None</template>
-        <template v-for="tag in result.metadata.tags">
-          <b-button disabled> {{ tag }} </b-button
-          >
-        </template>
+        These are the results for experiment {{ result.metadata.name }} done at
+        {{ result.metadata.datetime }}.
       </p>
 
-      <p>&nbsp;</p> 
       <p>
         Datasets showing items per user:
         <div class="form-check" v-for="dataset in uniqueDatasets">
@@ -388,7 +389,6 @@ function contains(string, array){
         </template>      
       </div>
     </div>
-
 
     <div class="container">
       <div class="row">

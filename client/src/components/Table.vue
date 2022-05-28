@@ -11,9 +11,11 @@ import { validateEmail, emptyFormGroup } from '../helpers/optionsFormatter'
 import { store } from '../store'
 import { makeHeader } from '../helpers/resultFormatter'
 import { statusPrefix, statusVariant, status } from '../helpers/queueFormatter'
+import { loadResult } from '../helpers/resultRequests'
+import SettingsModal from './Table/SettingsModal.vue'
 
 const emit = defineEmits([
-  'loadResult',
+  'viewResult',
   'loadResults',
   'loadMore',
   'paginationSort',
@@ -24,11 +26,11 @@ const props = defineProps({
   overview: Boolean,
   results: Array,
   headers: Array,
-  buttonText: String,
+  removeText: String,
   removable: Boolean,
+  editable: Boolean,
   serverFile: String,
   serverFile2: String,
-  serverFile3: String,
   pagination: Boolean,
   caption: String,
   expandable: Boolean,
@@ -50,6 +52,7 @@ const colItemStyle = {
 const caption = ref('')
 const entryAmount = ref(20)
 const deleteModalShow = ref(false)
+const settingsModalShow = ref(false)
 const editModalShow = ref(false)
 const viewModalShow = ref(false)
 const filtersModalShow = ref(false)
@@ -172,38 +175,14 @@ async function removeEntry() {
 }
 
 async function getMetadata(selectedID) {
-  //request the metadata of the specified entry
-  const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: selectedID }),
-  }
-  fetch(API_URL + props.serverFile3, requestOptions).then(() => {
-    console.log('Metadata succesfully requested')
-    getResult()
-  })
-}
-
-async function getResult() {
-  const response = await fetch(API_URL + props.serverFile3)
-  const data = await response.json()
+  const data = await loadResult(selectedID)
   metadataStr.value = formatMetadata(data.result)
+  console.log('Metadata succesfully requested')
 }
 
 async function getNameTagsMail(selectedID) {
-  const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: selectedID }),
-  }
-  fetch(API_URL + props.serverFile3, requestOptions).then(() => {
-    console.log('Metadata succesfully requested')
-    getOldValues()
-  })
-}
-async function getOldValues() {
-  const response = await fetch(API_URL + props.serverFile3)
-  const data = await response.json()
+  const data = await loadResult(selectedID)
+  console.log('Metadata succesfully requested')
   newName.value = data.result.metadata.name
   newTags.value = data.result.metadata.tags.toString()
   newEmail.value = data.result.metadata.email
@@ -437,6 +416,7 @@ function getCancelIcon(item) {
         >
           {{ header.name }}
         </b-th>
+        <b-th v-if="overview"></b-th>
       </b-tr>
       <b-tr>
         <b-th v-if="overview" :style="colItemStyle"></b-th>
@@ -447,6 +427,7 @@ function getCancelIcon(item) {
         >
           {{ subheader }}
         </b-th>
+        <b-th v-if="overview"></b-th>
       </b-tr>
     </b-thead>
     <b-tbody>
@@ -454,7 +435,7 @@ function getCancelIcon(item) {
         ><b-td class="align-middle" v-if="overview" :style="colItemStyle">
           <b-button
             variant="outline-primary fw-bold"
-            @click="$emit('loadResult', item.id)"
+            @click="$emit('viewResult', item.id)"
             >View result</b-button
           >
         </b-td>
@@ -484,11 +465,15 @@ function getCancelIcon(item) {
           </template>
           <template v-else> {{ value }}</template>
         </b-td>
-        <b-td class="align-middle" v-if="overview || removable">
+        <b-td
+          class="align-middle"
+          v-if="overview || removable"
+          :style="colItemStyle"
+        >
           <b-row class="m-0 float-end">
             <b-col md="auto" class="mx-0 px-0">
               <b-button
-                v-if="overview"
+                v-if="editable"
                 variant="primary"
                 class="mx-1"
                 @click="
@@ -502,11 +487,6 @@ function getCancelIcon(item) {
             </b-col>
             <b-col md="auto" class="mx-0 px-0">
               <b-button
-                v-if="
-                  overview ||
-                  (item.status &&
-                    item.status.slice(statusPrefix.length) == status.done)
-                "
                 variant="primary"
                 class="mx-1"
                 @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
@@ -533,6 +513,9 @@ function getCancelIcon(item) {
               </b-button>
             </b-col>
           </b-row>
+        </b-td>
+        <b-td class="align-middle" v-if="overview" :style="colItemStyle">
+          <SettingsModal :resultId="item.id" />
         </b-td>
       </b-tr>
     </b-tbody>

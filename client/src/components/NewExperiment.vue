@@ -10,6 +10,7 @@ import { API_URL } from '../api'
 import { emptyOption } from '../helpers/optionsFormatter'
 import { emptyFormGroup, validateEmail } from '../helpers/optionsFormatter'
 import { progress } from '../helpers/queueFormatter'
+import { watch } from 'vue'
 
 const horizontalLayout = ref(false)
 const oldMetadata = ref(false)
@@ -34,6 +35,16 @@ onMounted(async () => {
   initForm()
 })
 
+watch(
+  () => store.settings,
+  (newSettings) => {
+    console.log('newExperiment watch new settings:', newSettings)
+    form.value = newSettings.form
+    metadata.value = newSettings.metadata
+    store.currentTab = 0
+  }
+)
+
 // GET request: Get available options for selection from server
 async function getOptions() {
   const response = await fetch(API_URL + '/experiment/options')
@@ -44,8 +55,9 @@ async function getOptions() {
 
 // POST request: Send form to server.
 async function sendToServer() {
-  var sendForm = JSON.parse(JSON.stringify(form.value)) // clone
+  let sendForm = JSON.parse(JSON.stringify(form.value)) // clone
 
+  sendForm.rawSettings = JSON.parse(JSON.stringify(form.value)) // send raw settings for copying later TODO refactor
   sendForm.lists.approaches = reformat(sendForm.lists.approaches)
   sendForm.lists.metrics = reformat(sendForm.lists.metrics)
   sendForm.lists.datasets = reformat(sendForm.lists.datasets)
@@ -148,6 +160,7 @@ function reformat(property) {
       <b-form
         v-if="options"
         @submit="$event.preventDefault(), sendToServer()"
+        @keydown.enter.prevent
         @reset="$event.preventDefault(), initForm()"
       >
         <b-row class="text-center">
@@ -207,7 +220,6 @@ function reformat(property) {
                       tag-variant="dark"
                       remove-on-delete
                       separator=" ,;"
-                      no-add-on-enter
                       size="lg"
                     ></b-form-tags> </b-form-group
                 ></b-col>
