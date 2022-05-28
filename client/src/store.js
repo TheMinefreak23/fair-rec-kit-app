@@ -12,7 +12,12 @@ const store = reactive({
   currentTab: 0,
   currentResultTab: 0,
   resultPoll: null, // polls when there is an active experiment (result, queue, progress)
+  toast: null,
 })
+
+function showToast(mainOptions, otherOptions) {
+  store.toast = { mainOptions: mainOptions, otherOptions: otherOptions }
+}
 
 function pollForResult() {
   const interval = 300
@@ -97,4 +102,5 @@ export {
   getCalculation,
   getQueue,
   pollForResult,
+  showToast,
 }

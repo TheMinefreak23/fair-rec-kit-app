@@ -135,6 +135,7 @@ function closeResult(index) {
         <!--Toggled results sidebar (offcanvas)-->
         <div
           class="offcanvas offcanvas-end"
+          :style="{ width: '60em', overflowY: 'scroll' }"
           tabindex="-1"
           id="offcanvasRight"
           aria-labelledby="offcanvasRightLabel"
