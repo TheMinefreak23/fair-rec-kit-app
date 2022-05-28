@@ -26,17 +26,16 @@ const props = defineProps({
   maxK: Number,
   horizontalLayout: Boolean,
   data: { type: Object, required: true },
-  single: false, // single form group or multi (form group list)
+  single: { type: Boolean, default: false }, // single form group or multi (form group list)
 })
 
 onMounted(() => {
   form.value.single = props.single
   form.value.name = props.title
-  //console.log(props.name, props.defaultOption)
   if (props.defaultOption) {
-    form.value.main = props.defaultOption
-    setParameter(form.value.main)
+    form.value.main = props.defaultOption.value
   }
+  //console.log('form', form.value)
 })
 
 const form = computed({
@@ -51,6 +50,14 @@ const form = computed({
     emit('input', localValue)
   },
 })
+
+watch(
+  () => form.value.main,
+  (newMain) => {
+    setParameter(newMain)
+    //console.log('form', form.value)
+  }
+)
 
 watch(
   () =>
@@ -146,7 +153,6 @@ function chooseLabel(name) {
                     data-testid="main-select"
                     :options="options"
                     text-field="name"
-                    @change="setParameter($event)"
                     :required="required"
                   >
                     <template #first>
@@ -343,7 +349,7 @@ function chooseLabel(name) {
                 :name="option.name"
                 :title="option.title"
                 :options="option.options"
-                :defaultOption="option.default && option.default.value"
+                :defaultOption="option.default"
                 :required="option.required"
               />
               <FormGroupList
@@ -355,7 +361,7 @@ function chooseLabel(name) {
                   option.title + ' for ' + name + ' ' + form.main.name
                 "
                 :options="option.options"
-                :defaultOption="option.default && option.default.value"
+                :defaultOption="option.default"
                 :required="false"
               />
             </b-card>
