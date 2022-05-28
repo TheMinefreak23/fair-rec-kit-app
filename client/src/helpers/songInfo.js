@@ -8,6 +8,25 @@ const AB_API = 'https://acousticbrainz.org/api/v1/'
 const LFM_API = 'http://ws.audioscrobbler.com/2.0/'
 const LFM_key = '5ffe852eb4ffb7e7d5d53e71981cad7f'
 
+function authorisedGetRequestOptions(token) {
+  return {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token.token_type + ' ' + token.access_token,
+    },
+  }
+}
+
+async function getInfoFromSpotifyID(token, id) {
+  //console.log(requestOptions)
+  const url = SPOTIFY_API + 'tracks/' + id
+  const response = await fetch(url, authorisedGetRequestOptions(token))
+  const track = await response.json()
+  console.log('Spotify track from id', id, ':', track)
+  return track
+}
+
 async function getSongInfo(token, track, artist, mbid) {
   const lastFMData = await getLastFMinfo(artist, track, mbid)
 
@@ -17,12 +36,10 @@ async function getSongInfo(token, track, artist, mbid) {
   if (mbid == undefined) {
     mbid = await lastFMData.track.mbid
     console.log('mbid', mbid)
-  }
-
-  else { 
+  } else {
     track = await lastFMData.track.name
     artist = await lastFMData.track.artist.name
-   }
+  }
   return {
     Spotify: await getSpotifyInfo(token, track, artist),
     AcousticBrainz: await getAcousticBrainzInfo(mbid),
@@ -40,13 +57,6 @@ async function getSpotifyToken() {
 
 //Request Spotify data from artist and track name
 async function getSpotifyInfo(token, track, artist) {
-  const requestOptions = {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: token.token_type + ' ' + token.access_token,
-    },
-  }
   //console.log(requestOptions)
   const url =
     SPOTIFY_API +
@@ -54,7 +64,7 @@ async function getSpotifyInfo(token, track, artist) {
     (artist && 'artist:' + artist) +
     (track && '+' + 'track:' + track) +
     '&type=track'
-  const response = await fetch(url, requestOptions)
+  const response = await fetch(url, authorisedGetRequestOptions(token))
   const data = await response.json()
   //console.log('Spotify:', data)
   return data.tracks
@@ -62,7 +72,6 @@ async function getSpotifyInfo(token, track, artist) {
 
 // Request song-data from LastFM
 async function getLastFMinfo(artist, track, mbid) {
-
   var url
 
   if (mbid != (null || undefined)) {
@@ -73,8 +82,7 @@ async function getLastFMinfo(artist, track, mbid) {
       '&mbid=' +
       mbid +
       '&autocorrect=1&format=json'
-  }
-  else {
+  } else {
     url =
       LFM_API +
       '?method=track.getInfo&api_key=' +
@@ -84,7 +92,6 @@ async function getLastFMinfo(artist, track, mbid) {
       '&track=' +
       track +
       '&autocorrect=1&format=json'
-
   }
   const response = await fetch(url)
   const data = await response.json()
@@ -111,4 +118,4 @@ async function getAcousticBrainzInfo(musicbrainzId) {
   return json
 }
 
-export { getSongInfo, getSpotifyToken }
+export { getSongInfo, getSpotifyToken, getInfoFromSpotifyID }

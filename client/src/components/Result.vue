@@ -234,6 +234,21 @@ function findUniqueDatasets(){
 
 }
 
+// Get music detail info
+async function getInfo() {
+  songInfo.value = await getSongInfo(
+    token.value,
+    query.value.track,
+    query.value.artist
+  )
+
+  tracks.value = await songInfo.value.Spotify
+  track.value = tracks.value.items[0]
+  //get AcousticBrainz highlevel features using LastFM's mbid
+  highlevelFeatures.value = await songInfo.value.AcousticBrainz[
+    songInfo.value.LastFM.track.mbid
+  ][0]['highlevel']
+}
 </script>
 
 <template>
