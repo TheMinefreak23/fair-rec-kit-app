@@ -221,6 +221,8 @@ function chooseLabel(name) {
                                 ? props.maxK
                                 : value.max)
                           "
+                          type="number"
+                          number
                           :placeholder="
                             'Enter ' + underscoreToSpace(value.name)
                           "
