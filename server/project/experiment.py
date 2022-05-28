@@ -115,9 +115,6 @@ def run_experiment(experiment):
                                                      recommender_system.data_registry,
                                                      recommender_system.experiment_factory)
 
-    # TODO don't use the metrics until evaluation pipeline works
-    config.evaluation = []
-
     event_handler = EventHandler(current_experiment, end_experiment)
     recommender_system.run_experiment(config, events=event_handler.events)
 
@@ -142,10 +139,10 @@ def format_result(settings):
     """
     #print('== settings ==', settings)
     result = []
-    datasets = settings['datasets']
+    datasets = settings['data']
     for (dataset_index, dataset) in enumerate(datasets):
         # Add dataset identifier to name
-        dataset['name'] = dataset['name'] + '_' + str(dataset_index)
+        dataset['name'] = dataset['dataset'] + '_' + dataset['matrix'] + '_' + str(dataset_index)
         recs = []
         for (api, approaches) in settings['models'].items():
             for (approach_index, approach) in enumerate(approaches):
@@ -204,10 +201,13 @@ def calculate():
         if not current_experiment: 
             print('Current experiment should have started but is None')
         response['status'] = current_experiment.status.value if current_experiment else Status.NA.value
-        if current_experiment and current_experiment.status == Status.DONE:
-            response['calculation'] = result_storage.current_result
-        if current_experiment.status == Status.DONE or current_experiment.status == Status.ABORTED:
-            current_experiment = None
+        if current_experiment:
+            if current_experiment.status == Status.DONE:
+                # Set current result, TODO hacky
+                result_storage.result_by_id(current_experiment.job['timestamp']['stamp'])
+                response['calculation'] = result_storage.current_result
+            if current_experiment.status == Status.DONE or current_experiment.status == Status.ABORTED:
+                current_experiment = None
     # print('calculation response:', response)
     return response
 

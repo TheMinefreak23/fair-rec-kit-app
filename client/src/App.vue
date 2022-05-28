@@ -15,6 +15,7 @@ import MusicDetail from './components/MusicDetail.vue'
 import { useToast } from 'bootstrap-vue-3'
 import { store } from './store'
 import { status } from './helpers/queueFormatter'
+import { viewResultTab } from './helpers/resultRequests'
 import VCheckmark from './components/VCheckmark.vue'
 import TestSelect from './test/TestSelect.vue'
 let toast = useToast()
@@ -36,11 +37,6 @@ watch(
     toast.show(store.toast.mainOptions, store.toast.otherOptions)
   }
 )
-
-// Make result tab the active tab
-function goToResult() {
-  store.currentTab = 3
-}
 
 // Change UI on new result
 function onNewResult() {
@@ -80,7 +76,7 @@ function callToast() {
     :toast="{ root: true }"
     fluid="sm"
     position="position-fixed"
-    @click="done ? goToResult() : () => {}"
+    @click="done ? viewResultTab() : () => {}"
   >
   </b-container>
   <div class="d-flex flex-column min-vh-100">
@@ -154,10 +150,10 @@ function callToast() {
           <Documentation
         /></b-tab>
         <b-tab :title-item-class="blink ? 'blink' : ''" title="Results">
-          <Results @goToResult="goToResult" @toast="onNewResult"
+          <Results @toast="onNewResult"
         /></b-tab>
         <b-tab title="All results">
-          <PreviousResults @goToResult="goToResult" />
+          <PreviousResults />
         </b-tab>
         <b-tab title="Music Detail">
           <MusicDetail />
