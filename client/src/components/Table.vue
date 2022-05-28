@@ -482,6 +482,7 @@ function getCancelIcon(item) {
                   (selectedEntry = index),
                   getNameTagsMail(item.id)
               "
+              data-testid="edit"
               ><i class="bi bi-pencil-square"></i
             ></b-button>
             <b-button
@@ -493,6 +494,7 @@ function getCancelIcon(item) {
               variant="primary"
               class="mx-1"
               @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
+              data-testid="view-meta"
               ><i class="bi bi-info-circle"></i
             ></b-button>
             <!--REFACTOR status condition-->
@@ -507,6 +509,7 @@ function getCancelIcon(item) {
               variant="danger"
               class="mx-1 float-end"
               @click="setEntryRemoval(item)"
+              data-testid="delete"
             >
               <i :class="'bi ' + getCancelIcon(item)"></i>
             </b-button>

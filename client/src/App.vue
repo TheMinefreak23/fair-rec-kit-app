@@ -9,13 +9,14 @@ import PreviousResults from './components/PreviousResults.vue'
 import ExperimentQueue from './components/ExperimentQueue.vue'
 import NewExperiment from './components/NewExperiment.vue'
 import TestForm from './test/TestForm.vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { API_URL } from './api'
 import MusicDetail from './components/MusicDetail.vue'
 import { useToast } from 'bootstrap-vue-3'
 import { store } from './store'
 import { status } from './helpers/queueFormatter'
 import VCheckmark from './components/VCheckmark.vue'
+import TestSelect from './test/TestSelect.vue'
 let toast = useToast()
 const done = ref(false) // TODO refactor
 const blink = ref(false)
@@ -28,6 +29,13 @@ onMounted(async () => {
   console.log(data)
 })
 //const tabIndex = ref(0)
+
+watch(
+  () => store.toast,
+  () => {
+    toast.show(store.toast.mainOptions, store.toast.otherOptions)
+  }
+)
 
 // Make result tab the active tab
 function goToResult() {
@@ -67,6 +75,7 @@ function callToast() {
 </script>
 
 <template>
+  <!--<TestSelect />-->
   <b-container
     :toast="{ root: true }"
     fluid="sm"
