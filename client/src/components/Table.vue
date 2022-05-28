@@ -39,6 +39,14 @@ const props = defineProps({
   defaultSort: Number,
 })
 
+const colWidth = '6em'
+const colItemStyle = {
+  minWidth: colWidth,
+  width: colWidth,
+  maxWidth: colWidth,
+  inlineSize: colWidth,
+  overflowWrap: 'break-word',
+}
 const caption = ref('')
 const entryAmount = ref(20)
 const deleteModalShow = ref(false)
@@ -419,27 +427,31 @@ function getCancelIcon(item) {
     </caption>
     <b-thead head-variant="dark">
       <b-tr>
-        <b-th v-if="overview"></b-th>
+        <b-th v-if="overview" :style="colItemStyle"></b-th>
         <b-th
           v-for="(header, index) in headers"
           :key="header"
           :colspan="header.subheaders ? header.subheaders.length : 1"
-          style="cursor: pointer"
+          :style="{ ...colItemStyle, cursor: 'pointer' }"
           @click="setsorting(index)"
         >
           {{ header.name }}
         </b-th>
       </b-tr>
       <b-tr>
-        <b-th v-if="overview"></b-th>
-        <b-th v-for="subheader in subheaders" :key="subheader">
+        <b-th v-if="overview" :style="colItemStyle"></b-th>
+        <b-th
+          v-for="subheader in subheaders"
+          :key="subheader"
+          :style="colItemStyle"
+        >
           {{ subheader }}
         </b-th>
       </b-tr>
     </b-thead>
     <b-tbody>
       <b-tr v-for="(item, index) in sorted" :key="item"
-        ><b-td class="align-middle" v-if="overview">
+        ><b-td class="align-middle" v-if="overview" :style="colItemStyle">
           <b-button
             variant="outline-primary fw-bold"
             @click="$emit('loadResult', item.id)"
@@ -450,6 +462,7 @@ function getCancelIcon(item) {
           v-for="[key, value] in Object.entries(item)"
           :key="`${descending}_${sortindex}_${index}-${key}`"
           class="text-center"
+          :style="colItemStyle"
         >
           <!--Special pill format for status-->
           <!-- TODO refactor-->
@@ -472,48 +485,54 @@ function getCancelIcon(item) {
           <template v-else> {{ value }}</template>
         </b-td>
         <b-td class="align-middle" v-if="overview || removable">
-          <div class="m-0 float-end" style="width: 150px">
-            <b-button
-              v-if="overview"
-              variant="primary"
-              class="mx-1"
-              @click="
-                ;(editModalShow = !editModalShow),
-                  (selectedEntry = index),
-                  getNameTagsMail(item.id)
-              "
-              data-testid="edit"
-              ><i class="bi bi-pencil-square"></i
-            ></b-button>
-            <b-button
-              v-if="
-                overview ||
-                (item.status &&
-                  item.status.slice(statusPrefix.length) == status.done)
-              "
-              variant="primary"
-              class="mx-1"
-              @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
-              data-testid="view-meta"
-              ><i class="bi bi-info-circle"></i
-            ></b-button>
-            <!--REFACTOR status condition-->
-            <b-button
-              v-if="
-                removable &&
-                (!item.status ||
-                  [status.toDo, status.active].includes(
-                    item.status.slice(statusPrefix.length)
-                  ))
-              "
-              variant="danger"
-              class="mx-1 float-end"
-              @click="setEntryRemoval(item)"
-              data-testid="delete"
-            >
-              <i :class="'bi ' + getCancelIcon(item)"></i>
-            </b-button>
-          </div>
+          <b-row class="m-0 float-end">
+            <b-col md="auto" class="mx-0 px-0">
+              <b-button
+                v-if="overview"
+                variant="primary"
+                class="mx-1"
+                @click="
+                  ;(editModalShow = !editModalShow),
+                    (selectedEntry = index),
+                    getNameTagsMail(item.id)
+                "
+                data-testid="edit"
+                ><i class="bi bi-pencil-square"></i
+              ></b-button>
+            </b-col>
+            <b-col md="auto" class="mx-0 px-0">
+              <b-button
+                v-if="
+                  overview ||
+                  (item.status &&
+                    item.status.slice(statusPrefix.length) == status.done)
+                "
+                variant="primary"
+                class="mx-1"
+                @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
+                data-testid="view-meta"
+                ><i class="bi bi-info-circle"></i
+              ></b-button>
+            </b-col>
+            <b-col md="auto" class="mx-0 px-0">
+              <!--REFACTOR status condition-->
+              <b-button
+                v-if="
+                  removable &&
+                  (!item.status ||
+                    [status.toDo, status.active].includes(
+                      item.status.slice(statusPrefix.length)
+                    ))
+                "
+                variant="danger"
+                class="mx-1 float-end"
+                @click="setEntryRemoval(item)"
+                data-testid="delete"
+              >
+                <i :class="'bi ' + getCancelIcon(item)"></i>
+              </b-button>
+            </b-col>
+          </b-row>
         </b-td>
       </b-tr>
     </b-tbody>
