@@ -39,7 +39,7 @@ const props = defineProps({
   defaultSort: Number,
 })
 
-const colWidth = '3vw'
+const colWidth = '6em'
 const colItemStyle = {
   minWidth: colWidth,
   width: colWidth,
