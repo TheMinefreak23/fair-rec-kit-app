@@ -465,7 +465,11 @@ function getCancelIcon(item) {
           </template>
           <template v-else> {{ value }}</template>
         </b-td>
-        <b-td class="align-middle" v-if="overview || removable">
+        <b-td
+          class="align-middle"
+          v-if="overview || removable"
+          :style="colItemStyle"
+        >
           <b-row class="m-0 float-end">
             <b-col md="auto" class="mx-0 px-0">
               <b-button
@@ -483,10 +487,6 @@ function getCancelIcon(item) {
             </b-col>
             <b-col md="auto" class="mx-0 px-0">
               <b-button
-                v-if="
-                  item.status &&
-                  item.status.slice(statusPrefix.length) == status.done
-                "
                 variant="primary"
                 class="mx-1"
                 @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
@@ -514,7 +514,7 @@ function getCancelIcon(item) {
             </b-col>
           </b-row>
         </b-td>
-        <b-td class="align-middle" v-if="overview">
+        <b-td class="align-middle" v-if="overview" :style="colItemStyle">
           <SettingsModal :resultId="item.id" />
         </b-td>
       </b-tr>
