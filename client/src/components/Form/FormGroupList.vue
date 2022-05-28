@@ -5,11 +5,11 @@ import {
   capitalise,
   underscoreToSpace,
   formatMultipleItems,
-} from '../helpers/resultFormatter'
+} from '../../helpers/resultFormatter'
 //import { selectionOptions } from '../helpers/optionsFormatter'
 
-import FormGroup from './Form/FormGroup.vue'
-import { showToast } from '../store'
+import FormGroup from './FormGroup.vue'
+import { showToast } from '../../store'
 
 //const emit = defineEmits(['formChange'])
 const props = defineProps({
@@ -18,6 +18,7 @@ const props = defineProps({
   description: String,
   options: Array,
   required: Boolean,
+  default: String,
   maxK: Number,
   horizontalLayout: Boolean,
   data: { type: Object, required: true },
@@ -67,15 +68,6 @@ watch(
   }
 )
 
-/* TODO doesn't work
-// Set visible group on group count change (added/copy/remove)
-watch(
-  (form.groupCount,
-  (newCount) => {
-    visibleGroup.value = newCount - 1
-  })
-)*/
-
 // Splice groups array to remove a group
 function removeGroup(i) {
   // Don't remove first required option
@@ -84,10 +76,6 @@ function removeGroup(i) {
   const mainOption = { ...form.value.choices[i].main }
 
   form.value.groupCount--
-  /*form.value.main.splice(i, 1)
-  form.value.inputs.splice(i, 1)
-  form.value.selects.splice(i, 1)
-  form.value.lists.splice(i, 1)*/
   form.value.choices.splice(i, 1)
 
   // Set visible group to last before deleted one
@@ -100,9 +88,6 @@ function removeGroup(i) {
 function copyItem(i) {
   form.value.groupCount++ //Add a new item
   // Deep-copy the selected value to the new item
-  // form.value.choices[form.value.groupCount - 1] = JSON.parse(
-  //   JSON.stringify(form.value.choices[i])
-  // )
   let item = JSON.parse(JSON.stringify(form.value.choices[i]))
   form.value.choices.splice(i, 0, item)
   visibleGroup.value = i + 2 // Show newly copied item
@@ -137,20 +122,11 @@ function update() {
     if (mainChoice && !entries.includes(mainChoice.name)) {
       //every entry that does not exist in the list of option should be removed
       //Non-existing entries are replaced with a null entry
-      /*form.value.main[i] = deleteEntry
-      form.value.selects[i] = deleteEntry
-      form.value.inputs[i] = deleteEntry
-      form.value.lists[i] = deleteEntry*/
       form.value.choices[i] = deleteEntry
       if (props.required && form.value.groupCount > 1) form.value.groupCount--
     }
   }
-  //console.log(form.value.main)
   // Filter null values
-  /*form.value.main = form.value.main.filter((x) => x != deleteEntry)
-  form.value.selects = form.value.selects.filter((x) => x != deleteEntry)
-  form.value.inputs = form.value.inputs.filter((x) => x != deleteEntry)
-  form.value.lists = form.value.lists.filter((x) => x != deleteEntry)*/
   form.value.choices = form.value.choices.filter((x) => x != deleteEntry)
   //console.log(form.value.main)
 }
@@ -160,14 +136,6 @@ function update() {
 function shortGroupDescription(i) {
   const option = form.value.choices[i]
   let desc = capitalise(props.name) + ' ' + (i + 1)
-  /*switch (props.name) {
-    case value:
-      ''
-      break;
-
-    default:
-      break;
-  }*/
   if (!option || !option.main) return desc // No choice made yet, no description
 
   desc = desc + ': ' + option.main.name
@@ -300,6 +268,7 @@ function shortGroupDescription(i) {
                       (!form.choices.main ||
                         form.choices.every((x) => x.main == ''))
                     "
+                    :default="defaultOption"
                     :maxK="maxK"
                     :horizontalLayout="horizontalLayout"
                     @copy="copyItem(i - 1)"

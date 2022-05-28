@@ -2,7 +2,7 @@
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
-import FormGroupList from '../FormGroupList.vue'
+import FormGroupList from './FormGroupList.vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import {
   article,
@@ -22,6 +22,7 @@ const props = defineProps({
   title: String,
   options: Array,
   required: Boolean,
+  defaultOption: String,
   maxK: Number,
   horizontalLayout: Boolean,
   data: { type: Object, required: true },
@@ -31,6 +32,11 @@ const props = defineProps({
 onMounted(() => {
   form.value.single = props.single
   form.value.name = props.title
+  //console.log(props.name, props.defaultOption)
+  if (props.defaultOption) {
+    form.value.main = props.defaultOption
+    setParameter(form.value.main)
+  }
 })
 
 const form = computed({
@@ -46,19 +52,34 @@ const form = computed({
   },
 })
 
+watch(
+  () =>
+    // Watch for the changing of max K (recommendations) value
+    props.maxK,
+  (newK, oldK) => {
+    for (const input of form.value.inputs) {
+      if (
+        (!input.value || input.value == oldK) &&
+        input.name.toLowerCase() == 'k'
+      ) {
+        input.value = newK
+      }
+    }
+  }
+)
+
 // Set default values for the group parameters.
 function setParameter(option) {
   //console.log('setting parameter', props.name, props.options, form.value.main)
-  //let option = form.value.main[i]
   let choices
   //console.log(option)
   if (option.params) {
-    //console.log('option', props.name, 'params', option.params)
+    //console.log('option', props.name, option.name, 'params', option.params)
     if (option.params.values && option.params.values.length > 0) {
       choices = option.params.values
       form.value.inputs = choices.map((param) => ({
         name: param.name,
-        value: param.default,
+        value: param.name.toLowerCase() == 'k' ? props.maxK : param.default,
       }))
     }
     if (option.params.options && option.params.options.length > 0) {
@@ -72,7 +93,6 @@ function setParameter(option) {
       choices = option.params.dynamic
       // Sublists are not required TODO maybe some are?
       form.value.lists = choices.map(() => emptyFormGroup(false))
-      //console.log(form.value.lists)
     }
   }
 }
@@ -184,6 +204,7 @@ function chooseLabel(name) {
                         "
                         required
                       >
+                        <!--v-model="form.inputs[index].value"-->
                         <b-form-input
                           v-if="!value.name.includes('split')"
                           v-model="form.inputs[index].value"
@@ -193,6 +214,9 @@ function chooseLabel(name) {
                               (value.name.toLowerCase() == 'k'
                                 ? props.maxK
                                 : value.max)
+                          "
+                          :placeholder="
+                            'Enter ' + underscoreToSpace(value.name)
                           "
                           validated="true"
                         />
@@ -231,7 +255,7 @@ function chooseLabel(name) {
                           "
                           class="text-center"
                         >
-                          Seed will be randomly generated.
+                          <b>Seed will be randomly generated.</b>
                         </div>
                       </b-form-group></b-col
                     >
@@ -256,7 +280,6 @@ function chooseLabel(name) {
                       <b-form-radio-group
                         v-model="form.selects[index].value"
                         text-field="name"
-                        :value="option.default"
                         :options="option.options"
                         required
                       ></b-form-radio-group>
@@ -272,7 +295,6 @@ function chooseLabel(name) {
                     >
                       <b-form-checkbox
                         v-model="form.selects[index].value"
-                        checked="option.default"
                         size="lg"
                         required
                         >{{
@@ -304,42 +326,9 @@ function chooseLabel(name) {
               </b-col>
             </b-row>
           </b-col>
-          <!--Dynamic lists-->
-          <b-col v-if="horizontalLayout && hasDynamic()">
-            <!--Nested form group list.-->
-            <template
-              v-for="(option, index) in form.main.params.dynamic"
-              :key="option"
-            >
-              <b-card class="mb-1 bg-secondary">
-                <!-- Make a form group or list depending on the type -->
-                <FormGroup
-                  v-if="option.single"
-                  :single="true"
-                  v-model:data="form.lists[index].choices[0]"
-                  :name="option.name"
-                  :title="option.title"
-                  :options="option.options"
-                  :required="option.required"
-                  :horizontalLayout="horizontalLayout"
-                />
-                <FormGroupList
-                  v-else
-                  v-model:data="form.lists[index]"
-                  :name="option.name"
-                  :title="option.title"
-                  :description="
-                    option.title + ' for ' + name + ' ' + form.main.name
-                  "
-                  :options="option.options"
-                  :required="false"
-                />
-              </b-card>
-            </template>
-          </b-col>
         </b-row>
         <!--Dynamic lists-->
-        <b-col v-if="!horizontalLayout && hasDynamic()">
+        <b-col v-if="hasDynamic()">
           <!--Nested form group list.-->
           <template
             v-for="(option, index) in form.main.params.dynamic"
@@ -349,13 +338,13 @@ function chooseLabel(name) {
               <!-- Make a form group or list depending on the type -->
               <FormGroup
                 v-if="option.single"
-                :single="true"
+                single
                 v-model:data="form.lists[index].choices[0]"
                 :name="option.name"
                 :title="option.title"
                 :options="option.options"
+                :defaultOption="option.default && option.default.value"
                 :required="option.required"
-                :horizontalLayout="horizontalLayout"
               />
               <FormGroupList
                 v-else
@@ -366,6 +355,7 @@ function chooseLabel(name) {
                   option.title + ' for ' + name + ' ' + form.main.name
                 "
                 :options="option.options"
+                :defaultOption="option.default && option.default.value"
                 :required="false"
               />
             </b-card>

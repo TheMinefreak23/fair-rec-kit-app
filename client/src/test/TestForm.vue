@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-import FormGroupList from '../components/FormGroupList.vue'
+import FormGroupList from '../components/Form/FormGroupList.vue'
 import { API_URL } from '../api'
 
 const props = defineProps({

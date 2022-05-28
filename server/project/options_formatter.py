@@ -11,7 +11,7 @@ model_API_dict = {}
 
 # constants
 DEFAULTS = {  # 'split': 80,
-    'recCount': {'min': 0, 'max': 100, 'default': 10},
+    'recCount': {'min': 1, 'max': 100, 'default': 10},
 }  # default values
 DEFAULT_SPLIT = {'name': 'Train/testsplit', 'default': '80', 'min': 1, 'max': 99}
 filters = json.load(open('parameters/resultFilter.json'))  # TODO LOAD from dataset
@@ -82,6 +82,7 @@ def create_available_options(recommender_system):
     formatted_filters = reformat(filters, False)
     formatted_converters = reformat(converters, False)
     formatted_splits = reformat(splits, False)
+    print(formatted_splits)
 
     # MOCK: for now use all filters/metrics per dataset
     filter_option = {'name': 'filter',
@@ -99,7 +100,7 @@ def create_available_options(recommender_system):
                          'required': True,
                          'title': 'splitting',
                          'article': 'a',
-                         'default': 'Random',  # TODO use this
+                         'default': formatted_splits[0],
                          'options': formatted_splits}
 
     for dataset in datasets:
@@ -171,7 +172,7 @@ def config_dict_from_settings(experiment):
         print(dataset_matrices)
         print(dataset['dataset'])
         dataset['matrix'] = dataset_matrices[dataset['dataset']][0]
-        if dataset['conversion'] != [] and 'conversion' in dataset:
+        if 'conversion' in dataset and dataset['conversion'] != []:
             dataset['rating_converter'] = dataset['conversion'][0]
         dataset['splitting'] = dataset['splitting'][0]
         # TODO rename split param
