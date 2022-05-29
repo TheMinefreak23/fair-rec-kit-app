@@ -1,27 +1,28 @@
 <script setup>
-/*This program has been developed by students from the bachelor Computer Science at
+/* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
-© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+© Copyright Utrecht University (Department of Information and Computing Sciences) */
 
 import { computed } from 'vue'
 import { capitalise, underscoreToSpace } from '../../helpers/resultFormatter'
 
+const emit = defineEmits(['update:modelValue'])
 const props = defineProps({
   value: Object,
-  formValue: Object,
+  modelValue: Object,
   maxK: Number,
 })
 
 const form = computed({
   // getter
   get() {
-    //console.log(props.name, props.data)
-    return props.formValue
+    // console.log(props.name, props.data)
+    return props.modelValue
   },
   // setter
   set(localValue) {
     console.log('local form change to', localValue)
-    emit('input', localValue)
+    emit('update:modelValue', localValue)
   },
 })
 </script>
@@ -57,7 +58,7 @@ const form = computed({
       <!--Use a range slider if it's a train/test split option-->
       <SplitRange
         @input="form.value = $event"
-        v-model:value="form.value"
+        v-model="form.value"
         :min="value.min"
         :max="value.max"
         :name="value.name"

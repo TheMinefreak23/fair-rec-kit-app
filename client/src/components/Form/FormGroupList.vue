@@ -1,17 +1,15 @@
 <script setup>
+/* This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences) */
+
 import { computed, onMounted, ref, watch } from 'vue'
-import {
-  article,
-  capitalise,
-  underscoreToSpace,
-  formatMultipleItems,
-} from '../../helpers/resultFormatter'
-//import { selectionOptions } from '../helpers/optionsFormatter'
+import { capitalise } from '../../helpers/resultFormatter'
 
 import FormGroup from './FormGroup.vue'
 import { showToast } from '../../store'
 
-//const emit = defineEmits(['formChange'])
+const emit = defineEmits(['update:modelValue'])
 const props = defineProps({
   name: String,
   title: String,
@@ -20,35 +18,25 @@ const props = defineProps({
   required: Boolean,
   default: String,
   maxK: Number,
-  horizontalLayout: Boolean,
-  data: { type: Object, required: true },
+  modelValue: { type: Object, required: true },
 })
 
 const form = computed({
-  // getter
   get() {
-    //console.log(props.name, props.data)
-    return props.data
+    console.log(props.name, props.title, props.modelValue)
+    return props.modelValue
   },
-  // setter
   set(localValue) {
     console.log('local form change to', localValue)
-    emit('input', localValue)
+    emit('update:modelValue', localValue)
   },
 })
-//const flatOptions = props.nested ? flattenOptions() : props.options
 
 const visibleGroup = ref(1)
 
 onMounted(() => {
-  /*console.log(props.name)
-  if (props.name == 'filter' || props.name == 'dataset')
-    console.log(props.name, props.options)*/
   // TODO separate 1-sized formgrouplists
   form.value.name = props.title
-  /*if (props.name == 'filter')
-    console.log(props.name,form)*/
-  //console.log(props.name, 'options', props.options)
 })
 
 watch(
@@ -59,7 +47,7 @@ watch(
   () => {
     // Update form if this changes
     // TODO refactor
-    if (props.name == 'approach' || props.name == 'metric') update()
+    if (props.name === 'approach' || props.name === 'metric') update()
   },
   {
     // Make sure this does not trigger on initialization
@@ -68,11 +56,14 @@ watch(
   }
 )
 
-// Splice groups array to remove a group
+/**
+ * Splice groups array to remove a group
+ * @param {Int} i - The index of the group.
+ */
 function removeGroup(i) {
   // Don't remove first required option
-  if (props.required && form.value.groupCount == 1) return
-  //const mainOption = form.value.main[i]
+  if (props.required && form.value.groupCount === 1) return
+  // const mainOption = form.value.main[i]
   const mainOption = { ...form.value.choices[i].main }
 
   form.value.groupCount--
@@ -86,9 +77,9 @@ function removeGroup(i) {
 
 // Copies the selected item and puts it at the end of the list
 function copyItem(i) {
-  form.value.groupCount++ //Add a new item
+  form.value.groupCount++ // Add a new item
   // Deep-copy the selected value to the new item
-  let item = JSON.parse(JSON.stringify(form.value.choices[i]))
+  const item = JSON.parse(JSON.stringify(form.value.choices[i]))
   form.value.choices.splice(i, 0, item)
   visibleGroup.value = i + 2 // Show newly copied item
   console.log(form.value.choices[i].main)
@@ -109,9 +100,9 @@ function showFormToast(object, actionMessage) {
   showToast(mainOptions, otherOptions)
 }
 
-//Update the options that cannot be be submitted due to changing experiment type (
+// Update the options that cannot be be submitted due to changing experiment type (
 function update() {
-  let entries = props.options
+  const entries = props.options
     .map((category) => category.options)
     .concat()
     .flat()
@@ -120,15 +111,15 @@ function update() {
   for (let i = 0; i < form.value.choices.length; i++) {
     const mainChoice = form.value.choices[i].main
     if (mainChoice && !entries.includes(mainChoice.name)) {
-      //every entry that does not exist in the list of option should be removed
-      //Non-existing entries are replaced with a null entry
+      // every entry that does not exist in the list of option should be removed
+      // Non-existing entries are replaced with a null entry
       form.value.choices[i] = deleteEntry
       if (props.required && form.value.groupCount > 1) form.value.groupCount--
     }
   }
   // Filter null values
-  form.value.choices = form.value.choices.filter((x) => x != deleteEntry)
-  //console.log(form.value.main)
+  form.value.choices = form.value.choices.filter((x) => x !== deleteEntry)
+  // console.log(form.value.main)
 }
 
 // A brief description of the group option
@@ -139,7 +130,7 @@ function shortGroupDescription(i) {
   if (!option || !option.main) return desc // No choice made yet, no description
 
   desc = desc + ': ' + option.main.name
-  if (visibleGroup.value == i + 1) return desc // This group is selected, only show the option name
+  if (visibleGroup.value === i + 1) return desc // This group is selected, only show the option name
 
   // Show first inner options as featured option
   const featuredOptions = [
@@ -151,10 +142,10 @@ function shortGroupDescription(i) {
         (option.lists[0].main && option.lists[0].main.length)
       : '',
   ]
-    .filter((x) => x != '') // remove empty slots
+    .filter((x) => x !== '') // remove empty slots
     .join(', ')
 
-  if (featuredOptions != '') desc += ' | ' + featuredOptions
+  if (featuredOptions !== '') desc += ' | ' + featuredOptions
   return desc
 
   function valueOrEmptyString(list) {
@@ -169,11 +160,6 @@ function shortGroupDescription(i) {
 
 <template>
   <b-container>
-    <b-container
-      :toast="{ root: true }"
-      fluid="sm"
-      position="position-fixed"
-    ></b-container>
     <b-row>
       <h3 class="text-center text-white mb-0">
         <b-card no-body class="mb-0 bg-dark">
@@ -259,7 +245,7 @@ function shortGroupDescription(i) {
                   role="tabpanel"
                 >
                   <FormGroup
-                    v-model:data="form.choices[i - 1]"
+                    v-model="form.choices[i - 1]"
                     :name="name"
                     :options="options"
                     :required="
@@ -270,7 +256,6 @@ function shortGroupDescription(i) {
                     "
                     :default="defaultOption"
                     :maxK="maxK"
-                    :horizontalLayout="horizontalLayout"
                     @copy="copyItem(i - 1)"
                   />
                 </b-collapse>

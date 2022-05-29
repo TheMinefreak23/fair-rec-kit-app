@@ -1,7 +1,7 @@
 <script setup>
-/*This program has been developed by students from the bachelor Computer Science at
+/* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
-© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+© Copyright Utrecht University (Department of Information and Computing Sciences) */
 
 import Documentation from './components/Documentation.vue'
 import Results from './components/Results.vue'
@@ -18,6 +18,7 @@ import { status } from './helpers/queueFormatter'
 import { viewResultTab } from './helpers/resultRequests'
 import VCheckmark from './components/VCheckmark.vue'
 import TestSelect from './test/TestSelect.vue'
+
 let toast = useToast()
 const done = ref(false) // TODO refactor
 const blink = ref(false)
@@ -29,7 +30,6 @@ onMounted(async () => {
   const data = await response.json()
   console.log(data)
 })
-//const tabIndex = ref(0)
 
 watch(
   () => store.toast,
@@ -133,6 +133,7 @@ function callToast() {
         active-nav-item-class="bg-secondary text-danger"
       >
         <b-tab title="New Experiment"><NewExperiment /></b-tab>
+
         <b-tab>
           <ExperimentQueue />
           <template #title>

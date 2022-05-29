@@ -1,24 +1,16 @@
 <script setup>
-/*This program has been developed by students from the bachelor Computer Science at
+/* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
-© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+© Copyright Utrecht University (Department of Information and Computing Sciences) */
 import FormGroupList from './FormGroupList.vue'
-import { computed, onMounted, ref, watch } from 'vue'
-import {
-  article,
-  capitalise,
-  underscoreToSpace,
-  formatMultipleItems,
-} from '../../helpers/resultFormatter'
-//import { selectionOptions } from '../helpers/optionsFormatter'
-import SplitRange from './SplitRange.vue'
+import { computed, onMounted, watch } from 'vue'
+import { article } from '../../helpers/resultFormatter'
 import { emptyFormGroup } from '../../helpers/optionsFormatter'
-import MultiRangeSlider from 'multi-range-slider-vue'
 import '../../../node_modules/multi-range-slider-vue/MultiRangeSliderBlack.css'
 import FormInput from './FormInput.vue'
 import FormSelect from './FormSelect.vue'
 
-const emit = defineEmits(['copy'])
+const emit = defineEmits(['copy', 'update:modelValue'])
 const props = defineProps({
   name: String,
   title: String,
@@ -26,8 +18,7 @@ const props = defineProps({
   required: Boolean,
   defaultOption: String,
   maxK: Number,
-  horizontalLayout: Boolean,
-  data: { type: Object, required: true },
+  modelValue: { type: Object, required: true },
   single: { type: Boolean, default: false }, // single form group or multi (form group list)
 })
 
@@ -37,19 +28,19 @@ onMounted(() => {
   if (props.defaultOption) {
     form.value.main = props.defaultOption.value
   }
-  //console.log('form', form.value)
+  // console.log('form', form.value)
 })
 
 const form = computed({
   // getter
   get() {
-    //console.log(props.name, props.data)
-    return props.data
+    // console.log(props.name, props.data)
+    return props.modelValue
   },
   // setter
   set(localValue) {
     console.log('local form change to', localValue)
-    emit('input', localValue)
+    emit('update:modelValue', localValue)
   },
 })
 
@@ -57,7 +48,7 @@ watch(
   () => form.value.main,
   (newMain) => {
     setParameter(newMain)
-    //console.log('form', form.value)
+    // console.log('form', form.value)
   }
 )
 
@@ -69,8 +60,8 @@ watch(
     if (!form.value.inputs) return
     for (const input of form.value.inputs) {
       if (
-        (!input.value || input.value == oldK) &&
-        input.name.toLowerCase() == 'k'
+        (!input.value || input.value === oldK) &&
+        input.name.toLowerCase() === 'k'
       ) {
         input.value = newK
       }
@@ -80,16 +71,16 @@ watch(
 
 // Set default values for the group parameters.
 function setParameter(option) {
-  //console.log('setting parameter', props.name, props.options, form.value.main)
+  // console.log('setting parameter', props.name, props.options, form.value.main)
   let choices
-  //console.log(option)
+  // console.log(option)
   if (option.params) {
-    //console.log('option', props.name, option.name, 'params', option.params)
+    // console.log('option', props.name, option.name, 'params', option.params)
     if (option.params.values && option.params.values.length > 0) {
       choices = option.params.values
       form.value.inputs = choices.map((param) => ({
         name: param.name,
-        value: param.name.toLowerCase() == 'k' ? props.maxK : param.default,
+        value: param.name.toLowerCase() === 'k' ? props.maxK : param.default,
       }))
     }
     if (option.params.options && option.params.options.length > 0) {
@@ -110,28 +101,8 @@ function setParameter(option) {
 // Check whether the option has values/options params (not dynamic params)
 function hasParams() {
   const option = form.value.main
-  //console.log('hasParams option at', index, ':', option)
-  return (
-    option &&
-    option.params &&
-    option.params.length != 0 &&
-    ((option.params.values && option.params.values.length != 0) ||
-      (option.params.options && option.params.options.length != 0))
-  )
-}
-
-// Check whether the option has dynamic params
-function hasDynamic() {
-  //console.log('form main', form.value.main)
-  // TODO refactor with hasParams
-  const option = form.value.main
-  return (
-    option &&
-    option.params &&
-    option.params.length != 0 &&
-    option.params.dynamic &&
-    option.params.dynamic.length != 0
-  )
+  // console.log('hasParams option at', index, ':', option)
+  return option && option.params
 }
 </script>
 
@@ -179,16 +150,13 @@ function hasDynamic() {
               <b-col v-if="hasParams()">
                 <!--Value input options.-->
                 <b-row v-if="form.main.params.values">
-                  <template
+                  <FormInput
                     v-for="(value, index) in form.main.params.values"
                     :key="value"
-                  >
-                    <FormInput
-                      :value="value"
-                      v-model:formValue="form.inputs[index]"
-                      :maxK="maxK"
-                    />
-                  </template>
+                    :value="value"
+                    v-model="form.inputs[index]"
+                    :maxK="maxK"
+                  />
                 </b-row>
 
                 <!--Selection options-->
@@ -200,7 +168,7 @@ function hasDynamic() {
                   >
                     <FormSelect
                       :option="option"
-                      v-model:formValue="form.selects[index]"
+                      v-model="form.selects[index]"
                     />
                   </b-col>
                 </b-row>
@@ -209,38 +177,37 @@ function hasDynamic() {
           </b-col>
         </b-row>
         <!--Dynamic lists-->
-        <b-col v-if="hasDynamic()">
+        <b-col v-if="hasParams()">
           <!--Nested form group list.-->
-          <template
+          <b-card
+            class="mb-1 bg-secondary"
             v-for="(option, index) in form.main.params.dynamic"
             :key="option"
           >
-            <b-card class="mb-1 bg-secondary">
-              <!-- Make a form group or list depending on the type -->
-              <FormGroup
-                v-if="option.single"
-                single
-                v-model:data="form.lists[index].choices[0]"
-                :name="option.name"
-                :title="option.title"
-                :options="option.options"
-                :defaultOption="option.default"
-                :required="option.required"
-              />
-              <FormGroupList
-                v-else
-                v-model:data="form.lists[index]"
-                :name="option.name"
-                :title="option.title"
-                :description="
-                  option.title + ' for ' + name + ' ' + form.main.name
-                "
-                :options="option.options"
-                :defaultOption="option.default"
-                :required="false"
-              />
-            </b-card>
-          </template>
+            <!-- Make a form group or list depending on the type -->
+            <FormGroup
+              v-if="option.single"
+              single
+              v-model="form.lists[index].choices[0]"
+              :name="option.name"
+              :title="option.title"
+              :options="option.options"
+              :defaultOption="option.default"
+              :required="option.required"
+            />
+            <FormGroupList
+              v-else
+              v-model="form.lists[index]"
+              :name="option.name"
+              :title="option.title"
+              :description="
+                option.title + ' for ' + name + ' ' + form.main.name
+              "
+              :options="option.options"
+              :defaultOption="option.default"
+              :required="false"
+            />
+          </b-card>
         </b-col>
       </b-col>
     </b-col>

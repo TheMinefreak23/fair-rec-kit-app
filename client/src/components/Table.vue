@@ -371,11 +371,10 @@ function getCancelIcon(item) {
     @ok="$emit('changeFilters', filters)"
   >
     <FormGroupList
-      v-model:data="filters"
+      v-model="filters"
       name="filter"
-      plural="filters"
+      title="filters"
       :options="filterOptions"
-      id="filters"
     />
   </b-modal>
 
