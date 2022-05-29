@@ -4,6 +4,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 import json
+from logging import root
 
 from flask import (Blueprint, request)
 import pandas as pd
@@ -148,15 +149,21 @@ def export():
     #Load results from json
     json = request.json
     results = json.get('results', '{}')
-    name = json.get('filename', '{}')
     
-    #Create path to save the file
-    import os  
-    os.makedirs('project/exports', exist_ok=True) 
-
-    #Export the results to csv
+    import tkinter as tk
+    from tkinter.filedialog import asksaveasfilename
+    root = tk.Tk()
+    root.overrideredirect(True)
+    root.geometry('0x0+0+0')
+    root.deiconify()
+    root.lift()
+    root.focus_force()
+    tk.Tk().withdraw() # part of the import if you are not using other tkinter functions
+    
+    data = [('tsv', '*.tsv')]
+    fn = asksaveasfilename(initialdir='/', title='Export Table', filetypes=data, defaultextension='.tsv', initialfile="experiment", parent=root)
     df = pd.DataFrame(results)
-    df.to_csv('project/exports/' + name + '.csv', index=False)
+    df.to_csv(fn, index=False)
     return "Exported file"
 
 @results_bp.route('/validate', methods=['POST'])

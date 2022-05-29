@@ -59,7 +59,6 @@ function mockResult() {
  * @param {Int} index - the index of the tab within the result tabs
  */
 function closeResult(index) {
-  console.log(index)
   removeResult(index)
 }
 </script>

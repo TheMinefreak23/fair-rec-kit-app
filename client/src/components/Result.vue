@@ -254,6 +254,7 @@ function fillVisibleDatasets(){
 
 /**
  * Create an array that has all unique datasets in the result
+ * @returns {string}         - a list of all datasets in the experiments without duplicates
  */
 function findUniqueDatasets(){
   let datasetnames = userTables.map(getDatasetName)

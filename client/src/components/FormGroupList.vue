@@ -122,7 +122,10 @@ function showToast(object, actionMessage) {
   toast.show(
     {
       title:
-        capitalise(props.name) + ' ' + object.name + ' ' + actionMessage + '!',
+        capitalise(props.name) + ' ' + 
+        //If the metric doesn't have a value, don't mention it
+        (object.name == undefined ?  '' : object.name + ' ') +
+         actionMessage + '!',
     },
     { pos: 'top-right', delay: 800, variant: 'warning' }
   )
