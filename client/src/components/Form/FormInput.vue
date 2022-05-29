@@ -5,6 +5,8 @@ Utrecht University within the Software Project course.
 
 import { computed } from 'vue'
 import { capitalise, underscoreToSpace } from '../../helpers/resultFormatter'
+import SplitRange from './SplitRange.vue'
+import MultiRangeSlider from 'multi-range-slider-vue'
 
 const emit = defineEmits(['update:modelValue'])
 const props = defineProps({
@@ -57,7 +59,7 @@ const form = computed({
       />
       <!--Use a range slider if it's a train/test split option-->
       <SplitRange
-        @input="form.value = $event"
+        v-if="value.name.toLowerCase().includes('train')"
         v-model="form.value"
         :min="value.min"
         :max="value.max"
@@ -66,7 +68,7 @@ const form = computed({
       />
       <!-- Use a slider with 2 sliders if a range is needed-->
       <MultiRangeSlider
-        v-if="value.name.includes('range')"
+        v-if="value.name.toLowerCase().includes('range')"
         baseClassName="multi-range-slider-black"
         :min="value.min"
         :max="value.max"

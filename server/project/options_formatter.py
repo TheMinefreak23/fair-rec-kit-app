@@ -13,7 +13,7 @@ model_API_dict = {}
 DEFAULTS = {  # 'split': 80,
     'recCount': {'min': 1, 'max': 100, 'default': 10},
 }  # default values
-DEFAULT_SPLIT = {'name': 'Train/testsplit', 'default': '80', 'min': 1, 'max': 99}
+DEFAULT_SPLIT = {'name': 'Train/testsplit', 'default': '80', 'min': 0, 'max': 100}
 filters = json.load(open('parameters/resultFilter.json'))  # TODO LOAD from dataset
 
 # TODO for now use this to get the dataset matrix

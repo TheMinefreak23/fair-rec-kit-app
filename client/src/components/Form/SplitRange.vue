@@ -50,9 +50,9 @@ function closestMultiple(n, x) {
 function correctValue() {
   // Between min and max and divisible by step
   return (
-    props.value > props.min &&
-    props.value < props.max &&
-    props.value % props.step === 0
+    value.value > props.min &&
+    value.value < props.max &&
+    value.value % props.step === 0
   )
 }
 </script>
@@ -65,7 +65,6 @@ function correctValue() {
       :max="max"
       :step="step"
       data-testid="split-input"
-      id="customRange"
       v-model="value"
       number
     ></b-form-input>
