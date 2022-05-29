@@ -11,10 +11,6 @@ function emptyFormGroup(required) {
     // For required lists the minimum amount of group items is 1.
     groupCount: required ? 1 : 0,
     choices: [{}],
-    /*main: [],
-    inputs: [],
-    selects: [],
-    lists: [],*/
   }
 }
 

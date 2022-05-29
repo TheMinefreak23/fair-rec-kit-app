@@ -7,10 +7,12 @@ import enum
 
 from fairreckitlib.experiment.experiment_event import ON_END_EXPERIMENT_PIPELINE, ON_END_EXPERIMENT_THREAD, \
     ON_BEGIN_EXPERIMENT_PIPELINE, ON_BEGIN_EXPERIMENT_THREAD
-from fairreckitlib.model.pipeline.model_event import ON_BEGIN_MODEL_PIPELINE, ON_BEGIN_TRAIN_MODEL, ON_BEGIN_LOAD_TRAIN_SET
+from fairreckitlib.model.pipeline.model_event import ON_BEGIN_MODEL_PIPELINE, ON_BEGIN_TRAIN_MODEL, \
+    ON_BEGIN_LOAD_TRAIN_SET
 from fairreckitlib.data.pipeline.data_event import ON_BEGIN_DATA_PIPELINE, \
     ON_END_DATA_PIPELINE, ON_BEGIN_FILTER_DATASET, ON_BEGIN_SPLIT_DATASET
 from fairreckitlib.core.parsing.parse_event import ON_PARSE
+
 
 # Experiment status in queue
 class Status(enum.Enum):
@@ -21,6 +23,7 @@ class Status(enum.Enum):
     DONE = 'Done'
     NA = 'Not Available'
 
+
 """ TODO send enums to client?
 def enum_to_dict(enum):
     return {i.name: i.value for i in enum}
@@ -29,6 +32,7 @@ def enum_to_dict(enum):
 def get_statuses():
     return 
     """
+
 
 # Experiment progress status
 class ProgressStatus(enum.Enum):
@@ -64,45 +68,37 @@ class EventHandler():
         }
 
     def on_parse(self, event_listener, **kwargs):
-        print('epic')
+        # print('epic')
         self.experiment.progress = ProgressStatus.PARSING
 
-
     def on_data(self, event_listener, **kwargs):
-        print('super')
+        # print('super')
         self.experiment.progress = ProgressStatus.PROCESSING_DATA
 
-
     def on_filter(self, event_listener, **kwargs):
-        print('dangan')
+        # print('dangan')
         self.experiment.progress = ProgressStatus.FILTERING_DATA
 
-
     def on_split(self, event_listener, **kwargs):
-        print('ronpa')
+        # print('ronpa')
         self.experiment.progress = ProgressStatus.SPLITTING_DATA
 
-
     def on_model(self, event_listener, **kwargs):
-        print('2')
+        # print('2')
         self.experiment.progress = ProgressStatus.MODEL
 
-
     def on_load(self, event_listener, **kwargs):
-        print('2')
+        # print('2')
         self.experiment.progress = ProgressStatus.MODEL_LOAD
 
-
     def on_train(self, event_listener, **kwargs):
-        print('2')
+        # print('2')
         self.experiment.progress = ProgressStatus.TRAINING
-
 
     def on_begin_experiment(self, event_listener, **kwargs):
         # Update experiment status
         self.experiment.status = Status.ACTIVE
         self.experiment.progress = ProgressStatus.STARTED
-
 
     def on_end_experiment(self, event_listener, **kwargs):
         # TODO get real recs&eval result
@@ -110,8 +106,8 @@ class EventHandler():
         # print('config', current_experiment.config)
 
         # Update status
-        self.experiment.status = Status.DONE
-        self.experiment.progress = ProgressStatus.FINISHED
+        if self.experiment.status is not Status.ABORTED:
+            self.experiment.status = Status.DONE
+            self.experiment.progress = ProgressStatus.FINISHED
 
         self.end_experiment()
-
