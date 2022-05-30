@@ -34,6 +34,38 @@ RESULTS_ROOT_FOLDER = 'results/'
 RESULTS_OVERVIEW_PATH = RESULTS_ROOT_FOLDER + 'results_overview.json'
 
 
+def format_result(settings):
+    """Mock result experiment.
+
+    Args:
+        settings(dict): the experiment settings
+
+    Returns: (list) the mock result
+    """
+    #print('== settings ==', settings)
+    result = []
+    datasets = settings['data']
+    for (dataset_index, dataset) in enumerate(datasets):
+        # Add dataset identifier to name
+        dataset['name'] = dataset['dataset'] + '_' + dataset['matrix'] + '_' + str(dataset_index)
+        recs = []
+        for (api, approaches) in settings['models'].items():
+            for (approach_index, approach) in enumerate(approaches):
+                # Add approach, with index as identifier in the name
+                recommendation = {'approach': api + '_' + approach['name'] + '_' + str(approach_index),
+                                  #'recommendation': mock_recommend(dataset, approach),
+                                  'evals': []}
+                """
+                for metric in settings['metrics']:
+                    evaluation = mock_evaluate_all(approach, metric)
+                    recommendation['evals'].append(
+                        {'name': metric['name'], 'evaluation': evaluation, 'params': metric['params']})
+                    print(metric)"""
+                recs.append(recommendation)
+        result.append({'dataset': dataset, 'recs': recs})
+    return result
+
+
 def save_result(experiment, result):
     """Save result to overview.
 
@@ -170,6 +202,7 @@ def id_to_index(json_data, result_id):
     for iteration_id, data in enumerate(json_data['all_results']):
         if int(data['timestamp']['stamp']) == int(result_id):
             current_result_overview_id = iteration_id
+            #print('==ID TO INDEX','ID',result_id,'INDEX',iteration_id,'NAME',data['metadata']['name'])
     return current_result_overview_id
 
 

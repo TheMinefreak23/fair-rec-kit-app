@@ -35,6 +35,7 @@ const itemHeaderOptions = ref([[]])
 const userTables = combineResults(props.result.result)
 const visibleDatasets = ref([])
 const uniqueDatasets = findUniqueDatasets()
+const visibleMatrices = ref([])
 
 onMounted(() => {
   console.log('result', props.result)
@@ -332,20 +333,14 @@ async function getInfo() {
 
     </div>
     <div class="container">
+      <h4>Metrics</h4>
       <div class="row">
-        <h4>Metrics</h4>
-
-        <!--Show first two dataset results for now TODO-->
-        <template
-          v-for="(datasetResult, index) in result.result[1]
-            ? [result.result[0], result.result[1]]
-            : [result.result[0]]"
-          :key="datasetResult"
-        >
+        
           <p> {{datasetResult.results[0].dataset}}</p>
-          <div class="col-6">
           
+          <div :class="result.length > 1 ? 'col-6' : 'col'">
           <template v-if="visibleDatasets.includes(datasetResult.dataset.dataset)" :key="visibleDatasets">
+
             <Table
               :caption="userTables[index]"
               :results="datasetResult.results"
@@ -367,13 +362,32 @@ async function getInfo() {
         </h4>
         <h4 v-else>Predicted rating per user</h4>
       </div>
+      
+     <p>
+        Select items to be shown:
+        <div class="form-check" v-for="(entry, index) in userTables">
+          <input
+            v-model = "visibleMatrices"
+            class = "form-check-input"
+            type="checkbox"
+            :value="entry"
+            :id="entry"
+          />
+          <label class="form-check-label" :id="entry">
+            {{entry}}
+          </label>
+        </div>
+      </p>
+
+
       <div class="row">
         <!--Show recommendations for all datasets for now TODO-->
         <!--Currently only shows the results of the first dataset-->
         <template v-for="(entry, index) in userTables" :key="data">
           <template v-if="visibleDatasets.includes(getDatasetName(entry))" :key="visibleDatasets">
+            <template v-if="visibleMatrices.includes(entry)" :key="visibleMatrices">
           <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
-            <div class="col-6">
+            <div :class="visibleMatrices.length > 1 ? 'col-6' : 'col'">
               <Table
                 v-if="selectedHeaders[index]"
                 :key="props.result.id"
@@ -398,6 +412,7 @@ async function getInfo() {
               />
             </div>
             </template>
+          </template>
         </template>
       </div>
     </div>
