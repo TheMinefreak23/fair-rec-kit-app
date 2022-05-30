@@ -4,12 +4,12 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
 import Table from './Table.vue'
-import { onActivated, onMounted, onUpdated, ref, watch } from 'vue'
+import { onMounted, ref} from 'vue'
 import { emptyFormGroup } from '../helpers/optionsFormatter'
 import { makeHeader } from '../helpers/resultFormatter'
-
-import mockdata from '../../../server/mock/1647818279_HelloWorld/results-table.json'
 import { API_URL } from '../api'
+import { loadResult } from '../helpers/resultRequests'
+import SettingsModal from './Table/SettingsModal.vue'
 
 const props = defineProps({ headers: Array, result: Object })
 
@@ -37,14 +37,14 @@ const uniqueDatasets = findUniqueDatasets()
 onMounted(() => {
   console.log('result', props.result)
   console.log('result id', props.result.id)
-  loadEvaluations()
+  //loadEvaluations()
+  //loadResult(props.result.id)
   fillVisibleDatasets()
   //Load in all the user recommendation/prediction tables
   for (let index in userTables) {
     setRecs(parseInt(index))
   }
   console.log('availableFilters', availableFilters.value)
-  //loadEvaluations()
 })
 
 // GET request: Get available header options for selection from server
@@ -81,6 +81,7 @@ async function setRecs(currentTable) {
   }
 }
 
+/*
 //POST request: Ask server to load the evaluations of the current result
 //Currently not used, as evaluation tables are not finished
 async function loadEvaluations() {
@@ -104,7 +105,7 @@ async function getEvaluations() {
   console.log('succesfully retrieved evaluation data.')
   const resultsData = await response.json()
   console.log('results data', resultsData)
-}
+}*/
 
 //POST request: Ask server for next part of user recommendation table.
 async function getUserRecs(currentTable) {
@@ -233,15 +234,44 @@ function findUniqueDatasets(){
 
 }
 
+// Get music detail info
+async function getInfo() {
+  songInfo.value = await getSongInfo(
+    token.value,
+    query.value.track,
+    query.value.artist
+  )
+
+  tracks.value = await songInfo.value.Spotify
+  track.value = tracks.value.items[0]
+  //get AcousticBrainz highlevel features using LastFM's mbid
+  highlevelFeatures.value = await songInfo.value.AcousticBrainz[
+    songInfo.value.LastFM.track.mbid
+  ][0]['highlevel']
+}
 </script>
 
 <template>
   <div>
     <div class="container">
-      <h1 class="display-2">Results</h1>
+      <b-row>
+        <b-col><p class="lead" > Results for </p>
+      <h1 class="display-3"> {{ result.metadata.name }}    </h1>
+      <h3 class="text-muted"> {{ result.metadata.datetime}} </h3>
+      </b-col>
+      <b-col>
+        <div class="float-end">
+          <SettingsModal :resultId="result.id"/>
+            </div>
+      </b-col>
+      </b-row>
       <p class="lead">
-        These are the results for experiment {{ result.metadata.name }} done at
-        {{ result.metadata.datetime }}.
+        Tags:
+        <template v-if="!result.metadata.tags">None</template>
+        <template v-for="tag in result.metadata.tags">
+          <b-button disabled> {{ tag }} </b-button
+          >
+        </template>
       </p>
 
       <p>
@@ -260,14 +290,6 @@ function findUniqueDatasets(){
         </div>
       </p>
 
-      <div class="col">
-        Tags:
-        <template v-if="!result.metadata.tags">None</template>
-        <template v-for="tag in result.metadata.tags">
-          <b-button disabled> {{ tag }} </b-button
-          >
-        </template>
-      </div>
     </div>
 
     <div class="container">

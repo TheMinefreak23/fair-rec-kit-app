@@ -5,48 +5,86 @@ import json
 import time
 from unittest.mock import patch
 
+import polling as polling
+import requests
+
 from project.experiment import *
 from tests.test_result_storage import test_results_path, test_experiment, delete_test_results
 
+# TODO add more edge cases
+
 url_prefix = '/api/experiment'
 test_options = json.load(open('tests/options.json'))
-TEST_RESULTS_PATH = 'test/test_results'
+TEST_RESULTS_PATH = 'test_results' # TODO patch doesn't work
 
 
 def get_test_options():
-    test_options['timestamp']['stamp'] = str(time.time())
-    print(test_options)
-    return test_options
+    name = test_options['metadata']['name']
+    experiment = QueueItem(test_options, {}, Status.TODO, ProgressStatus.NA, name)
+    experiment.job['timestamp']['stamp'] = str(time.time())
+    print(experiment)
+    return experiment
 
 
-# Delete all results by emptying the file
-#def delete_test_results():
-#    os.rmdir(TEST_RESULTS_PATH)
+# Delete all results by deleting the test result directory
+def delete_test_results(results_dir):
+    os.rmdir(results_dir)
+
+
+# TODO
+def test_queue_format():
+    # Empty queue gives empty formatted queue
+    queue_result = formatted_queue()
+    assert queue_result == []
 
 
 # Test if experiment route works on mock JSON form data
-@patch('project.experiment.RESULTS_DIR', TEST_RESULTS_PATH)
+#@patch('project.experiment.RESULTS_DIR', TEST_RESULTS_PATH)
 def test_form(client):
+    from project.experiment import RESULTS_DIR
+    print('RESULTS DIR', RESULTS_DIR)
     from project.experiment import experiment_queue
     old_queue_length = len(experiment_queue)
-    response = client.post(url_prefix + '/calculation', json=get_test_options())
-    assert response.status_code == 200  # Assert success
+    post_response = client.post(url_prefix + '/calculation', json=test_options)
+
+    assert post_response.status_code == 200  # Assert success
+
     from project.experiment import experiment_queue
-    assert len(experiment_queue) == old_queue_length + 1  # Check if the queue has a new result
+    data = json.loads(post_response.data)
+    assert data['queue'] == formatted_queue()
+    # Check that the queue has a new item or no new item (item handled immediately)
+    assert len(experiment_queue) == old_queue_length + 1 or len(experiment_queue) == old_queue_length
 
     # Start the queue
-    #queue_response = client.get(url_prefix + '/queue')
-    time.sleep(0.1)
+    # queue_response = client.get(url_prefix + '/queue')
+    # time.sleep(0.1)
+
+    def finished():
+        get_response = client.get(url_prefix + '/calculation')
+        status = json.loads(get_response.data)['status']
+        # The experiment is queued, so it should be either on to do, active or done
+        assert status in [Status.TODO.value, Status.ACTIVE.value, Status.DONE.value]
+        return status == Status.DONE.value
+
+    # Poll for a result
+    polling.poll(
+        finished,
+        step=5,
+        poll_forever=True
+    )
 
     # Check the result
+    # TODO refactor
     get_response = client.get(url_prefix + '/calculation')
     from project.result_storage import current_result
-    assert json.loads(get_response.data)['calculation'] == current_result
+    data = json.loads(get_response.data)
+    assert data['calculation'] == current_result
     assert get_response.status_code == 200
 
-    #delete_test_results()
+    #delete_test_results(RESULTS_DIR)
 
-
+# TODO this test is kind of redundant, use fixtures?
+"""
 @patch('project.experiment.RESULTS_DIR', TEST_RESULTS_PATH)
 def test_calculate():
     from project.experiment import experiment_queue
@@ -57,16 +95,19 @@ def test_calculate():
     calculate_first()
     assert len(experiment_queue) == old_queue_length - 1
 
-    #delete_test_results()
+    delete_test_results()
+"""
 
-
+# TODO this test is kind of redundant, use fixtures?
+"""
 @patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
-def test_experiment():
+def test_run_experiment():
     print(get_test_options())
     run_experiment(get_test_options())
     from project.result_storage import current_result
     assert current_result['metadata']['name'] == test_options['metadata']['name']
-    #delete_test_results()
+    delete_test_results()
+"""
 
 
 def test_params(client):
@@ -77,71 +118,41 @@ def test_params(client):
 
 def test_calculate_route_post(client):
     # Test POST
-    post_response = client.post(url_prefix + '/calculation', json=test_experiment)
+    post_response = client.post(url_prefix + '/calculation', json=test_options)
     assert post_response.status_code == 200
-    assert json.loads(post_response.data) == experiment_queue
+    assert json.loads(post_response.data)['queue'] == formatted_queue()
 
 
 def test_calculate_route_get(client):
     # Test GET
     get_response = client.get(url_prefix + '/calculation')
     assert get_response.status_code == 200
-    from project.result_storage import current_result
-    assert json.loads(get_response.data)['calculation'] == current_result
+
+    data = json.loads(get_response.data)
+    assert 'status' in data
+    # TODO Status is not available if there is no experiment
+    #assert data['status'] == Status.NA.value
 
 
 def test_queue(client):
-    thread_alive = not experiment_thread.is_alive()
-
-    get_response = client.get(url_prefix + '/queue',)
+    get_response = client.get(url_prefix + '/queue', )
+    # TODO fixture?
     assert get_response.status_code == 200
-    assert json.loads(get_response.data) == experiment_queue
+    assert json.loads(get_response.data)['queue'] == formatted_queue()
 
-    # Assert that the thread has started running if the queue wasn't empty
-    if not thread_alive and experiment_queue:
-        assert experiment_thread.is_alive()
-
-
-def test_delete(client):
-    index = 0
-
-    # Copy the test experiment but change the name
-    test_experiment2 = test_experiment
-    test_experiment2['metadata']['name'] = 'bar'
-
-    # Add the test experiments to the queue
-    from project.experiment import experiment_queue
-    experiment_queue.append(test_experiment)
-    experiment_queue.append(test_experiment2)
-
-    old_queue_length = len(experiment_queue)
-
-    response = client.post(url_prefix + '/queue/delete', json={'index': index})
-    from project.experiment import experiment_queue
-    neighbour = experiment_queue[index+1]
-
-    # Test that the correct experiment has been deleted
-    assert experiment_queue[index] == neighbour
-
-    assert b'Removed index' in response.data
-    assert len(experiment_queue) == old_queue_length -1
+# TODO
+"""
+def test_cancel(client):
+"""
 
 
 def test_append():
-    metadata = test_experiment['metadata']
-    settings = 'test'
+    metadata = test_options['metadata']
+    settings = test_options['settings']
 
     append_queue(metadata, settings)
 
     queue_item = experiment_queue.pop()
-    assert queue_item['metadata'] == metadata
-    assert queue_item['settings'] == settings
-    assert float(queue_item['timestamp']['stamp']) > time.time() - 1000*3600
-
-    # test no name
-    metadata.pop('name', None)
-    append_queue(metadata, settings)
-    # No error
-
-
-
+    assert queue_item.job['metadata'] == metadata
+    assert queue_item.job['settings'] == settings
+    assert float(queue_item.job['timestamp']['stamp']) > time.time() - 1000 * 3600
