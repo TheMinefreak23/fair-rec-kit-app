@@ -13,6 +13,8 @@ import { makeHeader } from '../helpers/resultFormatter'
 import { statusPrefix, statusVariant, status } from '../helpers/queueFormatter'
 import { loadResult } from '../helpers/resultRequests'
 import SettingsModal from './Table/SettingsModal.vue'
+import { getInfoFromSpotifyID, getSpotifyToken } from '../helpers/songInfo'
+import MusicModal from './ItemDetail/MusicModal.vue'
 
 const emit = defineEmits([
   'viewResult',
@@ -49,26 +51,42 @@ const colItemStyle = {
   inlineSize: colWidth,
   overflowWrap: 'break-word',
 }
+// Pagination
 const caption = ref('')
 const entryAmount = ref(20)
+
+// Modals
 const deleteModalShow = ref(false)
-const settingsModalShow = ref(false)
 const editModalShow = ref(false)
 const viewModalShow = ref(false)
 const filtersModalShow = ref(false)
 const updateHeadersModalShow = ref(false)
+
+// Columns
 const checkedColumns = ref([])
 const itemColumns = ref([])
 const userColumns = ref([])
+
+// Filters
 const filters = ref(emptyFormGroup(false))
+
+// Item info
 const newName = ref('')
 const newTags = ref('')
 const newTagsList = ref([])
 const newEmail = ref('')
 const metadataStr = ref('')
 const selectedEntry = ref(0)
+
+// Sorting
 const sortindex = ref(0)
 const descending = ref(false)
+
+// Item (music) detail
+const track = ref()
+const highlevelFeatures = ref()
+const songInfo = ref({ lastFM: {} }) // TODO
+const musicModalShow = ref(false)
 
 const subheaders = computed(() => {
   const result = []
@@ -252,6 +270,23 @@ function getCancelIcon(item) {
   if (status == status.toDo) return 'bi-x-lg'
   else return 'bi-x-octagon-fill'
 }
+
+// Get music detail info
+// TODO refactor
+async function showMusicDetail(spotifyId) {
+  const token = await getSpotifyToken()
+  track.value = await getInfoFromSpotifyID(token, spotifyId)
+  //console.log('track', track.value)
+
+  // TODO
+  /*
+  //get AcousticBrainz highlevel features using LastFM's mbid
+  highlevelFeatures.value = await songInfo.value.AcousticBrainz[
+    songInfo.value.LastFM.track.mbid
+  ][0]['highlevel']*/
+
+  musicModalShow.value = !musicModalShow.value
+}
 </script>
 
 <template>
@@ -378,6 +413,14 @@ function getCancelIcon(item) {
     />
   </b-modal>
 
+  <MusicModal
+    v-if="track"
+    v-model:show="musicModalShow"
+    :track="track"
+    :lastFmTrack="songInfo.lastFM.track"
+    :highlevelFeatures="highlevelFeatures"
+  />
+
   <b-table-simple hover striped responsive caption-top>
     <caption>
       {{
@@ -462,7 +505,16 @@ function getCancelIcon(item) {
               {{ value.slice(statusPrefix.length) }}
             </b-button>
           </template>
-          <template v-else> {{ value }}</template>
+          <template v-else>
+            <template v-if="key == 'track_spotify-uri'">
+              <template v-if="value">
+                <b-button @click="showMusicDetail(item['track_spotify-uri'])"
+                  >View track</b-button
+                >
+              </template>
+            </template>
+            <template v-else>{{ value }} </template></template
+          >
         </b-td>
         <b-td
           class="align-middle"

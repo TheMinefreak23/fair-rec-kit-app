@@ -46,7 +46,7 @@ def create_available_options(recommender_system):
     #print(json.dumps(datasets, indent=4))
     global dataset_matrices
     dataset_matrices = {dataset: list(matrices.keys()) for (dataset, matrices) in datasets.items()}
-    #print(dataset_matrices)
+    print(dataset_matrices)
     predictors = recommender_system.get_available_algorithms(TYPE_PREDICTION)
     recommenders = recommender_system.get_available_algorithms(TYPE_RECOMMENDATION)
     # TODO different metrics for diff types
@@ -168,10 +168,11 @@ def config_dict_from_settings(experiment):
         # print(dataset)
         # TODO refactor
         dataset['dataset'] = dataset['name']
-        # TODO For now pick first matrix
-        print(dataset_matrices)
-        print(dataset['dataset'])
-        dataset['matrix'] = dataset_matrices[dataset['dataset']][0]
+        # TODO for now pick item matrix if available, else first matrix
+        #print(dataset_matrices)
+        #print(dataset['dataset'])
+        available_matrices = dataset_matrices[dataset['dataset']]
+        dataset['matrix'] = 'user-track-count' if 'user-track-count' in available_matrices else available_matrices[0]
         if 'conversion' in dataset and dataset['conversion'] != []:
             dataset['rating_converter'] = dataset['conversion'][0]
         dataset['splitting'] = dataset['splitting'][0]

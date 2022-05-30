@@ -107,7 +107,7 @@ function omitRecommendation(arr) {
 
 // Short result description, e.g. for a result tab
 export function shortResultDescription(result) {
-  console.log(result)
+  //console.log(result)
   const datasets = []
   const approaches = []
   for (const datasetResult of result.result) {
@@ -119,7 +119,7 @@ export function shortResultDescription(result) {
   const datetime = result.metadata.datetime
 
   function formatNames(list) {
-    console.log(Array.from(new Set(list)))
+    //console.log(Array.from(new Set(list)))
     const formattedList = []
     for (const name of Array.from(new Set(list))) {
       // Remove index (part after last underscore)
