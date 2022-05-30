@@ -3,10 +3,11 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
+import json
 
 from flask import (Blueprint, request)
 import pandas as pd
-from fairreckitlib.data.set.dataset import add_user_columns, add_item_columns
+from fairreckitlib.data.set.dataset import add_dataset_columns as add_data_columns
 
 from . import result_storage
 from .experiment import options, recommender_system
@@ -84,7 +85,7 @@ def old_result_by_id():
 def result_by_id():
     if request.method == 'POST':
         data = request.get_json()
-        print('data', data)
+        print('result_by_id data', data)
         result_storage.result_by_id(int(data['id']))
         if result_storage.current_result:
             response = {'status': 'success'}
@@ -92,6 +93,7 @@ def result_by_id():
             response = {'status': 'result not found'}
 
     else:  # GET request
+        print('current result', json.dumps(result_storage.current_result, indent=4))
         response = {'result': result_storage.current_result}
 
     return response
@@ -146,14 +148,18 @@ def user_result():
     # read mock dataframe
     recs = result_storage.current_recs[pair_id]
 
-    #filter recs
+    #TODO refactor/do dynamically
+    spotify_datasets = ['LFM-2B']
+    if dataset in spotify_datasets:
+        recs=add_spotify_columns(dataset, recs)
+
     recs = filter_results(recs, filters)
 
-    # Add optional columns to the dataframe (if any)
+    #Add optional columns to the dataframe (if any)
     if (len(chosen_headers) > 0):
-        recs = add_dataset_columns(dataset, recs, chosen_headers)
-
-    # Make sure not to sort on a column that does not exist anymore
+      recs=add_dataset_columns(dataset, recs, chosen_headers)
+    
+    #Make sure not to sort on a column that does not exist anymore
     if (len(recs.columns) <= sortIndex):
         sortIndex = 0
     # sort dataframe based on index and ascending or not
@@ -177,16 +183,30 @@ def user_result():
 
 
 def add_dataset_columns(dataset_name, dataframe, columns):
+    #print(dataset_name)
     dataset = recommender_system.data_registry.get_set(dataset_name)
     if dataset is None:
         return dataframe
 
     result = list(map(lambda column: column.lower(), columns))
-    dataframe = add_item_columns(dataset, dataframe, result)
-    dataframe = add_user_columns(dataset, dataframe, result)
+    matrix_name = 'user-track-count' # TODO
+    dataframe = add_data_columns(dataset, matrix_name, dataframe, result)
+    #dataframe = add_user_columns(dataset, dataframe, result)
+    #print(dataframe.head())
     return dataframe
 
 
 @results_bp.route('/headers', methods=['GET'])
 def headers():
     return result_storage.load_json('project/headers.json')
+
+# test
+def add_spotify_columns(dataset_name, dataframe):
+    dataset = recommender_system.data_registry.get_set(dataset_name)
+    matrix_name = 'user-track-count'
+    columns = ['track_id', 'track_spotify-uri']
+    dataframe = add_data_columns(dataset, matrix_name, dataframe, columns)
+    print(dataframe.head())
+    return dataframe
+
+

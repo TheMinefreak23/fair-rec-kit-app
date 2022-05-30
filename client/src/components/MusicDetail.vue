@@ -1,13 +1,18 @@
 <script setup>
-import { onMounted, ref } from 'vue'
-import { API_URL } from '../api'
-import { getSpotifyToken, getSongInfo } from '../helpers/songInfo'
+import MusicModal from './ItemDetail/MusicModal.vue'
+/*This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
+import { onMounted, ref } from 'vue'
+import { getSpotifyToken, getSongInfo } from '../helpers/songInfo'
+const track = ref({})
 const token = ref('test')
 const tracks = ref([])
-const track = ref({})
-const trackModalShow = ref(false)
 const query = ref({ track: 'orion', artist: 'metallica' })
+const highlevelFeatures = ref()
+const songInfo = ref()
+const modalShow = ref(false)
 
 onMounted(async () => {
   token.value = await getSpotifyToken()
@@ -16,14 +21,18 @@ onMounted(async () => {
 
 // Get music detail info
 async function getInfo() {
-  const songInfo = await getSongInfo(
+  songInfo.value = await getSongInfo(
     token.value,
     query.value.track,
     query.value.artist
   )
-  console.log("Song Info", songInfo)
-  tracks.value = await songInfo.Spotify
+
+  tracks.value = await songInfo.value.Spotify
   track.value = tracks.value.items[0]
+  //get AcousticBrainz highlevel features using LastFM's mbid
+  highlevelFeatures.value = await songInfo.value.AcousticBrainz[
+    songInfo.value.LastFM.track.mbid
+  ][0]['highlevel']
 }
 </script>
 
@@ -58,84 +67,26 @@ async function getInfo() {
     <b-card>
       <h3>Found tracks:</h3>
       <ul>
-        <li v-for="(queryTrack, index) in tracks.items">
+        <li v-for="queryTrack in tracks.items">
           {{ queryTrack.name }}
         </li>
       </ul>
     </b-card>
 
-    <template v-if="track">
+    <template v-if="track && highlevelFeatures && songInfo">
       <b-button
         style="width: 20vw; display: block"
         class="mx-auto"
         variant="primary"
-        @click="trackModalShow = !trackModalShow"
+        @click="modalShow = !modalShow"
         >Show track
       </b-button>
-      <b-modal
-        :style="{
-          backgroundColor: 'black',
-          color: 'black',
-        }"
-        v-if="track.artists"
-        v-model="trackModalShow"
-        :title="track.name + ' by ' + track.artists[0].name"
-        size="lg"
-      >
-        <b-container class="p-3">
-          <b-row v-if="track.album">
-            <b-row class="p-3">
-              <b-col>
-                <p>
-                  <!--TODO refactor into component with dynamic formatting-->
-                  Artist(s):
-                  <template v-for="(artist, index) in track.artists">{{
-                    artist.name
-                  }}</template>
-                </p>
-                <p>Album: {{ track.album.name }}</p>
-                <p>Attributes (graph of danceability etc): TODO</p>
-
-                <p>..:</p>
-              </b-col>
-              <b-col>
-                <!--Using medium sized image-->
-                <img :src="track.album.images[1].url" />
-              </b-col>
-            </b-row>
-          </b-row>
-          <b-row class="p-3">
-            <iframe
-              style="border-radius: 12px"
-              :src="
-                'https://open.spotify.com/embed/track/' +
-                track.id +
-                '?utm_source=generator'
-              "
-              width="100%"
-              height="80"
-              frameBorder="0"
-              allowfullscreen=""
-              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-            />
-          </b-row>
-          <b-row class="p-3">
-            <b-button v-b-toggle.collapse-1 variant="primary"
-              >Show full info</b-button
-            >
-            <b-collapse id="collapse-1">
-              <h3>
-                debug | id: {{ track.id }} | preview url:
-                {{ track.preview_url }}
-              </h3>
-              <p v-for="[key, value] of Object.entries(track)">
-                <b>{{ key }}</b
-                >: {{ value }}
-              </p>
-            </b-collapse>
-          </b-row>
-        </b-container>
-      </b-modal>
+      <MusicModal
+        :show="modalShow"
+        :track="track"
+        :lastFmTrack="songInfo.LastFM.track"
+        :highlevelFeatures="highlevelFeatures"
+      />
     </template>
   </b-container>
 </template>

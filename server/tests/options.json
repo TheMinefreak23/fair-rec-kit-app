@@ -1,75 +1,97 @@
 {
-  "timestamp": {
-    "stamp": "1651467547",
-    "datetime": "2022-05-02 06:59:07"
-  },
-  "metadata": {
-    "name": "m"
-  },
-  "settings": {
-    "lists": {
-      "datasets": [
-        {
-          "name": "ML-100K",
-          "params": [
-            {
-              "name": "Train/testsplit",
-              "value": 80
-            }
-          ],
-          "filters": [],
-          "conversion": [],
-          "splitting": [
-            {
-              "name": "random",
-              "params": [
-                {
-                  "name": "seed",
-                  "value": null
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "metrics": [],
-      "approaches": [
-        {
-          "name": "BiasedMF",
-          "params": [
-            {
-              "name": "features",
-              "value": 10
-            },
-            {
-              "name": "iterations",
-              "value": 20
-            },
-            {
-              "name": "user_reg",
-              "value": 0.1
-            },
-            {
-              "name": "item_reg",
-              "value": 0.1
-            },
-            {
-              "name": "damping",
-              "value": 5
-            },
-            {
-              "name": "random_seed",
-              "value": null
-            },
-            {
-              "name": "Method",
-              "value": "cd"
-            }
-          ]
-        }
-      ]
+    "metadata": {
+        "name": "Test487_unsourced",
+        "email": "exultingly@jacksnipe.com",
+        "tags": [
+            "lounges",
+            "trilogy",
+            "resale",
+            "polishings",
+            "jawboned"
+        ]
     },
-    "recommendations": 10,
-    "experimentMethod": "recommendation"
-  }
+    "settings": {
+        "recommendations": 63,
+        "experimentMethod": "recommendation",
+        "lists": {
+            "datasets": [
+                {
+                    "name": "ML-100K",
+                    "params": [
+                        {
+                            "name": "Train/testsplit",
+                            "value": 80
+                        }
+                    ],
+                    "filters": [],
+                    "conversion": [],
+                    "splitting": [
+                        {
+                            "name": "random",
+                            "params": [
+                                {
+                                    "name": "seed",
+                                    "value": null
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "metrics": [
+                {
+                    "name": "P@K",
+                    "params": [
+                        {
+                            "name": "K",
+                            "value": "10"
+                        }
+                    ],
+                    "filters": [
+                        {
+                            "name": "Country user threshold",
+                            "params": [
+                                {
+                                    "name": "threshold",
+                                    "value": 10
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "P@K",
+                    "params": [
+                        {
+                            "name": "K",
+                            "value": "5"
+                        }
+                    ],
+                    "filters": [
+                        {
+                            "name": "Artist Gender",
+                            "params": [
+                                {
+                                    "name": "Gender",
+                                    "value": "Female"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "approaches": [
+                {
+                    "name": "Random",
+                    "params": [
+                        {
+                            "name": "random_seed",
+                            "value": null
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "progress": "Not Available"
 }

@@ -4,13 +4,14 @@ Utrecht University within the Software Project course.
 
 import words from 'an-array-of-english-words'
 import { API_URL } from '../api'
-import { getCalculation, store } from '../store'
+import { getCalculation, pollForResult, store } from '../store'
 import { ref, onMounted } from 'vue'
 import mockLists from './mockLists.json'
 import mockMetrics from './mockMetrics.json'
+import { progress } from '../helpers/queueFormatter'
 
-var metadata = {}
-var form = {}
+let metadata = {}
+let form = {}
 
 async function sendMockData(options, simple = false, metrics = false) {
   console.log('options', options)
@@ -42,7 +43,12 @@ async function sendMockData(options, simple = false, metrics = false) {
     tags: randomWords(),
   }
 
-  store.currentExperiment = { metadata: metadata, settings: form }
+  // TODO get from server?
+  store.currentExperiment = {
+    metadata: metadata,
+    settings: form,
+    progress: progress.notAvailable,
+  }
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -58,8 +64,7 @@ async function sendMockData(options, simple = false, metrics = false) {
   console.log('sendToServer() queue', store.queue)
   // Switch to queue
   store.currentTab = 1
-  const interval = 1000
-  store.resultPoll = setInterval(getCalculation, interval)
+  pollForResult()
 }
 
 function generateRandomApproach(options) {
