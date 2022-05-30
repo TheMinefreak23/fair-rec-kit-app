@@ -250,7 +250,7 @@ function fillShownMetrics(){
   for(let dataset in result) {
      for(let metric in result[dataset].headers)
       
-       if (!(result[dataset].headers[metric].name.includes("Approach"))) {
+       if (!(result[dataset].headers[metric].name.includes("Approach")) && !(visibleMetrics.value.includes(result[dataset].headers[metric].name))) {
              visibleMetrics.value[i] = result[dataset].headers[metric].name
               availableMetrics.value[i] = result[dataset].headers[metric].name
               i++
@@ -303,14 +303,30 @@ function contains(string, array){
 }
 
 
+// Get music detail info
+async function getInfo() {
+  songInfo.value = await getSongInfo(
+    token.value,
+    query.value.track,
+    query.value.artist
+  )
+
+  tracks.value = await songInfo.value.Spotify
+  track.value = tracks.value.items[0]
+  //get AcousticBrainz highlevel features using LastFM's mbid
+  highlevelFeatures.value = await songInfo.value.AcousticBrainz[
+    songInfo.value.LastFM.track.mbid
+  ][0]['highlevel']
+}
 </script>
 
 <template>
   <div>
     <div class="container">
       <b-row>
-        <b-col>
-      <h1 class="display-2">Results</h1>
+        <b-col><p class="lead" > Results for </p>
+      <h1 class="display-3"> {{ result.metadata.name }}    </h1>
+      <h3 class="text-muted"> {{ result.metadata.datetime}} </h3>
       </b-col>
       <b-col>
         <div class="float-end">
@@ -319,8 +335,12 @@ function contains(string, array){
       </b-col>
       </b-row>
       <p class="lead">
-        These are the results for experiment {{ result.metadata.name }} done at
-        {{ result.metadata.datetime }}.
+        Tags:
+        <template v-if="!result.metadata.tags">None</template>
+        <template v-for="tag in result.metadata.tags">
+          <b-button disabled> {{ tag }} </b-button
+          >
+        </template>
       </p>
 
       <p>
@@ -355,14 +375,6 @@ function contains(string, array){
         </div>
       </p>
 
-      <div class="col">
-        Tags:
-        <template v-if="!result.metadata.tags">None</template>
-        <template v-for="tag in result.metadata.tags">
-          <b-button disabled> {{ tag }} </b-button
-          >
-        </template>
-      </div>
     </div>
 
     <div class="container">
