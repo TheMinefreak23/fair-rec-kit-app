@@ -54,7 +54,7 @@ onMounted(() => {
 onUnmounted(() => {
   console.log(props.index)
   const element = document.querySelector(`#group-${props.index - 1}`)
-  //console.log(element)
+  // console.log(element)
   if (element) element.scrollIntoView({ behavior: 'smooth' })
 })
 
@@ -73,9 +73,9 @@ const form = computed({
 
 watch(
   () => form.value.main,
-  (newMain) => {
-    setParameter(newMain)
+  () => {
     // console.log('form', form.value)
+    setParameter()
   }
 )
 
@@ -97,7 +97,8 @@ watch(
 )
 
 // Set default values for the group parameters.
-function setParameter(option) {
+function setParameter() {
+  const option = form.value.main
   // console.log('setting parameter', props.name, props.options, form.value.main)
   let choices
   // console.log(option)

@@ -23,7 +23,7 @@ const props = defineProps({
 
 const form = computed({
   get() {
-    //console.log(props.name, props.title, props.modelValue)
+    // console.log(props.name, props.title, props.modelValue)
     return props.modelValue
   },
   set(localValue) {
@@ -32,10 +32,10 @@ const form = computed({
   },
 })
 
-//const visibleGroup = ref(1)
+// const visibleGroup = ref(1)
 const groupVisible = ref([true]) // TODO refactor
 
-//const removedGroup = ref(false) // for animation on group removal
+// const removedGroup = ref(false) // for animation on group removal
 
 onMounted(() => {
   // TODO separate 1-sized formgrouplists
@@ -73,7 +73,7 @@ function removeGroup(i) {
   form.value.choices.splice(i, 1)
 
   // Set visible group to last before deleted one
-  //visibleGroup.value = i
+  // visibleGroup.value = i
   groupVisible.value[i] = true
 
   showFormToast(mainOption, 'removed')
@@ -84,7 +84,7 @@ function removeGroup(i) {
   const timeoutMs = 500
   setTimeout(() => {
     removedGroup.value = ''
-  }, timeoutMs)*/
+  }, timeoutMs) */
 }
 
 // Copies the selected item and puts it at the end of the list
@@ -93,9 +93,9 @@ function copyItem(i) {
   // Deep-copy the selected value to the new item
   const item = JSON.parse(JSON.stringify(form.value.choices[i]))
   form.value.choices.splice(i, 0, item)
-  //visibleGroup.value = i + 2 // Show newly copied item
+  // visibleGroup.value = i + 2 // Show newly copied item
   groupVisible.value[i + 1] = true
-  //console.log('copy', form.value.choices[i].main)
+  // console.log('copy', form.value.choices[i].main)
   showFormToast(form.value.choices[i].main, 'copied')
 }
 
@@ -120,19 +120,25 @@ function update() {
     .concat()
     .flat()
     .map((entry) => entry.name)
+
   const deleteEntry = 'NULL'
   for (let i = 0; i < form.value.choices.length; i++) {
     const mainChoice = form.value.choices[i].main
     if (mainChoice && !entries.includes(mainChoice.name)) {
-      // every entry that does not exist in the list of option should be removed
-      // Non-existing entries are replaced with a null entry
-      form.value.choices[i] = deleteEntry
-      if (props.required && form.value.groupCount > 1) form.value.groupCount--
+      // Every entry that does not exist in the list of option should be removed
+      if (!props.required || form.value.groupCount > 1) {
+        // Mark entry for deletion
+        form.value.choices[i] = deleteEntry
+        form.value.groupCount--
+        // Don't remove the required first option, but reset it
+      } else {
+        form.value.choices[i].main = ''
+      }
     }
   }
   // Filter null values
   form.value.choices = form.value.choices.filter((x) => x !== deleteEntry)
-  // console.log(form.value.main)
+  // console.log('after update', form.value.choices)
 }
 
 // A brief description of the group option
@@ -143,7 +149,7 @@ function shortGroupDescription(i) {
   if (!option || !option.main) return desc // No choice made yet, no description
 
   desc = desc + ': ' + option.main.name
-  //if (visibleGroup.value === i + 1) return desc // This group is selected, only show the option name
+  // if (visibleGroup.value === i + 1) return desc // This group is selected, only show the option name
   if (groupVisible.value[i]) return desc
 
   // Show first inner options as featured option
@@ -175,7 +181,7 @@ function addGroup() {
   form.value.groupCount++
   form.value.choices.push({})
   form.value.visible = true
-  //(visibleGroup.value = form.value.groupCount
+  // (visibleGroup.value = form.value.groupCount
   groupVisible.value[form.value.groupCount - 1] = true
 }
 </script>
