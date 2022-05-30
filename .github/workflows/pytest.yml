@@ -42,4 +42,6 @@ jobs:
           pip install fairreckitlib
            
       - name: Run tests and coverage
-        run: pytest ./server
+        run: |
+          cd ./server
+          pytest ./
