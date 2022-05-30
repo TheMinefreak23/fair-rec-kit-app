@@ -294,8 +294,9 @@ async function getInfo() {
     </div>
 
     <div class="container">
+      <h4>Metrics</h4>
       <div class="row">
-        <h4>Metrics</h4>
+        
 
         <!--Show first two dataset results for now TODO-->
         <template
@@ -304,9 +305,8 @@ async function getInfo() {
             : [result.result[0]]"
           :key="datasetResult"
         >
-          <p> {{datasetResult.results[0].dataset}}</p>
           
-          <div :class="result.result.length > 1 ? col : col-6">
+          <div :class="result.length > 1 ? 'col' : 'col-6'">
 
             <Table
               :caption="datasetResult.caption"
@@ -352,7 +352,7 @@ async function getInfo() {
           <template v-if="visibleDatasets.includes(getDatasetName(entry))" :key="visibleDatasets">
             <template v-if="visibleMatrices.includes(entry)" :key="visibleMatrices">
           <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
-              <div :class="visibleMatrices.length > 1 ? col : col-6">
+              <div :class="visibleMatrices.length > 1 ? 'col' : 'col-6'">
                 <Table
                   v-if="selectedHeaders[index]"
                   :key="props.result.id"
