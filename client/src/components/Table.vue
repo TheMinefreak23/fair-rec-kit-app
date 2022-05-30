@@ -453,6 +453,7 @@ async function showMusicDetail(spotifyId) {
         <b-th
           v-for="(header, index) in headers"
           :key="header"
+          class="text-center"
           :colspan="header.subheaders ? header.subheaders.length : 1"
           :style="{ ...colItemStyle, cursor: 'pointer' }"
           @click="setsorting(index)"
@@ -466,6 +467,7 @@ async function showMusicDetail(spotifyId) {
         <b-th
           v-for="subheader in subheaders"
           :key="subheader"
+          class="text-center"
           :style="colItemStyle"
         >
           {{ subheader }}
