@@ -98,22 +98,23 @@ def user_result():
     chunk_size = int(chunk_size)
     chosen_headers = json.get("optionalHeaders", [])
     matrix_name = json.get("matrix")
-    print('headers', chosen_headers)
-    dataset = json.get("dataset", "")
+    dataset_name = json.get("dataset", "")
     sortIndex = json.get("sortindex", 0)
 
     #read mock dataframe
     recs = result_storage.current_recs[pair_id]
+    print(list(recs))
+    dataset = recommender_system.data_registry.get_set(dataset_name)
 
     #TODO refactor/do dynamically
     spotify_datasets = ['LFM-2B']
-    if dataset in spotify_datasets:
-        recs=add_spotify_columns(dataset, recs)
+    if dataset_name in spotify_datasets:
+        recs=add_spotify_columns(dataset_name, recs)
 
     #Add optional columns to the dataframe (if any)
     if (len(chosen_headers) > 0):
-      recs=add_dataset_columns(dataset, recs, chosen_headers, matrix_name)
-    print(recs)
+      recs=add_dataset_columns(dataset_name, recs, chosen_headers, matrix_name)
+
     #Make sure not to sort on a column that does not exist anymore
     if (len(recs.columns) <= sortIndex):
         sortIndex = 0
@@ -134,6 +135,11 @@ def user_result():
 
     # return part of table that should be shown
     df_subset = df_sorted[start_rows:end_rows]
+
+    # rename the user and item headers so they reflect their respective content
+    item = dataset.get_matrix_config(matrix_name).item.key
+    user = dataset.get_matrix_config(matrix_name).user.key
+    df_subset.rename(columns = {'user': user, 'item': item}, inplace = True)
     return df_subset.to_json(orient='records')
 
 def add_dataset_columns(dataset_name, dataframe, columns, matrix_name):

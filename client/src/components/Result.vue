@@ -241,7 +241,7 @@ function combineResults(results) {
   let tables = []
   for (let dataset in results) {
     for (let approach in results[dataset].results) {
-      tables.push(results[dataset].dataset.dataset + '_' + results[dataset].results[approach].approach + '_' + runID.value)
+      tables.push(results[dataset].dataset.dataset + '_' + results[dataset].results[approach].approach + '_run' + runID.value)
     }
   }
   console.log(tables)
