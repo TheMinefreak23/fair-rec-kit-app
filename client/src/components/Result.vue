@@ -3,81 +3,82 @@
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
-import Table from './Table.vue'
-import { onMounted, ref} from 'vue'
-import { emptyFormGroup } from '../helpers/optionsFormatter'
-import { makeHeader } from '../helpers/resultFormatter'
-import { API_URL } from '../api'
-import { loadResult } from '../helpers/resultRequests'
-import SettingsModal from './Table/SettingsModal.vue'
+import Table from "./Table.vue";
+import { onMounted, ref } from "vue";
+import { emptyFormGroup } from "../helpers/optionsFormatter";
+import { makeHeader } from "../helpers/resultFormatter";
+import { API_URL } from "../api";
+import { loadResult } from "../helpers/resultRequests";
+import SettingsModal from "./Table/SettingsModal.vue";
+import DictionaryDisplay from "./Table/DictionaryDisplay.vue";
 
-const props = defineProps({ headers: Array, result: Object })
+const props = defineProps({ headers: Array, result: Object });
 
 //Default headers for recommendation experiments.
 const selectedHeaders = ref([
-  [{ name: 'Rank' }, { name: 'User' }, { name: 'Item' }, { name: 'Score' }],
-])
+  [{ name: "Rank" }, { name: "User" }, { name: "Item" }, { name: "Score" }],
+]);
 
-const experiment_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
+const experiment_tags = ref(["tag1 ", "tag2 ", "tag3 ", "tag4 "]);
 
-const data = ref({ results: [[]] })
-const startIndex = ref(0)
-const sortIndex = ref(0)
-const ascending = ref(true)
-const entryAmount = ref(20)
-const optionalHeaders = ref([[]])
-const availableFilters = ref([])
-const filters = ref(emptyFormGroup(false))
-const userHeaderOptions = ref([[]])
-const itemHeaderOptions = ref([[]])
-const userTables = combineResults()
-const visibleDatasets = ref([])
-const uniqueDatasets = findUniqueDatasets()
+const data = ref({ results: [[]] });
+const startIndex = ref(0);
+const sortIndex = ref(0);
+const ascending = ref(true);
+const entryAmount = ref(20);
+const optionalHeaders = ref([[]]);
+const availableFilters = ref([]);
+const filters = ref(emptyFormGroup(false));
+const userHeaderOptions = ref([[]]);
+const itemHeaderOptions = ref([[]]);
+const userTables = combineResults();
+const visibleDatasets = ref([]);
+const uniqueDatasets = findUniqueDatasets();
 
 onMounted(() => {
-  console.log('result', props.result)
-  console.log('result id', props.result.id)
+  console.log("result", props.result);
+  console.log("result id", props.result.id);
   //loadEvaluations()
   //loadResult(props.result.id)
-  fillVisibleDatasets()
+  fillVisibleDatasets();
   //Load in all the user recommendation/prediction tables
   for (let index in userTables) {
-    setRecs(parseInt(index))
+    setRecs(parseInt(index));
   }
-  console.log('availableFilters', availableFilters.value)
-})
+  console.log("availableFilters", availableFilters.value);
+});
 
 // GET request: Get available header options for selection from server
 async function getHeaderOptions(index) {
-  const response = await fetch(API_URL + '/all-results/headers')
-  const data = await response.json()
-  let headerOptions = data[getDatasetName(userTables[index])]
-  itemHeaderOptions.value[index] = headerOptions.itemHeaders
-  userHeaderOptions.value[index] = headerOptions.userHeaders
+  const response = await fetch(API_URL + "/all-results/headers");
+  const data = await response.json();
+  let headerOptions = data[getDatasetName(userTables[index])];
+  itemHeaderOptions.value[index] = headerOptions.itemHeaders;
+  userHeaderOptions.value[index] = headerOptions.userHeaders;
 }
 
 //POST request: Send result ID to the server to set current shown recommendations.
 async function setRecs(currentTable) {
   const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       id: props.result.id,
       runid: 0,
       pairid: currentTable,
     }),
-  }
-  console.log('sending to server:', requestOptions.body)
+  };
+  console.log("sending to server:", requestOptions.body);
   const response = await fetch(
-    API_URL + '/all-results/set-recs',
+    API_URL + "/all-results/set-recs",
     requestOptions
-  )
+  );
   //console.log('resultfetch', response)
-  if (response.status == '200') {
-    const data = await response.json()
-    availableFilters.value = data.availableFilters
-    getUserRecs(currentTable)
-    getHeaderOptions(currentTable)
+  if (response.status == "200") {
+    const data = await response.json();
+    availableFilters.value = data.availableFilters;
+    getUserRecs(currentTable);
+    getHeaderOptions(currentTable);
   }
 }
 
@@ -110,8 +111,8 @@ async function getEvaluations() {
 //POST request: Ask server for next part of user recommendation table.
 async function getUserRecs(currentTable) {
   const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       id: props.result.id,
       pairid: currentTable,
@@ -121,15 +122,15 @@ async function getUserRecs(currentTable) {
       amount: entryAmount.value,
       filters: filters.value,
       optionalHeaders: optionalHeaders.value[currentTable],
-      dataset: getDatasetName(userTables[currentTable])
+      dataset: getDatasetName(userTables[currentTable]),
     }),
-  }
+  };
 
-  const response = await fetch(API_URL + '/all-results/result', requestOptions)
-  data.value.results[currentTable] = await response.json()
+  const response = await fetch(API_URL + "/all-results/result", requestOptions);
+  data.value.results[currentTable] = await response.json();
   selectedHeaders.value[currentTable] = Object.keys(
     data.value.results[currentTable][0]
-  )
+  );
 }
 
 /**
@@ -139,16 +140,16 @@ async function getUserRecs(currentTable) {
  * @param {Int}    pairid    - Index of which result file to load (from overview.json)
  */
 function loadMore(increase, amount, pairid) {
-  amount = parseInt(amount)
+  amount = parseInt(amount);
 
   //Determine the index for where the next page starts, based on how many entries were shown before.
-  if (!increase && startIndex.value > 0) startIndex.value -= entryAmount.value
-  if (startIndex.value < 0) startIndex.value = 0
-  else if (increase) startIndex.value += entryAmount.value
-  else startIndex.value = 0
+  if (!increase && startIndex.value > 0) startIndex.value -= entryAmount.value;
+  if (startIndex.value < 0) startIndex.value = 0;
+  else if (increase) startIndex.value += entryAmount.value;
+  else startIndex.value = 0;
   //Update amount to new number of entries that are shown.
-  entryAmount.value = amount
-  getUserRecs(pairid)
+  entryAmount.value = amount;
+  getUserRecs(pairid);
 }
 
 /**
@@ -159,13 +160,13 @@ function loadMore(increase, amount, pairid) {
 function paginationSort(indexVar, pairid) {
   //When sorting on the same column twice in a row, switch to descending.
   if (sortIndex.value === indexVar) {
-    ascending.value = !ascending.value
+    ascending.value = !ascending.value;
   }
 
   //When sorting, start at startIndex 0 again to see either highest or lowest, passing on which column is sorted.
-  sortIndex.value = indexVar
-  startIndex.value = 0
-  getUserRecs(pairid)
+  sortIndex.value = indexVar;
+  startIndex.value = 0;
+  getUserRecs(pairid);
 }
 
 /**
@@ -174,8 +175,8 @@ function paginationSort(indexVar, pairid) {
  * @param {Int}    pairid    - Index of which result file to load (from overview.json)
  */
 function updateHeaders(headers, pairid) {
-  optionalHeaders.value[pairid] = headers
-  getUserRecs(pairid)
+  optionalHeaders.value[pairid] = headers;
+  getUserRecs(pairid);
 }
 
 /**
@@ -184,8 +185,8 @@ function updateHeaders(headers, pairid) {
  * @param {Int}    pairid    - Index of which result file to load (from overview.json)
  */
 function changeFilters(changedFilters, pairid) {
-  filters.value = changedFilters
-  getUserRecs(pairid)
+  filters.value = changedFilters;
+  getUserRecs(pairid);
 }
 
 /**
@@ -193,13 +194,17 @@ function changeFilters(changedFilters, pairid) {
  * @returns {Array}   - An array of all the user recommendation tables for this run
  */
 function combineResults() {
-  let tables = []
+  let tables = [];
   for (let dataset in props.result.result) {
     for (let approach in props.result.result[dataset].results) {
-      tables.push(props.result.result[dataset].caption + '_' + props.result.result[dataset].results[approach].approach)
+      tables.push(
+        props.result.result[dataset].caption +
+          "_" +
+          props.result.result[dataset].results[approach].approach
+      );
     }
   }
-  return tables
+  return tables;
 }
 
 /**
@@ -208,30 +213,28 @@ function combineResults() {
  * @returns {string}          - the name of the requested dataset
  */
 function getDatasetName(string) {
-return string.split(' ')[1].split('_')[0]
+  return string.split(" ")[1].split("_")[0];
 }
 
 /**
  * Fill array of datasets that are shown so that all are shown upon loading the page
  */
-function fillVisibleDatasets(){
-  console.log(findUniqueDatasets[0])
-  visibleDatasets.value = findUniqueDatasets()
-   
+function fillVisibleDatasets() {
+  console.log(findUniqueDatasets[0]);
+  visibleDatasets.value = findUniqueDatasets();
 }
 
 /**
  * Create an array that has all unique datasets in the result
  */
-function findUniqueDatasets(){
-  let datasetnames = []
+function findUniqueDatasets() {
+  let datasetnames = [];
 
-  for(let i=0; i<userTables.length;i++){
-      datasetnames[i] = getDatasetName(userTables[i])
+  for (let i = 0; i < userTables.length; i++) {
+    datasetnames[i] = getDatasetName(userTables[i]);
   }
 
-  return Array.from(new Set(datasetnames))
-
+  return Array.from(new Set(datasetnames));
 }
 
 // Get music detail info
@@ -240,14 +243,14 @@ async function getInfo() {
     token.value,
     query.value.track,
     query.value.artist
-  )
+  );
 
-  tracks.value = await songInfo.value.Spotify
-  track.value = tracks.value.items[0]
+  tracks.value = await songInfo.value.Spotify;
+  track.value = tracks.value.items[0];
   //get AcousticBrainz highlevel features using LastFM's mbid
   highlevelFeatures.value = await songInfo.value.AcousticBrainz[
     songInfo.value.LastFM.track.mbid
-  ][0]['highlevel']
+  ][0]["highlevel"];
 }
 </script>
 
@@ -273,6 +276,22 @@ async function getInfo() {
           >
         </template>
       </p>
+      <h2>Filters:</h2>
+      <b-list-group horizontal>
+        <b-list-group-item v-for="datasetResult in result.result"  > <!-- Filter for each dataset-->
+        {{datasetResult.dataset.name}}
+        <b-list-group>
+          <b-list-group-item v-for="filter in datasetResult.dataset.filters">
+            {{filter.name}}: {{Object.values( filter.params)[0]}}
+          </b-list-group-item>
+          <ul>
+            <li v-for="evale in datasetResult.evals"> <!-- Filter for each metric-->
+            {{evale.evaluation.filtered}}
+            </li>
+          </ul>
+        </b-list-group>
+        </b-list-group-item>
+      </b-list-group>
 
       <p>
         Datasets showing items per user:

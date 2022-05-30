@@ -29,32 +29,8 @@ def filter_results(dataframe, filters):
     Returns:
         results after filtering
     """
-    filter_factory = create_filter_factory()
-
-    # Generate the filters we will use, currently they have parameters??
-    age_filter = filter_factory.create(FILTER_AGE)
-    country_filter = filter_factory.create(FILTER_COUNTRY)
-    gender_filter = filter_factory.create(FILTER_GENDER)
-
-    process_filters = []
-    for filter in filters:
-        match(filter.name):
-            case "Age Range":
-                process_filters.append(age_filter({
-                    "min": filter.params[0].value[0], "max": filter.params[0].value[1]}))
-            case "Artist Gender":
-                process_filters.append(gender_filter(
-                    filter.params.value, "artist"))
-
-            case "User Gender":
-                process_filters.append(gender_filter(
-                    filter.params.value, "user"))
-
-            case "Countries":
-                process_filters.append(country_filter(filter.params.value))
-
-    for process in process_filters:
-        dataframe = process.run(dataframe)
+    #filter = fairreckitlib.data.filter
+    #filter(dataframe, filters)
 
     return dataframe
 
