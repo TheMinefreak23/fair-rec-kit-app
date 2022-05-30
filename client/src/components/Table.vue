@@ -287,7 +287,7 @@ function setsorting(i) {
   <b-modal
     id="change-columns-modal"
     v-model="updateHeadersModalShow"
-    title="Change columns"
+    title="Select headers"
     @ok="
       $emit('updateHeaders', [
         ...checkedColumns,
@@ -362,7 +362,7 @@ function setsorting(i) {
             @click="updateHeadersModalShow = !updateHeadersModalShow"
             class="m-1"
           >
-            Change Headers
+            Select Headers
           </b-button>
           <b-button @click="filtersModalShow = !filterModalShow" class="m-1">
             Filters

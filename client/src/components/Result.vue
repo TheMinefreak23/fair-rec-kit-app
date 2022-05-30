@@ -134,18 +134,18 @@ async function getUserRecs(currentTable) {
   )
 }
 
-async function exportTable() {
+async function exportTable(currentTable) {
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-type': 'application/json' },
-    body: JSON.stringify({ results: props.result.result[0].results}),
+    body: JSON.stringify({ results: props.result.result[currentTable].results}),
   }
   const response = await fetch(
     API_URL + '/all-results/export',
     requestOptions
-  ).then(() => {
-    console.log('exported succesfully')
-  })
+  )
+  const confirmation = await response.json()
+  console.log(confirmation.message)
 }
 
 async function validate() {
@@ -303,7 +303,7 @@ function findUniqueDatasets(){
 
         <!--Show first two dataset results for now TODO-->
         <template
-          v-for="datasetResult in result.result[1]
+          v-for="(datasetResult, index) in result.result[1]
             ? [result.result[0], result.result[1]]
             : [result.result[0]]"
           :key="datasetResult"
@@ -318,7 +318,7 @@ function findUniqueDatasets(){
               :headers="datasetResult.headers"
               :removable="false"
             />
-            <b-button @click="exportTable()">Export table</b-button>
+            <b-button @click="exportTable(index)">Export table</b-button>
           </template>
           </div>
         </template>

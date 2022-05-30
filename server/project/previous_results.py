@@ -150,21 +150,28 @@ def export():
     json = request.json
     results = json.get('results', '{}')
     
+    #Load the file selector
     import tkinter as tk
     from tkinter.filedialog import asksaveasfilename
     root = tk.Tk()
+
+    #Focus on the file selector and hide the overlay
     root.overrideredirect(True)
     root.geometry('0x0+0+0')
     root.deiconify()
     root.lift()
     root.focus_force()
-    tk.Tk().withdraw() # part of the import if you are not using other tkinter functions
-    
+    tk.Tk().withdraw()
+
     data = [('tsv', '*.tsv')]
-    fn = asksaveasfilename(initialdir='/', title='Export Table', filetypes=data, defaultextension='.tsv', initialfile="experiment", parent=root)
-    df = pd.DataFrame(results)
-    df.to_csv(fn, index=False)
-    return "Exported file"
+    try:
+        fn = asksaveasfilename(initialdir='/', title='Export Table', filetypes=data, defaultextension='.tsv', initialfile="experiment", parent=root)
+        df = pd.DataFrame(results)
+        df.to_csv(fn, index=False)
+        return {'message' : 'Exported succesfully'}
+    except:
+        return {'message' : 'Export cancelled'}
+    
 
 @results_bp.route('/validate', methods=['POST'])
 def validate(): 
