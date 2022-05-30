@@ -4,7 +4,6 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 import enum
-from .mail import mail, send_mail
 
 from fairreckitlib.experiment.experiment_event import ON_END_EXPERIMENT_PIPELINE, ON_END_EXPERIMENT_THREAD, \
     ON_BEGIN_EXPERIMENT_PIPELINE, ON_BEGIN_EXPERIMENT_THREAD
@@ -13,6 +12,7 @@ from fairreckitlib.model.pipeline.model_event import ON_BEGIN_MODEL_PIPELINE, ON
 from fairreckitlib.data.pipeline.data_event import ON_BEGIN_DATA_PIPELINE, \
     ON_END_DATA_PIPELINE, ON_BEGIN_FILTER_DATASET, ON_BEGIN_SPLIT_DATASET
 from fairreckitlib.core.parsing.parse_event import ON_PARSE
+from .mail import send_mail
 
 
 # Experiment status in queue
