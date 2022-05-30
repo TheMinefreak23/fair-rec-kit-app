@@ -475,48 +475,7 @@ async function showMusicDetail(spotifyId) {
     </b-thead>
     <b-tbody>
       <b-tr v-for="(item, index) in sorted" :key="item"
-        ><b-td class="align-middle" v-if="overview" :style="colItemStyle">
-          <b-button
-            variant="outline-primary fw-bold"
-            @click="$emit('viewResult', item.id)"
-            >View result</b-button
-          >
-        </b-td>
-        <b-td
-          v-for="[key, value] in Object.entries(item)"
-          :key="`${descending}_${sortindex}_${index}-${key}`"
-          class="text-center"
-          :style="colItemStyle"
         >
-          <!--Special pill format for status-->
-          <!-- TODO refactor-->
-          <template
-            v-if="typeof value === 'string' && value.startsWith(statusPrefix)"
-          >
-            <b-button
-              disabled
-              :variant="statusVariant(value)"
-              :class="
-                value.slice(statusPrefix.length) == status.active
-                  ? 'status-blinking'
-                  : 'status'
-              "
-              class="fw-bold"
-            >
-              {{ value.slice(statusPrefix.length) }}
-            </b-button>
-          </template>
-          <template v-else>
-            <template v-if="key == 'track_spotify-uri'">
-              <template v-if="value">
-                <b-button @click="showMusicDetail(item['track_spotify-uri'])"
-                  >View track</b-button
-                >
-              </template>
-            </template>
-            <template v-else>{{ value }} </template></template
-          >
-        </b-td>
         <b-td
           class="align-middle"
           v-if="overview || removable"
@@ -565,6 +524,49 @@ async function showMusicDetail(spotifyId) {
               </b-button>
             </b-col>
           </b-row>
+        </b-td>
+        <b-td
+          v-for="[key, value] in Object.entries(item)"
+          :key="`${descending}_${sortindex}_${index}-${key}`"
+          class="text-center"
+          :style="colItemStyle"
+        >
+          <!--Special pill format for status-->
+          <!-- TODO refactor-->
+          <template
+            v-if="typeof value === 'string' && value.startsWith(statusPrefix)"
+          >
+            <b-button
+              disabled
+              :variant="statusVariant(value)"
+              :class="
+                value.slice(statusPrefix.length) == status.active
+                  ? 'status-blinking'
+                  : 'status'
+              "
+              class="fw-bold"
+            >
+              {{ value.slice(statusPrefix.length) }}
+            </b-button>
+          </template>
+          <template v-else>
+            <template v-if="key == 'track_spotify-uri'">
+              <template v-if="value">
+                <b-button @click="showMusicDetail(item['track_spotify-uri'])"
+                  >View track</b-button
+                >
+              </template>
+            </template>
+            <template v-else>{{ value }} </template></template
+          >
+        </b-td>
+        
+        <b-td class="align-middle" v-if="overview" :style="colItemStyle">
+          <b-button
+            variant="outline-primary fw-bold"
+            @click="$emit('viewResult', item.id)"
+            >View result</b-button
+          >
         </b-td>
         <b-td class="align-middle" v-if="overview" :style="colItemStyle">
           <SettingsModal :resultId="item.id" />
