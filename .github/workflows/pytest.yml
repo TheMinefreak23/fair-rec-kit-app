@@ -34,4 +34,5 @@ jobs:
            
       - name: Run tests and coverage
         run: |
-          pytest ./server --cov
+          cd ./server
+          pytest --cov
