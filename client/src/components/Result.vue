@@ -255,8 +255,9 @@ async function getInfo() {
   <div>
     <div class="container">
       <b-row>
-        <b-col>
-      <h1 class="display-2">Results</h1>
+        <b-col><p class="lead" > Results for </p>
+      <h1 class="display-3"> {{ result.metadata.name }}    </h1>
+      <h3 class="text-muted"> {{ result.metadata.datetime}} </h3>
       </b-col>
       <b-col>
         <div class="float-end">
@@ -265,8 +266,12 @@ async function getInfo() {
       </b-col>
       </b-row>
       <p class="lead">
-        These are the results for experiment {{ result.metadata.name }} done at
-        {{ result.metadata.datetime }}.
+        Tags:
+        <template v-if="!result.metadata.tags">None</template>
+        <template v-for="tag in result.metadata.tags">
+          <b-button disabled> {{ tag }} </b-button
+          >
+        </template>
       </p>
 
       <p>
@@ -285,14 +290,6 @@ async function getInfo() {
         </div>
       </p>
 
-      <div class="col">
-        Tags:
-        <template v-if="!result.metadata.tags">None</template>
-        <template v-for="tag in result.metadata.tags">
-          <b-button disabled> {{ tag }} </b-button
-          >
-        </template>
-      </div>
     </div>
 
     <div class="container">
