@@ -148,6 +148,7 @@ async function getUserRecs(currentTable) {
 }
 
 async function exportTable(currentTable) {
+  // console.log('export request',props.result.result[currentTable].results)
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-type': 'application/json' },
@@ -333,23 +334,28 @@ async function getInfo() {
 
     </div>
     <div class="container">
-      <h4>Metrics</h4>
       <div class="row">
-        
-          <p> {{datasetResult.results[0].dataset}}</p>
+      <h4>Metrics</h4>
           
+          <!--Show first two dataset results for now TODO-->
+        <template
+          v-for="(datasetResult, index) in result.result[1]
+            ? [result.result[0], result.result[1]]
+            : [result.result[0]]"
+          :key="datasetResult"
+        >
+          <p> {{datasetResult.results[0].dataset}}</p>
           <div :class="result.length > 1 ? 'col-6' : 'col'">
-          <template v-if="visibleDatasets.includes(datasetResult.dataset.dataset)" :key="visibleDatasets">
-
-            <Table
-              :caption="userTables[index]"
-              :results="datasetResult.results"
-              :headers="datasetResult.headers"
-              :removable="false"
-            />
-            <b-button @click="exportTable(index)">Export table</b-button>
-          </template>
-          </div>
+            <template v-if="visibleDatasets.includes(datasetResult.dataset.dataset)" :key="visibleDatasets">
+              <Table
+                :caption="userTables[index]"
+                :results="datasetResult.results"
+                :headers="datasetResult.headers"
+                :removable="false"
+              />
+              <b-button @click="exportTable(index)">Export table</b-button>
+            </template>
+          </div>  
         </template>
       </div>
     </div>
