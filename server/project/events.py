@@ -13,6 +13,7 @@ from fairreckitlib.data.pipeline.data_event import ON_BEGIN_DATA_PIPELINE, \
     ON_END_DATA_PIPELINE, ON_BEGIN_FILTER_DATASET, ON_BEGIN_SPLIT_DATASET
 from fairreckitlib.core.parsing.parse_event import ON_PARSE
 from .mail import send_mail
+from .result_storage import save_result, format_result
 
 
 # Experiment status in queue
@@ -102,14 +103,14 @@ class EventHandler():
         self.experiment.progress = ProgressStatus.STARTED
 
     def on_end_experiment(self, event_listener, **kwargs):
-        # TODO get real recs&eval result
-        # print('saving job', current_experiment.job)
-        # print('config', current_experiment.config)
-
         # Update status
         if self.experiment.status is not Status.ABORTED:
+            #print('==END EXPERIMENT', self.experiment)
             self.experiment.status = Status.DONE
             self.experiment.progress = ProgressStatus.FINISHED
+
+            save_result(self.experiment.job, format_result(self.experiment.config))
+
             send_mail(self.experiment.job['metadata']['email'],
                   self.experiment.job['metadata']['name'],
                   self.experiment.job['timestamp']['datetime'])
