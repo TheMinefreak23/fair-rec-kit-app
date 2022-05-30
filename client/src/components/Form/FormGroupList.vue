@@ -23,7 +23,7 @@ const props = defineProps({
 
 const form = computed({
   get() {
-    console.log(props.name, props.title, props.modelValue)
+    //console.log(props.name, props.title, props.modelValue)
     return props.modelValue
   },
   set(localValue) {
@@ -84,8 +84,8 @@ function copyItem(i) {
   const item = JSON.parse(JSON.stringify(form.value.choices[i]))
   form.value.choices.splice(i, 0, item)
   //visibleGroup.value = i + 2 // Show newly copied item
-  groupVisible.value[i + 2] = true
-  console.log(form.value.choices[i].main)
+  groupVisible.value[i + 1] = true
+  //console.log('copy', form.value.choices[i].main)
   showFormToast(form.value.choices[i].main, 'copied')
 }
 
@@ -160,6 +160,14 @@ function shortGroupDescription(i) {
     return list && list.length > 0
   }
 }
+
+function addGroup() {
+  form.value.groupCount++
+  form.value.choices.push({})
+  form.value.visible = true
+  //(visibleGroup.value = form.value.groupCount
+  groupVisible.value[form.value.groupCount - 1] = true
+}
 </script>
 
 <template>
@@ -194,6 +202,7 @@ function shortGroupDescription(i) {
       </p>-->
           <b-row>
             <b-col
+              :id="'group-' + String(i - 1)"
               cols="12"
               role="tablist"
               v-for="i in form.groupCount"
@@ -253,6 +262,7 @@ function shortGroupDescription(i) {
                 <b-collapse :visible="groupVisible[i - 1]" role="tabpanel">
                   <FormGroup
                     v-model="form.choices[i - 1]"
+                    :index="i - 1"
                     :name="name"
                     :options="options"
                     :required="
@@ -276,13 +286,7 @@ function shortGroupDescription(i) {
       <h3 class="m-0">
         <b-card no-body class="mt-1">
           <b-button
-            @click="
-              form.groupCount++,
-                form.choices.push({}),
-                (form.visible = true),
-                //(visibleGroup = form.groupCount)
-                (groupVisible[form.groupCount - 1] = true)
-            "
+            @click="addGroup()"
             variant="primary"
             data-testid="add-button"
             >Add {{ name }}...

@@ -3,15 +3,16 @@
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
 import FormGroupList from './FormGroupList.vue'
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted, onUnmounted, watch } from 'vue'
 import { article } from '../../helpers/resultFormatter'
 import { emptyFormGroup } from '../../helpers/optionsFormatter'
 import '../../../node_modules/multi-range-slider-vue/MultiRangeSliderBlack.css'
 import FormInput from './FormInput.vue'
 import FormSelect from './FormSelect.vue'
 
-const emit = defineEmits(['copy', 'update:modelValue'])
+const emit = defineEmits(['copy', 'scroll', 'update:modelValue'])
 const props = defineProps({
+  index: Number, // group index for scrolling
   name: String,
   title: String,
   options: Array,
@@ -29,6 +30,18 @@ onMounted(() => {
     form.value.main = props.defaultOption.value
   }
   // console.log('form', form.value)
+  // scroll to new group
+
+  const element = document.querySelector(`#group-${props.index}`)
+  //console.log(element)
+  element.scrollIntoView({ behavior: 'smooth' })
+})
+
+onUnmounted(() => {
+  console.log(props.index)
+  const element = document.querySelector(`#group-${props.index - 1}`)
+  //console.log(element)
+  element.scrollIntoView({ behavior: 'smooth' })
 })
 
 const form = computed({
