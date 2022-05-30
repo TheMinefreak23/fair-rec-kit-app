@@ -118,7 +118,9 @@ function chooseLabel(name) {
             <b-row>
               <!--Main option selection-->
               <b-col cols="12">
-                <b-form-group :label="'Select ' + article(name) + ' ' + name + ' *'">
+                <b-form-group
+                  :label="'Select ' + article(name) + ' ' + name + ' *'"
+                >
                   <b-form-select
                     v-model="form.main"
                     data-testid="main-select"
@@ -128,7 +130,9 @@ function chooseLabel(name) {
                     :required="required"
                   >
                     <template #first>
-                      <b-form-select-option :value="''"
+                      <b-form-select-option
+                        :value="''"
+                        data-testid="main-option"
                         >Choose..</b-form-select-option
                       >
                     </template>
@@ -167,7 +171,9 @@ function chooseLabel(name) {
                       "
                     >
                       <b-form-group
-                        :label="capitalise(underscoreToSpace(value.name)) + ' *'"
+                        :label="
+                          capitalise(underscoreToSpace(value.name)) + ' *'
+                        "
                         :description="
                           'Between ' +
                           value.min +
@@ -257,7 +263,9 @@ function chooseLabel(name) {
                     </b-form-group>
                     <!--Use a checkbox if the options are of a binary (True or False) nature.-->
                     <b-form-group
-                      :label="capitalise(underscoreToSpace(option.name + '?')) + ' *'"
+                      :label="
+                        capitalise(underscoreToSpace(option.name + '?')) + ' *'
+                      "
                       v-if="
                         option.options[0] == true || option.options[0] == false
                       "

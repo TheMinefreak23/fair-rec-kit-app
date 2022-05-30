@@ -122,7 +122,7 @@ def collage(urls):
             if index == len(urls) - 1:
                 np.flip(images)
                 index = 0
-    background.save('background.png')
+    background.save('../client/public/background.png')
 
     #return "Background saved"
     # TODO why do we need to go back once tho

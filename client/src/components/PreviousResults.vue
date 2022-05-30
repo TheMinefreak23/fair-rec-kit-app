@@ -8,9 +8,10 @@ import { formatResults, formatResult } from '../helpers/resultFormatter.js'
 
 import { addResult, store } from '../store.js'
 import { API_URL } from '../api'
+import { viewResult } from '../helpers/resultRequests.js'
 
 const oldResultsFormat = ref(true) // TODO DEV
-const emit = defineEmits(['goToResult'])
+//const emit = defineEmits(['goToResult'])
 
 const exResults = ref([
   { id: 1, age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
@@ -52,31 +53,6 @@ async function getResults() {
   store.allResults = formatResults(data.all_results)
   //console.log('all results', store.allResults)
 }
-
-const resultsRoute = '/all-results/result-by-id'
-const url = API_URL + resultsRoute
-
-// Request full result from result ID (timestamp)
-async function loadResult(resultId) {
-  console.log('Loading result with ID:' + resultId)
-
-  const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: resultId }),
-  }
-  fetch(url, requestOptions).then(() => {
-    getResult()
-  })
-}
-
-// Get result back from result ID request
-async function getResult() {
-  const response = await fetch(url)
-  const data = await response.json()
-  addResult(formatResult(data.result))
-  emit('goToResult')
-}
 </script>
 
 <template>
@@ -84,16 +60,16 @@ async function getResult() {
     <div class="text-center py-2 mx-5">
       <h3>Previous results</h3>
       <Table
-        @loadResult="loadResult"
+        @viewResult="viewResult"
         @loadResults="getResults"
         :results="store.allResults"
         :headers="headers"
-        buttonText="Remove"
-        :removable="true"
-        :overview="true"
+        removeText="Remove"
+        removable
+        editable
+        overview
         serverFile="/all-results/delete"
         serverFile2="/all-results/edit"
-        :serverFile3="resultsRoute"
         :defaultSort="1"
       />
     </div>

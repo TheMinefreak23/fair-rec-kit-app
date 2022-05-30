@@ -46,7 +46,7 @@ def save_result(experiment, result):
 
     current_result = experiment
     add_result(current_result)
-    print(current_result)
+    #print('current result', current_result)
 
 
 def old_result_by_id(result_id):
@@ -66,7 +66,7 @@ def old_result_by_id(result_id):
     for result in results['all_results']:
         if 'timestamp' in result:
             if result['timestamp']['stamp'] == result_id:
-                print('result', result)
+                #print('result', result)
                 current_result = result
         else:
             current_result = None  # If there is an incorrectly formatted result, return nothing
@@ -267,7 +267,7 @@ def edit_result(index, new_name, new_tags, new_email):
     """
     file_results = load_results_overview()
     to_edit_result = file_results['all_results'][index]
-    print(new_tags)
+    #print(new_tags)
 
     def edit_metadata(attr, new_val):
         # Don't change the attribute if the input field has been left empty

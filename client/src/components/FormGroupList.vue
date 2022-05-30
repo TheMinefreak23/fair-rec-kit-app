@@ -8,9 +8,8 @@ import {
 } from '../helpers/resultFormatter'
 //import { selectionOptions } from '../helpers/optionsFormatter'
 
-import { useToast } from 'bootstrap-vue-3'
 import FormGroup from './Form/FormGroup.vue'
-let toast = useToast()
+import { showToast } from '../store'
 
 //const emit = defineEmits(['formChange'])
 const props = defineProps({
@@ -94,7 +93,7 @@ function removeGroup(i) {
   // Set visible group to last before deleted one
   visibleGroup.value = i
 
-  showToast(mainOption, 'removed')
+  showFormToast(mainOption, 'removed')
 }
 
 // Copies the selected item and puts it at the end of the list
@@ -104,31 +103,28 @@ function copyItem(i) {
   // form.value.choices[form.value.groupCount - 1] = JSON.parse(
   //   JSON.stringify(form.value.choices[i])
   // )
-  let item = JSON.parse(
-    JSON.stringify(form.value.choices[i])
-  )
+  let item = JSON.parse(JSON.stringify(form.value.choices[i]))
   form.value.choices.splice(i, 0, item)
   visibleGroup.value = i + 2 // Show newly copied item
   console.log(form.value.choices[i].main)
-  showToast(form.value.choices[i].main, 'copied')
+  showFormToast(form.value.choices[i].main, 'copied')
 }
 
 /**
- *
+ * TODO document
  */
-function showToast(object, actionMessage) {
+function showFormToast(object, actionMessage) {
   // Show toast
   // TODO delay and variant don't work?
-  toast.show(
-    {
-      title:
+  const mainOptions = {
+    title:
         capitalise(props.name) + ' ' + 
         //If the metric doesn't have a value, don't mention it
         (object.name == undefined ?  '' : object.name + ' ') +
          actionMessage + '!',
-    },
-    { pos: 'top-right', delay: 800, variant: 'warning' }
-  )
+  }
+  const otherOptions = { pos: 'top-right', delay: 800, variant: 'warning' }
+  showToast(mainOptions, otherOptions)
 }
 
 //Update the options that cannot be be submitted due to changing experiment type (
@@ -224,8 +220,10 @@ function shortGroupDescription(i) {
             @click="form.visible = !form.visible"
             variant="dark"
           >
-            <template v-if="form.visible">&#x25BC; | </template>
-            <template v-else>&#x25BA; | </template>
+            <template v-if="form.visible"
+              ><i class="bi bi-caret-down" /> |
+            </template>
+            <template v-else><i class="bi bi-caret-up" /> | </template>
           </b-button>
         </b-card>
       </h3>
@@ -264,10 +262,13 @@ function shortGroupDescription(i) {
                           "
                           :variant="visibleGroup == i ? 'secondary' : 'dark'"
                         >
+                          <!-- TODO refactor-->
                           <template v-if="visibleGroup == i"
-                            >&#x25BC; |
+                            ><i class="bi bi-caret-down" /> |
                           </template>
-                          <template v-else>&#x25BA; | </template>
+                          <template v-else
+                            ><i class="bi bi-caret-up" /> |
+                          </template>
                           {{ shortGroupDescription(i - 1) }}
                         </b-button>
                       </b-card>
@@ -324,6 +325,7 @@ function shortGroupDescription(i) {
                 (visibleGroup = form.groupCount)
             "
             variant="primary"
+            data-testid="add-button"
             >Add {{ name }}...
           </b-button>
         </b-card>

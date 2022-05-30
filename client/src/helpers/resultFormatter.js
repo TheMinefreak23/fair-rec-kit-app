@@ -1,32 +1,7 @@
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
-
-// TODO get from server
-export const status = {
-  toDo: 'To Do',
-  active: 'Active',
-  aborted: 'Aborted',
-  cancelled: 'Cancelled',
-  done: 'Done',
-}
-
-// TODO get from server
-export const progress = {
-  notAvailable: 'Not Available',
-  started: 'Started',
-  parsing: 'Parsing',
-  processingData: 'Processing Data',
-  filteringData: 'Filtering Data',
-  splittingData: 'Splitting Data',
-  model: 'Starting approach',
-  modelLoad: 'Loading train set',
-  training: 'Training',
-  evaluating: 'Evaluating',
-  finished: 'Finished',
-}
-
-export const statusPrefix = 'status_' // TODO hacky
+import { statusPrefix } from './queueFormatter'
 
 // Format data for a results overview
 // TODO refactor so headers are dynamic (no separate case for status header)
@@ -79,23 +54,6 @@ export function formatMultipleItems(items) {
   return string
 }
 
-export function statusVariant(rawStatus) {
-  const experimentStatus = rawStatus.slice(statusPrefix.length)
-  //console.log('statusVariant experimentStatus', experimentStatus)
-  switch (experimentStatus) {
-    case status.toDo:
-      return 'outline-warning'
-    case status.active:
-      return 'success'
-    case status.aborted:
-      return 'light'
-    case status.cancelled:
-      return 'light'
-    case status.done:
-      return 'outline-success'
-  }
-}
-
 // Format a result for the result tab
 export function formatResult(result) {
   console.log('before format', JSON.parse(JSON.stringify(result)))
@@ -109,10 +67,11 @@ export function formatResult(result) {
           const headers = [{ name: 'Approach' }]
 
           // Use metric names as headers
-          result.evals.map((e) => {
-            headers.push(formatEvaluation(e, result))
+          for (let [index, evaluation] of result.evals.entries()) {
+            headers.push(formatEvaluation(evaluation, index, result))
             //console.log(result)
-          })
+          }
+
           // Omit recommendation and evals (old properties)
           const { recommendation, evals, ...rest } = result
           datasetResult.headers = headers // TODO headers can be computed in outer loop
@@ -146,6 +105,32 @@ function omitRecommendation(arr) {
   )
 }*/
 
+// Short result description, e.g. for a result tab
+export function shortResultDescription(result) {
+  //console.log(result)
+  const datasets = []
+  const approaches = []
+  for (const datasetResult of result.result) {
+    datasets.push(datasetResult.dataset.name)
+    for (const rec of datasetResult.recs) {
+      approaches.push(rec.approach)
+    }
+  }
+  const datetime = result.metadata.datetime
+
+  function formatNames(list) {
+    //console.log(Array.from(new Set(list)))
+    const formattedList = []
+    for (const name of Array.from(new Set(list))) {
+      const lastIndex = name.lastIndexOf('_')
+      formattedList.push(name.slice(0, lastIndex))
+    }
+    return formattedList
+  }
+
+  return [datetime, formatNames(datasets), formatNames(approaches)].join(' | ')
+}
+
 // Show dataset info as formatted caption
 export function showDatasetInfo(dataset) {
   return (
@@ -156,9 +141,10 @@ export function showDatasetInfo(dataset) {
 }
 
 // Format evaluations (including filtered ones)
-export function formatEvaluation(e, result) {
+export function formatEvaluation(e, index, result) {
   // TODO refactor and/or give option to set decimal precision in UI
-  result[formatMetric(e)] = e.evaluation.global.toFixed(2)
+  // Add index for unique metric key
+  result[formatMetric(e) + '_' + index] = e.evaluation.global.toFixed(2)
 
   // Flatten filters
   //console.log(e.evaluation, e.evaluation.filtered)
@@ -197,8 +183,9 @@ export function formatEvaluation(e, result) {
       // Mock: get first entry for now
       const [name, val] = Object.entries(filter)[0]
       //const filterName = e.name + ' ' + name
-      const filterName = e.name + name
+      const filterName = formatMetric(e) + name
       result[filterName] = val
+      //console.log(result)
       subheaders.push(capitalise(name))
       //console.log(subheaders)
     })

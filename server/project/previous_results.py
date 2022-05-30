@@ -8,7 +8,7 @@ from logging import root
 
 from flask import (Blueprint, request)
 import pandas as pd
-from fairreckitlib.data.set.dataset import add_user_columns, add_item_columns
+from fairreckitlib.data.set.dataset import add_dataset_columns as add_data_columns
 
 from . import result_storage
 from .experiment import options, recommender_system, validate_experiment
@@ -103,10 +103,14 @@ def user_result():
     #read mock dataframe
     recs = result_storage.current_recs[pair_id]
 
+    #TODO refactor/do dynamically
+    spotify_datasets = ['LFM-2B']
+    if dataset in spotify_datasets:
+        recs=add_spotify_columns(dataset, recs)
+
     #Add optional columns to the dataframe (if any)
     if (len(chosen_headers) > 0):
       recs=add_dataset_columns(dataset, recs, chosen_headers)
-
     
     #Make sure not to sort on a column that does not exist anymore
     if (len(recs.columns) <= sortIndex):
@@ -131,18 +135,31 @@ def user_result():
     return df_subset.to_json(orient='records')
 
 def add_dataset_columns(dataset_name, dataframe, columns):
+    #print(dataset_name)
     dataset = recommender_system.data_registry.get_set(dataset_name)
     if dataset is None:
         return dataframe
 
     result = list(map(lambda column: column.lower(), columns))
-    dataframe = add_item_columns(dataset, dataframe, result)
-    dataframe = add_user_columns(dataset, dataframe, result)
+    matrix_name = 'user-track-count' # TODO
+    dataframe = add_data_columns(dataset, matrix_name, dataframe, result)
+    #dataframe = add_user_columns(dataset, dataframe, result)
+    #print(dataframe.head())
     return dataframe
+
 
 @results_bp.route('/headers', methods=['GET'])
 def headers():
-    return result_storage.load_json('project/headers.json')   
+    return result_storage.load_json('project/headers.json')
+
+# test
+def add_spotify_columns(dataset_name, dataframe):
+    dataset = recommender_system.data_registry.get_set(dataset_name)
+    matrix_name = 'user-track-count'
+    columns = ['track_id', 'track_spotify-uri']
+    dataframe = add_data_columns(dataset, matrix_name, dataframe, columns)
+    print(dataframe.head())
+    return dataframe
 
 @results_bp.route('/export', methods=['POST'])
 def export(): 
