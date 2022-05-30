@@ -17,8 +17,8 @@ def make_mail(app):
 def send_mail(adress, name, timestamp):
     global mail
     msg = Message(subject='Your calculation ' + name + ' is ready!',
-            body='Hello! \n Your calculation with name ' + name + ' and time ' + timestamp + " is done!",
-            sender='farreckit@noreply.com',
+            body='Hello! \n Your calculation with name ' + name + ' and timestamp ' + timestamp + " is done!",
+            sender='fairreckit@noreply.com',
             recipients=[adress])
     with mail_app.app_context():
         mail.send(msg)
