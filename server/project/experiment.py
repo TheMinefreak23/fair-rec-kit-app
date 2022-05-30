@@ -10,6 +10,8 @@ import threading
 import time
 from dataclasses import dataclass
 from datetime import datetime
+from tkinter.ttk import Progressbar
+from click import progressbar
 import yaml
 from fairreckitlib.experiment.experiment_config_parsing import Parser
 
@@ -76,7 +78,7 @@ def calculate_first():
 
     # If there is a queue item to do, run it.
     if first:
-        run_experiment(first)
+        run_new_experiment(first)
         # mock_experiment(experiment)
 
 
@@ -97,6 +99,10 @@ def run_experiment(experiment):
     global current_experiment
     current_experiment = experiment
 
+    return EventHandler(current_experiment, end_experiment).events
+
+def run_new_experiment(experiment):    
+    events = run_experiment(experiment)
     # Create config files directory if it doesn't exist yet.
     if not os.path.isdir(CONFIG_DIR):
         os.mkdir(CONFIG_DIR)
@@ -117,6 +123,12 @@ def run_experiment(experiment):
 
     # TODO USE THIS FUNCTION INSTEAD OF PARSING
     # recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)
+
+def validate_experiment(filepath):
+    experiment = QueueItem(job={}, config={}, name='',status=Status.DONE, progress=ProgressStatus.NA)
+    print(experiment)
+    events = run_experiment(experiment)
+    recommender_system.validate_experiment(result_dir=filepath, num_runs=1, events=events)
 
 def send_email(metadata, timestamp):
     print("llanfairpwlchfairgwyngychgogerychchwryrndrwbwchllantisiligogogoch")
