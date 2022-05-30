@@ -29,6 +29,7 @@ const entryAmount = ref(20)
 const optionalHeaders = ref([[]])
 const availableFilters = ref([])
 const filters = ref(emptyFormGroup(false))
+const optionalHeaderOptions = ref([])
 const userHeaderOptions = ref([[]])
 const itemHeaderOptions = ref([[]])
 const userTables = combineResults(props.result.result)
@@ -50,11 +51,20 @@ onMounted(() => {
 
 // GET request: Get available header options for selection from server
 async function getHeaderOptions(index) {
-  const response = await fetch(API_URL + '/all-results/headers')
+  const requestOptions = { 
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: props.result.result[index].dataset.dataset,
+    }),
+  }
+  const response = await fetch(API_URL + '/all-results/headers', requestOptions)
   const data = await response.json()
-  let headerOptions = data[getDatasetName(userTables[index])]
-  itemHeaderOptions.value[index] = headerOptions.itemHeaders
-  userHeaderOptions.value[index] = headerOptions.userHeaders
+  let headerOptions = data
+  console.log(data)
+  optionalHeaderOptions.value[index] = headerOptions
+  itemHeaderOptions.value[index] = headerOptions.movie
+  userHeaderOptions.value[index] = headerOptions.user
 }
 
 //POST request: Send result ID to the server to set current shown recommendations.
@@ -124,7 +134,8 @@ async function getUserRecs(currentTable) {
       amount: entryAmount.value,
       filters: filters.value,
       optionalHeaders: optionalHeaders.value[currentTable],
-      dataset: getDatasetName(userTables[currentTable])
+      dataset: props.result.result[currentTable].dataset.dataset,
+      matrix: props.result.result[currentTable].dataset.matrix
     }),
   }
 
@@ -230,9 +241,10 @@ function combineResults(results) {
   let tables = []
   for (let dataset in results) {
     for (let approach in results[dataset].results) {
-      tables.push(results[dataset].caption + '_' + results[dataset].results[approach].approach + '_' + runID.value)
+      tables.push(results[dataset].dataset.dataset + '_' + results[dataset].results[approach].approach + '_' + runID.value)
     }
   }
+  console.log(tables)
   return tables
 }
 
@@ -242,7 +254,7 @@ function combineResults(results) {
  * @returns {string}          - the name of the requested dataset
  */
 function getDatasetName(string) {
-  return string.split(' ')[1].split('_')[0]
+  return string.split('_')[0]
 }
 
 /**
@@ -333,9 +345,9 @@ async function getInfo() {
           <p> {{datasetResult.results[0].dataset}}</p>
           <div class="col-6">
           
-          <template v-if="visibleDatasets.includes(getDatasetName(datasetResult.caption))" :key="visibleDatasets">
+          <template v-if="visibleDatasets.includes(datasetResult.dataset.dataset)" :key="visibleDatasets">
             <Table
-              :caption="datasetResult.dataset"
+              :caption="userTables[index]"
               :results="datasetResult.results"
               :headers="datasetResult.headers"
               :removable="false"
@@ -370,6 +382,7 @@ async function getInfo() {
                 :headers="selectedHeaders[index].map(makeHeader)"
                 :filters="filters"
                 :filterOptions="availableFilters"
+                :headerOptions="optionalHeaderOptions[index]"
                 :userOptions="userHeaderOptions[index]"
                 :itemOptions="itemHeaderOptions[index]"
                 pagination

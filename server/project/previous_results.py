@@ -97,6 +97,8 @@ def user_result():
     chunk_size = json.get("amount", 20)
     chunk_size = int(chunk_size)
     chosen_headers = json.get("optionalHeaders", [])
+    matrix_name = json.get("matrix")
+    print('headers', chosen_headers)
     dataset = json.get("dataset", "")
     sortIndex = json.get("sortindex", 0)
 
@@ -110,8 +112,8 @@ def user_result():
 
     #Add optional columns to the dataframe (if any)
     if (len(chosen_headers) > 0):
-      recs=add_dataset_columns(dataset, recs, chosen_headers)
-    
+      recs=add_dataset_columns(dataset, recs, chosen_headers, matrix_name)
+    print(recs)
     #Make sure not to sort on a column that does not exist anymore
     if (len(recs.columns) <= sortIndex):
         sortIndex = 0
@@ -134,23 +136,29 @@ def user_result():
     df_subset = df_sorted[start_rows:end_rows]
     return df_subset.to_json(orient='records')
 
-def add_dataset_columns(dataset_name, dataframe, columns):
+def add_dataset_columns(dataset_name, dataframe, columns, matrix_name):
     #print(dataset_name)
     dataset = recommender_system.data_registry.get_set(dataset_name)
     if dataset is None:
         return dataframe
 
     result = list(map(lambda column: column.lower(), columns))
-    matrix_name = 'user-track-count' # TODO
     dataframe = add_data_columns(dataset, matrix_name, dataframe, result)
     #dataframe = add_user_columns(dataset, dataframe, result)
     #print(dataframe.head())
     return dataframe
 
 
-@results_bp.route('/headers', methods=['GET'])
+@results_bp.route('/headers', methods=['POST'])
 def headers():
-    return result_storage.load_json('project/headers.json')
+    json = request.json
+    dataset_name = json.get("name")
+    dataset = recommender_system.data_registry.get_set(dataset_name)
+    for matrix_name in dataset.get_available_matrices():
+        columns = dataset.get_available_columns(matrix_name)
+        print(columns)
+    #return result_storage.load_json('project/headers.json')[dataset_name]
+    return columns
 
 # test
 def add_spotify_columns(dataset_name, dataframe):
