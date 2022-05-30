@@ -83,9 +83,6 @@ def calculate_first():
 # experiment_thread = threading.Thread(target=calculate_first)
 
 def end_experiment():
-    if current_experiment.status is not Status.ABORTED:
-        # result_storage.save_result(current_experiment.job, {})
-        result_storage.save_result(current_experiment.job, format_result(current_experiment.config))
 
     # Calculate next item in queue
     calculate_first()
@@ -121,44 +118,18 @@ def run_experiment(experiment):
     # TODO USE THIS FUNCTION INSTEAD OF PARSING
     # recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)
 
+def send_email(metadata, timestamp):
+    print("llanfairpwlchfairgwyngychgogerychchwryrndrwbwchllantisiligogogoch")
+    print(metadata["name"])
+    print(metadata["email"])
+    print(timestamp)
+
 
 def mock_experiment():
     """Mock running an experiment and save the mock result."""
     # Mock experiment duration.
     time.sleep(2.5)
-    result_storage.save_result(current_experiment.job, format_result(current_experiment.config))
-
-
-def format_result(settings):
-    """Mock result experiment.
-
-    Args:
-        settings(dict): the experiment settings
-
-    Returns: (list) the mock result
-    """
-    #print('== settings ==', settings)
-    result = []
-    datasets = settings['data']
-    for (dataset_index, dataset) in enumerate(datasets):
-        # Add dataset identifier to name
-        dataset['name'] = dataset['dataset'] + '_' + dataset['matrix'] + '_' + str(dataset_index)
-        recs = []
-        for (api, approaches) in settings['models'].items():
-            for (approach_index, approach) in enumerate(approaches):
-                # Add approach, with index as identifier in the name
-                recommendation = {'approach': api + '_' + approach['name'] + '_' + str(approach_index),
-                                  #'recommendation': mock_recommend(dataset, approach),
-                                  'evals': []}
-                """
-                for metric in settings['metrics']:
-                    evaluation = mock_evaluate_all(approach, metric)
-                    recommendation['evals'].append(
-                        {'name': metric['name'], 'evaluation': evaluation, 'params': metric['params']})
-                    print(metric)"""
-                recs.append(recommendation)
-        result.append({'dataset': dataset, 'recs': recs})
-    return result
+    result_storage.save_result(current_experiment.job, result_storage.format_result(current_experiment.config))
 
 
 @compute_bp.route('/options', methods=['GET'])
