@@ -199,16 +199,15 @@ export function formatMetric(evaluation) {
   // If it is a K metric, replace K with the parameter
   const name = evaluation.name
   if (name.toLowerCase()[name.length - 1] == 'k') {
-    //console.log(evaluation)
     // TODO refactor K condition
-    return name.slice(0, -1) + evaluation.params['K']
+    return name.slice(0, -1) + evaluation.params[0].value
   } else return name
 }
 
 /**
  * convert list of header names into supported header format, capitalise and remove underscores
- * @param {string}   header  - list of headers.
- * @returns {string}         - the name of the requested dataset
+ * @param {string}   header  - the header that needs to be formatted
+ * @returns {Object}         - the formatted header inside an object
  */
 export function makeHeader(header) {
   return {
