@@ -32,7 +32,8 @@ const form = computed({
   },
 })
 
-const visibleGroup = ref(1)
+//const visibleGroup = ref(1)
+const groupVisible = ref([true]) // TODO refactor
 
 onMounted(() => {
   // TODO separate 1-sized formgrouplists
@@ -70,7 +71,8 @@ function removeGroup(i) {
   form.value.choices.splice(i, 1)
 
   // Set visible group to last before deleted one
-  visibleGroup.value = i
+  //visibleGroup.value = i
+  groupVisible.value[i] = true
 
   showFormToast(mainOption, 'removed')
 }
@@ -81,7 +83,8 @@ function copyItem(i) {
   // Deep-copy the selected value to the new item
   const item = JSON.parse(JSON.stringify(form.value.choices[i]))
   form.value.choices.splice(i, 0, item)
-  visibleGroup.value = i + 2 // Show newly copied item
+  //visibleGroup.value = i + 2 // Show newly copied item
+  groupVisible.value[i + 2] = true
   console.log(form.value.choices[i].main)
   showFormToast(form.value.choices[i].main, 'copied')
 }
@@ -130,7 +133,8 @@ function shortGroupDescription(i) {
   if (!option || !option.main) return desc // No choice made yet, no description
 
   desc = desc + ': ' + option.main.name
-  if (visibleGroup.value === i + 1) return desc // This group is selected, only show the option name
+  //if (visibleGroup.value === i + 1) return desc // This group is selected, only show the option name
+  if (groupVisible.value[i]) return desc
 
   // Show first inner options as featured option
   const featuredOptions = [
@@ -191,7 +195,6 @@ function shortGroupDescription(i) {
           <b-row>
             <b-col
               cols="12"
-              class="accordion"
               role="tablist"
               v-for="i in form.groupCount"
               :key="i - 1"
@@ -207,14 +210,22 @@ function shortGroupDescription(i) {
                           block
                           @click="
                             // TODO this is pretty hacky
-                            visibleGroup == i
+                            /*visibleGroup == i
                               ? (visibleGroup = -1)
-                              : (visibleGroup = i)
+                              : (visibleGroup = i)*/
+                            groupVisible[i - 1] = !groupVisible[i - 1]
                           "
-                          :variant="visibleGroup == i ? 'secondary' : 'dark'"
+                          :variant="
+                            //visibleGroup == i ? 'secondary' : 'dark'
+                            groupVisible[i - 1]
+                          "
                         >
                           <!-- TODO refactor-->
-                          <template v-if="visibleGroup == i"
+                          <template
+                            v-if="
+                              //visibleGroup == i
+                              groupVisible[i - 1]
+                            "
                             ><i class="bi bi-caret-down" /> |
                           </template>
                           <template v-else
@@ -238,12 +249,8 @@ function shortGroupDescription(i) {
                   </b-row>
                 </b-row>
                 <!--Collapsable group-->
-                <b-collapse
-                  :id="name + 'accordion-' + i"
-                  :accordion="name + '-accordion'"
-                  :visible="visibleGroup == i"
-                  role="tabpanel"
-                >
+                <!--<b-collapse :visible="visibleGroup == i" role="tabpanel">-->
+                <b-collapse :visible="groupVisible[i - 1]" role="tabpanel">
                   <FormGroup
                     v-model="form.choices[i - 1]"
                     :name="name"
@@ -273,7 +280,8 @@ function shortGroupDescription(i) {
               form.groupCount++,
                 form.choices.push({}),
                 (form.visible = true),
-                (visibleGroup = form.groupCount)
+                //(visibleGroup = form.groupCount)
+                (groupVisible[form.groupCount - 1] = true)
             "
             variant="primary"
             data-testid="add-button"
