@@ -25,7 +25,7 @@ const blink = ref(false)
 
 // Ping
 onMounted(async () => {
-  //console.log(API_URL)
+  // console.log(API_URL)
   const response = await fetch(API_URL)
   const data = await response.json()
   console.log(data)

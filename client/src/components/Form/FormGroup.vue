@@ -4,7 +4,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
 import FormGroupList from './FormGroupList.vue'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { article } from '../../helpers/resultFormatter'
+import { article, capitalise } from '../../helpers/resultFormatter'
 import { emptyFormGroup } from '../../helpers/optionsFormatter'
 import '../../../node_modules/multi-range-slider-vue/MultiRangeSliderBlack.css'
 import FormInput from './FormInput.vue'
@@ -52,7 +52,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  console.log(props.index)
+  // console.log(props.index)
   const element = document.querySelector(`#group-${props.index - 1}`)
   // console.log(element)
   if (element) element.scrollIntoView({ behavior: 'smooth' })
@@ -106,6 +106,7 @@ function setParameter() {
     // console.log('option', props.name, option.name, 'params', option.params)
     if (option.params.values && option.params.values.length > 0) {
       choices = option.params.values
+      // console.log('choices', choices)
       form.value.inputs = choices.map((param) => ({
         name: param.name,
         value: param.name.toLowerCase() === 'k' ? props.maxK : param.default,
@@ -118,6 +119,7 @@ function setParameter() {
         value: param.default,
       }))
     }
+    // console.log('selects', form.value.selects)
     if (option.params.dynamic && option.params.dynamic.length > 0) {
       choices = option.params.dynamic
       // Sublists are not required TODO maybe some are?

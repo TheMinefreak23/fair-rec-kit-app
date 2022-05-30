@@ -29,8 +29,25 @@ const form = computed({
   },
 })
 
-function chooseLabel(name) {
-  return 'Choose ' + article(name) + ' ' + underscoreToSpace(name)
+function chooseLabel() {
+  return (
+    'Choose ' +
+    article(props.option.name) +
+    ' ' +
+    underscoreToSpace(props.option.name)
+  )
+}
+
+function checkboxLabel() {
+  return capitalise(underscoreToSpace(props.option.name + '?'))
+}
+
+function formatOptions(options) {
+  console.log(options)
+  return options.map((option) => ({
+    name: capitalise(String(option)),
+    value: option,
+  }))
 }
 </script>
 
@@ -38,19 +55,19 @@ function chooseLabel(name) {
   <div>
     <!--Use a radio group if there are a few options and they aren't true/false.-->
     <b-form-group
-      :label="chooseLabel(option.name) + ' *'"
+      :label="chooseLabel() + ' *'"
       v-if="option.options.length < 3 && typeof option.options[0] != 'boolean'"
     >
       <b-form-radio-group
         v-model="form.value"
         text-field="name"
-        :options="option.options"
+        :options="formatOptions(option.options)"
         required
       ></b-form-radio-group>
     </b-form-group>
     <!--Use a checkbox if the options are of a binary (True or False) nature.-->
     <b-form-group
-      :label="capitalise(underscoreToSpace(option.name + '?')) + ' *'"
+      :label="checkboxLabel() + ' *'"
       v-if="option.options[0] == true || option.options[0] == false"
     >
       <b-form-checkbox v-model="form.value" size="lg" required>{{
@@ -65,7 +82,7 @@ function chooseLabel(name) {
       <!--TODO: ADD MULTIPLE SELECT FOR FILTERS (MODAL?)-->
       <b-form-select
         v-model="form.value"
-        :options="option.options"
+        :options="formatOptions(option.options)"
         text-field="name"
         required
       >
