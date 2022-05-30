@@ -202,7 +202,7 @@ function addGroup() {
       </p>-->
           <b-row>
             <b-col
-              :id="'group-' + String(i - 1)"
+              :id="`group-${name.split()[0]}-${i - 1}`"
               cols="12"
               role="tablist"
               v-for="i in form.groupCount"

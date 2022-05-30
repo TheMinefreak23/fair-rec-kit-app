@@ -32,16 +32,20 @@ onMounted(() => {
   // console.log('form', form.value)
   // scroll to new group
 
-  const element = document.querySelector(`#group-${props.index}`)
-  //console.log(element)
-  element.scrollIntoView({ behavior: 'smooth' })
+  console.log(`#group-${props.name.split()[0]}-${props.index}`)
+  // TODO refactor to ID function?
+  const element = document.querySelector(
+    `#group-${props.name.split()[0]}-${props.index}`
+  )
+  console.log(element)
+  if (element) element.scrollIntoView({ behavior: 'smooth' })
 })
 
 onUnmounted(() => {
   console.log(props.index)
   const element = document.querySelector(`#group-${props.index - 1}`)
   //console.log(element)
-  element.scrollIntoView({ behavior: 'smooth' })
+  if (element) element.scrollIntoView({ behavior: 'smooth' })
 })
 
 const form = computed({
