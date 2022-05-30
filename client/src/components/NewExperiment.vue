@@ -94,6 +94,7 @@ function initForm() {
     },
     recommendations: options.value && options.value.defaults.recCount.default, // The default amount of recommendations per user
     experimentMethod: 'recommendation', // The default experiment type
+    includeRatedItems: true,
   }
 }
 
