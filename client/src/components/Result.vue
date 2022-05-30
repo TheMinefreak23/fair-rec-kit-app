@@ -306,7 +306,7 @@ async function getInfo() {
           :key="datasetResult"
         >
           
-          <div :class="result.length > 1 ? 'col' : 'col-6'">
+          <div :class="result.length > 1 ? 'col-6' : 'col'">
 
             <Table
               :caption="datasetResult.caption"
@@ -352,7 +352,7 @@ async function getInfo() {
           <template v-if="visibleDatasets.includes(getDatasetName(entry))" :key="visibleDatasets">
             <template v-if="visibleMatrices.includes(entry)" :key="visibleMatrices">
           <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
-              <div :class="visibleMatrices.length > 1 ? 'col' : 'col-6'">
+              <div :class="visibleMatrices.length > 1 ? 'col-6' : 'col'">
                 <Table
                   v-if="selectedHeaders[index]"
                   :key="props.result.id"
