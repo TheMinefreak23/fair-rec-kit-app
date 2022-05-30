@@ -35,6 +35,8 @@ const form = computed({
 //const visibleGroup = ref(1)
 const groupVisible = ref([true]) // TODO refactor
 
+//const removedGroup = ref(false) // for animation on group removal
+
 onMounted(() => {
   // TODO separate 1-sized formgrouplists
   form.value.name = props.title
@@ -75,6 +77,14 @@ function removeGroup(i) {
   groupVisible.value[i] = true
 
   showFormToast(mainOption, 'removed')
+
+  /*
+  // TODO multiple usage, refactor to function/composable?
+  removedGroup.value = 'removed'
+  const timeoutMs = 500
+  setTimeout(() => {
+    removedGroup.value = ''
+  }, timeoutMs)*/
 }
 
 // Copies the selected item and puts it at the end of the list
@@ -296,3 +306,22 @@ function addGroup() {
     </b-row>
   </b-container>
 </template>
+
+<style>
+/*
+.removed {
+  animation: red-glowing 1800ms;
+}
+
+@keyframes red-glowing {
+  0% {
+    background-color: #ffb4b4d6;
+  }
+  50% {
+    background-color: #ff5353d7;
+  }
+  100% {
+    background-color: #ff9898d6;
+  }
+}*/
+</style>
