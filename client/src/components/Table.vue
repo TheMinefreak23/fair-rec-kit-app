@@ -506,7 +506,6 @@ async function showMusicDetail(spotifyId) {
         >
           <b-row class="m-0 float-end d-block">
             <b-button
-              v-if="editable"
               variant="primary"
               @click="$emit('loadResult', item.id)"
               class="m-1"
@@ -516,7 +515,7 @@ async function showMusicDetail(spotifyId) {
             <div class="p-0" style="width: 150px">
               <b-col md="auto" class="mx-0 px-0 d-inline">
                 <b-button
-                  v-if="overview"
+                  v-if="overview && editable"
                   variant="outline-primary"
                   class="mx-1"
                   v-b-tooltip.hover
