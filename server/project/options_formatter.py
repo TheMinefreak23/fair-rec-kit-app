@@ -11,9 +11,9 @@ model_API_dict = {}
 
 # constants
 DEFAULTS = {  # 'split': 80,
-    'recCount': {'min': 0, 'max': 100, 'default': 10},
+    'recCount': {'min': 1, 'max': 100, 'default': 10},
 }  # default values
-DEFAULT_SPLIT = {'name': 'Train/testsplit', 'default': '80', 'min': 1, 'max': 99}
+DEFAULT_SPLIT = {'name': 'Train/testsplit', 'default': '80', 'min': 0, 'max': 100}
 filters = json.load(open('parameters/resultFilter.json'))  # TODO LOAD from dataset
 
 # TODO for now use this to get the dataset matrix
@@ -82,6 +82,7 @@ def create_available_options(recommender_system):
     formatted_filters = reformat(filters, False)
     formatted_converters = reformat(converters, False)
     formatted_splits = reformat(splits, False)
+    print(formatted_splits)
 
     # MOCK: for now use all filters/metrics per dataset
     filter_option = {'name': 'filter',
@@ -99,7 +100,7 @@ def create_available_options(recommender_system):
                          'required': True,
                          'title': 'splitting',
                          'article': 'a',
-                         'default': 'Random',  # TODO use this
+                         'default': formatted_splits[0],
                          'options': formatted_splits}
 
     for dataset in datasets:
@@ -172,7 +173,7 @@ def config_dict_from_settings(experiment):
         #print(dataset['dataset'])
         available_matrices = dataset_matrices[dataset['dataset']]
         dataset['matrix'] = 'user-track-count' if 'user-track-count' in available_matrices else available_matrices[0]
-        if dataset['conversion'] != [] and 'conversion' in dataset:
+        if 'conversion' in dataset and dataset['conversion'] != []:
             dataset['rating_converter'] = dataset['conversion'][0]
         dataset['splitting'] = dataset['splitting'][0]
         # TODO rename split param
@@ -204,7 +205,8 @@ def config_dict_from_settings(experiment):
         'models': models,
         'evaluation': settings['metrics'],
         'name': experiment_id,
-        'top_K': settings['recommendations'],
+        'top_K': int(settings['recommendations']),
+        'rated_items_filter': not settings['includeRatedItems'] if 'includeRatedItems' in settings else False,
         'type': settings['experimentMethod']}
 
     # print(config_dict)
@@ -218,12 +220,25 @@ def form_to_data(settings):
         reformat_list(settings, option_name, option_list)
     del settings['lists']
 
+def parse_if_number(string):
+    if string:
+        if isinstance(string, float) or isinstance(string,int):
+            return string
+        if string.isnumeric():
+            return int(string)
+        try:
+            number = float(string)
+            return number
+        except ValueError:
+            return string
+    return None
+
 
 # Reformat settings list from form to data
 def reformat_list(settings, option_name, option_list):
     for option in option_list:
         # print(option)
-        option['params'] = {param['name']: param['value'] for param in option['params']}
+        option['params'] = {param['name']: parse_if_number(param['value']) for param in option['params']}
         # Format inner formgrouplists
         for inner_option_name, inner_option_list in option.items():
             if inner_option_name not in ['name', 'params']:  # TODO use settings/lists key after all?
