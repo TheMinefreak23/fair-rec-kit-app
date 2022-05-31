@@ -1,29 +1,20 @@
 <script setup>
-/*This program has been developed by students from the bachelor Computer Science at
+/* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
-© Copyright Utrecht University (Department of Information and Computing Sciences)*/
-import { onMounted, ref } from 'vue'
-import FormGroupList from './FormGroupList.vue'
+© Copyright Utrecht University (Department of Information and Computing Sciences) */
+import { onMounted, ref, watch } from 'vue'
+import FormGroupList from './Form/FormGroupList.vue'
 import { sendMockData } from '../test/mockExperimentOptions.js'
 import { store, pollForResult } from '../store.js'
 import { API_URL } from '../api'
-import { emptyOption } from '../helpers/optionsFormatter'
 import { emptyFormGroup, validateEmail } from '../helpers/optionsFormatter'
 import { progress } from '../helpers/queueFormatter'
 
-const horizontalLayout = ref(false)
-const oldMetadata = ref(false)
 const options = ref()
 
-//Store the settings of the form in a reference
-const form = ref({
-  lists: initLists(),
-})
+// Store the settings of the form in a reference
+const form = ref(initForm())
 const metadata = ref({})
-const splitOptions = [
-  { text: 'Random', value: 'random' },
-  { text: 'Time', value: 'time' },
-]
 const experimentMethods = [
   { text: 'Recommendation (default)', value: 'recommendation' },
   { text: 'Prediction', value: 'prediction' },
@@ -31,8 +22,18 @@ const experimentMethods = [
 
 onMounted(async () => {
   await getOptions()
-  initForm()
+  initSettings()
 })
+
+watch(
+  () => store.settings,
+  (newSettings) => {
+    console.log('newExperiment watch new settings:', newSettings)
+    form.value = newSettings.form
+    metadata.value = newSettings.metadata
+    store.currentTab = 0
+  }
+)
 
 // GET request: Get available options for selection from server
 async function getOptions() {
@@ -44,8 +45,9 @@ async function getOptions() {
 
 // POST request: Send form to server.
 async function sendToServer() {
-  var sendForm = JSON.parse(JSON.stringify(form.value)) // clone
+  const sendForm = JSON.parse(JSON.stringify(form.value)) // clone
 
+  sendForm.rawSettings = JSON.parse(JSON.stringify(form.value)) // send raw settings for copying later TODO refactor
   sendForm.lists.approaches = reformat(sendForm.lists.approaches)
   sendForm.lists.metrics = reformat(sendForm.lists.metrics)
   sendForm.lists.datasets = reformat(sendForm.lists.datasets)
@@ -76,31 +78,32 @@ async function sendToServer() {
   pollForResult()
 }
 
-//Declare default values of the form
-function initForm() {
-  form.value = { lists: initLists() }
+// Declare default values of the form
+function initSettings() {
+  form.value = initForm()
   metadata.value = {}
-  form.value.recommendations = options.value.defaults.recCount.default //The default amount of recommendations per user
-  //form.value.split = options.value.defaults.split //The default train-test ratio
-  //form.value.splitMethod = 'random' //The default method of splitting datasets
-  form.value.experimentMethod = 'recommendation' //The default experiment type
 }
 
 // Initialise form group list settings
-function initLists() {
+function initForm() {
   return {
-    datasets: emptyFormGroup(true),
-    metrics: emptyFormGroup(),
-    approaches: emptyFormGroup(true),
+    lists: {
+      datasets: emptyFormGroup(true),
+      metrics: emptyFormGroup(),
+      approaches: emptyFormGroup(true),
+    },
+    recommendations: options.value && options.value.defaults.recCount.default, // The default amount of recommendations per user
+    experimentMethod: 'recommendation', // The default experiment type
+    includeRatedItems: true,
   }
 }
 
 // Change the form format into a data format
 function reformat(property) {
-  let formattedChoices = []
-  for (let i in property.choices) {
+  const formattedChoices = []
+  for (const i in property.choices) {
     const choices = property.choices[i]
-    //console.log('reformat', choices)
+    // console.log('reformat', choices)
     if (choices.main) {
       // Direct settings (inputs/selects)
       let params = []
@@ -108,18 +111,18 @@ function reformat(property) {
       if (choices.selects) params = params.concat(choices.selects)
       formattedChoices[i] = {
         name: choices.main.name,
-        params: params,
+        params,
       }
       // Nested formgrouplists
       if (choices.lists != null) {
-        for (let list of choices.lists) {
-          //console.log('list', list)
+        for (const list of choices.lists) {
+          // console.log('list', list)
           if (list.choices[0].single) {
             // formgroup not list
             // TODO refactor
             formattedChoices[i][list.choices[0].name] = reformat(list)
           } else formattedChoices[i][list.name] = reformat(list)
-          //console.log('list', formattedChoices[i][list.name])
+          // console.log('list', formattedChoices[i][list.name])
         }
       }
     }
@@ -130,25 +133,14 @@ function reformat(property) {
 
 <template>
   <div class="py-2 mx-5">
-    <b-row>
-      <b-col md="auto">
-        <b-form-checkbox v-model="horizontalLayout"
-          >use broad layout</b-form-checkbox
-        >
-      </b-col>
-      <b-col>
-        <b-form-checkbox v-model="oldMetadata"
-          >use old metadata layout</b-form-checkbox
-        >
-      </b-col>
-    </b-row>
     <b-card>
       <b-row class="text-center"> <h3>New Experiment</h3></b-row>
       <!--This form contains all the necessary parameters for a user to submit a request for a experiment-->
       <b-form
         v-if="options"
         @submit="$event.preventDefault(), sendToServer()"
-        @reset="$event.preventDefault(), initForm()"
+        @keydown.enter.prevent
+        @reset="$event.preventDefault(), initSettings()"
       >
         <b-row class="text-center">
           <b-row>
@@ -170,11 +162,7 @@ function reformat(property) {
             experiment Name
             Tags (optional)
             Email for notification (optional) -->
-            <b-col
-              md="auto"
-              v-if="!oldMetadata"
-              class="p-2 m-1 rounded-3 bg-secondary"
-            >
+            <b-col md="auto" class="p-2 m-1 rounded-3 bg-secondary">
               <!--<h3 class="text-center">Meta</h3>-->
               <b-row>
                 <b-col>
@@ -207,7 +195,6 @@ function reformat(property) {
                       tag-variant="dark"
                       remove-on-delete
                       separator=" ,;"
-                      no-add-on-enter
                       size="lg"
                     ></b-form-tags> </b-form-group
                 ></b-col>
@@ -215,41 +202,29 @@ function reformat(property) {
             </b-col>
           </b-row>
 
-          <b-col class="g-0" :cols="horizontalLayout ? 12 : 6">
+          <b-col class="g-0" cols="6">
             <!--User can select a dataset.-->
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
               <FormGroupList
-                v-model:data="form.lists.datasets"
+                v-model="form.lists.datasets"
                 name="dataset"
-                title="Datasets"
+                title="datasets"
                 :options="options.datasets"
                 required
-                :horizontalLayout="horizontalLayout"
-                id="datasets"
               />
-              <!--User provides an optional rating conversion-->
-              <!-- Select a rating conversion from the options received from the server -->
-              <!--
-              <b-form-group label="Select a rating conversion">
-                <b-form-select
-                  v-model:data="form.conversion"
-                  :options="[{ text: 'None (default)', value: null }]"
-                >
-                </b-form-select>
-              </b-form-group>-->
             </div>
           </b-col>
 
-          <b-col class="g-0" :cols="horizontalLayout ? 12 : 6">
+          <b-col class="g-0" cols="6">
             <!-- User can select any number of recommender approaches -->
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
               <FormGroupList
-                v-model:data="form.lists.approaches"
+                v-model="form.lists.approaches"
                 name="approach"
                 :title="
                   (form.experimentMethod == 'recommendation'
-                    ? 'Recommender'
-                    : 'Predictor') + ' approaches'
+                    ? 'recommender'
+                    : 'predictor') + ' approaches'
                 "
                 :options="
                   form.experimentMethod == 'recommendation'
@@ -257,7 +232,6 @@ function reformat(property) {
                     : options.predictors
                 "
                 :required="true"
-                :horizontalLayout="horizontalLayout"
               />
 
               <b-row>
@@ -299,7 +273,7 @@ function reformat(property) {
               <!--User can select any number of metrics -->
               <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
                 <FormGroupList
-                  v-model:data="form.lists.metrics"
+                  v-model="form.lists.metrics"
                   name="metric"
                   title="metrics"
                   :maxK="form.recommendations"
@@ -308,38 +282,7 @@ function reformat(property) {
                       ? options.recMetrics
                       : options.predMetrics
                   "
-                  :horizontalLayout="!oldMetadata"
-                /></div
-            ></b-col>
-            <b-col v-if="oldMetadata">
-              <!-- Input for metadata such as:
-            experiment Name
-            Tags (optional)
-            Email for notification (optional) -->
-              <div class="p-2 m-1 rounded-3 bg-secondary">
-                <!--<h3 class="text-center">Meta</h3>-->
-                <b-row>
-                  <b-col>
-                    <b-form-group label="Experiment name">
-                      <b-form-input
-                        placeholder="New experiment"
-                        v-model="metadata.name"
-                      ></b-form-input>
-                    </b-form-group>
-                  </b-col>
-                  <b-col>
-                    <b-form-group label="E-mail (optional)">
-                      <b-form-input
-                        type="email"
-                        placeholder="example@mail.com"
-                        v-model="metadata.email"
-                      ></b-form-input>
-                    </b-form-group>
-                  </b-col>
-                  <b-form-group label="Tags (optional)">
-                    <b-form-input v-model="metadata.tags"></b-form-input>
-                  </b-form-group>
-                </b-row>
+                />
               </div>
             </b-col>
             <!-- Buttons to submit or reset an experiment-->

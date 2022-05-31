@@ -10,11 +10,14 @@ from fairreckitlib.core.config_constants import TYPE_PREDICTION, TYPE_RECOMMENDA
 model_API_dict = {}
 
 # constants
-DEFAULTS = {#'split': 80,
-            'recCount': {'min': 0, 'max': 100, 'default': 10},
-            }  # default values
-DEFAULT_SPLIT = {'name': 'Train/testsplit', 'default': '80', 'min': 1, 'max': 99}
-filters = json.load(open('parameters/resultFilter.json')) #TODO LOAD from dataset
+DEFAULTS = {  # 'split': 80,
+    'recCount': {'min': 1, 'max': 100, 'default': 10},
+}  # default values
+DEFAULT_SPLIT = {'name': 'Train/testsplit', 'default': '80', 'min': 0, 'max': 100}
+filters = json.load(open('parameters/resultFilter.json'))  # TODO LOAD from dataset
+
+# TODO for now use this to get the dataset matrix
+dataset_matrices = {}
 
 
 # TODO do this in another way
@@ -40,7 +43,10 @@ def create_available_options(recommender_system):
     options = {}
 
     datasets = recommender_system.get_available_datasets()
-    #print(datasets)
+    #print(json.dumps(datasets, indent=4))
+    global dataset_matrices
+    dataset_matrices = {dataset: list(matrices.keys()) for (dataset, matrices) in datasets.items()}
+    print(dataset_matrices)
     predictors = recommender_system.get_available_algorithms(TYPE_PREDICTION)
     recommenders = recommender_system.get_available_algorithms(TYPE_RECOMMENDATION)
     # TODO different metrics for diff types
@@ -76,6 +82,7 @@ def create_available_options(recommender_system):
     formatted_filters = reformat(filters, False)
     formatted_converters = reformat(converters, False)
     formatted_splits = reformat(splits, False)
+    print(formatted_splits)
 
     # MOCK: for now use all filters/metrics per dataset
     filter_option = {'name': 'filter',
@@ -93,7 +100,7 @@ def create_available_options(recommender_system):
                          'required': True,
                          'title': 'splitting',
                          'article': 'a',
-                         'default': 'Random',  # TODO use this
+                         'default': formatted_splits[0],
                          'options': formatted_splits}
 
     for dataset in datasets:
@@ -158,14 +165,19 @@ def config_dict_from_settings(experiment):
     # Format datasets
     # Add generic split to all dataset
     for dataset in settings['datasets']:
-        #print(dataset)
+        # print(dataset)
         # TODO refactor
-        if dataset['conversion'] != [] and 'conversion' in dataset:
-            dataset['conversion'] = dataset['conversion'][0]
+        dataset['dataset'] = dataset['name']
+        # TODO for now pick item matrix if available, else first matrix
+        #print(dataset_matrices)
+        #print(dataset['dataset'])
+        available_matrices = dataset_matrices[dataset['dataset']]
+        dataset['matrix'] = 'user-track-count' if 'user-track-count' in available_matrices else available_matrices[0]
+        if 'conversion' in dataset and dataset['conversion'] != []:
+            dataset['rating_converter'] = dataset['conversion'][0]
         dataset['splitting'] = dataset['splitting'][0]
         # TODO rename split param
         dataset['splitting']['test_ratio'] = (100 - int(dataset['params']['Train/testsplit'])) / 100
-
 
     # Format models
     models = {}
@@ -187,35 +199,50 @@ def config_dict_from_settings(experiment):
 
     print(config)"""
 
-    #print(name)
-    config_dict = {'datasets': settings['datasets'],
-                   'models': models,
-                   'evaluation': settings['metrics'],
-                   'name': experiment_id,
-                   'top_K': settings['recommendations'],
-                   'type': settings['experimentMethod']}
+    # print(name)
+    config_dict = {
+        'data': settings['datasets'],
+        'models': models,
+        'evaluation': settings['metrics'],
+        'name': experiment_id,
+        'top_K': int(settings['recommendations']),
+        'rated_items_filter': not settings['includeRatedItems'] if 'includeRatedItems' in settings else False,
+        'type': settings['experimentMethod']}
 
-    #print(config_dict)
+    # print(config_dict)
     return config_dict, experiment_id
 
 
 def form_to_data(settings):
     # Format from group list form data
     for option_name, option_list in settings['lists'].items():
-        #print(option_list)
+        # print(option_list)
         reformat_list(settings, option_name, option_list)
     del settings['lists']
+
+def parse_if_number(string):
+    if string:
+        if isinstance(string, float) or isinstance(string,int):
+            return string
+        if string.isnumeric():
+            return int(string)
+        try:
+            number = float(string)
+            return number
+        except ValueError:
+            return string
+    return None
 
 
 # Reformat settings list from form to data
 def reformat_list(settings, option_name, option_list):
     for option in option_list:
-        #print(option)
-        option['params'] = {param['name']: param['value'] for param in option['params']}
+        # print(option)
+        option['params'] = {param['name']: parse_if_number(param['value']) for param in option['params']}
         # Format inner formgrouplists
         for inner_option_name, inner_option_list in option.items():
-            if inner_option_name not in ['name', 'params']: # TODO use settings/lists key after all?
-                #print(json.dumps(option, indent=4))
+            if inner_option_name not in ['name', 'params']:  # TODO use settings/lists key after all?
+                # print(json.dumps(option, indent=4))
                 reformat_list(option, inner_option_name, inner_option_list)
     settings[option_name] = option_list
 

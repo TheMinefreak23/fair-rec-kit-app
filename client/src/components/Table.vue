@@ -6,14 +6,18 @@ import { computed, onMounted, ref } from 'vue'
 import sortBy from 'just-sort-by'
 import { API_URL } from '../api'
 import { formatMetadata } from '../helpers/metadataFormatter'
-import FormGroupList from './FormGroupList.vue'
+import FormGroupList from './Form/FormGroupList.vue'
 import { validateEmail, emptyFormGroup } from '../helpers/optionsFormatter'
 import { store } from '../store'
-import { makeHeader } from '../helpers/resultFormatter'
+import { makeHeader, capitalise } from '../helpers/resultFormatter'
 import { statusPrefix, statusVariant, status } from '../helpers/queueFormatter'
+import { loadResult } from '../helpers/resultRequests'
+import SettingsModal from './Table/SettingsModal.vue'
+import { getInfoFromSpotifyID, getSpotifyToken } from '../helpers/songInfo'
+import MusicModal from './ItemDetail/MusicModal.vue'
 
 const emit = defineEmits([
-  'loadResult',
+  'viewResult',
   'loadResults',
   'loadMore',
   'paginationSort',
@@ -24,14 +28,15 @@ const props = defineProps({
   overview: Boolean,
   results: Array,
   headers: Array,
-  buttonText: String,
+  removeText: String,
   removable: Boolean,
+  editable: Boolean,
   serverFile: String,
   serverFile2: String,
-  serverFile3: String,
   pagination: Boolean,
   caption: String,
   expandable: Boolean,
+  headerOptions: Object,
   userOptions: Array,
   itemOptions: Array,
   filters: Object,
@@ -39,25 +44,48 @@ const props = defineProps({
   defaultSort: Number,
 })
 
+const colWidth = '6em'
+const colItemStyle = {
+  minWidth: colWidth,
+  width: colWidth,
+  maxWidth: colWidth,
+  inlineSize: colWidth,
+  overflowWrap: 'break-word',
+}
+// Pagination
 const caption = ref('')
 const entryAmount = ref(20)
+
+// Modals
 const deleteModalShow = ref(false)
 const editModalShow = ref(false)
 const viewModalShow = ref(false)
 const filtersModalShow = ref(false)
 const updateHeadersModalShow = ref(false)
+
+// Columns
 const checkedColumns = ref([])
-const itemColumns = ref([])
-const userColumns = ref([])
+
+// Filters
 const filters = ref(emptyFormGroup(false))
+
+// Item info
 const newName = ref('')
 const newTags = ref('')
 const newTagsList = ref([])
 const newEmail = ref('')
 const metadataStr = ref('')
 const selectedEntry = ref(0)
+
+// Sorting
 const sortindex = ref(0)
 const descending = ref(false)
+
+// Item (music) detail
+const track = ref()
+const highlevelFeatures = ref()
+const songInfo = ref({ lastFM: {} }) // TODO
+const musicModalShow = ref(false)
 
 const subheaders = computed(() => {
   const result = []
@@ -164,38 +192,14 @@ async function removeEntry() {
 }
 
 async function getMetadata(selectedID) {
-  //request the metadata of the specified entry
-  const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: selectedID }),
-  }
-  fetch(API_URL + props.serverFile3, requestOptions).then(() => {
-    console.log('Metadata succesfully requested')
-    getResult()
-  })
-}
-
-async function getResult() {
-  const response = await fetch(API_URL + props.serverFile3)
-  const data = await response.json()
+  const data = await loadResult(selectedID)
   metadataStr.value = formatMetadata(data.result)
+  console.log('Metadata succesfully requested')
 }
 
 async function getNameTagsMail(selectedID) {
-  const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: selectedID }),
-  }
-  fetch(API_URL + props.serverFile3, requestOptions).then(() => {
-    console.log('Metadata succesfully requested')
-    getOldValues()
-  })
-}
-async function getOldValues() {
-  const response = await fetch(API_URL + props.serverFile3)
-  const data = await response.json()
+  const data = await loadResult(selectedID)
+  console.log('Metadata succesfully requested')
   newName.value = data.result.metadata.name
   newTags.value = data.result.metadata.tags.toString()
   newEmail.value = data.result.metadata.email
@@ -265,6 +269,23 @@ function getCancelIcon(item) {
   if (status == status.toDo) return 'bi-x-lg'
   else return 'bi-x-octagon-fill'
 }
+
+// Get music detail info
+// TODO refactor
+async function showMusicDetail(spotifyId) {
+  const token = await getSpotifyToken()
+  track.value = await getInfoFromSpotifyID(token, spotifyId)
+  //console.log('track', track.value)
+
+  // TODO
+  /*
+  //get AcousticBrainz highlevel features using LastFM's mbid
+  highlevelFeatures.value = await songInfo.value.AcousticBrainz[
+    songInfo.value.LastFM.track.mbid
+  ][0]['highlevel']*/
+
+  musicModalShow.value = !musicModalShow.value
+}
 </script>
 
 <template>
@@ -329,54 +350,34 @@ function getCancelIcon(item) {
 
   <!-- Modal used for changing the headers of the user recommendations table -->
   <b-modal
+    v-if="props.headerOptions"
     id="change-columns-modal"
     v-model="updateHeadersModalShow"
-    title="Change columns"
-    @ok="
-      $emit('updateHeaders', [
-        ...checkedColumns,
-        ...userColumns,
-        ...itemColumns,
-      ])
-    "
+    title="Select headers"
+    @ok="$emit('updateHeaders', checkedColumns)"
   >
     <p>Select the extra headers you want to be shown</p>
-    <p>User specific:</p>
-    <div
-      class="form-check form-switch"
-      v-for="(header, index) in userOptions"
-      :key="header"
-    >
-      <input
-        v-model="userColumns"
-        class="form-check-input"
-        type="checkbox"
-        :value="header"
-        :id="header"
-      />
-      <label class="form-check-label" :id="header">
-        {{ makeHeader(header).name }}
-      </label>
-    </div>
-
-    <p>Item specific:</p>
-    <div
-      class="form-check form-switch"
-      v-for="(header, index) in itemOptions"
-      :key="header"
-    >
-      <input
-        v-model="itemColumns"
-        class="form-check-input"
-        type="checkbox"
-        :value="header"
-        :id="header"
-      />
-      <label class="form-check-label" :id="header">
-        {{ makeHeader(header).name }}
-      </label>
-    </div>
+    <template v-for="category in Object.keys(props.headerOptions)">
+      <p>{{capitalise(category)}} specific:</p>
+      <div
+        class="form-check form-switch"
+        v-for="header in props.headerOptions[category]"
+        :key="header"
+      >
+        <input
+          v-model="checkedColumns"
+          class="form-check-input"
+          type="checkbox"
+          :value="header"
+          :id="header"
+        />
+        <label class="form-check-label" :id="header">
+          {{ makeHeader(header).name }}
+        </label>
+      </div>
+    </template>
   </b-modal>
+
   <b-modal
     id="change-columns-modal"
     v-model="filtersModalShow"
@@ -384,13 +385,20 @@ function getCancelIcon(item) {
     @ok="$emit('changeFilters', filters)"
   >
     <FormGroupList
-      v-model:data="filters"
+      v-model="filters"
       name="filter"
-      plural="filters"
+      title="filters"
       :options="filterOptions"
-      id="filters"
     />
   </b-modal>
+
+  <MusicModal
+    v-if="track"
+    v-model:show="musicModalShow"
+    :track="track"
+    :lastFmTrack="songInfo.lastFM.track"
+    :highlevelFeatures="highlevelFeatures"
+  />
 
   <b-table-simple hover striped responsive caption-top>
     <caption>
@@ -409,7 +417,7 @@ function getCancelIcon(item) {
             @click="updateHeadersModalShow = !updateHeadersModalShow"
             class="m-1"
           >
-            Change Headers
+            Select Headers
           </b-button>
           <b-button @click="filtersModalShow = !filterModalShow" class="m-1">
             Filters
@@ -419,30 +427,38 @@ function getCancelIcon(item) {
     </caption>
     <b-thead head-variant="dark">
       <b-tr>
-        <b-th v-if="overview"></b-th>
+        <b-th v-if="overview" :style="colItemStyle"></b-th>
         <b-th
           v-for="(header, index) in headers"
           :key="header"
+          class="text-center"
           :colspan="header.subheaders ? header.subheaders.length : 1"
-          style="cursor: pointer"
+          :style="{ ...colItemStyle, cursor: 'pointer' }"
           @click="setsorting(index)"
         >
           {{ header.name }}
         </b-th>
+        <b-th v-if="overview"></b-th>
       </b-tr>
       <b-tr>
-        <b-th v-if="overview"></b-th>
-        <b-th v-for="subheader in subheaders" :key="subheader">
+        <b-th v-if="overview" :style="colItemStyle"></b-th>
+        <b-th
+          v-for="subheader in subheaders"
+          :key="subheader"
+          class="text-center"
+          :style="colItemStyle"
+        >
           {{ subheader }}
         </b-th>
+        <b-th v-if="overview"></b-th>
       </b-tr>
     </b-thead>
     <b-tbody>
       <b-tr v-for="(item, index) in sorted" :key="item"
-        ><b-td class="align-middle" v-if="overview">
+        ><b-td class="align-middle" v-if="overview" :style="colItemStyle">
           <b-button
             variant="outline-primary fw-bold"
-            @click="$emit('loadResult', item.id)"
+            @click="$emit('viewResult', item.id)"
             >View result</b-button
           >
         </b-td>
@@ -450,6 +466,7 @@ function getCancelIcon(item) {
           v-for="[key, value] in Object.entries(item)"
           :key="`${descending}_${sortindex}_${index}-${key}`"
           class="text-center"
+          :style="colItemStyle"
         >
           <!--Special pill format for status-->
           <!-- TODO refactor-->
@@ -469,51 +486,68 @@ function getCancelIcon(item) {
               {{ value.slice(statusPrefix.length) }}
             </b-button>
           </template>
-          <template v-else> {{ value }}</template>
+          <template v-else>
+            <template v-if="key == 'track_spotify-uri'">
+              <template v-if="value">
+                <b-button @click="showMusicDetail(item['track_spotify-uri'])"
+                  >View track</b-button
+                >
+              </template>
+            </template>
+            <template v-else>{{ value }} </template></template
+          >
         </b-td>
-        <b-td class="align-middle" v-if="overview || removable">
-          <div class="m-0 float-end" style="width: 150px">
-            <b-button
-              v-if="overview"
-              variant="primary"
-              class="mx-1"
-              @click="
-                ;(editModalShow = !editModalShow),
-                  (selectedEntry = index),
-                  getNameTagsMail(item.id)
-              "
-              data-testid="edit"
-              ><i class="bi bi-pencil-square"></i
-            ></b-button>
-            <b-button
-              v-if="
-                overview ||
-                (item.status &&
-                  item.status.slice(statusPrefix.length) == status.done)
-              "
-              variant="primary"
-              class="mx-1"
-              @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
-              data-testid="view-meta"
-              ><i class="bi bi-info-circle"></i
-            ></b-button>
-            <!--REFACTOR status condition-->
-            <b-button
-              v-if="
-                removable &&
-                (!item.status ||
-                  [status.toDo, status.active].includes(
-                    item.status.slice(statusPrefix.length)
-                  ))
-              "
-              variant="danger"
-              class="mx-1 float-end"
-              @click="setEntryRemoval(item)"
-              data-testid="delete"
-            >
-              <i :class="'bi ' + getCancelIcon(item)"></i>
-            </b-button>
-          </div>
+        <b-td
+          class="align-middle"
+          v-if="overview || removable"
+          :style="colItemStyle"
+        >
+          <b-row class="m-0 float-end">
+            <b-col md="auto" class="mx-0 px-0">
+              <b-button
+                v-if="editable"
+                variant="primary"
+                class="mx-1"
+                @click="
+                  ;(editModalShow = !editModalShow),
+                    (selectedEntry = index),
+                    getNameTagsMail(item.id)
+                "
+                data-testid="edit"
+                ><i class="bi bi-pencil-square"></i
+              ></b-button>
+            </b-col>
+            <b-col md="auto" class="mx-0 px-0">
+              <b-button
+                variant="primary"
+                class="mx-1"
+                @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
+                data-testid="view-meta"
+                ><i class="bi bi-info-circle"></i
+              ></b-button>
+            </b-col>
+            <b-col md="auto" class="mx-0 px-0">
+              <!--REFACTOR status condition-->
+              <b-button
+                v-if="
+                  removable &&
+                  (!item.status ||
+                    [status.toDo, status.active].includes(
+                      item.status.slice(statusPrefix.length)
+                    ))
+                "
+                variant="danger"
+                class="mx-1 float-end"
+                @click="setEntryRemoval(item)"
+                data-testid="delete"
+              >
+                <i :class="'bi ' + getCancelIcon(item)"></i>
+              </b-button>
+            </b-col>
+          </b-row>
+        </b-td>
+        <b-td class="align-middle" v-if="overview" :style="colItemStyle">
+          <SettingsModal :resultId="item.id" />
         </b-td>
       </b-tr>
     </b-tbody>

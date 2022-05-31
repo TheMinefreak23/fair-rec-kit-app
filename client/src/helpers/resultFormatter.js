@@ -1,15 +1,15 @@
-/*This program has been developed by students from the bachelor Computer Science at
+/* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
-© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+© Copyright Utrecht University (Department of Information and Computing Sciences) */
 import { statusPrefix } from './queueFormatter'
 
 // Format data for a results overview
 // TODO refactor so headers are dynamic (no separate case for status header)
 export function formatResults(allResults, showStatus) {
   const results = []
-  for (let i in allResults) {
+  for (const i in allResults) {
     const rawResult = allResults[i]
-    //console.log('rawResult', rawResult)
+    // console.log('rawResult', rawResult)
     results[i] = {
       id: rawResult.timestamp.stamp,
       datetime: rawResult.timestamp.datetime,
@@ -28,7 +28,7 @@ export function formatResults(allResults, showStatus) {
 
 // Format an array of strings into a comma separated string
 export function formatArray(array) {
-  var string = ''
+  let string = ''
   if (array == null) {
     string = 'None'
   } else {
@@ -39,8 +39,8 @@ export function formatArray(array) {
 
 // Format an array of named objects into a comma separated string
 export function formatMultipleItems(items) {
-  //console.log('items before format', items)
-  var string = ''
+  // console.log('items before format', items)
+  let string = ''
   if (items == null) {
     string = 'None'
   } else {
@@ -50,7 +50,7 @@ export function formatMultipleItems(items) {
       .filter(() => true) // remove empty array slots
       .join(', ')
   }
-  //console.log(items)
+  // console.log(items)
   return string
 }
 
@@ -67,9 +67,9 @@ export function formatResult(result) {
           const headers = [{ name: 'Approach' }]
 
           // Use metric names as headers
-          for (let [index, evaluation] of result.evals.entries()) {
+          for (const [index, evaluation] of result.evals.entries()) {
             headers.push(formatEvaluation(evaluation, index, result))
-            //console.log(result)
+            // console.log(result)
           }
 
           // Omit recommendation and evals (old properties)
@@ -77,9 +77,9 @@ export function formatResult(result) {
           datasetResult.headers = headers // TODO headers can be computed in outer loop
           return rest
         })
-        //console.log(datasetResult.results[0])
-        //console.log(datasetResult.headers)
-        //datasetResult.headers = makeHeaders(datasetResult.results[0])
+        // console.log(datasetResult.results[0])
+        // console.log(datasetResult.headers)
+        // datasetResult.headers = makeHeaders(datasetResult.results[0])
         datasetResult.caption = showDatasetInfo(datasetResult.dataset)
         return datasetResult
       }),
@@ -103,11 +103,11 @@ function omitRecommendation(arr) {
       }),
     })
   )
-}*/
+} */
 
 // Short result description, e.g. for a result tab
 export function shortResultDescription(result) {
-  console.log(result)
+  //console.log(result)
   const datasets = []
   const approaches = []
   for (const datasetResult of result.result) {
@@ -119,9 +119,10 @@ export function shortResultDescription(result) {
   const datetime = result.metadata.datetime
 
   function formatNames(list) {
-    console.log(Array.from(new Set(list)))
+    //console.log(Array.from(new Set(list)))
     const formattedList = []
     for (const name of Array.from(new Set(list))) {
+      // Remove index (part after last underscore)
       const lastIndex = name.lastIndexOf('_')
       formattedList.push(name.slice(0, lastIndex))
     }
@@ -147,18 +148,18 @@ export function formatEvaluation(e, index, result) {
   result[formatMetric(e) + '_' + index] = e.evaluation.global.toFixed(2)
 
   // Flatten filters
-  //console.log(e.evaluation, e.evaluation.filtered)
+  // console.log(e.evaluation, e.evaluation.filtered)
   // Add filter category (main name) to filter parameter name
   // TODO refactor
   const filtered = []
-  for (let filter of e.evaluation.filtered) {
-    //console.log('filter', filter)
+  for (const filter of e.evaluation.filtered) {
+    // console.log('filter', filter)
     for (const [mainName, params] of Object.entries(filter)) {
-      //console.log(mainName, params)
+      // console.log(mainName, params)
       for (const param of params) {
         for (const [paramName, paramValue] of Object.entries(param)) {
           const filterItem = {}
-          //console.log('paramValue', paramValue.toFixed(2))
+          // console.log('paramValue', paramValue.toFixed(2))
           filterItem[mainName + ' ' + '(' + paramName + ')'] =
             paramValue.toFixed(2)
           filtered.push(filterItem)
@@ -171,26 +172,26 @@ export function formatEvaluation(e, index, result) {
     .map((filter) => Object.entries(filter))
     .map(([mainName, param] => { mainName + } ))
     .flat()
-    .flat()*/
-  //console.log(filtered)
+    .flat() */
+  // console.log(filtered)
 
   // Get filtered values and make subheaders
-  if (filtered.length == 0) {
+  if (filtered.length === 0) {
     return { name: formatMetric(e) }
   } else {
     const subheaders = ['Global']
     filtered.map((filter) => {
       // Mock: get first entry for now
       const [name, val] = Object.entries(filter)[0]
-      //const filterName = e.name + ' ' + name
+      // const filterName = e.name + ' ' + name
       const filterName = formatMetric(e) + name
       result[filterName] = val
-      //console.log(result)
+      // console.log(result)
       subheaders.push(capitalise(name))
-      //console.log(subheaders)
+      // console.log(subheaders)
     })
 
-    return { name: formatMetric(e), subheaders: subheaders }
+    return { name: formatMetric(e), subheaders }
   }
 }
 
@@ -198,17 +199,17 @@ export function formatEvaluation(e, index, result) {
 export function formatMetric(evaluation) {
   // If it is a K metric, replace K with the parameter
   const name = evaluation.name
-  if (name.toLowerCase()[name.length - 1] == 'k') {
-    //console.log(evaluation)
+  if (name.toLowerCase()[name.length - 1] === 'k') {
+    // console.log(evaluation)
     // TODO refactor K condition
-    return name.slice(0, -1) + evaluation.params['K']
+    return name.slice(0, -1) + evaluation.params.K
   } else return name
 }
 
 /**
  * convert list of header names into supported header format, capitalise and remove underscores
- * @param {string}   header  - list of headers.
- * @returns {string}         - the name of the requested dataset
+ * @param {string}   header  - the header that needs to be formatted
+ * @returns {Object}         - the formatted header inside an object
  */
 export function makeHeader(header) {
   return {
@@ -221,11 +222,19 @@ export function article(word) {
 }
 
 export function capitalise(string) {
-  return string[0].toUpperCase() + string.slice(1)
+  // Convert word to upper if the last word if it's small enough (abbreviation)
+  if (string.replace('?', '').length <= 2) {
+    return string.toUpperCase()
+  }
+  const words = string.split(' ')
+  if (words.length === 1) {
+    return string[0].toUpperCase() + string.slice(1)
+  }
+  return words.map((word) => capitalise(word)).join(' ')
 }
 
 export function underscoreToSpace(string) {
   return string.replaceAll('_', ' ')
 }
 
-//export { formatResults, formatResult, capitalise, article, underscoreToSpace }
+// export { formatResults, formatResult, capitalise, article, underscoreToSpace }

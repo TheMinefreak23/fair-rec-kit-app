@@ -10,7 +10,7 @@ import { store, removeResult } from '../store'
 import { status } from '../helpers/queueFormatter'
 import { shortResultDescription } from '../helpers/resultFormatter'
 
-const emit = defineEmits(['goToResult', 'toast'])
+const emit = defineEmits(['toast'])
 const showResultModal = ref(false)
 const currentTab = ref(0)
 
@@ -60,7 +60,6 @@ function mockResult() {
  * @param {Int} index - the index of the tab within the result tabs
  */
 function closeResult(index) {
-  console.log(index)
   removeResult(index)
 }
 </script>
@@ -135,6 +134,7 @@ function closeResult(index) {
         <!--Toggled results sidebar (offcanvas)-->
         <div
           class="offcanvas offcanvas-end"
+          :style="{ width: '60em', overflowY: 'scroll' }"
           tabindex="-1"
           id="offcanvasRight"
           aria-labelledby="offcanvasRightLabel"
