@@ -264,12 +264,17 @@ function setEntryRemoval(item) {
 }
 
 function getCancelIcon(item) {
-  if (!item.status) return 'bi-trash'
+  if (!item.status) return 'bi-trash-fill'
   const status = item.status.slice(statusPrefix.length)
   if (status == status.toDo) return 'bi-x-lg'
   else return 'bi-x-octagon-fill'
 }
 
+function getTooltipText(item) {
+  if (!item.status) return 'Delete'
+  const status = item.status.slice(statusPrefix.length)
+  if (status == status.toDo) return 'Cancel'
+  else return 'Cancel'
 // Get music detail info
 // TODO refactor
 async function showMusicDetail(spotifyId) {
@@ -457,16 +462,12 @@ async function showMusicDetail(spotifyId) {
     <b-tbody>
       <b-tr v-for="(item, index) in sorted" :key="item"
         ><b-td class="align-middle" v-if="overview" :style="colItemStyle">
-          <b-button
-            variant="outline-primary fw-bold"
-            @click="$emit('viewResult', item.id)"
-            >View result</b-button
-          >
+          
         </b-td>
         <b-td
           v-for="[key, value] in Object.entries(item)"
           :key="`${descending}_${sortindex}_${index}-${key}`"
-          class="text-center"
+          class="text-center align-middle"
           :style="colItemStyle"
         >
           <!--Special pill format for status-->
@@ -498,17 +499,23 @@ async function showMusicDetail(spotifyId) {
             <template v-else>{{ value }} </template></template
           >
         </b-td>
-        <b-td
-          class="align-middle"
-          v-if="overview || removable"
-          :style="colItemStyle"
-        >
-          <b-row class="m-0 float-end">
-            <b-col md="auto" class="mx-0 px-0">
+        <b-td class="align-middle" style="width:150px;" v-if="overview || removable">
+          <b-row class="m-0 float-end d-block">
               <b-button
                 v-if="editable"
                 variant="primary"
+                @click="$emit('loadResult', item.id)"
+                class="m-1"
+                style="width:142px;"
+                >View result
+              </b-button>
+            <div class="p-0" style="width:150px;">
+            <b-col md="auto" class="mx-0 px-0 d-inline">
+              <b-button
+                v-if="overview"
+                variant="outline-primary"
                 class="mx-1"
+                v-b-tooltip.hover title="Edit data"
                 @click="
                   ;(editModalShow = !editModalShow),
                     (selectedEntry = index),
@@ -518,33 +525,41 @@ async function showMusicDetail(spotifyId) {
                 ><i class="bi bi-pencil-square"></i
               ></b-button>
             </b-col>
-            <b-col md="auto" class="mx-0 px-0">
-              <b-button
-                variant="primary"
-                class="mx-1"
-                @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
-                data-testid="view-meta"
-                ><i class="bi bi-info-circle"></i
-              ></b-button>
-            </b-col>
-            <b-col md="auto" class="mx-0 px-0">
-              <!--REFACTOR status condition-->
+            <b-col md="auto" class="mx-0 px-0 d-inline">
               <b-button
                 v-if="
+                  overview ||
+                  (item.status &&
+                    item.status.slice(statusPrefix.length) == status.done)
+                "
+                variant="outline-primary"
+                class="mx-1"
+                v-b-tooltip.hover title="Show information"
+                @click=";(viewModalShow = !viewModalShow), getMetadata(item.id)"
+                data-testid="view-meta"
+                ><i class="bi bi-info-circle-fill"></i
+              ></b-button>
+            </b-col>
+            <b-col md="auto" class="mx-0 px-0 d-inline">
+              <!--REFACTOR status condition-->
+              <b-button
+                v-if=
                   removable &&
                   (!item.status ||
                     [status.toDo, status.active].includes(
                       item.status.slice(statusPrefix.length)
                     ))
-                "
-                variant="danger"
+                
+                variant="outline-danger"
                 class="mx-1 float-end"
+                v-b-tooltip.hover :title= "getTooltipText(item)"
                 @click="setEntryRemoval(item)"
                 data-testid="delete"
               >
-                <i :class="'bi ' + getCancelIcon(item)"></i>
+                <i :class='"bi " + getCancelIcon(item)'></i>
               </b-button>
             </b-col>
+            </div>
           </b-row>
         </b-td>
         <b-td class="align-middle" v-if="overview" :style="colItemStyle">
