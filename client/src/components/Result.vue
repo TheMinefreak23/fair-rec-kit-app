@@ -326,7 +326,7 @@ function hideResults(results){
   let result = []
     for(let i=0; i<results.length; i++) {
       const object_as_array = Object.entries(results[i]).filter(([property, value]) => {
-        return property.startsWith('Approach') || contains(property, visibleMetrics.value)
+        return property.startsWith('approach') || contains(property, visibleMetrics.value)
       })
       result.push(Object.fromEntries(object_as_array))
     }
@@ -434,13 +434,14 @@ async function getInfo() {
             <template v-if="visibleDatasets.includes(datasetResult.dataset.dataset)" :key="visibleDatasets">
               <Table
                 :caption="userTables[index]"
-                :results="datasetResult.results"
-                :headers="datasetResult.headers"
+                :results="hideResults(datasetResult.results)"
+                :headers="hideHeaders(datasetResult.headers)"
                 :removable="false"
               />
               <b-button @click="exportTable(index)">Export table</b-button>
             </template>
           </div>  
+          <p> {{datasetResult.results}}</p>
         </template>
       </div>
     </div>
