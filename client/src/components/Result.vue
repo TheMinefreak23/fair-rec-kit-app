@@ -285,7 +285,7 @@ function hideResults(results){
   let result = []
     for(let i=0; i<results.length; i++) {
       const object_as_array = Object.entries(results[i]).filter(([property, value]) => {
-        return !property.startsWith('P@') || contains(property, visibleMetrics.value)
+        return property.startsWith('Approach') || contains(property, visibleMetrics.value)
       })
       result.push(Object.fromEntries(object_as_array))
     }
