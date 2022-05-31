@@ -14,17 +14,15 @@ const props = defineProps({
 })
 
 const track = ref()
-const highlevelFeatures = ref()
-const songInfo = ref({ lastFM: {} }) // TODO
 const musicModalShow = ref(false)
 
 onMounted(() => {
-  loadMusicDetail(props.uri)
+  getTrackItemInfo(props.uri)
 })
 
-// Get music detail info
+// Get music detail info for a table item
 // TODO refactor
-async function loadMusicDetail(spotifyId) {
+async function getTrackItemInfo(spotifyId) {
   const token = await getSpotifyToken()
   track.value = await getInfoFromSpotifyID(token, spotifyId)
   //console.log('track', track.value)
@@ -36,27 +34,14 @@ async function loadMusicDetail(spotifyId) {
   ]
   emit('update:modelValue', info)
   //emit('changeColumns', ['Track', 'Album', 'Artist'])
-  emit(
+  /*emit(
     'changeColumns',
     info.map((item) => item.header)
-  )
-
-  // TODO
-  /*
-  //get AcousticBrainz highlevel features using LastFM's mbid
-  highlevelFeatures.value = await songInfo.value.AcousticBrainz[
-    songInfo.value.LastFM.track.mbid
-  ][0]['highlevel']*/
+  )*/
 }
 </script>
 
 <template>
-  <MusicModal
-    v-if="track"
-    v-model:show="musicModalShow"
-    :track="track"
-    :lastFmTrack="songInfo.lastFM.track"
-    :highlevelFeatures="highlevelFeatures"
-  />
+  <MusicModal v-if="track" v-model:show="musicModalShow" :track="track" />
   <b-button @click="musicModalShow = !musicModalShow"> View track </b-button>
 </template>

@@ -25,7 +25,7 @@ const runID = ref(0)
 const startIndex = ref(0)
 const sortIndex = ref(0)
 const ascending = ref(true)
-const entryAmount = ref(20)
+const entryAmount = ref(10)
 const optionalHeaders = ref([[]])
 const availableFilters = ref([])
 const filters = ref(emptyFormGroup(false))
@@ -276,21 +276,6 @@ function findUniqueDatasets(){
   return Array.from(new Set(datasetnames))
 }
 
-// Get music detail info
-async function getInfo() {
-  songInfo.value = await getSongInfo(
-    token.value,
-    query.value.track,
-    query.value.artist
-  )
-
-  tracks.value = await songInfo.value.Spotify
-  track.value = tracks.value.items[0]
-  //get AcousticBrainz highlevel features using LastFM's mbid
-  highlevelFeatures.value = await songInfo.value.AcousticBrainz[
-    songInfo.value.LastFM.track.mbid
-  ][0]['highlevel']
-}
 </script>
 
 <template>

@@ -56,7 +56,7 @@ const colItemStyle = {
 
 // Pagination
 const caption = ref('')
-const entryAmount = ref(20)
+const entryAmount = ref(10)
 
 // Modals
 const deleteModalShow = ref(false)
@@ -86,6 +86,7 @@ const descending = ref(false)
 // Item detail
 const infoHeaders = ref([])
 const itemsInfo = ref([])
+const additionalInfoAmount = ref(0)
 
 const subheaders = computed(() => {
   const result = []
@@ -114,6 +115,18 @@ onMounted(() => {
   if (props.defaultSort) {
     sortindex.value = props.defaultSort
     descending.value = true // For now sort by descending on default, TODO refactor
+  }
+  /*console.log(
+    'HEADERS',
+    props.headers.map((header) => header.name)
+  )*/
+  // TODO refactor includes
+  if (
+    props.headers
+      .map((header) => header.name)
+      .some((name) => name.includes('spotify-uri'))
+  ) {
+    toggleInfoColumns(['Album', 'Snippet'])
   }
 })
 
@@ -282,22 +295,24 @@ function toggleInfoColumns(addHeaders) {
     ...props.headers.filter((header) => !isItemKey(header.name)),
     ...addHeaders.map((header) => ({ name: header })),
   ]
+  additionalInfoAmount.value = addHeaders.length // TODO refactor
+  // console.log('additional info amount', additionalInfoAmount.value)
   console.log('toggleInfo infoHeaders', infoHeaders.value)
   //emit('updateHeaders', newHeaders)
 }
 
 function isRecsHeader(key) {
   //console.log('infoHeaders', infoHeaders.value)
-  console.log(
+  /*console.log(
     'filteredHeaders',
     filteredHeaders().map((header) => header.name.toLowerCase())
   )
-  console.log('filteredHeaders', key)
+  console.log('filteredHeaders', key)*/
   return (
     key &&
     filteredHeaders()
       .map((header) => header.name.toLowerCase())
-      .includes(key.split('_').join(' '))
+      .includes(key.split('_').join(' ')) // TODO refactor
   )
 }
 
@@ -478,7 +493,7 @@ const filteredHeaders = () => {
           v-for="[key, value] in Object.entries(item)"
           :key="`${descending}_${sortindex}_${index}-${key}`"
         >
-          <!--Show table column if the header is selected-->
+          <!-- For recs tables, show filtered columns -->
           <!-- TODO refactor -->
           <b-td
             v-if="overview || isRecsHeader(key)"
@@ -508,12 +523,9 @@ const filteredHeaders = () => {
               <!-- Spotify column -->
               <template v-if="key === 'track_spotify-uri'">
                 <template v-if="value">
-                  <MusicItem
-                    v-model="itemsInfo[index]"
-                    :uri="item[key]"
-                    @changeColumns="toggleInfoColumns"
-                  />
+                  <MusicItem v-model="itemsInfo[index]" :uri="item[key]" />
                 </template>
+                <template v-else></template>
               </template>
               <!-- Regular column -->
               <template v-else>
@@ -523,13 +535,20 @@ const filteredHeaders = () => {
           </b-td>
         </template>
         <!-- Additional item info -->
-        <b-td v-for="info in itemsInfo[index]" :style="colItemStyle">
-          {{ key }}
-          <template v-if="info.header.toLowerCase() === 'snippet'"
-            ><AudioSnippet :trackId="info.value"
-          /></template>
-          <template v-else=""> {{ info.value }}</template>
-        </b-td>
+        <!-- TODO refactor -->
+        <template v-for="i in additionalInfoAmount">
+          <b-td v-if="itemsInfo[index]" :style="colItemStyle">
+            <template
+              v-if="
+                itemsInfo[index][i - 1] &&
+                itemsInfo[index][i - 1].header.toLowerCase() === 'snippet'
+              "
+              ><AudioSnippet :trackId="itemsInfo[index][i - 1].value"
+            /></template>
+            <template v-else=""> {{ itemsInfo[index][i - 1].value }}</template>
+          </b-td>
+          <b-td :style="colItemStyle" v-else></b-td>
+        </template>
         <b-td
           class="align-middle"
           v-if="overview || removable"
