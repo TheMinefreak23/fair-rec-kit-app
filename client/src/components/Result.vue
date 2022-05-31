@@ -21,6 +21,7 @@ const selectedHeaders = ref([
 const experiment_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '])
 
 const data = ref({ results: [[]] })
+const runID = ref(0)
 const startIndex = ref(0)
 const sortIndex = ref(0)
 const ascending = ref(true)
@@ -28,11 +29,13 @@ const entryAmount = ref(20)
 const optionalHeaders = ref([[]])
 const availableFilters = ref([])
 const filters = ref(emptyFormGroup(false))
+const optionalHeaderOptions = ref([])
 const userHeaderOptions = ref([[]])
 const itemHeaderOptions = ref([[]])
-const userTables = combineResults()
+const userTables = combineResults(props.result.result)
 const visibleDatasets = ref([])
 const uniqueDatasets = findUniqueDatasets()
+const visibleMatrices = ref([])
 
 onMounted(() => {
   console.log('result', props.result)
@@ -49,11 +52,20 @@ onMounted(() => {
 
 // GET request: Get available header options for selection from server
 async function getHeaderOptions(index) {
-  const response = await fetch(API_URL + '/all-results/headers')
+  const requestOptions = { 
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: props.result.result[index].dataset.dataset,
+    }),
+  }
+  const response = await fetch(API_URL + '/all-results/headers', requestOptions)
   const data = await response.json()
-  let headerOptions = data[getDatasetName(userTables[index])]
-  itemHeaderOptions.value[index] = headerOptions.itemHeaders
-  userHeaderOptions.value[index] = headerOptions.userHeaders
+  let headerOptions = data
+  console.log(data)
+  optionalHeaderOptions.value[index] = headerOptions
+  itemHeaderOptions.value[index] = headerOptions.movie
+  userHeaderOptions.value[index] = headerOptions.user
 }
 
 //POST request: Send result ID to the server to set current shown recommendations.
@@ -63,7 +75,7 @@ async function setRecs(currentTable) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       id: props.result.id,
-      runid: 0,
+      runid: runID.value,
       pairid: currentTable,
     }),
   }
@@ -84,20 +96,22 @@ async function setRecs(currentTable) {
 /*
 //POST request: Ask server to load the evaluations of the current result
 //Currently not used, as evaluation tables are not finished
-async function loadEvaluations() {
-  const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-type': 'application/json' },
-    body: JSON.stringify({ id: props.result.id }),
-  }
-  const response = await fetch(
-    API_URL + '/all-results/result-by-id',
-    requestOptions
-  ).then(() => {
-    console.log('succesful POST request to API to retrieve evaluation data')
-    getEvaluations()
-  })
-}
+// async function loadEvaluations() {
+//   const requestOptions = {
+//     method: 'POST',
+//     headers: { 'Content-type': 'application/json' },
+//     body: JSON.stringify({ id: props.result.id }),
+//   }
+//   const response = await fetch(
+//     API_URL + '/all-results/result-by-id',
+//     requestOptions
+//   ).then(() => {
+//     console.log('succesful POST request to API to retrieve evaluation data')
+//     const resultsData = await response.json()
+//     console.log('results data', resultsData)
+//     getEvaluations()
+//   })
+// }
 
 //GET request: Ask server for currently loaded evaluations
 async function getEvaluations() {
@@ -121,7 +135,8 @@ async function getUserRecs(currentTable) {
       amount: entryAmount.value,
       filters: filters.value,
       optionalHeaders: optionalHeaders.value[currentTable],
-      dataset: getDatasetName(userTables[currentTable])
+      dataset: props.result.result[currentTable].dataset.dataset,
+      matrix: props.result.result[currentTable].dataset.matrix
     }),
   }
 
@@ -130,6 +145,36 @@ async function getUserRecs(currentTable) {
   selectedHeaders.value[currentTable] = Object.keys(
     data.value.results[currentTable][0]
   )
+}
+
+async function exportTable(currentTable) {
+  // console.log('export request',props.result.result[currentTable].results)
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-type': 'application/json' },
+    body: JSON.stringify({ results: props.result.result[currentTable].results}),
+  }
+  const response = await fetch(
+    API_URL + '/all-results/export',
+    requestOptions
+  )
+  const confirmation = await response.json()
+  console.log(confirmation.message)
+}
+
+async function validate() {
+  let file = props.result.id + '_' + props.result.metadata.name
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-type': 'application/json' },
+    body: JSON.stringify({ filepath: file }),
+  }
+  const response = await fetch(
+    API_URL + '/all-results/validate',
+    requestOptions
+  ).then(() => {
+    console.log('Experiment validated succesfully')
+  })
 }
 
 /**
@@ -190,15 +235,18 @@ function changeFilters(changedFilters, pairid) {
 
 /**
  * Combines every approach with every dataset that it is being applied onto
+ * @param {Array}     - A list of the results (the same as props.results.result)
  * @returns {Array}   - An array of all the user recommendation tables for this run
  */
-function combineResults() {
+function combineResults(results) {
+  console.log(results)
   let tables = []
-  for (let dataset in props.result.result) {
-    for (let approach in props.result.result[dataset].results) {
-      tables.push(props.result.result[dataset].caption + '_' + props.result.result[dataset].results[approach].approach)
+  for (let dataset in results) {
+    for (let approach in results[dataset].results) {
+      tables.push(results[dataset].dataset.dataset + '_' + results[dataset].results[approach].approach + '_run' + runID.value)
     }
   }
+  console.log(tables)
   return tables
 }
 
@@ -208,30 +256,24 @@ function combineResults() {
  * @returns {string}          - the name of the requested dataset
  */
 function getDatasetName(string) {
-return string.split(' ')[1].split('_')[0]
+  return string.split('_')[0]
 }
 
 /**
  * Fill array of datasets that are shown so that all are shown upon loading the page
  */
 function fillVisibleDatasets(){
-  console.log(findUniqueDatasets[0])
   visibleDatasets.value = findUniqueDatasets()
    
 }
 
 /**
  * Create an array that has all unique datasets in the result
+ * @returns {string}         - a list of all datasets in the experiments without duplicates
  */
 function findUniqueDatasets(){
-  let datasetnames = []
-
-  for(let i=0; i<userTables.length;i++){
-      datasetnames[i] = getDatasetName(userTables[i])
-  }
-
+  let datasetnames = userTables.map(getDatasetName)
   return Array.from(new Set(datasetnames))
-
 }
 
 // Get music detail info
@@ -273,7 +315,7 @@ async function getInfo() {
           >
         </template>
       </p>
-
+      <b-button @click="validate()">Validate run</b-button>
       <p>
         Datasets showing items per user:
         <div class="form-check" v-for="dataset in uniqueDatasets">
@@ -291,28 +333,29 @@ async function getInfo() {
       </p>
 
     </div>
-
     <div class="container">
       <div class="row">
-        <h4>Metrics</h4>
-
-        <!--Show first two dataset results for now TODO-->
+      <h4>Metrics</h4>
+          
+          <!--Show first two dataset results for now TODO-->
         <template
-          v-for="datasetResult in result.result[1]
+          v-for="(datasetResult, index) in result.result[1]
             ? [result.result[0], result.result[1]]
             : [result.result[0]]"
           :key="datasetResult"
         >
           <p> {{datasetResult.results[0].dataset}}</p>
-          <div class="col-6">
-
-            <Table
-              :caption="datasetResult.caption"
-              :results="datasetResult.results"
-              :headers="datasetResult.headers"
-              :removable="false"
-            />
-          </div>
+          <div :class="result.length > 1 ? 'col-6' : 'col'">
+            <template v-if="visibleDatasets.includes(datasetResult.dataset.dataset)" :key="visibleDatasets">
+              <Table
+                :caption="userTables[index]"
+                :results="datasetResult.results"
+                :headers="datasetResult.headers"
+                :removable="false"
+              />
+              <b-button @click="exportTable(index)">Export table</b-button>
+            </template>
+          </div>  
         </template>
       </div>
     </div>
@@ -325,13 +368,32 @@ async function getInfo() {
         </h4>
         <h4 v-else>Predicted rating per user</h4>
       </div>
+      
+     <p>
+        Select items to be shown:
+        <div class="form-check" v-for="(entry, index) in userTables">
+          <input
+            v-model = "visibleMatrices"
+            class = "form-check-input"
+            type="checkbox"
+            :value="entry"
+            :id="entry"
+          />
+          <label class="form-check-label" :id="entry">
+            {{entry}}
+          </label>
+        </div>
+      </p>
+
+
       <div class="row">
         <!--Show recommendations for all datasets for now TODO-->
         <!--Currently only shows the results of the first dataset-->
         <template v-for="(entry, index) in userTables" :key="data">
           <template v-if="visibleDatasets.includes(getDatasetName(entry))" :key="visibleDatasets">
+            <template v-if="visibleMatrices.includes(entry)" :key="visibleMatrices">
           <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
-            <div class="col-6">
+            <div :class="visibleMatrices.length > 1 ? 'col-6' : 'col'">
               <Table
                 v-if="selectedHeaders[index]"
                 :key="props.result.id"
@@ -340,6 +402,7 @@ async function getInfo() {
                 :headers="selectedHeaders[index].map(makeHeader)"
                 :filters="filters"
                 :filterOptions="availableFilters"
+                :headerOptions="optionalHeaderOptions[index]"
                 :userOptions="userHeaderOptions[index]"
                 :itemOptions="itemHeaderOptions[index]"
                 pagination
@@ -355,6 +418,7 @@ async function getInfo() {
               />
             </div>
             </template>
+          </template>
         </template>
       </div>
     </div>

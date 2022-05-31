@@ -208,8 +208,8 @@ export function formatMetric(evaluation) {
 
 /**
  * convert list of header names into supported header format, capitalise and remove underscores
- * @param {string}   header  - list of headers.
- * @returns {string}         - the name of the requested dataset
+ * @param {string}   header  - the header that needs to be formatted
+ * @returns {Object}         - the formatted header inside an object
  */
 export function makeHeader(header) {
   return {
