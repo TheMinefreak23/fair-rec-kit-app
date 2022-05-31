@@ -45,14 +45,7 @@ const props = defineProps({
 })
 
 // Column width
-const colWidth = '6em'
-const colItemStyle = {
-  minWidth: colWidth,
-  width: colWidth,
-  maxWidth: colWidth,
-  inlineSize: colWidth,
-  overflowWrap: 'break-word',
-}
+const colWidth = 6
 
 // Pagination
 // const caption = ref('')
@@ -129,6 +122,17 @@ onMounted(() => {
     toggleInfoColumns(['Album', 'Snippet'])
   }
 })
+
+function colItemStyle(colWidth) {
+  const width = colWidth + 'em'
+  return {
+    minWidth: width,
+    width,
+    maxWidth: width,
+    inlineSize: width,
+    overflowWrap: 'break-word',
+  }
+}
 
 /**
  * Turns a string into an array separated by comma's
@@ -457,12 +461,12 @@ const filteredHeaders = () => {
     </caption>
     <b-thead head-variant="dark">
       <b-tr>
-        <b-th v-if="overview" :style="colItemStyle"></b-th>
+        <b-th v-if="overview" :style="colItemStyle(colWidth)"></b-th>
         <template v-for="(header, index) in filteredHeaders()" :key="header">
           <b-th
             class="text-center"
             :colspan="header.subheaders ? header.subheaders.length : 1"
-            :style="{ ...colItemStyle, cursor: 'pointer' }"
+            :style="{ ...colItemStyle(colWidth), cursor: 'pointer' }"
             @click="setsorting(index)"
           >
             {{ header.name }}
@@ -471,9 +475,9 @@ const filteredHeaders = () => {
         <b-th v-if="overview"></b-th>
       </b-tr>
       <b-tr v-if="overview">
-        <b-th :style="colItemStyle"></b-th>
+        <b-th :style="colItemStyle(colWidth)"></b-th>
         <template v-for="subheader in subheaders" :key="subheader">
-          <b-th class="text-center" :style="colItemStyle">
+          <b-th class="text-center" :style="colItemStyle(colWidth)">
             {{ subheader }}
           </b-th>
         </template>
@@ -482,7 +486,11 @@ const filteredHeaders = () => {
     </b-thead>
     <b-tbody>
       <b-tr v-for="(item, index) in sorted" :key="item"
-        ><b-td class="align-middle" v-if="overview" :style="colItemStyle">
+        ><b-td
+          class="align-middle"
+          v-if="overview"
+          :style="colItemStyle(colWidth)"
+        >
           <b-button
             variant="outline-primary fw-bold"
             @click="$emit('viewResult', item.id)"
@@ -538,7 +546,7 @@ const filteredHeaders = () => {
         <!-- Additional item info -->
         <!-- TODO refactor -->
         <template v-for="i in additionalInfoAmount">
-          <b-td v-if="itemsInfo[index]" :style="colItemStyle">
+          <b-td v-if="itemsInfo[index]" :style="colItemStyle(colWidth * 3)">
             <template
               v-if="
                 itemsInfo[index][i - 1] &&
@@ -548,12 +556,12 @@ const filteredHeaders = () => {
             /></template>
             <template v-else=""> {{ itemsInfo[index][i - 1].value }}</template>
           </b-td>
-          <b-td :style="colItemStyle" v-else></b-td>
+          <b-td :style="colItemStyle(colWidth)" v-else></b-td>
         </template>
         <b-td
           class="align-middle"
           v-if="overview || removable"
-          :style="colItemStyle"
+          :style="colItemStyle(colWidth)"
         >
           <b-row class="m-0 float-end">
             <b-col md="auto" class="mx-0 px-0">
@@ -599,7 +607,11 @@ const filteredHeaders = () => {
             </b-col>
           </b-row>
         </b-td>
-        <b-td class="align-middle" v-if="overview" :style="colItemStyle">
+        <b-td
+          class="align-middle"
+          v-if="overview"
+          :style="colItemStyle(colWidth)"
+        >
           <SettingsModal :resultId="item.id" />
         </b-td>
       </b-tr>
