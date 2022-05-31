@@ -28,7 +28,7 @@ def index():
     msg = Message(subject = 'foobar',
                   body = 'I am calling to let you know about your cars expired warrenty please get back to me as soon as possible thanks :):):):)',
                   sender='foo@bar.gov',
-                  recipients=['gaypiss6969@gmail.com'])
+                  recipients=['voswesseling@gmail.com'])
     mail.send(msg)
     #print(msg)
     return 'owo'
