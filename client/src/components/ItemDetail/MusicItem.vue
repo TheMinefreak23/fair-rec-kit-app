@@ -10,7 +10,7 @@ import { getInfoFromSpotifyID, getSpotifyToken } from '../../helpers/songInfo'
 const emit = defineEmits(['update:modelValue'], ['changeColumns'])
 const props = defineProps({
   uri: String,
-  //header: String, // Table column header
+  // header: String, // Table column header
 })
 
 const track = ref()
@@ -25,23 +25,25 @@ onMounted(() => {
 async function getTrackItemInfo(spotifyId) {
   const token = await getSpotifyToken()
   track.value = await getInfoFromSpotifyID(token, spotifyId)
-  //console.log('track', track.value)
+  // console.log('track', track.value)
   const info = [
     { header: 'Album', value: track.value.album.name },
     { header: 'Snippet', value: spotifyId },
-    //track.value.name,
-    //track.value.artists.map((artist) => artist.name).join(', '),
+    // track.value.name,
+    // track.value.artists.map((artist) => artist.name).join(', '),
   ]
   emit('update:modelValue', info)
-  //emit('changeColumns', ['Track', 'Album', 'Artist'])
-  /*emit(
+  // emit('changeColumns', ['Track', 'Album', 'Artist'])
+  /* emit(
     'changeColumns',
     info.map((item) => item.header)
-  )*/
+  ) */
 }
 </script>
 
 <template>
-  <MusicModal v-if="track" v-model:show="musicModalShow" :track="track" />
-  <b-button @click="musicModalShow = !musicModalShow"> View track </b-button>
+  <div>
+    <MusicModal v-if="track" v-model="musicModalShow" :track="track" />
+    <b-button @click="musicModalShow = !musicModalShow"> View track </b-button>
+  </div>
 </template>

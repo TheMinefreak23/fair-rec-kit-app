@@ -22,17 +22,17 @@ ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 const emit = defineEmits(['update:show'])
 const props = defineProps({
   track: Object,
-  show: Boolean,
+  modelValue: Boolean,
 })
 const chartInfo = ref()
 const lastFmTrack = ref()
 
 const modalShow = computed({
   get() {
-    return props.show
+    return props.modelValue
   },
   set(localValue) {
-    emit('update:show', localValue)
+    emit('update:modelValue', localValue)
   },
 })
 
@@ -47,7 +47,7 @@ onMounted(async () => {
   lastFmTrack.value = songInfo.LastFM.track
 
   if (songInfo.AcousticBrainz) {
-    //get AcousticBrainz highlevel features using LastFM's mbid
+    // get AcousticBrainz highlevel features using LastFM's mbid
     const highlevelFeatures = songInfo.AcousticBrainz[0]['highlevel']
 
     generateChart(highlevelFeatures)

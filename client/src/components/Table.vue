@@ -1,7 +1,7 @@
 <script setup>
-/*This program has been developed by students from the bachelor Computer Science at
+/* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
-© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+© Copyright Utrecht University (Department of Information and Computing Sciences) */
 import { computed, onMounted, ref } from 'vue'
 import sortBy from 'just-sort-by'
 import { API_URL } from '../api'
@@ -55,7 +55,7 @@ const colItemStyle = {
 }
 
 // Pagination
-const caption = ref('')
+// const caption = ref('')
 const entryAmount = ref(10)
 
 // Modals
@@ -102,24 +102,24 @@ const subheaders = computed(() => {
 })
 
 const sorted = computed(() => {
-  //console.log(props.results)
+  // console.log(props.results)
 
   if (!props.pagination) return sort(sortindex.value)
   else return props.results
 })
 
 onMounted(() => {
-  /*if (props.caption == 'Testcaption')
-    console.log('filterOptions', props.filterOptions)*/
+  /* if (props.caption == 'Testcaption')
+    console.log('filterOptions', props.filterOptions) */
   // Sort on default column if it is given
   if (props.defaultSort) {
     sortindex.value = props.defaultSort
     descending.value = true // For now sort by descending on default, TODO refactor
   }
-  /*console.log(
+  /* console.log(
     'HEADERS',
     props.headers.map((header) => header.name)
-  )*/
+  ) */
   // TODO refactor includes
   if (
     props.headers
@@ -153,7 +153,7 @@ function checkEmail(Email) {
 }
 
 async function editEntry() {
-  //Inform the server of the new values at the selected index
+  // Inform the server of the new values at the selected index
   newTagsList.value = stringToList(newTags.value)
   newEmail.value = checkEmail(newEmail.value)
   const requestOptions = {
@@ -187,9 +187,11 @@ async function removeEntry() {
   if (entry.remove) {
     // Remove first matching item from store
     const list = entry.fromQueue ? store.allResults : store.queue
-    for (let i in list) {
-      if (list[i].id == entry.id) list.splice(i, 1)
-      break
+    for (const i in list) {
+      if (list[i].id === entry.id) {
+        list.splice(i, 1)
+        break
+      }
     }
   }
 
@@ -246,7 +248,7 @@ function setsorting(i) {
   sortindex.value = i
   emit('paginationSort', i)
 }
-//console.log('propsfilteroptions', props.filterOptions)
+// console.log('propsfilteroptions', props.filterOptions)
 
 // TODO refactor
 function setEntryRemoval(item) {
@@ -268,10 +270,10 @@ function setEntryRemoval(item) {
   }
   selectedEntry.value = {
     id: item.id,
-    title: title,
-    description: description,
-    removeFromStore: removeFromStore,
-    fromQueue: fromQueue,
+    title,
+    description,
+    removeFromStore,
+    fromQueue,
   }
   deleteModalShow.value = !deleteModalShow.value
 }
@@ -298,16 +300,16 @@ function toggleInfoColumns(addHeaders) {
   additionalInfoAmount.value = addHeaders.length // TODO refactor
   // console.log('additional info amount', additionalInfoAmount.value)
   console.log('toggleInfo infoHeaders', infoHeaders.value)
-  //emit('updateHeaders', newHeaders)
+  // emit('updateHeaders', newHeaders)
 }
 
 function isRecsHeader(key) {
-  //console.log('infoHeaders', infoHeaders.value)
-  /*console.log(
+  // console.log('infoHeaders', infoHeaders.value)
+  /* console.log(
     'filteredHeaders',
     filteredHeaders().map((header) => header.name.toLowerCase())
   )
-  console.log('filteredHeaders', key)*/
+  console.log('filteredHeaders', key) */
   return (
     key &&
     filteredHeaders()
