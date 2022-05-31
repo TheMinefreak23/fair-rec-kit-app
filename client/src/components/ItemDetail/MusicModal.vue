@@ -1,7 +1,7 @@
 <script setup>
-/*This program has been developed by students from the bachelor Computer Science at
+/* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
-© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+© Copyright Utrecht University (Department of Information and Computing Sciences) */
 
 import { computed, onMounted, ref } from 'vue'
 import { Bar } from 'vue-chartjs'
@@ -14,6 +14,7 @@ import {
   CategoryScale,
   LinearScale,
 } from 'chart.js'
+import AudioSnippet from './AudioSnippet.vue'
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
@@ -39,10 +40,10 @@ onMounted(() => {
   if (props.highlevelFeatures) generateChart(props.highlevelFeatures)
 })
 
-//Generate the data for the audiofeatures Bar-chart
+// Generate the data for the audiofeatures Bar-chart
 async function generateChart(highlevelFeatures) {
   chartInfo.value = { labels: [], datasets: [] }
-  //available moods from AcousticBrainz
+  // available moods from AcousticBrainz
   const moods = [
     'acoustic',
     'aggressive',
@@ -52,13 +53,13 @@ async function generateChart(highlevelFeatures) {
     'relaxed',
     'sad',
   ]
-  //also include danceability seperately
-  const danceability = highlevelFeatures['danceability']['all']['danceable']
+  // also include danceability seperately
+  const danceability = highlevelFeatures.danceability.all.danceable
   const data = [danceability]
   for (const mood of moods) {
     const tagname = 'mood_' + mood
     const feature = highlevelFeatures[tagname]
-    //console.log('value', feature)
+    // console.log('value', feature)
     data.push(feature.all[mood])
   }
   chartInfo.value.datasets[0] = {
@@ -112,7 +113,7 @@ async function generateChart(highlevelFeatures) {
                   </div>
                   <div>
                     <b>LastFM tags:</b>
-                    <div v-for="item in lastFmTrack.toptags.tag">
+                    <div v-for="item in lastFmTrack.toptags.tag" :key="item">
                       <a :href="item.url">{{ item.name }}</a>
                     </div>
                   </div>
@@ -125,19 +126,7 @@ async function generateChart(highlevelFeatures) {
             </b-row>
           </b-row>
           <b-row class="p-3">
-            <iframe
-              style="border-radius: 12px"
-              :src="
-                'https://open.spotify.com/embed/track/' +
-                track.id +
-                '?utm_source=generator'
-              "
-              width="100%"
-              height="80"
-              frameBorder="0"
-              allowfullscreen=""
-              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-            />
+            <AudioSnippet :trackId="track.id" />
           </b-row>
           <b-row class="p-3">
             <b-button v-b-toggle.collapse-1 variant="primary"
@@ -148,7 +137,7 @@ async function generateChart(highlevelFeatures) {
                 debug | id: {{ track.id }} | preview url:
                 {{ track.preview_url }}
               </h3>
-              <p v-for="[key, value] of Object.entries(track)">
+              <p v-for="[key, value] of Object.entries(track)" :key="key">
                 <b>{{ key }}</b
                 >: {{ value }}
               </p>

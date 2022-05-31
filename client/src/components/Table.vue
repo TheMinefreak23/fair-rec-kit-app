@@ -13,8 +13,8 @@ import { makeHeader, capitalise } from '../helpers/resultFormatter'
 import { statusPrefix, statusVariant, status } from '../helpers/queueFormatter'
 import { loadResult } from '../helpers/resultRequests'
 import SettingsModal from './Table/SettingsModal.vue'
-import { getInfoFromSpotifyID, getSpotifyToken } from '../helpers/songInfo'
-import MusicModal from './ItemDetail/MusicModal.vue'
+import MusicItem from './ItemDetail/MusicItem.vue'
+import AudioSnippet from './ItemDetail/AudioSnippet.vue'
 
 const emit = defineEmits([
   'viewResult',
@@ -44,6 +44,7 @@ const props = defineProps({
   defaultSort: Number,
 })
 
+// Column width
 const colWidth = '6em'
 const colItemStyle = {
   minWidth: colWidth,
@@ -52,6 +53,7 @@ const colItemStyle = {
   inlineSize: colWidth,
   overflowWrap: 'break-word',
 }
+
 // Pagination
 const caption = ref('')
 const entryAmount = ref(20)
@@ -81,11 +83,9 @@ const selectedEntry = ref(0)
 const sortindex = ref(0)
 const descending = ref(false)
 
-// Item (music) detail
-const track = ref()
-const highlevelFeatures = ref()
-const songInfo = ref({ lastFM: {} }) // TODO
-const musicModalShow = ref(false)
+// Item detail
+const infoHeaders = ref([])
+const itemsInfo = ref([])
 
 const subheaders = computed(() => {
   const result = []
@@ -270,21 +270,42 @@ function getCancelIcon(item) {
   else return 'bi-x-octagon-fill'
 }
 
-// Get music detail info
-// TODO refactor
-async function showMusicDetail(spotifyId) {
-  const token = await getSpotifyToken()
-  track.value = await getInfoFromSpotifyID(token, spotifyId)
-  //console.log('track', track.value)
+function isItemKey(key) {
+  const lowerKey = key.toLowerCase()
+  const itemKeys = ['item']
+  return itemKeys.includes(lowerKey) || lowerKey.includes('id')
+}
 
-  // TODO
-  /*
-  //get AcousticBrainz highlevel features using LastFM's mbid
-  highlevelFeatures.value = await songInfo.value.AcousticBrainz[
-    songInfo.value.LastFM.track.mbid
-  ][0]['highlevel']*/
+// Hide item (ID) columns and show info columns
+function toggleInfoColumns(addHeaders) {
+  infoHeaders.value = [
+    ...props.headers.filter((header) => !isItemKey(header.name)),
+    ...addHeaders.map((header) => ({ name: header })),
+  ]
+  console.log('toggleInfo infoHeaders', infoHeaders.value)
+  //emit('updateHeaders', newHeaders)
+}
 
-  musicModalShow.value = !musicModalShow.value
+function isRecsHeader(key) {
+  //console.log('infoHeaders', infoHeaders.value)
+  console.log(
+    'filteredHeaders',
+    filteredHeaders().map((header) => header.name.toLowerCase())
+  )
+  console.log('filteredHeaders', key)
+  return (
+    key &&
+    filteredHeaders()
+      .map((header) => header.name.toLowerCase())
+      .includes(key.split('_').join(' '))
+  )
+}
+
+// TODO computed ?
+const filteredHeaders = () => {
+  return props.overview || infoHeaders.value.length == 0
+    ? props.headers
+    : infoHeaders.value
 }
 </script>
 
@@ -358,7 +379,7 @@ async function showMusicDetail(spotifyId) {
   >
     <p>Select the extra headers you want to be shown</p>
     <template v-for="category in Object.keys(props.headerOptions)">
-      <p>{{capitalise(category)}} specific:</p>
+      <p>{{ capitalise(category) }} specific:</p>
       <div
         class="form-check form-switch"
         v-for="header in props.headerOptions[category]"
@@ -393,14 +414,6 @@ async function showMusicDetail(spotifyId) {
     />
   </b-modal>
 
-  <MusicModal
-    v-if="track"
-    v-model:show="musicModalShow"
-    :track="track"
-    :lastFmTrack="songInfo.lastFM.track"
-    :highlevelFeatures="highlevelFeatures"
-  />
-
   <b-table-simple hover striped responsive caption-top>
     <caption>
       {{
@@ -429,28 +442,25 @@ async function showMusicDetail(spotifyId) {
     <b-thead head-variant="dark">
       <b-tr>
         <b-th v-if="overview" :style="colItemStyle"></b-th>
-        <b-th
-          v-for="(header, index) in headers"
-          :key="header"
-          class="text-center"
-          :colspan="header.subheaders ? header.subheaders.length : 1"
-          :style="{ ...colItemStyle, cursor: 'pointer' }"
-          @click="setsorting(index)"
-        >
-          {{ header.name }}
-        </b-th>
+        <template v-for="(header, index) in filteredHeaders()" :key="header">
+          <b-th
+            class="text-center"
+            :colspan="header.subheaders ? header.subheaders.length : 1"
+            :style="{ ...colItemStyle, cursor: 'pointer' }"
+            @click="setsorting(index)"
+          >
+            {{ header.name }}
+          </b-th>
+        </template>
         <b-th v-if="overview"></b-th>
       </b-tr>
-      <b-tr>
-        <b-th v-if="overview" :style="colItemStyle"></b-th>
-        <b-th
-          v-for="subheader in subheaders"
-          :key="subheader"
-          class="text-center"
-          :style="colItemStyle"
-        >
-          {{ subheader }}
-        </b-th>
+      <b-tr v-if="overview">
+        <b-th :style="colItemStyle"></b-th>
+        <template v-for="subheader in subheaders" :key="subheader">
+          <b-th class="text-center" :style="colItemStyle">
+            {{ subheader }}
+          </b-th>
+        </template>
         <b-th v-if="overview"></b-th>
       </b-tr>
     </b-thead>
@@ -463,40 +473,62 @@ async function showMusicDetail(spotifyId) {
             >View result</b-button
           >
         </b-td>
-        <b-td
+        <!-- Table results content -->
+        <template
           v-for="[key, value] in Object.entries(item)"
           :key="`${descending}_${sortindex}_${index}-${key}`"
-          class="text-center"
-          :style="colItemStyle"
         >
-          <!--Special pill format for status-->
-          <!-- TODO refactor-->
-          <template
-            v-if="typeof value === 'string' && value.startsWith(statusPrefix)"
+          <!--Show table column if the header is selected-->
+          <!-- TODO refactor -->
+          <b-td
+            v-if="overview || isRecsHeader(key)"
+            class="text-center"
+            :style="colItemStyle"
           >
-            <b-button
-              disabled
-              :variant="statusVariant(value)"
-              :class="
-                value.slice(statusPrefix.length) == status.active
-                  ? 'status-blinking'
-                  : 'status'
-              "
-              class="fw-bold"
+            <!--Special pill format for status-->
+            <!-- TODO refactor-->
+            <template
+              v-if="typeof value === 'string' && value.startsWith(statusPrefix)"
             >
-              {{ value.slice(statusPrefix.length) }}
-            </b-button>
-          </template>
-          <template v-else>
-            <template v-if="key == 'track_spotify-uri'">
-              <template v-if="value">
-                <b-button @click="showMusicDetail(item['track_spotify-uri'])"
-                  >View track</b-button
-                >
+              <b-button
+                disabled
+                :variant="statusVariant(value)"
+                :class="
+                  value.slice(statusPrefix.length) == status.active
+                    ? 'status-blinking'
+                    : 'status'
+                "
+                class="fw-bold"
+              >
+                {{ value.slice(statusPrefix.length) }}
+              </b-button>
+            </template>
+            <!-- Non-status columns -->
+            <template v-else>
+              <!-- Spotify column -->
+              <template v-if="key === 'track_spotify-uri'">
+                <template v-if="value">
+                  <MusicItem
+                    v-model="itemsInfo[index]"
+                    :uri="item[key]"
+                    @changeColumns="toggleInfoColumns"
+                  />
+                </template>
+              </template>
+              <!-- Regular column -->
+              <template v-else>
+                {{ value }}
               </template>
             </template>
-            <template v-else>{{ value }} </template></template
-          >
+          </b-td>
+        </template>
+        <!-- Additional item info -->
+        <b-td v-for="info in itemsInfo[index]" :style="colItemStyle">
+          {{ key }}
+          <template v-if="info.header.toLowerCase() === 'snippet'"
+            ><AudioSnippet :trackId="info.value"
+          /></template>
+          <template v-else=""> {{ info.value }}</template>
         </b-td>
         <b-td
           class="align-middle"
