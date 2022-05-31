@@ -9,7 +9,7 @@ import { formatMetadata } from '../helpers/metadataFormatter'
 import FormGroupList from './FormGroupList.vue'
 import { validateEmail, emptyFormGroup } from '../helpers/optionsFormatter'
 import { store } from '../store'
-import { makeHeader } from '../helpers/resultFormatter'
+import { makeHeader, capitalise } from '../helpers/resultFormatter'
 import { statusPrefix, statusVariant, status } from '../helpers/queueFormatter'
 import { loadResult } from '../helpers/resultRequests'
 import SettingsModal from './Table/SettingsModal.vue'
@@ -36,6 +36,7 @@ const props = defineProps({
   pagination: Boolean,
   caption: String,
   expandable: Boolean,
+  headerOptions: Object,
   userOptions: Array,
   itemOptions: Array,
   filters: Object,
@@ -64,8 +65,6 @@ const updateHeadersModalShow = ref(false)
 
 // Columns
 const checkedColumns = ref([])
-const itemColumns = ref([])
-const userColumns = ref([])
 
 // Filters
 const filters = ref(emptyFormGroup(false))
@@ -351,54 +350,34 @@ async function showMusicDetail(spotifyId) {
 
   <!-- Modal used for changing the headers of the user recommendations table -->
   <b-modal
+    v-if="props.headerOptions"
     id="change-columns-modal"
     v-model="updateHeadersModalShow"
-    title="Change columns"
-    @ok="
-      $emit('updateHeaders', [
-        ...checkedColumns,
-        ...userColumns,
-        ...itemColumns,
-      ])
-    "
+    title="Select headers"
+    @ok="$emit('updateHeaders', checkedColumns)"
   >
     <p>Select the extra headers you want to be shown</p>
-    <p>User specific:</p>
-    <div
-      class="form-check form-switch"
-      v-for="(header, index) in userOptions"
-      :key="header"
-    >
-      <input
-        v-model="userColumns"
-        class="form-check-input"
-        type="checkbox"
-        :value="header"
-        :id="header"
-      />
-      <label class="form-check-label" :id="header">
-        {{ makeHeader(header).name }}
-      </label>
-    </div>
-
-    <p>Item specific:</p>
-    <div
-      class="form-check form-switch"
-      v-for="(header, index) in itemOptions"
-      :key="header"
-    >
-      <input
-        v-model="itemColumns"
-        class="form-check-input"
-        type="checkbox"
-        :value="header"
-        :id="header"
-      />
-      <label class="form-check-label" :id="header">
-        {{ makeHeader(header).name }}
-      </label>
-    </div>
+    <template v-for="category in Object.keys(props.headerOptions)">
+      <p>{{capitalise(category)}} specific:</p>
+      <div
+        class="form-check form-switch"
+        v-for="header in props.headerOptions[category]"
+        :key="header"
+      >
+        <input
+          v-model="checkedColumns"
+          class="form-check-input"
+          type="checkbox"
+          :value="header"
+          :id="header"
+        />
+        <label class="form-check-label" :id="header">
+          {{ makeHeader(header).name }}
+        </label>
+      </div>
+    </template>
   </b-modal>
+
   <b-modal
     id="change-columns-modal"
     v-model="filtersModalShow"
@@ -439,7 +418,7 @@ async function showMusicDetail(spotifyId) {
             @click="updateHeadersModalShow = !updateHeadersModalShow"
             class="m-1"
           >
-            Change Headers
+            Select Headers
           </b-button>
           <b-button @click="filtersModalShow = !filterModalShow" class="m-1">
             Filters

@@ -172,7 +172,7 @@ function chooseLabel(name) {
                     >
                       <b-form-group
                         :label="
-                          capitalise(underscoreToSpace(value.name)) + ' *'
+                          capitalise(underscoreToSpace(value.name)) + (value.name != 'seed' ? ' *' : '')
                         "
                         :description="
                           'Between ' +
