@@ -111,8 +111,9 @@ class EventHandler():
 
             save_result(self.experiment.job, format_result(self.experiment.config))
 
-            send_mail(self.experiment.job['metadata']['email'],
-                  self.experiment.job['metadata']['name'],
-                  self.experiment.job['timestamp']['datetime'])
+            if 'email' in self.experiment.job['metadata']:
+                send_mail(self.experiment.job['metadata']['email'],
+                          self.experiment.job['metadata']['name'],
+                          self.experiment.job['timestamp']['datetime'])
 
         self.end_experiment()
