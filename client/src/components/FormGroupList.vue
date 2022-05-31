@@ -118,7 +118,10 @@ function showFormToast(object, actionMessage) {
   // TODO delay and variant don't work?
   const mainOptions = {
     title:
-      capitalise(props.name) + ' ' + object.name + ' ' + actionMessage + '!',
+        capitalise(props.name) + ' ' + 
+        //If the metric doesn't have a value, don't mention it
+        (object.name == undefined ?  '' : object.name + ' ') +
+         actionMessage + '!',
   }
   const otherOptions = { pos: 'top-right', delay: 800, variant: 'warning' }
   showToast(mainOptions, otherOptions)
@@ -217,8 +220,10 @@ function shortGroupDescription(i) {
             @click="form.visible = !form.visible"
             variant="dark"
           >
-            <template v-if="form.visible">&#x25BC; | </template>
-            <template v-else>&#x25BA; | </template>
+            <template v-if="form.visible"
+              ><i class="bi bi-caret-down" /> |
+            </template>
+            <template v-else><i class="bi bi-caret-up" /> | </template>
           </b-button>
         </b-card>
       </h3>
@@ -257,10 +262,13 @@ function shortGroupDescription(i) {
                           "
                           :variant="visibleGroup == i ? 'secondary' : 'dark'"
                         >
+                          <!-- TODO refactor-->
                           <template v-if="visibleGroup == i"
-                            >&#x25BC; |
+                            ><i class="bi bi-caret-down" /> |
                           </template>
-                          <template v-else>&#x25BA; | </template>
+                          <template v-else
+                            ><i class="bi bi-caret-up" /> |
+                          </template>
                           {{ shortGroupDescription(i - 1) }}
                         </b-button>
                       </b-card>

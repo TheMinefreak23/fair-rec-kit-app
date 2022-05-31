@@ -4,13 +4,14 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 import json
+from logging import root
 
 from flask import (Blueprint, request)
 import pandas as pd
-from fairreckitlib.data.set.dataset import add_user_columns, add_item_columns
+from fairreckitlib.data.set.dataset import add_dataset_columns as add_data_columns
 
 from . import result_storage
-from .experiment import options, recommender_system
+from .experiment import options, recommender_system, validate_experiment
 
 results_bp = Blueprint('results', __name__, url_prefix='/api/all-results')
 
@@ -96,17 +97,24 @@ def user_result():
     chunk_size = json.get("amount", 20)
     chunk_size = int(chunk_size)
     chosen_headers = json.get("optionalHeaders", [])
-    dataset = json.get("dataset", "")
+    matrix_name = json.get("matrix")
+    dataset_name = json.get("dataset", "")
     sortIndex = json.get("sortindex", 0)
 
     #read mock dataframe
     recs = result_storage.current_recs[pair_id]
+    print(list(recs))
+    dataset = recommender_system.data_registry.get_set(dataset_name)
+
+    #TODO refactor/do dynamically
+    spotify_datasets = ['LFM-2B']
+    if dataset_name in spotify_datasets:
+        recs=add_spotify_columns(dataset_name, recs)
 
     #Add optional columns to the dataframe (if any)
     if (len(chosen_headers) > 0):
-      recs=add_dataset_columns(dataset, recs, chosen_headers)
+      recs=add_dataset_columns(dataset_name, recs, chosen_headers, matrix_name)
 
-    
     #Make sure not to sort on a column that does not exist anymore
     if (len(recs.columns) <= sortIndex):
         sortIndex = 0
@@ -127,20 +135,78 @@ def user_result():
 
     # return part of table that should be shown
     df_subset = df_sorted[start_rows:end_rows]
+
+    # rename the user and item headers so they reflect their respective content
+    item = dataset.get_matrix_config(matrix_name).item.key
+    user = dataset.get_matrix_config(matrix_name).user.key
+    df_subset.rename(columns = {'user': user, 'item': item}, inplace = True)
     return df_subset.to_json(orient='records')
 
-def add_dataset_columns(dataset_name, dataframe, columns):
+def add_dataset_columns(dataset_name, dataframe, columns, matrix_name):
+    #print(dataset_name)
     dataset = recommender_system.data_registry.get_set(dataset_name)
     if dataset is None:
         return dataframe
 
     result = list(map(lambda column: column.lower(), columns))
-    dataframe = add_item_columns(dataset, dataframe, result)
-    dataframe = add_user_columns(dataset, dataframe, result)
+    dataframe = add_data_columns(dataset, matrix_name, dataframe, result)
+    #dataframe = add_user_columns(dataset, dataframe, result)
+    #print(dataframe.head())
     return dataframe
 
-@results_bp.route('/headers', methods=['GET'])
+
+@results_bp.route('/headers', methods=['POST'])
 def headers():
-    return result_storage.load_json('project/headers.json')   
+    json = request.json
+    dataset_name = json.get("name")
+    dataset = recommender_system.data_registry.get_set(dataset_name)
+    for matrix_name in dataset.get_available_matrices():
+        columns = dataset.get_available_columns(matrix_name)
+        print(columns)
+    #return result_storage.load_json('project/headers.json')[dataset_name]
+    return columns
 
+# test
+def add_spotify_columns(dataset_name, dataframe):
+    dataset = recommender_system.data_registry.get_set(dataset_name)
+    matrix_name = 'user-track-count'
+    columns = ['track_id', 'track_spotify-uri']
+    dataframe = add_data_columns(dataset, matrix_name, dataframe, columns)
+    print(dataframe.head())
+    return dataframe
 
+@results_bp.route('/export', methods=['POST'])
+def export(): 
+    #Load results from json
+    json = request.json
+    results = json.get('results', '{}')
+    
+    #Load the file selector
+    import tkinter as tk
+    from tkinter.filedialog import asksaveasfilename
+    root = tk.Tk()
+
+    #Focus on the file selector and hide the overlay
+    root.overrideredirect(True)
+    root.geometry('0x0+0+0')
+    root.deiconify()
+    root.lift()
+    root.focus_force()
+    tk.Tk().withdraw()
+
+    data = [('tsv', '*.tsv')]
+    try:
+        fn = asksaveasfilename(initialdir='/', title='Export Table', filetypes=data, defaultextension='.tsv', initialfile="experiment", parent=root)
+        df = pd.DataFrame(results)
+        df.to_csv(fn, index=False)
+        return {'message' : 'Exported succesfully'}
+    except:
+        return {'message' : 'Export cancelled'}
+    
+
+@results_bp.route('/validate', methods=['POST'])
+def validate(): 
+    json = request.json
+    filepath = json.get('filepath')
+    validate_experiment(filepath)
+    return "Validated"

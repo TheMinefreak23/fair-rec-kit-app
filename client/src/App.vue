@@ -15,6 +15,7 @@ import MusicDetail from './components/MusicDetail.vue'
 import { useToast } from 'bootstrap-vue-3'
 import { store } from './store'
 import { status } from './helpers/queueFormatter'
+import { viewResultTab } from './helpers/resultRequests'
 import VCheckmark from './components/VCheckmark.vue'
 import TestSelect from './test/TestSelect.vue'
 let toast = useToast()
@@ -36,11 +37,6 @@ watch(
     toast.show(store.toast.mainOptions, store.toast.otherOptions)
   }
 )
-
-// Make result tab the active tab
-function goToResult() {
-  store.currentTab = 3
-}
 
 // Change UI on new result
 function onNewResult() {
@@ -80,7 +76,7 @@ function callToast() {
     :toast="{ root: true }"
     fluid="sm"
     position="position-fixed"
-    @click="done ? goToResult() : () => {}"
+    @click="done ? viewResultTab() : () => {}"
   >
   </b-container>
   <div class="d-flex flex-column min-vh-100">
@@ -89,43 +85,48 @@ function callToast() {
       rel="stylesheet"
     />
     <!--<TestForm :useTestOptions="true" />-->
-    <div class="bg-dark nav justify-content-center py-2">
-      <img src="/RecCoonLogo.png" style="height: 50px" class="ms-auto" />
-      <h1 class="text-white my-0 p-0">FairRecKit</h1>
 
-      <div class="dropdown my-auto ms-auto me-3">
-        <button
-          class="btn btn-secondary dropdown-toggle"
-          type="button"
-          id="dropdownMenuButton1"
-          data-bs-toggle="dropdown"
-          aria-expanded="false"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            fill="currentColor"
-            class="bi bi-gear-fill"
-            viewBox="0 0 16 16"
-          >
-            <path
-              d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"
-            />
-          </svg>
-        </button>
-        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-          <li>
-            <div class="form-check form-switch px-2">
-              <p class="d-inline ps-2">Dark Mode</p>
-              <input
-                class="form-check-input mx-auto"
-                type="checkbox"
-                id="changeTheme"
-              />
-            </div>
-          </li>
-        </ul>
+    <div class="bg-dark">
+      <div class="wrap">
+        <div class="content nav justify-content-center py-2">
+          <img src="/RecCoonLogo.png" style="height: 50px" class="ms-auto" />
+          <h1 class="text-white my-0 p-0">FairRecKit</h1>
+
+          <div class="dropdown my-auto ms-auto me-3">
+            <button
+              class="btn btn-secondary dropdown-toggle"
+              type="button"
+              id="dropdownMenuButton1"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                class="bi bi-gear-fill"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"
+                />
+              </svg>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+              <li>
+                <div class="form-check form-switch px-2">
+                  <p class="d-inline ps-2">Dark Mode</p>
+                  <input
+                    class="form-check-input mx-auto"
+                    type="checkbox"
+                    id="changeTheme"
+                  />
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
     <div class="nav-center">
@@ -154,10 +155,10 @@ function callToast() {
           <Documentation
         /></b-tab>
         <b-tab :title-item-class="blink ? 'blink' : ''" title="Results">
-          <Results @goToResult="goToResult" @toast="onNewResult"
+          <Results @toast="onNewResult"
         /></b-tab>
         <b-tab title="All results">
-          <PreviousResults @goToResult="goToResult" />
+          <PreviousResults />
         </b-tab>
         <b-tab title="Music Detail">
           <MusicDetail />
@@ -302,5 +303,26 @@ function callToast() {
     background-color: #ffffffd6;
     box-shadow: 0 0 0 #28a745;
   }
+}
+
+.wrap {
+  position: relative;
+}
+.wrap:before {
+  content: ' ';
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.3;
+  background-image: url('public/background.png');
+  background-repeat: repeat;
+  background-position: 50% 0;
+  background-size: 20%;
+}
+.content {
+  position: relative;
 }
 </style>

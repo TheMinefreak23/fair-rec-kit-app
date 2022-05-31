@@ -9,11 +9,15 @@ import { formatMetadata } from '../helpers/metadataFormatter'
 import FormGroupList from './FormGroupList.vue'
 import { validateEmail, emptyFormGroup } from '../helpers/optionsFormatter'
 import { store } from '../store'
-import { makeHeader } from '../helpers/resultFormatter'
+import { makeHeader, capitalise } from '../helpers/resultFormatter'
 import { statusPrefix, statusVariant, status } from '../helpers/queueFormatter'
+import { loadResult } from '../helpers/resultRequests'
+import SettingsModal from './Table/SettingsModal.vue'
+import { getInfoFromSpotifyID, getSpotifyToken } from '../helpers/songInfo'
+import MusicModal from './ItemDetail/MusicModal.vue'
 
 const emit = defineEmits([
-  'loadResult',
+  'viewResult',
   'loadResults',
   'loadMore',
   'paginationSort',
@@ -24,14 +28,15 @@ const props = defineProps({
   overview: Boolean,
   results: Array,
   headers: Array,
-  buttonText: String,
+  removeText: String,
   removable: Boolean,
+  editable: Boolean,
   serverFile: String,
   serverFile2: String,
-  serverFile3: String,
   pagination: Boolean,
   caption: String,
   expandable: Boolean,
+  headerOptions: Object,
   userOptions: Array,
   itemOptions: Array,
   filters: Object,
@@ -47,25 +52,40 @@ const colItemStyle = {
   inlineSize: colWidth,
   overflowWrap: 'break-word',
 }
+// Pagination
 const caption = ref('')
 const entryAmount = ref(20)
+
+// Modals
 const deleteModalShow = ref(false)
 const editModalShow = ref(false)
 const viewModalShow = ref(false)
 const filtersModalShow = ref(false)
 const updateHeadersModalShow = ref(false)
+
+// Columns
 const checkedColumns = ref([])
-const itemColumns = ref([])
-const userColumns = ref([])
+
+// Filters
 const filters = ref(emptyFormGroup(false))
+
+// Item info
 const newName = ref('')
 const newTags = ref('')
 const newTagsList = ref([])
 const newEmail = ref('')
 const metadataStr = ref('')
 const selectedEntry = ref(0)
+
+// Sorting
 const sortindex = ref(0)
 const descending = ref(false)
+
+// Item (music) detail
+const track = ref()
+const highlevelFeatures = ref()
+const songInfo = ref({ lastFM: {} }) // TODO
+const musicModalShow = ref(false)
 
 const subheaders = computed(() => {
   const result = []
@@ -172,38 +192,14 @@ async function removeEntry() {
 }
 
 async function getMetadata(selectedID) {
-  //request the metadata of the specified entry
-  const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: selectedID }),
-  }
-  fetch(API_URL + props.serverFile3, requestOptions).then(() => {
-    console.log('Metadata succesfully requested')
-    getResult()
-  })
-}
-
-async function getResult() {
-  const response = await fetch(API_URL + props.serverFile3)
-  const data = await response.json()
+  const data = await loadResult(selectedID)
   metadataStr.value = formatMetadata(data.result)
+  console.log('Metadata succesfully requested')
 }
 
 async function getNameTagsMail(selectedID) {
-  const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: selectedID }),
-  }
-  fetch(API_URL + props.serverFile3, requestOptions).then(() => {
-    console.log('Metadata succesfully requested')
-    getOldValues()
-  })
-}
-async function getOldValues() {
-  const response = await fetch(API_URL + props.serverFile3)
-  const data = await response.json()
+  const data = await loadResult(selectedID)
+  console.log('Metadata succesfully requested')
   newName.value = data.result.metadata.name
   newTags.value = data.result.metadata.tags.toString()
   newEmail.value = data.result.metadata.email
@@ -279,6 +275,21 @@ function getTooltipText(item) {
   const status = item.status.slice(statusPrefix.length)
   if (status == status.toDo) return 'Cancel'
   else return 'Cancel'
+// Get music detail info
+// TODO refactor
+async function showMusicDetail(spotifyId) {
+  const token = await getSpotifyToken()
+  track.value = await getInfoFromSpotifyID(token, spotifyId)
+  //console.log('track', track.value)
+
+  // TODO
+  /*
+  //get AcousticBrainz highlevel features using LastFM's mbid
+  highlevelFeatures.value = await songInfo.value.AcousticBrainz[
+    songInfo.value.LastFM.track.mbid
+  ][0]['highlevel']*/
+
+  musicModalShow.value = !musicModalShow.value
 }
 </script>
 
@@ -344,54 +355,34 @@ function getTooltipText(item) {
 
   <!-- Modal used for changing the headers of the user recommendations table -->
   <b-modal
+    v-if="props.headerOptions"
     id="change-columns-modal"
     v-model="updateHeadersModalShow"
-    title="Change columns"
-    @ok="
-      $emit('updateHeaders', [
-        ...checkedColumns,
-        ...userColumns,
-        ...itemColumns,
-      ])
-    "
+    title="Select headers"
+    @ok="$emit('updateHeaders', checkedColumns)"
   >
     <p>Select the extra headers you want to be shown</p>
-    <p>User specific:</p>
-    <div
-      class="form-check form-switch"
-      v-for="(header, index) in userOptions"
-      :key="header"
-    >
-      <input
-        v-model="userColumns"
-        class="form-check-input"
-        type="checkbox"
-        :value="header"
-        :id="header"
-      />
-      <label class="form-check-label" :id="header">
-        {{ makeHeader(header).name }}
-      </label>
-    </div>
-
-    <p>Item specific:</p>
-    <div
-      class="form-check form-switch"
-      v-for="(header, index) in itemOptions"
-      :key="header"
-    >
-      <input
-        v-model="itemColumns"
-        class="form-check-input"
-        type="checkbox"
-        :value="header"
-        :id="header"
-      />
-      <label class="form-check-label" :id="header">
-        {{ makeHeader(header).name }}
-      </label>
-    </div>
+    <template v-for="category in Object.keys(props.headerOptions)">
+      <p>{{capitalise(category)}} specific:</p>
+      <div
+        class="form-check form-switch"
+        v-for="header in props.headerOptions[category]"
+        :key="header"
+      >
+        <input
+          v-model="checkedColumns"
+          class="form-check-input"
+          type="checkbox"
+          :value="header"
+          :id="header"
+        />
+        <label class="form-check-label" :id="header">
+          {{ makeHeader(header).name }}
+        </label>
+      </div>
+    </template>
   </b-modal>
+
   <b-modal
     id="change-columns-modal"
     v-model="filtersModalShow"
@@ -406,6 +397,14 @@ function getTooltipText(item) {
       id="filters"
     />
   </b-modal>
+
+  <MusicModal
+    v-if="track"
+    v-model:show="musicModalShow"
+    :track="track"
+    :lastFmTrack="songInfo.lastFM.track"
+    :highlevelFeatures="highlevelFeatures"
+  />
 
   <b-table-simple hover striped responsive caption-top>
     <caption>
@@ -424,7 +423,7 @@ function getTooltipText(item) {
             @click="updateHeadersModalShow = !updateHeadersModalShow"
             class="m-1"
           >
-            Change Headers
+            Select Headers
           </b-button>
           <b-button @click="filtersModalShow = !filterModalShow" class="m-1">
             Filters
@@ -438,22 +437,26 @@ function getTooltipText(item) {
         <b-th
           v-for="(header, index) in headers"
           :key="header"
+          class="text-center"
           :colspan="header.subheaders ? header.subheaders.length : 1"
           :style="{ ...colItemStyle, cursor: 'pointer' }"
           @click="setsorting(index)"
         >
           {{ header.name }}
         </b-th>
+        <b-th v-if="overview"></b-th>
       </b-tr>
       <b-tr>
         <b-th v-if="overview" :style="colItemStyle"></b-th>
         <b-th
           v-for="subheader in subheaders"
           :key="subheader"
+          class="text-center"
           :style="colItemStyle"
         >
           {{ subheader }}
         </b-th>
+        <b-th v-if="overview"></b-th>
       </b-tr>
     </b-thead>
     <b-tbody>
@@ -485,12 +488,21 @@ function getTooltipText(item) {
               {{ value.slice(statusPrefix.length) }}
             </b-button>
           </template>
-          <template v-else> {{ value }}</template>
+          <template v-else>
+            <template v-if="key == 'track_spotify-uri'">
+              <template v-if="value">
+                <b-button @click="showMusicDetail(item['track_spotify-uri'])"
+                  >View track</b-button
+                >
+              </template>
+            </template>
+            <template v-else>{{ value }} </template></template
+          >
         </b-td>
         <b-td class="align-middle" style="width:150px;" v-if="overview || removable">
           <b-row class="m-0 float-end d-block">
               <b-button
-                v-if="overview"
+                v-if="editable"
                 variant="primary"
                 @click="$emit('loadResult', item.id)"
                 class="m-1"
@@ -549,6 +561,9 @@ function getTooltipText(item) {
             </b-col>
             </div>
           </b-row>
+        </b-td>
+        <b-td class="align-middle" v-if="overview" :style="colItemStyle">
+          <SettingsModal :resultId="item.id" />
         </b-td>
       </b-tr>
     </b-tbody>

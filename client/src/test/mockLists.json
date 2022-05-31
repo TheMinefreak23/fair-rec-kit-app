@@ -1,7 +1,7 @@
 {
   "datasets": [
     {
-      "name": "ML-100K",
+      "name": "LFM-2B",
       "params": [
         {
           "name": "Train/testsplit",
