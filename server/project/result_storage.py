@@ -142,12 +142,31 @@ def result_by_id(result_id):
                 approach_index = name_to_index(
                     data['result'][dataset_index]['recs'],
                     run_overview['overview'][pair_id]['recommender_system'], 'approach')
-                data['result'][dataset_index]['recs'][approach_index]['evals'] = evaluation_data[
-                    'evaluations'] if evaluation_data else []
+                data['result'][dataset_index]['recs'][approach_index]['evals'] = add_evaluation(
+                    data['result'][dataset_index]['recs'][approach_index]['evals'],
+                    evaluation_data['evaluations'])
 
     global current_result
     current_result = data
     # print('current result', json.dumps(current_result, indent=4))
+
+
+def add_evaluation(data, evaluation):
+    if not evaluation:
+        return data
+    if not data:
+        return format_evaluation(evaluation)
+    for i in enumerate(evaluation):
+        data[i]['evaluations'].append(evaluation['evaluation'])
+    return data
+
+
+def format_evaluation(evaluation):
+    for e in evaluation:
+        evaluation_list = [e['evaluation']]
+        e.pop('evaluation')
+        e['evaluations'] = evaluation_list
+    return evaluation
 
 
 def get_overview(evaluation_id, runid):
