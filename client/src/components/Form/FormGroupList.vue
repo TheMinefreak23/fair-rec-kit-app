@@ -1,53 +1,45 @@
 <script setup>
+/* This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences) */
+
 import { computed, onMounted, ref, watch } from 'vue'
-import {
-  article,
-  capitalise,
-  underscoreToSpace,
-  formatMultipleItems,
-} from '../helpers/resultFormatter'
-//import { selectionOptions } from '../helpers/optionsFormatter'
+import { capitalise } from '../../helpers/resultFormatter'
 
-import FormGroup from './Form/FormGroup.vue'
-import { showToast } from '../store'
+import FormGroup from './FormGroup.vue'
+import { showToast } from '../../store'
 
-//const emit = defineEmits(['formChange'])
+const emit = defineEmits(['update:modelValue'])
 const props = defineProps({
   name: String,
   title: String,
   description: String,
   options: Array,
   required: Boolean,
+  default: String,
   maxK: Number,
-  horizontalLayout: Boolean,
-  data: { type: Object, required: true },
+  modelValue: { type: Object, required: true },
 })
 
 const form = computed({
-  // getter
   get() {
-    //console.log(props.name, props.data)
-    return props.data
+    // console.log(props.name, props.title, props.modelValue)
+    return props.modelValue
   },
-  // setter
   set(localValue) {
     console.log('local form change to', localValue)
-    emit('input', localValue)
+    emit('update:modelValue', localValue)
   },
 })
-//const flatOptions = props.nested ? flattenOptions() : props.options
 
-const visibleGroup = ref(1)
+// const visibleGroup = ref(1)
+const groupVisible = ref([true]) // TODO refactor
+
+// const removedGroup = ref(false) // for animation on group removal
 
 onMounted(() => {
-  /*console.log(props.name)
-  if (props.name == 'filter' || props.name == 'dataset')
-    console.log(props.name, props.options)*/
   // TODO separate 1-sized formgrouplists
   form.value.name = props.title
-  /*if (props.name == 'filter')
-    console.log(props.name,form)*/
-  //console.log(props.name, 'options', props.options)
 })
 
 watch(
@@ -58,7 +50,7 @@ watch(
   () => {
     // Update form if this changes
     // TODO refactor
-    if (props.name == 'approach' || props.name == 'metric') update()
+    if (props.name === 'approach' || props.name === 'metric') update()
   },
   {
     // Make sure this does not trigger on initialization
@@ -67,46 +59,43 @@ watch(
   }
 )
 
-/* TODO doesn't work
-// Set visible group on group count change (added/copy/remove)
-watch(
-  (form.groupCount,
-  (newCount) => {
-    visibleGroup.value = newCount - 1
-  })
-)*/
-
-// Splice groups array to remove a group
+/**
+ * Splice groups array to remove a group
+ * @param {Int} i - The index of the group.
+ */
 function removeGroup(i) {
   // Don't remove first required option
-  if (props.required && form.value.groupCount == 1) return
-  //const mainOption = form.value.main[i]
+  if (props.required && form.value.groupCount === 1) return
+  // const mainOption = form.value.main[i]
   const mainOption = { ...form.value.choices[i].main }
 
   form.value.groupCount--
-  /*form.value.main.splice(i, 1)
-  form.value.inputs.splice(i, 1)
-  form.value.selects.splice(i, 1)
-  form.value.lists.splice(i, 1)*/
   form.value.choices.splice(i, 1)
 
   // Set visible group to last before deleted one
-  visibleGroup.value = i
+  // visibleGroup.value = i
+  groupVisible.value[i] = true
 
   showFormToast(mainOption, 'removed')
+
+  /*
+  // TODO multiple usage, refactor to function/composable?
+  removedGroup.value = 'removed'
+  const timeoutMs = 500
+  setTimeout(() => {
+    removedGroup.value = ''
+  }, timeoutMs) */
 }
 
 // Copies the selected item and puts it at the end of the list
 function copyItem(i) {
-  form.value.groupCount++ //Add a new item
+  form.value.groupCount++ // Add a new item
   // Deep-copy the selected value to the new item
-  // form.value.choices[form.value.groupCount - 1] = JSON.parse(
-  //   JSON.stringify(form.value.choices[i])
-  // )
-  let item = JSON.parse(JSON.stringify(form.value.choices[i]))
+  const item = JSON.parse(JSON.stringify(form.value.choices[i]))
   form.value.choices.splice(i, 0, item)
-  visibleGroup.value = i + 2 // Show newly copied item
-  console.log(form.value.choices[i].main)
+  // visibleGroup.value = i + 2 // Show newly copied item
+  groupVisible.value[i + 1] = true
+  // console.log('copy', form.value.choices[i].main)
   showFormToast(form.value.choices[i].main, 'copied')
 }
 
@@ -127,35 +116,32 @@ function showFormToast(object, actionMessage) {
   showToast(mainOptions, otherOptions)
 }
 
-//Update the options that cannot be be submitted due to changing experiment type (
+// Update the options that cannot be be submitted due to changing experiment type (
 function update() {
-  let entries = props.options
+  const entries = props.options
     .map((category) => category.options)
     .concat()
     .flat()
     .map((entry) => entry.name)
+
   const deleteEntry = 'NULL'
   for (let i = 0; i < form.value.choices.length; i++) {
     const mainChoice = form.value.choices[i].main
     if (mainChoice && !entries.includes(mainChoice.name)) {
-      //every entry that does not exist in the list of option should be removed
-      //Non-existing entries are replaced with a null entry
-      /*form.value.main[i] = deleteEntry
-      form.value.selects[i] = deleteEntry
-      form.value.inputs[i] = deleteEntry
-      form.value.lists[i] = deleteEntry*/
-      form.value.choices[i] = deleteEntry
-      if (props.required && form.value.groupCount > 1) form.value.groupCount--
+      // Every entry that does not exist in the list of option should be removed
+      if (!props.required || form.value.groupCount > 1) {
+        // Mark entry for deletion
+        form.value.choices[i] = deleteEntry
+        form.value.groupCount--
+        // Don't remove the required first option, but reset it
+      } else {
+        form.value.choices[i].main = ''
+      }
     }
   }
-  //console.log(form.value.main)
   // Filter null values
-  /*form.value.main = form.value.main.filter((x) => x != deleteEntry)
-  form.value.selects = form.value.selects.filter((x) => x != deleteEntry)
-  form.value.inputs = form.value.inputs.filter((x) => x != deleteEntry)
-  form.value.lists = form.value.lists.filter((x) => x != deleteEntry)*/
-  form.value.choices = form.value.choices.filter((x) => x != deleteEntry)
-  //console.log(form.value.main)
+  form.value.choices = form.value.choices.filter((x) => x !== deleteEntry)
+  // console.log('after update', form.value.choices)
 }
 
 // A brief description of the group option
@@ -163,18 +149,11 @@ function update() {
 function shortGroupDescription(i) {
   const option = form.value.choices[i]
   let desc = capitalise(props.name) + ' ' + (i + 1)
-  /*switch (props.name) {
-    case value:
-      ''
-      break;
-
-    default:
-      break;
-  }*/
   if (!option || !option.main) return desc // No choice made yet, no description
 
   desc = desc + ': ' + option.main.name
-  if (visibleGroup.value == i + 1) return desc // This group is selected, only show the option name
+  // if (visibleGroup.value === i + 1) return desc // This group is selected, only show the option name
+  if (groupVisible.value[i]) return desc
 
   // Show first inner options as featured option
   const featuredOptions = [
@@ -186,10 +165,10 @@ function shortGroupDescription(i) {
         (option.lists[0].main && option.lists[0].main.length)
       : '',
   ]
-    .filter((x) => x != '') // remove empty slots
+    .filter((x) => x !== '') // remove empty slots
     .join(', ')
 
-  if (featuredOptions != '') desc += ' | ' + featuredOptions
+  if (featuredOptions !== '') desc += ' | ' + featuredOptions
   return desc
 
   function valueOrEmptyString(list) {
@@ -200,15 +179,18 @@ function shortGroupDescription(i) {
     return list && list.length > 0
   }
 }
+
+function addGroup() {
+  form.value.groupCount++
+  form.value.choices.push({})
+  form.value.visible = true
+  // (visibleGroup.value = form.value.groupCount
+  groupVisible.value[form.value.groupCount - 1] = true
+}
 </script>
 
 <template>
   <b-container>
-    <b-container
-      :toast="{ root: true }"
-      fluid="sm"
-      position="position-fixed"
-    ></b-container>
     <b-row>
       <h3 class="text-center text-white mb-0">
         <b-card no-body class="mb-0 bg-dark">
@@ -239,8 +221,8 @@ function shortGroupDescription(i) {
       </p>-->
           <b-row>
             <b-col
+              :id="`group-${name.split()[0]}-${i - 1}`"
               cols="12"
-              class="accordion"
               role="tablist"
               v-for="i in form.groupCount"
               :key="i - 1"
@@ -256,14 +238,22 @@ function shortGroupDescription(i) {
                           block
                           @click="
                             // TODO this is pretty hacky
-                            visibleGroup == i
+                            /*visibleGroup == i
                               ? (visibleGroup = -1)
-                              : (visibleGroup = i)
+                              : (visibleGroup = i)*/
+                            groupVisible[i - 1] = !groupVisible[i - 1]
                           "
-                          :variant="visibleGroup == i ? 'secondary' : 'dark'"
+                          :variant="
+                            //visibleGroup == i ? 'secondary' : 'dark'
+                            groupVisible[i - 1]
+                          "
                         >
                           <!-- TODO refactor-->
-                          <template v-if="visibleGroup == i"
+                          <template
+                            v-if="
+                              //visibleGroup == i
+                              groupVisible[i - 1]
+                            "
                             ><i class="bi bi-caret-down" /> |
                           </template>
                           <template v-else
@@ -287,14 +277,11 @@ function shortGroupDescription(i) {
                   </b-row>
                 </b-row>
                 <!--Collapsable group-->
-                <b-collapse
-                  :id="name + 'accordion-' + i"
-                  :accordion="name + '-accordion'"
-                  :visible="visibleGroup == i"
-                  role="tabpanel"
-                >
+                <!--<b-collapse :visible="visibleGroup == i" role="tabpanel">-->
+                <b-collapse :visible="groupVisible[i - 1]" role="tabpanel">
                   <FormGroup
-                    v-model:data="form.choices[i - 1]"
+                    v-model="form.choices[i - 1]"
+                    :index="i - 1"
                     :name="name"
                     :options="options"
                     :required="
@@ -303,8 +290,8 @@ function shortGroupDescription(i) {
                       (!form.choices.main ||
                         form.choices.every((x) => x.main == ''))
                     "
+                    :default="defaultOption"
                     :maxK="maxK"
-                    :horizontalLayout="horizontalLayout"
                     @copy="copyItem(i - 1)"
                   />
                 </b-collapse>
@@ -318,12 +305,7 @@ function shortGroupDescription(i) {
       <h3 class="m-0">
         <b-card no-body class="mt-1">
           <b-button
-            @click="
-              form.groupCount++,
-                form.choices.push({}),
-                (form.visible = true),
-                (visibleGroup = form.groupCount)
-            "
+            @click="addGroup()"
             variant="primary"
             data-testid="add-button"
             >Add {{ name }}...
@@ -333,3 +315,22 @@ function shortGroupDescription(i) {
     </b-row>
   </b-container>
 </template>
+
+<style>
+/*
+.removed {
+  animation: red-glowing 1800ms;
+}
+
+@keyframes red-glowing {
+  0% {
+    background-color: #ffb4b4d6;
+  }
+  50% {
+    background-color: #ff5353d7;
+  }
+  100% {
+    background-color: #ff9898d6;
+  }
+}*/
+</style>
