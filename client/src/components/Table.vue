@@ -275,6 +275,7 @@ function getTooltipText(item) {
   const status = item.status.slice(statusPrefix.length)
   if (status == status.toDo) return 'Cancel'
   else return 'Cancel'
+}
 // Get music detail info
 // TODO refactor
 async function showMusicDetail(spotifyId) {
@@ -556,7 +557,7 @@ async function showMusicDetail(spotifyId) {
                 @click="setEntryRemoval(item)"
                 data-testid="delete"
               >
-                <i :class='"bi " + getCancelIcon(item)'></i>
+                <i :class="'bi ' + getCancelIcon(item)"></i>
               </b-button>
             </b-col>
             </div>
