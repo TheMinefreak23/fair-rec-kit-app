@@ -206,7 +206,7 @@ def config_dict_from_settings(experiment):
         'evaluation': settings['metrics'],
         'name': experiment_id,
         'top_K': int(settings['recommendations']),
-        'rated_items_filter': not settings['includeRatedItems'],
+        'rated_items_filter': not settings['includeRatedItems'] if 'includeRatedItems' in settings else False,
         'type': settings['experimentMethod']}
 
     # print(config_dict)
