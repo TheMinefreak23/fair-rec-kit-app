@@ -108,10 +108,9 @@ class EventHandler():
             #print('==END EXPERIMENT', self.experiment)
             self.experiment.status = Status.DONE
             self.experiment.progress = ProgressStatus.FINISHED
-
-            save_result(self.experiment.job, format_result(self.experiment.config))
-
-            send_mail(self.experiment.job['metadata']['email'],
+            if not(self.experiment.validating):
+                save_result(self.experiment.job, format_result(self.experiment.config))
+                send_mail(self.experiment.job['metadata']['email'],
                   self.experiment.job['metadata']['name'],
                   self.experiment.job['timestamp']['datetime'])
 

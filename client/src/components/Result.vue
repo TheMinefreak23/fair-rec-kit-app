@@ -36,6 +36,7 @@ const userTables = combineResults(props.result.result)
 const visibleDatasets = ref([])
 const uniqueDatasets = findUniqueDatasets()
 const visibleMatrices = ref([])
+const validationAmount = ref(1)
 
 onMounted(() => {
   console.log('result', props.result)
@@ -167,7 +168,7 @@ async function validate() {
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-type': 'application/json' },
-    body: JSON.stringify({ filepath: file }),
+    body: JSON.stringify({ filepath: file, amount: validationAmount }),
   }
   const response = await fetch(
     API_URL + '/all-results/validate',
@@ -304,7 +305,17 @@ async function getInfo() {
       <b-col>
         <div class="float-end">
           <SettingsModal :resultId="result.id"/>
-            </div>
+          <b-form-input type="number" 
+            v-model="validationAmount"
+            v-b-tooltip.hover
+            title="Number of validation runs"></b-form-input>
+          <b-button @click="validate()"
+            variant="outline-primary fw-bold"
+            v-b-tooltip.hover
+            title="Validate this experiment"
+            >Validate run
+          </b-button>
+        </div>
       </b-col>
       </b-row>
       <p class="lead">
@@ -315,7 +326,6 @@ async function getInfo() {
           >
         </template>
       </p>
-      <b-button @click="validate()">Validate run</b-button>
       <p>
         Datasets showing items per user:
         <div class="form-check" v-for="dataset in uniqueDatasets">
@@ -344,11 +354,11 @@ async function getInfo() {
             : [result.result[0]]"
           :key="datasetResult"
         >
-          <p> {{datasetResult.results[0].dataset}}</p>
+        <!-- <template v-for="(entry, index) in userTables" :key="datasetResult"> -->
           <div :class="result.length > 1 ? 'col-6' : 'col'">
             <template v-if="visibleDatasets.includes(datasetResult.dataset.dataset)" :key="visibleDatasets">
               <Table
-                :caption="userTables[index]"
+                :caption="datasetResult"
                 :results="datasetResult.results"
                 :headers="datasetResult.headers"
                 :removable="false"
@@ -390,8 +400,11 @@ async function getInfo() {
         <!--Show recommendations for all datasets for now TODO-->
         <!--Currently only shows the results of the first dataset-->
         <template v-for="(entry, index) in userTables" :key="data">
-          <template v-if="visibleDatasets.includes(getDatasetName(entry))" :key="visibleDatasets">
-            <template v-if="visibleMatrices.includes(entry)" :key="visibleMatrices">
+          <template v-if=
+          "visibleDatasets.includes(getDatasetName(entry)) &&
+          visibleMatrices.includes(entry)" 
+          :key="visibleUserTables">
+            <!-- <template v-if="visibleMatrices.includes(entry)" :key="visibleMatrices"> -->
           <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
             <div :class="visibleMatrices.length > 1 ? 'col-6' : 'col'">
               <Table
@@ -403,8 +416,6 @@ async function getInfo() {
                 :filters="filters"
                 :filterOptions="availableFilters"
                 :headerOptions="optionalHeaderOptions[index]"
-                :userOptions="userHeaderOptions[index]"
-                :itemOptions="itemHeaderOptions[index]"
                 pagination
                 expandable
                 @paginationSort="(i) => paginationSort(i, index)"
@@ -417,7 +428,7 @@ async function getInfo() {
                 @updateHeaders="(headers) => updateHeaders(headers, index)"
               />
             </div>
-            </template>
+            <!-- </template> -->
           </template>
         </template>
       </div>

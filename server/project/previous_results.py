@@ -11,7 +11,7 @@ import pandas as pd
 from fairreckitlib.data.set.dataset import add_dataset_columns as add_data_columns
 
 from . import result_storage
-from .experiment import options, recommender_system, validate_experiment
+from .experiment import add_validation, options, recommender_system
 
 results_bp = Blueprint('results', __name__, url_prefix='/api/all-results')
 
@@ -103,7 +103,6 @@ def user_result():
 
     #read mock dataframe
     recs = result_storage.current_recs[pair_id]
-    print(list(recs))
     dataset = recommender_system.data_registry.get_set(dataset_name)
 
     #TODO refactor/do dynamically
@@ -162,7 +161,6 @@ def headers():
     dataset = recommender_system.data_registry.get_set(dataset_name)
     for matrix_name in dataset.get_available_matrices():
         columns = dataset.get_available_columns(matrix_name)
-        print(columns)
     #return result_storage.load_json('project/headers.json')[dataset_name]
     return columns
 
@@ -208,5 +206,6 @@ def export():
 def validate(): 
     json = request.json
     filepath = json.get('filepath')
-    validate_experiment(filepath)
+    amount = json.get('amount', 1)
+    add_validation(filepath, amount)
     return "Validated"

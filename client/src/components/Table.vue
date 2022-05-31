@@ -37,8 +37,6 @@ const props = defineProps({
   caption: String,
   expandable: Boolean,
   headerOptions: Object,
-  userOptions: Array,
-  itemOptions: Array,
   filters: Object,
   filterOptions: Array,
   defaultSort: Number,
