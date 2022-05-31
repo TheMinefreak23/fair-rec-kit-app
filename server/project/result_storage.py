@@ -142,13 +142,14 @@ def result_by_id(result_id):
                 approach_index = name_to_index(
                     data['result'][dataset_index]['recs'],
                     run_overview['overview'][pair_id]['recommender_system'], 'approach')
+                print("owowowowowo " + str(dataset_index) + " uwuwuwuwuwuwuwuwu " + str(approach_index))
                 data['result'][dataset_index]['recs'][approach_index]['evals'] = add_evaluation(
                     data['result'][dataset_index]['recs'][approach_index]['evals'],
                     evaluation_data['evaluations'])
 
     global current_result
     current_result = data
-    # print('current result', json.dumps(current_result, indent=4))
+    print('current result', json.dumps(current_result, indent=4))
 
 
 def add_evaluation(data, evaluation):
@@ -156,8 +157,8 @@ def add_evaluation(data, evaluation):
         return data
     if not data:
         return format_evaluation(evaluation)
-    for i in enumerate(evaluation):
-        data[i]['evaluations'].append(evaluation['evaluation'])
+    for index, value in enumerate(evaluation):
+        data[index]['evaluations'].append(value['evaluation'])
     return data
 
 
@@ -239,6 +240,9 @@ def name_to_index(json_data, name, key, by_name=False):
         result_value = json_data[i][key]
         if by_name and result_value['name'] == name or result_value == name:
             current_index = i
+    print("name: " + name + " key: " + key +
+          " found name at index: " + str(current_index) +
+          " with name " + json_data[current_index][key]['value'])
     return current_index
 
 
