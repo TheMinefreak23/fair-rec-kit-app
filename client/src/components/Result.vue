@@ -1,18 +1,18 @@
 <script setup>
-/*This program has been developed by students from the bachelor Computer Science at
+/* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
-© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+© Copyright Utrecht University (Department of Information and Computing Sciences) */
 
 import Table from './Table.vue'
 import { onMounted, ref } from 'vue'
 import { emptyFormGroup } from '../helpers/optionsFormatter'
 import { makeHeader } from '../helpers/resultFormatter'
 import { API_URL } from '../api'
-import SettingsModal from './Table/SettingsModal.vue'
+import SettingsModal from './Table/Modals/SettingsModal.vue'
 
 const props = defineProps({ headers: Array, result: Object });
 
-//Default headers for recommendation experiments.
+// Default headers for recommendation experiments.
 const selectedHeaders = ref([
   [{ name: 'Rank' }, { name: 'User' }, { name: 'Item' }, { name: 'Score' }],
 ]);
@@ -40,12 +40,12 @@ const visibleMatrices = ref([])
 onMounted(() => {
   console.log('result', props.result);
   console.log('result id', props.result.id);
-  //loadEvaluations()
-  //loadResult(props.result.id)
+  // loadEvaluations()
+  // loadResult(props.result.id)
   fillVisibleDatasets()
   fillShownMetrics()
-  //Load in all the user recommendation/prediction tables
-  for (let index in userTables) {
+  // Load in all the user recommendation/prediction tables
+  for (const index in userTables) {
     setRecs(parseInt(index));
   }
   console.log('availableFilters', availableFilters.value);
@@ -65,14 +65,14 @@ async function getHeaderOptions(index) {
   }
   const response = await fetch(API_URL + '/all-results/headers', requestOptions)
   const data = await response.json()
-  let headerOptions = data
+  const headerOptions = data
   console.log(data)
   optionalHeaderOptions.value[index] = headerOptions
   itemHeaderOptions.value[index] = headerOptions.movie
   userHeaderOptions.value[index] = headerOptions.user
 }
 
-//POST request: Send result ID to the server to set current shown recommendations.
+// POST request: Send result ID to the server to set current shown recommendations.
 async function setRecs(currentTable) {
   const requestOptions = {
     method: 'POST',
@@ -88,7 +88,7 @@ async function setRecs(currentTable) {
     API_URL + '/all-results/set-recs',
     requestOptions
   );
-  //console.log('resultfetch', response)
+  // console.log('resultfetch', response)
   if (response.status == '200') {
     const data = await response.json();
     availableFilters.value = data.availableFilters;
@@ -123,7 +123,7 @@ async function getEvaluations() {
   console.log('succesfully retrieved evaluation data.')
   const resultsData = await response.json()
   console.log('results data', resultsData)
-}*/
+} */
 
 /**
  * POST request: Ask server for next part of user recommendation table.
@@ -170,7 +170,7 @@ async function exportTable(currentTable) {
 }
 
 async function validate() {
-  let file = props.result.id + '_' + props.result.metadata.name
+  const file = props.result.id + '_' + props.result.metadata.name
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-type': 'application/json' },
@@ -193,12 +193,12 @@ async function validate() {
 function loadMore(increase, amount, pairid) {
   amount = parseInt(amount);
 
-  //Determine the index for where the next page starts, based on how many entries were shown before.
+  // Determine the index for where the next page starts, based on how many entries were shown before.
   if (!increase && startIndex.value > 0) startIndex.value -= entryAmount.value;
   if (startIndex.value < 0) startIndex.value = 0;
   else if (increase) startIndex.value += entryAmount.value;
   else startIndex.value = 0;
-  //Update amount to new number of entries that are shown.
+  // Update amount to new number of entries that are shown.
   entryAmount.value = amount;
   getUserRecs(pairid);
 }
@@ -209,12 +209,12 @@ function loadMore(increase, amount, pairid) {
  * @param {Int}    pairid    - Index of which result file to load (from overview.json)
  */
 function paginationSort(indexVar, pairid) {
-  //When sorting on the same column twice in a row, switch to descending.
+  // When sorting on the same column twice in a row, switch to descending.
   if (sortIndex.value === indexVar) {
     ascending.value = !ascending.value;
   }
 
-  //When sorting, start at startIndex 0 again to see either highest or lowest, passing on which column is sorted.
+  // When sorting, start at startIndex 0 again to see either highest or lowest, passing on which column is sorted.
   sortIndex.value = indexVar;
   startIndex.value = 0;
   getUserRecs(pairid);
@@ -247,9 +247,9 @@ function changeFilters(changedFilters, pairid) {
  */
 function combineResults(results) {
   console.log(results)
-  let tables = []
-  for (let dataset in results) {
-    for (let approach in results[dataset].results) {
+  const tables = []
+  for (const dataset in results) {
+    for (const approach in results[dataset].results) {
       tables.push(results[dataset].dataset.dataset + '_' + results[dataset].results[approach].approach + '_run' + runID.value)
     }
   }
@@ -279,7 +279,7 @@ function fillVisibleDatasets() {
  * @returns {string}         - a list of all datasets in the experiments without duplicates
  */
 function findUniqueDatasets() {
-  let datasetnames = userTables.map(getDatasetName)
+  const datasetnames = userTables.map(getDatasetName)
   return Array.from(new Set(datasetnames))
 }
 
@@ -287,10 +287,10 @@ function findUniqueDatasets() {
  * Fill array of metrics that are shown so that all are shown upon loading the page
  */
 function fillShownMetrics() {
-  let result = props.result.result
+  const result = props.result.result
   let i = 0
-  for (let dataset in result) {
-    for (let metric in result[dataset].headers)
+  for (const dataset in result) {
+    for (const metric in result[dataset].headers)
 
       if (!(result[dataset].headers[metric].name.includes("Approach")) && !(visibleMetrics.value.includes(result[dataset].headers[metric].name))) {
         visibleMetrics.value[i] = result[dataset].headers[metric].name
@@ -306,9 +306,9 @@ function fillShownMetrics() {
  * @param {Array} headers  - array of headers that have to be checked
  */
 function hideHeaders(headers) {
-  let result = []
+  const result = []
   for (let i = 0; i < headers.length; i++) {
-    if (visibleMetrics.value.includes(headers[i].name) || headers[i].name == "Approach") {
+    if (visibleMetrics.value.includes(headers[i].name) || headers[i].name === "Approach") {
       result.push(headers[i])
     }
   }
@@ -322,7 +322,7 @@ function hideHeaders(headers) {
  * @param {Array} results  - array of results that have to be filtered
  */
 function hideResults(results) {
-  let result = []
+  const result = []
   for (let i = 0; i < results.length; i++) {
     const object_as_array = Object.entries(results[i]).filter(([property, value]) => {
       return property.startsWith('approach') || contains(property, visibleMetrics.value)
@@ -343,22 +343,6 @@ function contains(string, array) {
   return array.some(element => string.startsWith(element))
 }
 
-
-// Get music detail info
-async function getInfo() {
-  songInfo.value = await getSongInfo(
-    token.value,
-    query.value.track,
-    query.value.artist
-  )
-
-  tracks.value = await songInfo.value.Spotify
-  track.value = tracks.value.items[0]
-  //get AcousticBrainz highlevel features using LastFM's mbid
-  highlevelFeatures.value = await songInfo.value.AcousticBrainz[
-    songInfo.value.LastFM.track.mbid
-  ][0]['highlevel']
-}
 </script>
 
 <template>

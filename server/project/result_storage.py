@@ -289,18 +289,19 @@ def delete_result(result_id):
     write_results_overview(file_results)
 
 
-def edit_result(index, new_name, new_tags, new_email):
+def edit_result(result_id, new_name, new_tags, new_email):
     """Edit a result.
 
     Args:
-        index(int): the result index
+        result_id(int): the result ID
         new_name(string): the new metadata name of the result
         new_tags(string): the new metadata tags of the result
         new_email(string): the new metadata email of the result
     """
-    file_results = load_results_overview()
-    to_edit_result = file_results['all_results'][index]
-    #print(new_tags)
+    file_results = load_results_overview()['all_results']
+    # Get index of the first item with the ID
+    index = next((i for i in range(len(file_results)) if file_results[i]['timestamp']['stamp'] == result_id), None)
+    to_edit_result = file_results[index]
 
     def edit_metadata(attr, new_val):
         # Don't change the attribute if the input field has been left empty
@@ -312,9 +313,9 @@ def edit_result(index, new_name, new_tags, new_email):
         edit_metadata(data_name, new_data)
 
     # TODO Add more editable values
-    file_results['all_results'][index] = to_edit_result
+    file_results[index] = to_edit_result
 
-    write_results_overview(file_results)
+    write_results_overview({'all_results': file_results})
 
 
 def create_results_overview():
@@ -327,7 +328,7 @@ def create_results_overview():
         with open(RESULTS_OVERVIEW_PATH, 'w', encoding='utf-8') as file:
             json.dump({'all_results': []}, file, indent=4)
 
-
+# TODO UNUSED
 def parse_tags(tags_string):
     """Parse result tags (given by user as metadata).
 
@@ -339,5 +340,6 @@ def parse_tags(tags_string):
     """
     # Split tags by comma and get the unique tags
     unique = list(set(tags_string.split(',')))
+    print('parsed tags unique list', unique)
     # Remove empty tags
     return [tag for tag in unique if tag]

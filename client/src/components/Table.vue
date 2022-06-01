@@ -4,17 +4,16 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
 import { computed, onMounted, ref } from 'vue'
 import sortBy from 'just-sort-by'
-import { API_URL } from '../api'
-import { formatMetadata } from '../helpers/metadataFormatter'
 import FormGroupList from './Form/FormGroupList.vue'
-import { validateEmail, emptyFormGroup } from '../helpers/optionsFormatter'
-import { store } from '../store'
-import { makeHeader, capitalise } from '../helpers/resultFormatter'
+import { emptyFormGroup } from '../helpers/optionsFormatter'
 import { statusPrefix, statusVariant, status } from '../helpers/queueFormatter'
-import { loadResult } from '../helpers/resultRequests'
-import SettingsModal from './Table/SettingsModal.vue'
+import SettingsModal from './Table/Modals/SettingsModal.vue'
 import MusicItem from './ItemDetail/MusicItem.vue'
 import AudioSnippet from './ItemDetail/AudioSnippet.vue'
+import InfoModal from './Table/Modals/InfoModal.vue'
+import DeletionModal from './Table/Modals/DeletionModal.vue'
+import EditModal from './Table/Modals/EditModal.vue'
+import HeadersModal from './Table/Modals/HeadersModal.vue'
 
 const emit = defineEmits([
   'viewResult',
@@ -53,25 +52,10 @@ const colWidth = 6
 const entryAmount = ref(10)
 
 // Modals
-const deleteModalShow = ref(false)
-const editModalShow = ref(false)
-const viewModalShow = ref(false)
 const filtersModalShow = ref(false)
-const updateHeadersModalShow = ref(false)
-
-// Columns
-const checkedColumns = ref([])
 
 // Filters
 const filters = ref(emptyFormGroup(false))
-
-// Item info
-const newName = ref('')
-const newTags = ref('')
-const newTagsList = ref([])
-const newEmail = ref('')
-const metadataStr = ref('')
-const selectedEntry = ref(0)
 
 // Sorting
 const sortindex = ref(0)
@@ -136,96 +120,6 @@ function colItemStyle(colWidth) {
 }
 
 /**
- * Turns a string into an array separated by comma's
- * @param {string} str the string that turns into an array
- * @return {[string]} array of strings
- */
-function stringToList(str) {
-  return str.split(',')
-}
-
-/**
- * returns an empty string if the Email is not valid
- * @param {string} Email Email to validate
- * @return {string}
- */
-function checkEmail(Email) {
-  if (validateEmail(Email)) {
-    return Email
-  } else {
-    return ''
-  }
-}
-
-async function editEntry() {
-  // Inform the server of the new values at the selected index
-  newTagsList.value = stringToList(newTags.value)
-  newEmail.value = checkEmail(newEmail.value)
-  const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      index: selectedEntry.value,
-      new_name: newName.value,
-      new_tags: newTagsList.value,
-      new_email: newEmail.value,
-    }),
-  }
-  fetch(API_URL + props.serverFile2, requestOptions).then(() => {
-    console.log('Item edited succesfully')
-    emit('loadResults')
-  })
-  emptyVmodels()
-}
-
-// Resets the editable values
-function emptyVmodels() {
-  newName.value = ''
-  newTags.value = ''
-  newEmail.value = ''
-}
-
-// Remove an entry from the list
-async function removeEntry() {
-  const entry = selectedEntry.value
-
-  if (entry.remove) {
-    // Remove first matching item from store
-    const list = entry.fromQueue ? store.allResults : store.queue
-    for (const i in list) {
-      if (list[i].id === entry.id) {
-        list.splice(i, 1)
-        break
-      }
-    }
-  }
-
-  // Inform the server to remove the same entry
-  const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: entry.id }),
-  }
-  fetch(API_URL + props.serverFile, requestOptions).then(() => {
-    console.log('Item', entry.id, 'removed succesfully')
-  })
-}
-
-async function getMetadata(selectedID) {
-  const data = await loadResult(selectedID)
-  metadataStr.value = formatMetadata(data.result)
-  console.log('Metadata succesfully requested')
-}
-
-async function getNameTagsMail(selectedID) {
-  const data = await loadResult(selectedID)
-  console.log('Metadata succesfully requested')
-  newName.value = data.result.metadata.name
-  newTags.value = data.result.metadata.tags.toString()
-  newEmail.value = data.result.metadata.email
-}
-
-/**
  * Sorts data based on index.
  * @param {Int}	i	- i is the column index on which is being sorted.
  * @return	{[Object]} Sorted array of results.
@@ -254,41 +148,6 @@ function setsorting(i) {
   emit('paginationSort', i)
 }
 // console.log('propsfilteroptions', props.filterOptions)
-
-// TODO refactor
-function setEntryRemoval(item) {
-  let title = ''
-  let description = ''
-  let removeFromStore = true
-  let fromQueue = true
-  if (!item.status) {
-    fromQueue = false
-    title = 'Remove entry?'
-    description = `Are you sure you want to remove result ${item.name}?`
-  } else if (status == status.toDo) {
-    title = 'Cancel experiment?'
-    description = `Are you sure you want to cancel scheduled experiment ${item.name}?`
-  } else {
-    removeFromStore = false
-    title = 'Abort experiment?'
-    description = `Are you sure you want to abort active experiment ${item.name}?`
-  }
-  selectedEntry.value = {
-    id: item.id,
-    title,
-    description,
-    removeFromStore,
-    fromQueue,
-  }
-  deleteModalShow.value = !deleteModalShow.value
-}
-
-function getCancelIcon(item) {
-  if (!item.status) return 'bi-trash'
-  const status = item.status.slice(statusPrefix.length)
-  if (status == status.toDo) return 'bi-x-lg'
-  else return 'bi-x-octagon-fill'
-}
 
 function isItemKey(key) {
   const lowerKey = key.toLowerCase()
@@ -332,197 +191,230 @@ const filteredHeaders = () => {
 </script>
 
 <template>
-  <!--Shows when the user wants to delete an entry-->
-  <b-modal id="deletion-modal" v-model="deleteModalShow" :title="selectedEntry.title" ok-title="Yes" ok-variant="danger"
-    cancel-title="No" @ok="removeEntry()">
-    <p>{{ selectedEntry.description }}</p>
-  </b-modal>
+  <div>
+    <!-- Filters Modal -->
+    <b-modal
+      id="change-columns-modal"
+      v-model="filtersModalShow"
+      title="Change filters"
+      @ok="$emit('changeFilters', filters)"
+    >
+      <FormGroupList
+        v-model="filters"
+        name="filter"
+        title="filters"
+        :options="filterOptions"
+      />
+    </b-modal>
 
-  <!--Shows when the user wants to edit an entry-->
-  <b-modal id="edit-modal" v-model="editModalShow" title="Editing results" size="lg" @ok="editEntry()"
-    @cancel="emptyVmodels()">
-    <h6>Please type in the new values. Blank fields will be left unchanged.</h6>
-    Name:
-    <b-form-input v-model="newName" placeholder="Enter new name"></b-form-input>
-    <br />
-    Tags: (separate tags using a single comma)
-    <b-form-input v-model="newTags" placeholder="Enter new tags"></b-form-input>
-    <br />
-    E-mail:
-    <p v-if="validateEmail(newEmail)" style="color: green">
-      This is E-mail is valid :)
-    </p>
-    <p v-else-if="newEmail != '' && newEmail != null" style="color: red">
-      This is not a valid E-mail :(
-    </p>
-    <b-form-input v-model="newEmail" placeholder="Enter new e-mail" type="email"></b-form-input>
-    <br />
-    <!--
-    Color (this doesn't do anything):
-    <b-form-input type="color"></b-form-input>
-    <br />-->
-  </b-modal>
-
-  <!-- Shows the metadata and experiment configuration of the designated entry -->
-  <b-modal id="view-modal" v-model="viewModalShow" title="Result information" ok-only>
-    <h5>Here is the metadata and experiment configuration:</h5>
-    <span style="white-space: pre-wrap">{{ metadataStr }}</span>
-  </b-modal>
-
-  <!-- Modal used for changing the headers of the user recommendations table -->
-  <b-modal v-if="props.headerOptions" id="change-columns-modal" v-model="updateHeadersModalShow" title="Select headers"
-    @ok="$emit('updateHeaders', checkedColumns)">
-    <p>Select the extra headers you want to be shown</p>
-    <template v-for="category in Object.keys(props.headerOptions)">
-      <p>{{ capitalise(category) }} specific:</p>
-      <div class="form-check form-switch" v-for="header in props.headerOptions[category]" :key="header">
-        <input v-model="checkedColumns" class="form-check-input" type="checkbox" :value="header" :id="header" />
-        <label class="form-check-label" :id="header">
-          {{ makeHeader(header).name }}
-        </label>
-      </div>
-    </template>
-  </b-modal>
-
-  <b-modal id="change-columns-modal" v-model="filtersModalShow" title="Change filters"
-    @ok="$emit('changeFilters', filters)">
-    <FormGroupList v-model="filters" name="filter" title="filters" :options="filterOptions" />
-  </b-modal>
-
-  <b-table-simple hover striped responsive caption-top>
-    <caption>
-      {{
+    <!-- Table -->
+    <b-table-simple hover striped responsive caption-top>
+      <caption>
+        {{
           props.caption
-      }}
+        }}
 
-      <template v-if="expandable">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" rel="stylesheet" />
+        <template v-if="expandable">
+          <!-- Bootstrap icons -->
+          <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
+            rel="stylesheet"
+          />
 
-        <div class="float-end">
-          <b-button @click="updateHeadersModalShow = !updateHeadersModalShow" class="m-1">
-            Select Headers
-          </b-button>
-          <b-button @click="filtersModalShow = !filterModalShow" class="m-1">
-            Filters
-          </b-button>
-        </div>
-      </template>
-    </caption>
-    <b-thead head-variant="dark">
-      <b-tr>
-        <b-th v-if="overview" :style="colItemStyle(colWidth)"></b-th>
-        <template v-for="(header, index) in filteredHeaders()" :key="header">
-          <b-th class="text-center" :colspan="header.subheaders ? header.subheaders.length : 1"
-            :style="{ ...colItemStyle(colWidth), cursor: 'pointer' }" @click="setsorting(index)">
-            {{ header.name }}
-          </b-th>
+          <!-- Headers and filters modal buttons -->
+          <div class="float-end">
+            <HeadersModal
+              :headerOptions="headerOptions"
+              @updateHeaders="(e) => emit('updateHeaders', e)"
+            />
+            <b-button @click="filtersModalShow = !filterModalShow" class="m-1">
+              Filters
+            </b-button>
+          </div>
         </template>
-        <b-th v-if="overview"></b-th>
-      </b-tr>
-      <b-tr v-if="overview">
-        <b-th :style="colItemStyle(colWidth)"></b-th>
-        <template v-for="subheader in subheaders" :key="subheader">
-          <b-th class="text-center" :style="colItemStyle(colWidth)">
-            {{ subheader }}
-          </b-th>
-        </template>
-        <b-th v-if="overview"></b-th>
-      </b-tr>
-    </b-thead>
-    <b-tbody>
-      <b-tr v-for="(item, index) in sorted" :key="item">
-        <!-- Table results content -->
-        <template v-for="[key, value] in Object.entries(item)" :key="`${descending}_${sortindex}_${index}-${key}`">
-          <!-- For recs tables, show filtered columns -->
-          <!-- TODO refactor -->
-          <b-td v-if="!recs || isRecsHeader(key)" class="text-center" :style="colItemStyle">
-            <!--Special pill format for status-->
-            <!-- TODO refactor-->
-            <template v-if="typeof value === 'string' && value.startsWith(statusPrefix)">
-              <b-button disabled :variant="statusVariant(value)" :class="
-                value.slice(statusPrefix.length) == status.active
-                  ? 'status-blinking'
-                  : 'status'
-              " class="fw-bold">
-                {{ value.slice(statusPrefix.length) }}
-              </b-button>
-            </template>
-            <!-- Non-status columns -->
-            <template v-else>
-              <!-- Spotify column -->
-              <template v-if="key === 'track_spotify-uri'">
-                <template v-if="value">
-                  <MusicItem v-model="itemsInfo[index]" :uri="item[key]" />
-                </template>
-                <template v-else></template>
+      </caption>
+
+      <!-- Headers -->
+      <b-thead head-variant="dark">
+        <!-- Main headers -->
+        <b-tr>
+          <b-th v-if="overview" :style="colItemStyle(colWidth)"></b-th>
+          <template v-for="(header, index) in filteredHeaders()" :key="header">
+            <b-th
+              class="text-center"
+              :colspan="header.subheaders ? header.subheaders.length : 1"
+              :style="{ ...colItemStyle(colWidth), cursor: 'pointer' }"
+              @click="setsorting(index)"
+            >
+              {{ header.name }}
+            </b-th>
+          </template>
+          <b-th v-if="overview"></b-th>
+        </b-tr>
+        <!-- Subheaders -->
+        <b-tr v-if="overview">
+          <b-th :style="colItemStyle(colWidth)"></b-th>
+          <template v-for="subheader in subheaders" :key="subheader">
+            <b-th class="text-center" :style="colItemStyle(colWidth)">
+              {{ subheader }}
+            </b-th>
+          </template>
+          <b-th v-if="overview"></b-th>
+        </b-tr>
+      </b-thead>
+
+      <!-- Sorted table items -->
+      <b-tbody>
+        <b-tr v-for="(item, index) in sorted" :key="item">
+          <!-- Table results content -->
+          <template
+            v-for="[key, value] in Object.entries(item)"
+            :key="`${descending}_${sortindex}_${index}-${key}`"
+          >
+            <!-- For recs tables, show filtered columns -->
+            <!-- TODO refactor -->
+            <b-td
+              v-if="!recs || isRecsHeader(key)"
+              class="text-center"
+              :style="colItemStyle"
+            >
+              <!--Special pill format for status-->
+              <!-- TODO refactor-->
+              <template
+                v-if="
+                  typeof value === 'string' && value.startsWith(statusPrefix)
+                "
+              >
+                <b-button
+                  disabled
+                  :variant="statusVariant(value)"
+                  :class="
+                    value.slice(statusPrefix.length) == status.active
+                      ? 'status-blinking'
+                      : 'status'
+                  "
+                  class="fw-bold"
+                >
+                  {{ value.slice(statusPrefix.length) }}
+                </b-button>
               </template>
-              <!-- Regular column -->
+              <!-- Non-status columns -->
               <template v-else>
-                {{ value }}
+                <!-- Spotify column -->
+                <template v-if="key === 'track_spotify-uri'">
+                  <template v-if="value">
+                    <MusicItem v-model="itemsInfo[index]" :uri="item[key]" />
+                  </template>
+                  <template v-else></template>
+                </template>
+                <!-- Regular column -->
+                <template v-else>
+                  {{ value }}
+                </template>
               </template>
-            </template>
+            </b-td>
+          </template>
+          <!-- Additional item info -->
+          <!-- TODO refactor -->
+          <template v-for="i in additionalInfoAmount" :key="i">
+            <b-td
+              v-if="itemsInfo[index]"
+              class="text-center"
+              :style="colItemStyle(colWidth * 3)"
+            >
+              <template
+                v-if="
+                  itemsInfo[index][i - 1] &&
+                  itemsInfo[index][i - 1].header.toLowerCase() === 'snippet'
+                "
+              >
+                <AudioSnippet :trackId="itemsInfo[index][i - 1].value" />
+              </template>
+              <template v-else> {{ itemsInfo[index][i - 1].value }}</template>
+            </b-td>
+            <b-td :style="colItemStyle(colWidth * 3)" v-else></b-td>
+          </template>
+          <b-td
+            class="align-middle"
+            v-if="overview || removable"
+            :style="colItemStyle(colWidth)"
+          >
+            <b-row class="m-0 float-end">
+              <b-col md="auto" class="mx-0 px-0">
+                <InfoModal :id="item.id" />
+              </b-col>
+              <b-col md="auto" class="mx-0 px-0">
+                <EditModal
+                  v-if="editable"
+                  :id="item.id"
+                  :index="index"
+                  :editUrl="serverFile2"
+                  @loadResults="emit('loadResults')"
+                />
+              </b-col>
+              <b-col md="auto" class="mx-0 px-0">
+                <!--REFACTOR status condition-->
+                <DeletionModal
+                  v-if="
+                    removable &&
+                    (!item.status ||
+                      [status.toDo, status.active].includes(
+                        item.status.slice(statusPrefix.length)
+                      ))
+                  "
+                  :item="item"
+                  :removalUrl="serverFile"
+                />
+              </b-col>
+            </b-row>
           </b-td>
-        </template>
-        <!-- Additional item info -->
-        <!-- TODO refactor -->
-        <template v-for="i in additionalInfoAmount">
-          <b-td v-if="itemsInfo[index]" :style="colItemStyle(colWidth * 3)">
-            <template v-if="
-              itemsInfo[index][i - 1] &&
-              itemsInfo[index][i - 1].header.toLowerCase() === 'snippet'
-            ">
-              <AudioSnippet :trackId="itemsInfo[index][i - 1].value" />
-            </template>
-            <template v-else=""> {{ itemsInfo[index][i - 1].value }}</template>
+          <b-td
+            class="align-middle"
+            v-if="overview"
+            :style="colItemStyle(colWidth)"
+          >
+            <b-button
+              variant="outline-primary fw-bold"
+              @click="$emit('viewResult', item.id)"
+              >View result</b-button
+            >
           </b-td>
-          <b-td :style="colItemStyle(colWidth)" v-else></b-td>
-        </template>
-        <b-td class="align-middle" v-if="overview || removable" :style="colItemStyle(colWidth)">
-          <b-row class="m-0 float-end">
-            <b-col md="auto" class="mx-0 px-0">
-              <b-button v-if="editable" variant="primary" class="mx-1" @click="
-                ; (editModalShow = !editModalShow),
-                (selectedEntry = index),
-                getNameTagsMail(item.id)
-              " data-testid="edit"><i class="bi bi-pencil-square"></i></b-button>
-            </b-col>
-            <b-col md="auto" class="mx-0 px-0">
-              <b-button variant="primary" class="mx-1" @click="; (viewModalShow = !viewModalShow), getMetadata(item.id)"
-                data-testid="view-meta"><i class="bi bi-info-circle"></i></b-button>
-            </b-col>
-            <b-col md="auto" class="mx-0 px-0">
-              <!--REFACTOR status condition-->
-              <b-button v-if="
-                removable &&
-                (!item.status ||
-                  [status.toDo, status.active].includes(
-                    item.status.slice(statusPrefix.length)
-                  ))
-              " variant="danger" class="mx-1 float-end" @click="setEntryRemoval(item)" data-testid="delete">
-                <i :class="'bi ' + getCancelIcon(item)"></i>
-              </b-button>
-            </b-col>
-          </b-row>
-        </b-td>
-        <b-td class="align-middle" v-if="overview" :style="colItemStyle(colWidth)">
-          <b-button variant="outline-primary fw-bold" @click="$emit('viewResult', item.id)">View result</b-button>
-        </b-td>
-        <b-td class="align-middle" v-if="overview" :style="colItemStyle(colWidth)">
-          <SettingsModal :resultId="item.id" />
-        </b-td>
-      </b-tr>
-    </b-tbody>
-  </b-table-simple>
+          <b-td
+            class="align-middle"
+            v-if="overview"
+            :style="colItemStyle(colWidth)"
+          >
+            <SettingsModal :resultId="item.id" />
+          </b-td>
+        </b-tr>
+      </b-tbody>
+    </b-table-simple>
 
-  <b-button v-if="pagination" @click="$emit('loadMore', false, entryAmount)" variant="outline-primary"
-    :disabled="entryAmount < 1">
-    Show previous {{ entryAmount }} items
-  </b-button>
-  <b-button v-if="pagination" @click="$emit('loadMore', true, entryAmount)" variant="outline-primary"
-    :disabled="entryAmount < 1">
-    Show next {{ entryAmount }} items
-  </b-button>
-  <b-form-input v-model="entryAmount" v-if="pagination" :state="entryAmount >= 1" type="number">20</b-form-input>
+    <!-- Pagination -->
+    <b-button
+      v-if="pagination"
+      @click="$emit('loadMore', false, entryAmount)"
+      variant="outline-primary"
+      :disabled="entryAmount < 1"
+    >
+      Show previous {{ entryAmount }} items
+    </b-button>
+    <b-button
+      v-if="pagination"
+      @click="$emit('loadMore', true, entryAmount)"
+      variant="outline-primary"
+      :disabled="entryAmount < 1"
+    >
+      Show next {{ entryAmount }} items
+    </b-button>
+    <b-form-input
+      v-model="entryAmount"
+      v-if="pagination"
+      :state="entryAmount >= 1"
+      type="number"
+      >20</b-form-input
+    >
+  </div>
 </template>
 
 <style scoped>
