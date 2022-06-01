@@ -10,12 +10,12 @@ import { makeHeader } from '../helpers/resultFormatter'
 import { API_URL } from '../api'
 import SettingsModal from './Table/SettingsModal.vue'
 
-const props = defineProps({ headers: Array, result: Object })
+const props = defineProps({ headers: Array, result: Object });
 
 //Default headers for recommendation experiments.
 const selectedHeaders = ref([
   [{ name: 'Rank' }, { name: 'User' }, { name: 'Item' }, { name: 'Score' }],
-])
+]);
 
 
 const data = ref({ results: [[]] })
@@ -38,18 +38,18 @@ const uniqueDatasets = findUniqueDatasets()
 const visibleMatrices = ref([])
 
 onMounted(() => {
-  console.log('result', props.result)
-  console.log('result id', props.result.id)
+  console.log('result', props.result);
+  console.log('result id', props.result.id);
   //loadEvaluations()
   //loadResult(props.result.id)
   fillVisibleDatasets()
   fillShownMetrics()
   //Load in all the user recommendation/prediction tables
   for (let index in userTables) {
-    setRecs(parseInt(index))
+    setRecs(parseInt(index));
   }
-  console.log('availableFilters', availableFilters.value)
-})
+  console.log('availableFilters', availableFilters.value);
+});
 
 /** 
  * GET request: Get available header options for selection from server
@@ -82,18 +82,18 @@ async function setRecs(currentTable) {
       runid: runID.value,
       pairid: currentTable,
     }),
-  }
-  console.log('sending to server:', requestOptions.body)
+  };
+  console.log('sending to server:', requestOptions.body);
   const response = await fetch(
     API_URL + '/all-results/set-recs',
     requestOptions
-  )
+  );
   //console.log('resultfetch', response)
   if (response.status == '200') {
-    const data = await response.json()
-    availableFilters.value = data.availableFilters
-    getUserRecs(currentTable)
-    getHeaderOptions(currentTable)
+    const data = await response.json();
+    availableFilters.value = data.availableFilters;
+    getUserRecs(currentTable);
+    getHeaderOptions(currentTable);
   }
 }
 
@@ -145,13 +145,13 @@ async function getUserRecs(currentTable) {
       dataset: props.result.result[currentTable].dataset.dataset,
       matrix: props.result.result[currentTable].dataset.matrix
     }),
-  }
+  };
 
-  const response = await fetch(API_URL + '/all-results/result', requestOptions)
-  data.value.results[currentTable] = await response.json()
+  const response = await fetch(API_URL + '/all-results/result', requestOptions);
+  data.value.results[currentTable] = await response.json();
   selectedHeaders.value[currentTable] = Object.keys(
     data.value.results[currentTable][0]
-  )
+  );
 }
 
 async function exportTable(currentTable) {
@@ -191,16 +191,16 @@ async function validate() {
  * @param {Int}    pairid    - Index of which result file to load (from overview.json)
  */
 function loadMore(increase, amount, pairid) {
-  amount = parseInt(amount)
+  amount = parseInt(amount);
 
   //Determine the index for where the next page starts, based on how many entries were shown before.
-  if (!increase && startIndex.value > 0) startIndex.value -= entryAmount.value
-  if (startIndex.value < 0) startIndex.value = 0
-  else if (increase) startIndex.value += entryAmount.value
-  else startIndex.value = 0
+  if (!increase && startIndex.value > 0) startIndex.value -= entryAmount.value;
+  if (startIndex.value < 0) startIndex.value = 0;
+  else if (increase) startIndex.value += entryAmount.value;
+  else startIndex.value = 0;
   //Update amount to new number of entries that are shown.
-  entryAmount.value = amount
-  getUserRecs(pairid)
+  entryAmount.value = amount;
+  getUserRecs(pairid);
 }
 
 /**
@@ -211,13 +211,13 @@ function loadMore(increase, amount, pairid) {
 function paginationSort(indexVar, pairid) {
   //When sorting on the same column twice in a row, switch to descending.
   if (sortIndex.value === indexVar) {
-    ascending.value = !ascending.value
+    ascending.value = !ascending.value;
   }
 
   //When sorting, start at startIndex 0 again to see either highest or lowest, passing on which column is sorted.
-  sortIndex.value = indexVar
-  startIndex.value = 0
-  getUserRecs(pairid)
+  sortIndex.value = indexVar;
+  startIndex.value = 0;
+  getUserRecs(pairid);
 }
 
 /**
@@ -226,8 +226,8 @@ function paginationSort(indexVar, pairid) {
  * @param {Int}    pairid    - Index of which result file to load (from overview.json)
  */
 function updateHeaders(headers, pairid) {
-  optionalHeaders.value[pairid] = headers
-  getUserRecs(pairid)
+  optionalHeaders.value[pairid] = headers;
+  getUserRecs(pairid);
 }
 
 /**
@@ -236,8 +236,8 @@ function updateHeaders(headers, pairid) {
  * @param {Int}    pairid    - Index of which result file to load (from overview.json)
  */
 function changeFilters(changedFilters, pairid) {
-  filters.value = changedFilters
-  getUserRecs(pairid)
+  filters.value = changedFilters;
+  getUserRecs(pairid);
 }
 
 /**
@@ -383,6 +383,25 @@ async function getInfo() {
           <b-button disabled> {{ tag }} </b-button>
         </template>
       </p>
+      <h2>Filters:</h2>
+      <b-list-group horizontal>
+        <b-list-group-item v-for="datasetResult in result.result">
+          <!-- Filter for each dataset-->
+          {{ datasetResult.dataset.name }}
+          <b-list-group>
+            <b-list-group-item v-for="filter in datasetResult.dataset.filters">
+              {{ filter.name }}: {{ Object.values(filter.params)[0] }}
+            </b-list-group-item>
+            <ul>
+              <li v-for="evale in datasetResult.evals">
+                <!-- Filter for each metric-->
+                {{ evale.evaluation.filtered }}
+              </li>
+            </ul>
+          </b-list-group>
+        </b-list-group-item>
+      </b-list-group>
+
       <b-button @click="validate()">Validate run</b-button>
       <p>
         Datasets showing items per user:
@@ -454,7 +473,7 @@ async function getInfo() {
             <template v-if="visibleMatrices.includes(entry)" :key="visibleMatrices">
               <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
               <div :class="visibleMatrices.length > 1 ? 'col-6' : 'col'">
-                <Table v-if="selectedHeaders[index]" :key="props.result.id" :caption="entry"
+                <Table v-if="selectedHeaders[index]" :key="props.result.id" :caption="entry" recs
                   :results="data.results[index]" :headers="selectedHeaders[index].map(makeHeader)" :filters="filters"
                   :filterOptions="availableFilters" :headerOptions="optionalHeaderOptions[index]"
                   :userOptions="userHeaderOptions[index]" :itemOptions="itemHeaderOptions[index]" pagination expandable
