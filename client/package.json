@@ -36,5 +36,10 @@
     "sass": "^1.49.11",
     "vite": "^2.8.4",
     "vitest": "^0.10.1"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "semi": false,
+    "jsxSingleQuote": true
   }
 }

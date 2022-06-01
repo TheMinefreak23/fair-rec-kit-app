@@ -3,9 +3,9 @@
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
-import DictionaryDisplay from './DictionaryDisplay.vue'
-import { store } from '../../store'
-import { loadResult } from '../../helpers/resultRequests'
+import DictionaryDisplay from '../DictionaryDisplay.vue'
+import { store } from '../../../store'
+import { loadResult } from '../../../helpers/resultRequests'
 import { ref } from 'vue'
 
 const props = defineProps({ resultId: String })
@@ -42,19 +42,8 @@ function cleanSettings() {
 
 <template>
   <!--Shows when the user wants to make settings from a result-->
-  <b-modal
-    scrollable
-    size="lg"
-    header-bg-variant="dark"
-    header-text-variant="light"
-    id="settings-modal"
-    v-model="show"
-    title="Copy settings from this result?"
-    ok-title="Yes"
-    ok-variant="danger"
-    cancel-title="No"
-    @ok="setSettings"
-  >
+  <b-modal scrollable size="lg" header-bg-variant="dark" header-text-variant="light" id="settings-modal" v-model="show"
+    title="Copy settings from this result?" ok-title="Yes" ok-variant="danger" cancel-title="No" @ok="setSettings">
     <b-container v-if="settings">
       <h2>Settings for {{ settings.metadata.name }}:</h2>
       <b-row>
@@ -64,12 +53,8 @@ function cleanSettings() {
     <p>Do you want to use these settings for a new experiment?</p>
   </b-modal>
 
-  <b-button
-    variant="outline-primary fw-bold"
-    @click="copySettings(resultId)"
-    v-b-tooltip.hover
-    title="Copy result settings to new experiment"
-  >
+  <b-button variant="outline-primary fw-bold" @click="copySettings(resultId)" v-b-tooltip.hover
+    title="Copy result settings to new experiment">
     Copy settings
   </b-button>
 </template>
