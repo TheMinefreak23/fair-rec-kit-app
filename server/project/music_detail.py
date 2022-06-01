@@ -68,11 +68,10 @@ def get_background():
     Returns:
         Image: Background-image
     """
-    #kek = '5PorskWxAZMSnVB8nG9ojL'
-    kekw = '6KnSfElksjrqygPIc4TDmf'
-    #TOP_50 = '37i9dQZEVXbMDoHDwVN2tF'
-    #TOP_100 = '3IsxzDS04BvejFJcQ0iVyW'
-    playlist_id = kekw
+    playlist1 = '6KnSfElksjrqygPIc4TDmf' # Playlist with nice album art
+    #TOP_50 = '37i9dQZEVXbMDoHDwVN2tF' # Spotify top 50 chart
+
+    playlist_id = playlist1
 
     items = []
     # Keep querying until we have all playlist items.
