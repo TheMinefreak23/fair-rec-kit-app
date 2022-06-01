@@ -104,7 +104,11 @@ def set_recs():
     pair_id = json.get("pairid")
     path = result_storage.get_overview(result_id, run_id)[
         pair_id]['ratings_path']
-    result_storage.current_recs[pair_id] = pd.read_csv(
+    # Declare current_recs as a dictionary in a dictionary
+    if not run_id in result_storage.current_recs:
+        result_storage.current_recs[run_id] = {}
+    # Load the correct ratings file
+    result_storage.current_recs[run_id][pair_id] = pd.read_csv(
         path, sep='\t', header=0)
     return {'status': 'success', 'availableFilters': options['filters']}
 
@@ -120,6 +124,7 @@ def user_result():
     """
     json = request.json
     pair_id = json.get("pairid")
+    run_id = json.get("runid")
     filters = json.get("filters")
 
     chunk_size = json.get("amount", 20)
@@ -128,11 +133,11 @@ def user_result():
     matrix_name = json.get("matrix")
     dataset_name = json.get("dataset", "")
     sortIndex = json.get("sortindex", 0)
-
     # read mock dataframe
-    recs = result_storage.current_recs[pair_id]
+    print('dinges', run_id)
+    print(result_storage.current_recs[run_id])
+    recs = result_storage.current_recs[run_id][pair_id]
     dataset = recommender_system.data_registry.get_set(dataset_name)
-
     #TODO refactor/do dynamically
     spotify_datasets = ['LFM-2B']
     if dataset_name in spotify_datasets:

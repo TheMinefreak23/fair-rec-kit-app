@@ -63,20 +63,27 @@ export function formatResult(result) {
     result: result.result
       // Format result per dataset
       .map((datasetResult) => {
-        datasetResult.results = datasetResult.recs.map((result) => {
-          const headers = [{ name: 'Approach' }]
+        datasetResult.results = []
+        for (let runID in datasetResult.recs[0].evals[0].evaluation) {
+          // Format result per approach
+          datasetResult.results.push(
+            datasetResult.recs.map((result) => {
+              const headers = [{ name: 'Approach' }]
 
-          // Use metric names as headers
-          for (const [index, evaluation] of result.evals.entries()) {
-            headers.push(formatEvaluation(evaluation, index, result))
-            // console.log(result)
-          }
+              // Use metric names as headers
+              for (const [index, evaluation] of result.evals.entries()) {
+                headers.push(formatEvaluation(evaluation, index, result, runID))
+                // console.log(result)
+              }
 
-          // Omit recommendation and evals (old properties)
-          const { recommendation, evals, ...rest } = result
-          datasetResult.headers = headers // TODO headers can be computed in outer loop
-          return rest
-        })
+              // Omit recommendation and evals (old properties)
+              const { recommendation, evals, ...rest } = result
+              datasetResult.headers = headers // TODO headers can be computed in outer loop
+              return rest
+            })
+          )
+        }
+
         // console.log(datasetResult.results[0])
         // console.log(datasetResult.headers)
         // datasetResult.headers = makeHeaders(datasetResult.results[0])
@@ -142,17 +149,18 @@ export function showDatasetInfo(dataset) {
 }
 
 // Format evaluations (including filtered ones)
-export function formatEvaluation(e, index, result) {
+export function formatEvaluation(e, index, result, runID) {
   // TODO refactor and/or give option to set decimal precision in UI
+  // TODO support several runs
   // Add index for unique metric key
-  result[formatMetric(e) + '_' + index] = e.evaluation.global.toFixed(2)
+  result[formatMetric(e) + '_' + index] = e.evaluation[runID].global.toFixed(2)
 
   // Flatten filters
   // console.log(e.evaluation, e.evaluation.filtered)
   // Add filter category (main name) to filter parameter name
   // TODO refactor
   const filtered = []
-  for (const filter of e.evaluation.filtered) {
+  for (const filter of e.evaluation[0].filtered) {
     // console.log('filter', filter)
     for (const [mainName, params] of Object.entries(filter)) {
       // console.log(mainName, params)

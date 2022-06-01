@@ -18,8 +18,9 @@ const selectedHeaders = ref([
 ]);
 
 
-const data = ref({ results: [[]] })
+const data = ref({ results: [] })
 const runID = ref(0)
+const runNumbers = [...Array(props.result.result[0].results.length).keys()]
 const startIndex = ref(0)
 const sortIndex = ref(0)
 const ascending = ref(true)
@@ -28,8 +29,6 @@ const optionalHeaders = ref([[]])
 const availableFilters = ref([])
 const filters = ref(emptyFormGroup(false))
 const optionalHeaderOptions = ref([])
-const userHeaderOptions = ref([[]])
-const itemHeaderOptions = ref([[]])
 const userTables = combineResults(props.result.result)
 const visibleDatasets = ref([])
 const visibleMetrics = ref([])
@@ -46,9 +45,14 @@ onMounted(() => {
   fillVisibleDatasets()
   fillShownMetrics()
   // Load in all the user recommendation/prediction tables
-  for (const index in userTables) {
-    setRecs(parseInt(index));
+  for (const run in runNumbers) {
+    data.value.results[run] = []
+    for (const index in userTables) {
+      data.value.results[run][index] = []
+      setRecs(parseInt(index), parseInt(run));
+    }
   }
+
   console.log('availableFilters', availableFilters.value);
 });
 
@@ -69,18 +73,16 @@ async function getHeaderOptions(index) {
   const headerOptions = data
   console.log(data)
   optionalHeaderOptions.value[index] = headerOptions
-  itemHeaderOptions.value[index] = headerOptions.movie
-  userHeaderOptions.value[index] = headerOptions.user
 }
 
 // POST request: Send result ID to the server to set current shown recommendations.
-async function setRecs(currentTable) {
+async function setRecs(currentTable, runID) {
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       id: props.result.id,
-      runid: runID.value,
+      runid: runID,
       pairid: currentTable,
     }),
   };
@@ -93,7 +95,7 @@ async function setRecs(currentTable) {
   if (response.status == '200') {
     const data = await response.json();
     availableFilters.value = data.availableFilters;
-    getUserRecs(currentTable);
+    getUserRecs(currentTable, runID);
     getHeaderOptions(currentTable);
   }
 }
@@ -130,13 +132,14 @@ async function getEvaluations() {
  * POST request: Ask server for next part of user recommendation table.
  * @param {Int}   currentTable  - Index of which result file to load (from overview.json)
  */
-async function getUserRecs(currentTable) {
+async function getUserRecs(currentTable, runID) {
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       id: props.result.id,
       pairid: currentTable,
+      runid: runID,
       start: startIndex.value,
       sortindex: sortIndex.value,
       ascending: ascending.value,
@@ -147,11 +150,10 @@ async function getUserRecs(currentTable) {
       matrix: props.result.result[currentTable].dataset.matrix
     }),
   };
-
   const response = await fetch(API_URL + '/all-results/result', requestOptions);
-  data.value.results[currentTable] = await response.json();
+  data.value.results[runID][currentTable] = await response.json();
   selectedHeaders.value[currentTable] = Object.keys(
-    data.value.results[currentTable][0]
+    data.value.results[0][currentTable][0]
   );
 }
 
@@ -175,7 +177,7 @@ async function validate() {
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-type': 'application/json' },
-    body: JSON.stringify({ filepath: file, amount: validationAmount }),
+    body: JSON.stringify({ filepath: file, amount: validationAmount.value }),
   }
   const response = await fetch(
     API_URL + '/all-results/validate',
@@ -191,7 +193,7 @@ async function validate() {
  * @param {Int}    amount    - Number of items that the user has requested.
  * @param {Int}    pairid    - Index of which result file to load (from overview.json)
  */
-function loadMore(increase, amount, pairid) {
+function loadMore(increase, amount, pairid, runID) {
   amount = parseInt(amount);
 
   // Determine the index for where the next page starts, based on how many entries were shown before.
@@ -201,7 +203,7 @@ function loadMore(increase, amount, pairid) {
   else startIndex.value = 0;
   // Update amount to new number of entries that are shown.
   entryAmount.value = amount;
-  getUserRecs(pairid);
+  getUserRecs(pairid, runID);
 }
 
 /**
@@ -209,7 +211,7 @@ function loadMore(increase, amount, pairid) {
  * @param {int}   indexVar  - Index of the column on which is sorted.
  * @param {Int}    pairid    - Index of which result file to load (from overview.json)
  */
-function paginationSort(indexVar, pairid) {
+function paginationSort(indexVar, pairid, runID) {
   // When sorting on the same column twice in a row, switch to descending.
   if (sortIndex.value === indexVar) {
     ascending.value = !ascending.value;
@@ -218,7 +220,7 @@ function paginationSort(indexVar, pairid) {
   // When sorting, start at startIndex 0 again to see either highest or lowest, passing on which column is sorted.
   sortIndex.value = indexVar;
   startIndex.value = 0;
-  getUserRecs(pairid);
+  getUserRecs(pairid, runID);
 }
 
 /**
@@ -226,9 +228,9 @@ function paginationSort(indexVar, pairid) {
  * @param {Array}   headers  - A list of the headers that have been selected to be shown
  * @param {Int}    pairid    - Index of which result file to load (from overview.json)
  */
-function updateHeaders(headers, pairid) {
+function updateHeaders(headers, pairid, runID) {
   optionalHeaders.value[pairid] = headers;
-  getUserRecs(pairid);
+  getUserRecs(pairid, runID);
 }
 
 /**
@@ -236,9 +238,9 @@ function updateHeaders(headers, pairid) {
  * @param {Array}   changedFilters  - A list of filters that are selected
  * @param {Int}    pairid    - Index of which result file to load (from overview.json)
  */
-function changeFilters(changedFilters, pairid) {
+function changeFilters(changedFilters, pairid, runID) {
   filters.value = changedFilters;
-  getUserRecs(pairid);
+  getUserRecs(pairid, runID);
 }
 
 /**
@@ -247,14 +249,12 @@ function changeFilters(changedFilters, pairid) {
  * @returns {Array}   - An array of all the user recommendation tables for this run
  */
 function combineResults(results) {
-  console.log(results)
   const tables = []
   for (const dataset in results) {
-    for (const approach in results[dataset].results) {
-      tables.push(results[dataset].dataset.dataset + '_' + results[dataset].results[approach].approach + '_run' + runID.value)
+    for (const approach in results[dataset].results[runID.value]) {
+      tables.push(results[dataset].dataset.dataset + '_' + results[dataset].results[0][approach].approach)
     }
   }
-  console.log(tables)
   return tables
 }
 
@@ -350,25 +350,21 @@ function contains(string, array) {
   <div>
     <div class="container">
       <b-row>
-        <b-col><p class="lead" > Results for </p>
-      <h1 class="display-3"> {{ result.metadata.name }}    </h1>
-      <h3 class="text-muted"> {{ result.metadata.datetime}} </h3>
-      </b-col>
-      <b-col>
-        <div class="float-end">
-          <SettingsModal :resultId="result.id"/>
-          <b-form-input type="number" 
-            v-model="validationAmount"
-            v-b-tooltip.hover
-            title="Number of validation runs"></b-form-input>
-          <b-button @click="validate()"
-            variant="outline-primary fw-bold"
-            v-b-tooltip.hover
-            title="Validate this experiment"
-            >Validate run
-          </b-button>
-        </div>
-      </b-col>
+        <b-col>
+          <p class="lead"> Results for </p>
+          <h1 class="display-3"> {{ result.metadata.name }} </h1>
+          <h3 class="text-muted"> {{ result.metadata.datetime }} </h3>
+        </b-col>
+        <b-col>
+          <div class="float-end">
+            <SettingsModal :resultId="result.id" />
+            <b-form-input type="number" v-model="validationAmount" v-b-tooltip.hover title="Number of validation runs">
+            </b-form-input>
+            <b-button @click="validate()" variant="outline-primary fw-bold" v-b-tooltip.hover
+              title="Validate this experiment">Validate run
+            </b-button>
+          </div>
+        </b-col>
       </b-row>
       <p class="lead">
         Tags:
@@ -422,17 +418,18 @@ function contains(string, array) {
       <h4>Metrics</h4>
 
       <b-row>
-        <!--Show first two dataset results for now TODO-->
-        <template v-for="(datasetResult, index) in result.result" :key="datasetResult">
-          <b-col :cols="result.result.length > 1 ? '6' : '12'">
-            <p> {{ datasetResult.results[0].dataset }}</p>
-            <template v-if="visibleDatasets.includes(datasetResult.dataset.dataset)" :key="visibleDatasets">
-              <Table :caption="userTables[index]" :results="hideResults(datasetResult.results)"
-                :headers="hideHeaders(datasetResult.headers)" :removable="false" />
-              <b-button @click="exportTable(index)">Export table</b-button>
-            </template>
-          </b-col>
-          <!--<p> {{ datasetResult.results }}</p>-->
+        <template v-for="runID in runNumbers">
+
+          <template v-for="(datasetResult, index) in result.result" :key="datasetResult">
+            <b-col :cols="result.result.length > 1 ? '6' : '12'">
+              <template v-if="visibleDatasets.includes(datasetResult.dataset.dataset)" :key="visibleDatasets">
+                <h4>Run {{ runID }}</h4>
+                <Table :caption="userTables[index]" :results="hideResults(datasetResult.results[runID])"
+                  :headers="hideHeaders(datasetResult.headers)" :removable="false" />
+                <b-button @click="exportTable(index)">Export table</b-button>
+              </template>
+            </b-col>
+          </template>
         </template>
       </b-row>
     </b-container>
@@ -448,7 +445,7 @@ function contains(string, array) {
 
       <p>
         Select items to be shown:
-      <div class="form-check" v-for="(entry, index) in userTables">
+      <div class="form-check" v-for="entry in userTables">
         <input v-model="visibleMatrices" class="form-check-input" type="checkbox" :value="entry" :id="entry" />
         <label class="form-check-label" :id="entry">
           {{ entry }}
@@ -459,37 +456,25 @@ function contains(string, array) {
 
       <div class="row">
         <!--Show recommendations for all datasets for now TODO-->
-        <!--Currently only shows the results of the first dataset-->
-        <template v-for="(entry, index) in userTables" :key="data">
-          <template v-if=
-          "visibleDatasets.includes(getDatasetName(entry)) &&
-          visibleMatrices.includes(entry)" 
-          :key="visibleUserTables">
-            <!-- <template v-if="visibleMatrices.includes(entry)" :key="visibleMatrices"> -->
-          <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
-            <div :class="visibleMatrices.length > 1 ? 'col-6' : 'col'">
-              <Table
-                v-if="selectedHeaders[index]"
-                :key="props.result.id"
-                :caption="entry"
-                :results="data.results[index]"
-                :headers="selectedHeaders[index].map(makeHeader)"
-                :filters="filters"
-                :filterOptions="availableFilters"
-                :headerOptions="optionalHeaderOptions[index]"
-                pagination
-                expandable
-                @paginationSort="(i) => paginationSort(i, index)"
-                @loadMore="
-                  (increase, amount) => loadMore(increase, amount, index)
-                "
-                @changeFilters="
-                  (changedFilters) => changeFilters(changedFilters, index)
-                "
-                @updateHeaders="(headers) => updateHeaders(headers, index)"
-              />
-            </div>
-            <!-- </template> -->
+        <template v-for="run in runNumbers">
+          <template v-for="(entry, index) in userTables" :key="data">
+            <template v-if="visibleDatasets.includes(getDatasetName(entry)) &&
+            visibleMatrices.includes(entry)" :key="visibleUserTables">
+              <h4>Run {{ run }}</h4>
+              <!-- <template v-if="visibleMatrices.includes(entry)" :key="visibleMatrices"> -->
+              <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
+              <div :class="visibleMatrices.length > 1 ? 'col-6' : 'col'">
+                <Table v-if="selectedHeaders[index]" :key="props.result.id" :caption="entry"
+                  :results="data.results[run][index]" :headers="selectedHeaders[index].map(makeHeader)"
+                  :filters="filters" :filterOptions="availableFilters" :headerOptions="optionalHeaderOptions[index]"
+                  pagination expandable @paginationSort="(i) => paginationSort(i, index, run)" @loadMore="
+                    (increase, amount) => loadMore(increase, amount, index, run)
+                  " @changeFilters="
+  (changedFilters) => changeFilters(changedFilters, index, run)
+" @updateHeaders="(headers) => updateHeaders(headers, index, run)" />
+              </div>
+              <!-- </template> -->
+            </template>
           </template>
         </template>
       </div>
