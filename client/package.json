@@ -5,13 +5,16 @@
     "dev": "vite",
     "test": "vitest",
     "build": "vite build",
-    "preview": "vite preview --port 5050"
+    "preview": "vite preview --port 5050",
+    "cypress:open": "cypress open"
   },
   "dependencies": {
     "@popperjs/core": "^2.11.4",
+    "@testing-library/cypress": "^8.0.2",
     "an-array-of-english-words": "^2.0.0",
     "bootstrap": "^5.1.3",
     "bootstrap-vue-3": "^0.1.11",
+    "cypress": "^9.7.0",
     "just-sort-by": "^3.0.1",
     "multi-range-slider-vue": "^1.1.4",
     "requirejs": "^2.3.6",
