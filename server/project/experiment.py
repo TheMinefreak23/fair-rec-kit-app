@@ -6,12 +6,9 @@ Utrecht University within the Software Project course.
 import enum
 import json
 import os
-import threading
 import time
 from dataclasses import dataclass
 from datetime import datetime
-from tkinter.ttk import Progressbar
-from click import progressbar
 import yaml
 from fairreckitlib.experiment.experiment_config_parsing import Parser
 
