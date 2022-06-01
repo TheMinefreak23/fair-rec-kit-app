@@ -430,9 +430,6 @@ const filteredHeaders = () => {
     </b-thead>
     <b-tbody>
       <b-tr v-for="(item, index) in sorted" :key="item">
-        <b-td class="align-middle" v-if="overview" :style="colItemStyle(colWidth)">
-          <b-button variant="outline-primary fw-bold" @click="$emit('viewResult', item.id)">View result</b-button>
-        </b-td>
         <!-- Table results content -->
         <template v-for="[key, value] in Object.entries(item)" :key="`${descending}_${sortindex}_${index}-${key}`">
           <!-- For recs tables, show filtered columns -->
@@ -484,8 +481,8 @@ const filteredHeaders = () => {
             <b-col md="auto" class="mx-0 px-0">
               <b-button v-if="editable" variant="primary" class="mx-1" @click="
                 ; (editModalShow = !editModalShow),
-                (selectedEntry = index),
-                getNameTagsMail(item.id)
+  (selectedEntry = index),
+  getNameTagsMail(item.id)
               " data-testid="edit"><i class="bi bi-pencil-square"></i></b-button>
             </b-col>
             <b-col md="auto" class="mx-0 px-0">
@@ -505,6 +502,9 @@ const filteredHeaders = () => {
               </b-button>
             </b-col>
           </b-row>
+        </b-td>
+        <b-td class="align-middle" v-if="overview" :style="colItemStyle(colWidth)">
+          <b-button variant="outline-primary fw-bold" @click="$emit('viewResult', item.id)">View result</b-button>
         </b-td>
         <b-td class="align-middle" v-if="overview" :style="colItemStyle(colWidth)">
           <SettingsModal :resultId="item.id" />
