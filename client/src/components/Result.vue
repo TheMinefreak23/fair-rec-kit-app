@@ -175,7 +175,7 @@ async function validate() {
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-type': 'application/json' },
-    body: JSON.stringify({ filepath: file, amount: validationAmount }),
+    body: JSON.stringify({ filepath: file, amount: validationAmount.value }),
   }
   const response = await fetch(
     API_URL + '/all-results/validate',
