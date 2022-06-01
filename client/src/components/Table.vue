@@ -410,7 +410,6 @@ const filteredHeaders = () => {
     </caption>
     <b-thead head-variant="dark">
       <b-tr>
-        <b-th v-if="overview" :style="colItemStyle(colWidth)"></b-th>
         <template v-for="(header, index) in filteredHeaders()" :key="header">
           <b-th class="text-center" :colspan="header.subheaders ? header.subheaders.length : 1"
             :style="{ ...colItemStyle(colWidth), cursor: 'pointer' }" @click="setsorting(index)">
@@ -418,15 +417,16 @@ const filteredHeaders = () => {
           </b-th>
         </template>
         <b-th v-if="overview"></b-th>
+        <b-th v-if="overview" :style="colItemStyle(colWidth)"></b-th>
       </b-tr>
       <b-tr v-if="overview">
-        <b-th :style="colItemStyle(colWidth)"></b-th>
         <template v-for="subheader in subheaders" :key="subheader">
           <b-th class="text-center" :style="colItemStyle(colWidth)">
             {{ subheader }}
           </b-th>
         </template>
         <b-th v-if="overview"></b-th>
+        <b-th v-if="overview" :style="colItemStyle(colWidth)"></b-th>
       </b-tr>
     </b-thead>
     <b-tbody>
@@ -482,8 +482,8 @@ const filteredHeaders = () => {
             <b-col md="auto" class="mx-0 px-0">
               <b-button v-if="editable" variant="primary" class="mx-1" @click="
                 ; (editModalShow = !editModalShow),
-                (selectedEntry = index),
-                getNameTagsMail(item.id)
+  (selectedEntry = index),
+  getNameTagsMail(item.id)
               " data-testid="edit"><i class="bi bi-pencil-square"></i></b-button>
             </b-col>
             <b-col md="auto" class="mx-0 px-0">
