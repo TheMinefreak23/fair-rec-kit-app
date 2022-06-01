@@ -308,40 +308,41 @@ async function showMusicDetail(spotifyId) {
     const itemKeys = ['item']
     return itemKeys.includes(lowerKey) || lowerKey.includes('id')
   }
+}
 
-  // Hide item (ID) columns and show info columns
-  function toggleInfoColumns(addHeaders) {
-    infoHeaders.value = [
-      ...props.headers.filter((header) => !isItemKey(header.name)),
-      ...addHeaders.map((header) => ({ name: header })),
-    ]
-    additionalInfoAmount.value = addHeaders.length // TODO refactor
-    // console.log('additional info amount', additionalInfoAmount.value)
-    console.log('toggleInfo infoHeaders', infoHeaders.value)
-    // emit('updateHeaders', newHeaders)
-  }
+// Hide item (ID) columns and show info columns
+function toggleInfoColumns(addHeaders) {
+  infoHeaders.value = [
+    ...props.headers.filter((header) => !isItemKey(header.name)),
+    ...addHeaders.map((header) => ({ name: header })),
+  ]
+  additionalInfoAmount.value = addHeaders.length // TODO refactor
+  // console.log('additional info amount', additionalInfoAmount.value)
+  console.log('toggleInfo infoHeaders', infoHeaders.value)
+  // emit('updateHeaders', newHeaders)
+}
 
-  function isRecsHeader(key) {
-    // console.log('infoHeaders', infoHeaders.value)
-    /* console.log(
-      'filteredHeaders',
-      filteredHeaders().map((header) => header.name.toLowerCase())
-    )
-    console.log('filteredHeaders', key) */
-    return (
-      key &&
-      filteredHeaders()
-        .map((header) => header.name.toLowerCase())
-        .includes(key.split('_').join(' ')) // TODO refactor
-    )
-  }
+function isRecsHeader(key) {
+  // console.log('infoHeaders', infoHeaders.value)
+  /* console.log(
+    'filteredHeaders',
+    filteredHeaders().map((header) => header.name.toLowerCase())
+  )
+  console.log('filteredHeaders', key) */
+  return (
+    key &&
+    filteredHeaders()
+      .map((header) => header.name.toLowerCase())
+      .includes(key.split('_').join(' ')) // TODO refactor
+  )
+}
 
-  // TODO computed ?
-  const filteredHeaders = () => {
-    return !props.recs || infoHeaders.value.length === 0
-      ? props.headers
-      : infoHeaders.value
-  }
+// TODO computed ?
+const filteredHeaders = () => {
+  return !props.recs || infoHeaders.value.length === 0
+    ? props.headers
+    : infoHeaders.value
+}
 </script>
 
 <template>
@@ -390,12 +391,10 @@ async function showMusicDetail(spotifyId) {
       <p>{{ capitalise(category) }} specific:</p>
       <div class="form-check form-switch" v-for="header in props.headerOptions[category]" :key="header">
         <input v-model="checkedColumns" class="form-check-input" type="checkbox" :value="header" :id="header" />
-        <div class="form-check form-switch" v-for="header in props.headerOptions[category]" :key="header">
-          <input v-model="checkedColumns" class="form-check-input" type="checkbox" :value="header" :id="header" />
-          <label class="form-check-label" :id="header">
-            {{ makeHeader(header).name }}
-          </label>
-        </div>
+        <label class="form-check-label" :id="header">
+          {{ makeHeader(header).name }}
+        </label>
+      </div>
     </template>
   </b-modal>
 
@@ -425,23 +424,21 @@ async function showMusicDetail(spotifyId) {
     </caption>
     <b-thead head-variant="dark">
       <b-tr>
-        <b-th v-if="overview" :style="colItemStyle(colWidth)"></b-th>
         <template v-for="(header, index) in filteredHeaders()" :key="header">
           <b-th class="text-center" :colspan="header.subheaders ? header.subheaders.length : 1"
             :style="{ ...colItemStyle(colWidth), cursor: 'pointer' }" @click="setsorting(index)">
             {{ header.name }}
           </b-th>
         </template>
-        <b-th v-if="overview"></b-th>
+        <b-th v-if="overview" :style="colItemStyle(colWidth)"></b-th>
       </b-tr>
       <b-tr v-if="overview">
-        <b-th :style="colItemStyle(colWidth)"></b-th>
         <template v-for="subheader in subheaders" :key="subheader">
           <b-th class="text-center" :style="colItemStyle(colWidth)">
             {{ subheader }}
           </b-th>
         </template>
-        <b-th v-if="overview"></b-th>
+        <b-th v-if="overview" :style="colItemStyle(colWidth)"></b-th>
       </b-tr>
     </b-thead>
     <b-tbody>
@@ -476,7 +473,7 @@ async function showMusicDetail(spotifyId) {
                 {{ value }}
               </template>
             </template>
-            <template v-else>{{ value }} </template>
+          </b-td>
         </template>
         <!-- Additional item info -->
         <!-- TODO refactor -->
@@ -494,7 +491,7 @@ async function showMusicDetail(spotifyId) {
         </template>
         <b-td class="align-middle" style="width: 150px" v-if="overview || removable">
           <b-row class="m-0 float-end d-block">
-            <b-button variant="primary" @click="$emit('loadResult', item.id)" class="m-1" style="width: 142px">View
+            <b-button variant="primary" @click="$emit('viewResult', item.id)" class="m-1" style="width: 142px">View
               result
             </b-button>
             <div class="p-0" style="width: 150px">
@@ -530,9 +527,6 @@ async function showMusicDetail(spotifyId) {
               </b-col>
             </div>
           </b-row>
-        </b-td>
-        <b-td class="align-middle" v-if="overview" :style="colItemStyle(colWidth)">
-          <b-button variant="outline-primary fw-bold" @click="$emit('viewResult', item.id)">View result</b-button>
         </b-td>
         <b-td class="align-middle" v-if="overview" :style="colItemStyle(colWidth)">
           <SettingsModal :resultId="item.id" />
