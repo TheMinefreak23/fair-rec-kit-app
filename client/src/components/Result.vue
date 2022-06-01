@@ -36,6 +36,7 @@ const visibleMetrics = ref([])
 const availableMetrics = ref([])
 const uniqueDatasets = findUniqueDatasets()
 const visibleMatrices = ref([])
+const validationAmount = ref(1)
 
 onMounted(() => {
   console.log('result', props.result);
@@ -174,7 +175,7 @@ async function validate() {
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-type': 'application/json' },
-    body: JSON.stringify({ filepath: file }),
+    body: JSON.stringify({ filepath: file, amount: validationAmount.value }),
   }
   const response = await fetch(
     API_URL + '/all-results/validate',
@@ -349,16 +350,25 @@ function contains(string, array) {
   <div>
     <div class="container">
       <b-row>
-        <b-col>
-          <p class="lead"> Results for </p>
-          <h1 class="display-3"> {{ result.metadata.name }} </h1>
-          <h3 class="text-muted"> {{ result.metadata.datetime }} </h3>
-        </b-col>
-        <b-col>
-          <div class="float-end">
-            <SettingsModal :resultId="result.id" />
-          </div>
-        </b-col>
+        <b-col><p class="lead" > Results for </p>
+      <h1 class="display-3"> {{ result.metadata.name }}    </h1>
+      <h3 class="text-muted"> {{ result.metadata.datetime}} </h3>
+      </b-col>
+      <b-col>
+        <div class="float-end">
+          <SettingsModal :resultId="result.id"/>
+          <b-form-input type="number" 
+            v-model="validationAmount"
+            v-b-tooltip.hover
+            title="Number of validation runs"></b-form-input>
+          <b-button @click="validate()"
+            variant="outline-primary fw-bold"
+            v-b-tooltip.hover
+            title="Validate this experiment"
+            >Validate run
+          </b-button>
+        </div>
+      </b-col>
       </b-row>
       <p class="lead">
         Tags:
@@ -451,21 +461,35 @@ function contains(string, array) {
         <!--Show recommendations for all datasets for now TODO-->
         <!--Currently only shows the results of the first dataset-->
         <template v-for="(entry, index) in userTables" :key="data">
-          <template v-if="visibleDatasets.includes(getDatasetName(entry))" :key="visibleDatasets">
-            <template v-if="visibleMatrices.includes(entry)" :key="visibleMatrices">
-              <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
-              <div :class="visibleMatrices.length > 1 ? 'col-6' : 'col'">
-                <Table v-if="selectedHeaders[index]" :key="props.result.id" :caption="entry" recs
-                  :results="data.results[index]" :headers="selectedHeaders[index].map(makeHeader)" :filters="filters"
-                  :filterOptions="availableFilters" :headerOptions="optionalHeaderOptions[index]"
-                  :userOptions="userHeaderOptions[index]" :itemOptions="itemHeaderOptions[index]" pagination expandable
-                  @paginationSort="(i) => paginationSort(i, index)" @loadMore="
-                    (increase, amount) => loadMore(increase, amount, index)
-                  " @changeFilters="
-  (changedFilters) => changeFilters(changedFilters, index)
-" @updateHeaders="(headers) => updateHeaders(headers, index)" />
-              </div>
-            </template>
+          <template v-if=
+          "visibleDatasets.includes(getDatasetName(entry)) &&
+          visibleMatrices.includes(entry)" 
+          :key="visibleUserTables">
+            <!-- <template v-if="visibleMatrices.includes(entry)" :key="visibleMatrices"> -->
+          <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
+            <div :class="visibleMatrices.length > 1 ? 'col-6' : 'col'">
+              <Table
+                v-if="selectedHeaders[index]"
+                :key="props.result.id"
+                :caption="entry"
+                :results="data.results[index]"
+                :headers="selectedHeaders[index].map(makeHeader)"
+                :filters="filters"
+                :filterOptions="availableFilters"
+                :headerOptions="optionalHeaderOptions[index]"
+                pagination
+                expandable
+                @paginationSort="(i) => paginationSort(i, index)"
+                @loadMore="
+                  (increase, amount) => loadMore(increase, amount, index)
+                "
+                @changeFilters="
+                  (changedFilters) => changeFilters(changedFilters, index)
+                "
+                @updateHeaders="(headers) => updateHeaders(headers, index)"
+              />
+            </div>
+            <!-- </template> -->
           </template>
         </template>
       </div>

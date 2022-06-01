@@ -46,6 +46,7 @@ class QueueItem:
     status: Status
     progress: ProgressStatus
     name: str
+    validating: bool = False
 
 
 def formatted_queue():
@@ -78,7 +79,10 @@ def calculate_first():
 
     # If there is a queue item to do, run it.
     if first:
-        run_new_experiment(first)
+        if first.validating:
+            validate_experiment(first)
+        else:
+            run_new_experiment(first)
         # mock_experiment(experiment)
 
 
@@ -101,8 +105,8 @@ def run_experiment(experiment):
 
     return EventHandler(current_experiment, end_experiment).events
 
-def run_new_experiment(experiment):    
-    events = run_experiment(experiment)
+def run_new_experiment(experiment):  
+    events = run_experiment(experiment)  
     # Create config files directory if it doesn't exist yet.
     if not os.path.isdir(CONFIG_DIR):
         os.mkdir(CONFIG_DIR)
@@ -118,17 +122,20 @@ def run_new_experiment(experiment):
                                                      recommender_system.data_registry,
                                                      recommender_system.experiment_factory)
 
-    event_handler = EventHandler(current_experiment, end_experiment)
-    recommender_system.run_experiment(config, events=event_handler.events)
+    recommender_system.run_experiment(config, events=events)
 
     # TODO USE THIS FUNCTION INSTEAD OF PARSING
     # recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)
 
-def validate_experiment(filepath):
-    experiment = QueueItem(job={}, config={}, name='',status=Status.DONE, progress=ProgressStatus.NA)
-    print(experiment)
+def validate_experiment(experiment):
     events = run_experiment(experiment)
-    recommender_system.validate_experiment(result_dir=filepath, num_runs=1, events=events)
+    recommender_system.validate_experiment(result_dir=experiment.job['filepath'], num_runs=experiment.job['amount'], events=events)
+
+def add_validation(filepath, amount):
+    experiment = QueueItem(job={'filepath': filepath, 'amount': amount}, config={}, name='',status=Status.TODO, progress=ProgressStatus.NA, validating=True)
+    experiment_queue.append(experiment)
+    calculate_first()
+
 
 def send_email(metadata, timestamp):
     print("llanfairpwlchfairgwyngychgogerychchwryrndrwbwchllantisiligogogoch")

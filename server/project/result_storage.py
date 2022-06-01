@@ -266,11 +266,7 @@ def add_result(result):
     """
     file_results = load_results_overview()
     file_results['all_results'].append(result)
-    write_results_overview(file_results)
-
-def add_run(runid):
-    file_results = load_results_overview()
-    
+    write_results_overview(file_results)    
 
 
 def delete_result(result_id):
