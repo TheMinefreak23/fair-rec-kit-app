@@ -424,26 +424,24 @@ async function getInfo() {
       </p>
 
     </div>
-    <div class="container">
-      <div class="row">
-        <h4>Metrics</h4>
+    <b-container>
+      <h4>Metrics</h4>
 
+      <b-row>
         <!--Show first two dataset results for now TODO-->
-        <template v-for="(datasetResult, index) in result.result[1]
-        ? [result.result[0], result.result[1]]
-        : [result.result[0]]" :key="datasetResult">
-          <p> {{ datasetResult.results[0].dataset }}</p>
-          <div :class="result.length > 1 ? 'col-6' : 'col'">
+        <template v-for="(datasetResult, index) in result.result" :key="datasetResult">
+          <b-col :cols="result.result.length > 1 ? '6' : '12'">
+            <p> {{ datasetResult.results[0].dataset }}</p>
             <template v-if="visibleDatasets.includes(datasetResult.dataset.dataset)" :key="visibleDatasets">
               <Table :caption="userTables[index]" :results="hideResults(datasetResult.results)"
                 :headers="hideHeaders(datasetResult.headers)" :removable="false" />
               <b-button @click="exportTable(index)">Export table</b-button>
             </template>
-          </div>
-          <p> {{ datasetResult.results }}</p>
+          </b-col>
+          <!--<p> {{ datasetResult.results }}</p>-->
         </template>
-      </div>
-    </div>
+      </b-row>
+    </b-container>
 
     <div class="container">
       <div class="row">
