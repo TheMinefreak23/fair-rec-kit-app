@@ -6,12 +6,9 @@ Utrecht University within the Software Project course.
 import enum
 import json
 import os
-import threading
 import time
 from dataclasses import dataclass
 from datetime import datetime
-from tkinter.ttk import Progressbar
-from click import progressbar
 import yaml
 from fairreckitlib.experiment.experiment_config_parsing import Parser
 
@@ -20,6 +17,7 @@ from fairreckitlib.recommender_system import RecommenderSystem
 from flask import (Blueprint, request)
 
 from . import result_storage
+from . import result_loader
 from .events import ProgressStatus, Status, EventHandler
 from .options_formatter import create_available_options, config_dict_from_settings
 
@@ -194,7 +192,7 @@ def calculate():
         if current_experiment:
             if current_experiment.status == Status.DONE:
                 # Set current result, TODO hacky
-                result_storage.result_by_id(current_experiment.job['timestamp']['stamp'])
+                result_loader.result_by_id(current_experiment.job['timestamp']['stamp'])
                 response['calculation'] = result_storage.current_result
             if current_experiment.status == Status.DONE or current_experiment.status == Status.ABORTED:
                 current_experiment = None
