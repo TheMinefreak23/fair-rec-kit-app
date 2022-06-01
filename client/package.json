@@ -22,6 +22,13 @@
   "devDependencies": {
     "@testing-library/vue": "^6.5.1",
     "@vitejs/plugin-vue": "^2.2.2",
+    "eslint": "^8.16.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.2.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-vue": "^9.0.1",
     "happy-dom": "^2.49.0",
     "sass": "^1.49.11",
     "vite": "^2.8.4",

@@ -6,7 +6,7 @@ import { computed, onMounted, ref } from 'vue'
 import sortBy from 'just-sort-by'
 import { API_URL } from '../api'
 import { formatMetadata } from '../helpers/metadataFormatter'
-import FormGroupList from './FormGroupList.vue'
+import FormGroupList from './Form/FormGroupList.vue'
 import { validateEmail, emptyFormGroup } from '../helpers/optionsFormatter'
 import { store } from '../store'
 import { makeHeader, capitalise } from '../helpers/resultFormatter'
@@ -383,11 +383,10 @@ async function showMusicDetail(spotifyId) {
     @ok="$emit('changeFilters', filters)"
   >
     <FormGroupList
-      v-model:data="filters"
+      v-model="filters"
       name="filter"
-      plural="filters"
+      title="filters"
       :options="filterOptions"
-      id="filters"
     />
   </b-modal>
 

@@ -13,7 +13,6 @@ from .previous_results import results_bp
 from .result_storage import create_results_overview
 from .mail import make_mail, mail_bp
 
-mail = {}
 def create_app():
     """Instantiate the app."""
     app = Flask(__name__)
