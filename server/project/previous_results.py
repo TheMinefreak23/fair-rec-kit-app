@@ -79,11 +79,11 @@ def result_by_id():
 @results_bp.route('/edit', methods=['POST'])
 def edit():
     data = request.get_json()
-    index = data.get('index')
+    id = data.get('id')
     new_name = data.get('new_name')
     new_tags = data.get('new_tags')
     new_email = data.get('new_email')
-    result_storage.edit_result(index, new_name, new_tags, new_email)
+    result_storage.edit_result(id, new_name, new_tags, new_email)
     return "Edited index"
 
 

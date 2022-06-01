@@ -9,6 +9,7 @@ import { store, pollForResult } from '../store.js'
 import { API_URL } from '../api'
 import { emptyFormGroup, validateEmail } from '../helpers/optionsFormatter'
 import { progress } from '../helpers/queueFormatter'
+import Tags from './Tags.vue'
 
 const options = ref()
 
@@ -134,14 +135,12 @@ function reformat(property) {
 <template>
   <div class="py-2 mx-5">
     <b-card>
-      <b-row class="text-center"> <h3>New Experiment</h3></b-row>
+      <b-row class="text-center">
+        <h3>New Experiment</h3>
+      </b-row>
       <!--This form contains all the necessary parameters for a user to submit a request for a experiment-->
-      <b-form
-        v-if="options"
-        @submit="$event.preventDefault(), sendToServer()"
-        @keydown.enter.prevent
-        @reset="$event.preventDefault(), initSettings()"
-      >
+      <b-form v-if="options" @submit="$event.preventDefault(), sendToServer()" @keydown.enter.prevent
+        @reset="$event.preventDefault(), initSettings()">
         <b-row class="text-center">
           <b-row>
             <b-col>
@@ -150,10 +149,7 @@ function reformat(property) {
                   <p>Experiment type</p>
                 </b-col>
                 <b-col md="auto">
-                  <b-form-radio-group
-                    v-model="form.experimentMethod"
-                    :options="experimentMethods"
-                  >
+                  <b-form-radio-group v-model="form.experimentMethod" :options="experimentMethods">
                   </b-form-radio-group>
                 </b-col>
               </b-row>
@@ -167,37 +163,23 @@ function reformat(property) {
               <b-row>
                 <b-col>
                   <b-form-group label-cols-md="4" label="Experiment name">
-                    <b-form-input
-                      placeholder="New experiment"
-                      v-model="metadata.name"
-                    ></b-form-input>
+                    <b-form-input placeholder="New experiment" v-model="metadata.name"></b-form-input>
                   </b-form-group>
                 </b-col>
                 <b-col>
                   <b-form-group label-cols-md="4" label="E-mail (optional)">
-                    <b-form-input
-                      type="email"
-                      placeholder="example@mail.com"
-                      :state="
-                        metadata.email
-                          ? validateEmail(metadata.email) != null
-                          : null
-                      "
-                      v-model="metadata.email"
-                    ></b-form-input>
+                    <b-form-input type="email" placeholder="example@mail.com" :state="
+                      metadata.email
+                        ? validateEmail(metadata.email) != null
+                        : null
+                    " v-model="metadata.email"></b-form-input>
                   </b-form-group>
                 </b-col>
                 <b-col cols="12">
                   <b-form-group label-cols-md="2" label="Tags (optional)">
-                    <b-form-tags
-                      v-model="metadata.tags"
-                      tag-pills
-                      tag-variant="dark"
-                      remove-on-delete
-                      separator=" ,;"
-                      size="lg"
-                    ></b-form-tags> </b-form-group
-                ></b-col>
+                    <Tags v-model="metadata.tags" />
+                  </b-form-group>
+                </b-col>
               </b-row>
             </b-col>
           </b-row>
@@ -205,65 +187,42 @@ function reformat(property) {
           <b-col class="g-0" cols="6">
             <!--User can select a dataset.-->
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
-              <FormGroupList
-                v-model="form.lists.datasets"
-                name="dataset"
-                title="datasets"
-                :options="options.datasets"
-                required
-              />
+              <FormGroupList v-model="form.lists.datasets" name="dataset" title="datasets" :options="options.datasets"
+                required />
             </div>
           </b-col>
 
           <b-col class="g-0" cols="6">
             <!-- User can select any number of recommender approaches -->
             <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
-              <FormGroupList
-                v-model="form.lists.approaches"
-                name="approach"
-                :title="
-                  (form.experimentMethod == 'recommendation'
-                    ? 'recommender'
-                    : 'predictor') + ' approaches'
-                "
-                :options="
-                  form.experimentMethod == 'recommendation'
-                    ? options.recommenders
-                    : options.predictors
-                "
-                :required="true"
-              />
+              <FormGroupList v-model="form.lists.approaches" name="approach" :title="
+                (form.experimentMethod == 'recommendation'
+                  ? 'recommender'
+                  : 'predictor') + ' approaches'
+              " :options="
+  form.experimentMethod == 'recommendation'
+    ? options.recommenders
+    : options.predictors
+" :required="true" />
 
               <b-row>
                 <b-row v-if="form.experimentMethod == 'recommendation'">
                   <b-col md="auto">
                     <!--User can select the amount of recommendations per user -->
-                    <b-form-group
-                      label="Select number of recommendations per user: *"
-                    >
-                      <b-form-input
-                        type="range"
-                        :min="options.defaults.recCount.min"
-                        :max="options.defaults.recCount.max"
-                        v-model="form.recommendations"
-                      />
+                    <b-form-group label="Select number of recommendations per user: *">
+                      <b-form-input type="range" :min="options.defaults.recCount.min"
+                        :max="options.defaults.recCount.max" v-model="form.recommendations" />
                     </b-form-group>
                   </b-col>
                   <b-col md="auto">
-                    <b-form-input md="auto" v-model="form.recommendations"
-                      >{{ form.recommendations }}
+                    <b-form-input md="auto" v-model="form.recommendations">{{ form.recommendations }}
                     </b-form-input>
                   </b-col>
                   <b-col md="auto">
-                    <b-form-checkbox
-                      v-model="form.includeRatedItems"
-                      buttons
-                      button-variant="outline-primary"
-                      required
-                      >Include already rated items in
-                      recommendations</b-form-checkbox
-                    ></b-col
-                  >
+                    <b-form-checkbox v-model="form.includeRatedItems" buttons button-variant="outline-primary" required>
+                      Include already rated items in
+                      recommendations</b-form-checkbox>
+                  </b-col>
                 </b-row>
               </b-row>
             </div>
@@ -272,49 +231,28 @@ function reformat(property) {
             <b-col>
               <!--User can select any number of metrics -->
               <div class="p-2 my-2 mx-1 rounded-3 bg-secondary">
-                <FormGroupList
-                  v-model="form.lists.metrics"
-                  name="metric"
-                  title="metrics"
-                  :maxK="form.recommendations"
+                <FormGroupList v-model="form.lists.metrics" name="metric" title="metrics" :maxK="form.recommendations"
                   :options="
                     form.experimentMethod == 'recommendation'
                       ? options.recMetrics
                       : options.predMetrics
-                  "
-                />
+                  " />
               </div>
             </b-col>
             <!-- Buttons to submit or reset an experiment-->
             <div class="d-flex justify-content-center">
-              <b-button class="mx-1" size="lg" type="reset" variant="danger"
-                >Reset</b-button
-              >
-              <b-button class="mx-1" size="lg" type="submit" variant="primary"
-                >Send</b-button
-              >
+              <b-button class="mx-1" size="lg" type="reset" variant="danger">Reset</b-button>
+              <b-button class="mx-1" size="lg" type="submit" variant="primary">Send</b-button>
             </div>
           </b-row>
         </b-row>
       </b-form>
       <!--Send a plethora of mock data to the queue-->
-      <b-button type="test" variant="warning" @click="sendMockData(options)"
-        >Mock</b-button
-      >
+      <b-button type="test" variant="warning" @click="sendMockData(options)">Mock</b-button>
       <!--Simple version of the mock-->
-      <b-button
-        type="test"
-        variant="primary"
-        @click="sendMockData(options, true)"
-        >Simple Mock</b-button
-      >
+      <b-button type="test" variant="primary" @click="sendMockData(options, true)">Simple Mock</b-button>
       <!--Simple version of the mock with metrics-->
-      <b-button
-        type="test"
-        variant="primary"
-        @click="sendMockData(options, true, true)"
-        >Metric Mock</b-button
-      >
+      <b-button type="test" variant="primary" @click="sendMockData(options, true, true)">Metric Mock</b-button>
     </b-card>
   </div>
 </template>
