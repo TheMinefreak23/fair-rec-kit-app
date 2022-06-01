@@ -290,7 +290,7 @@ def mock_evaluate(approach, metric):
 
 def append_queue(metadata, settings):
     """
-    Add a experiment item (settings) to the queue.
+    Add an experiment item (settings) to the queue.
 
     :param metadata: the experiment metadata
     :param settings: the experiment settings

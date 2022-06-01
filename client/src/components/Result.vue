@@ -3,13 +3,12 @@
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
-import Table from './Table.vue';
-import { onMounted, ref } from 'vue';
-import { emptyFormGroup } from '../helpers/optionsFormatter';
-import { makeHeader } from '../helpers/resultFormatter';
-import { API_URL } from '../api';
-import { loadResult } from '../helpers/resultRequests';
-import SettingsModal from './Table/SettingsModal.vue';
+import Table from './Table.vue'
+import { onMounted, ref } from 'vue'
+import { emptyFormGroup } from '../helpers/optionsFormatter'
+import { makeHeader } from '../helpers/resultFormatter'
+import { API_URL } from '../api'
+import SettingsModal from './Table/SettingsModal.vue'
 
 const props = defineProps({ headers: Array, result: Object });
 
@@ -18,7 +17,6 @@ const selectedHeaders = ref([
   [{ name: 'Rank' }, { name: 'User' }, { name: 'Item' }, { name: 'Score' }],
 ]);
 
-const experiment_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 ']);
 
 const data = ref({ results: [[]] })
 const runID = ref(0)
@@ -34,6 +32,8 @@ const userHeaderOptions = ref([[]])
 const itemHeaderOptions = ref([[]])
 const userTables = combineResults(props.result.result)
 const visibleDatasets = ref([])
+const visibleMetrics = ref([])
+const availableMetrics = ref([])
 const uniqueDatasets = findUniqueDatasets()
 const visibleMatrices = ref([])
 
@@ -42,15 +42,19 @@ onMounted(() => {
   console.log('result id', props.result.id);
   //loadEvaluations()
   //loadResult(props.result.id)
-  fillVisibleDatasets();
-  // Load in all the user recommendation/prediction tables
+  fillVisibleDatasets()
+  fillShownMetrics()
+  //Load in all the user recommendation/prediction tables
   for (let index in userTables) {
     setRecs(parseInt(index));
   }
   console.log('availableFilters', availableFilters.value);
 });
 
-// GET request: Get available header options for selection from server
+/** 
+ * GET request: Get available header options for selection from server
+ * @param {Int}  index  - index of the current result table
+ */
 async function getHeaderOptions(index) {
   const requestOptions = {
     method: 'POST',
@@ -121,7 +125,10 @@ async function getEvaluations() {
   console.log('results data', resultsData)
 }*/
 
-//POST request: Ask server for next part of user recommendation table.
+/**
+ * POST request: Ask server for next part of user recommendation table.
+ * @param {Int}   currentTable  - Index of which result file to load (from overview.json)
+ */
 async function getUserRecs(currentTable) {
   const requestOptions = {
     method: 'POST',
@@ -276,6 +283,82 @@ function findUniqueDatasets() {
   return Array.from(new Set(datasetnames))
 }
 
+/**
+ * Fill array of metrics that are shown so that all are shown upon loading the page
+ */
+function fillShownMetrics() {
+  let result = props.result.result
+  let i = 0
+  for (let dataset in result) {
+    for (let metric in result[dataset].headers)
+
+      if (!(result[dataset].headers[metric].name.includes("Approach")) && !(visibleMetrics.value.includes(result[dataset].headers[metric].name))) {
+        visibleMetrics.value[i] = result[dataset].headers[metric].name
+        availableMetrics.value[i] = result[dataset].headers[metric].name
+        i++
+      }
+  }
+
+}
+
+/**
+ * Return an array of filtered headers, so that only those selected are shown
+ * @param {Array} headers  - array of headers that have to be checked
+ */
+function hideHeaders(headers) {
+  let result = []
+  for (let i = 0; i < headers.length; i++) {
+    if (visibleMetrics.value.includes(headers[i].name) || headers[i].name == "Approach") {
+      result.push(headers[i])
+    }
+  }
+
+  return result
+}
+
+/**
+ * Return an array of filtered results, so that only results for the selected
+ * headers are shown
+ * @param {Array} results  - array of results that have to be filtered
+ */
+function hideResults(results) {
+  let result = []
+  for (let i = 0; i < results.length; i++) {
+    const object_as_array = Object.entries(results[i]).filter(([property, value]) => {
+      return property.startsWith('approach') || contains(property, visibleMetrics.value)
+    })
+    result.push(Object.fromEntries(object_as_array))
+  }
+
+  return result
+}
+
+/**
+ * Check if input string starts with any of the array elements, 
+ * return a boolean
+ * @param {String} string - string that might start with element of array
+ * @param {Array} array - array of strings that might be part of the string
+ */
+function contains(string, array) {
+  return array.some(element => string.startsWith(element))
+}
+
+
+// Get music detail info
+async function getInfo() {
+  songInfo.value = await getSongInfo(
+    token.value,
+    query.value.track,
+    query.value.artist
+  )
+
+  tracks.value = await songInfo.value.Spotify
+  track.value = tracks.value.items[0]
+  //get AcousticBrainz highlevel features using LastFM's mbid
+  highlevelFeatures.value = await songInfo.value.AcousticBrainz[
+    songInfo.value.LastFM.track.mbid
+  ][0]['highlevel']
+}
 </script>
 
 <template>
@@ -330,26 +413,35 @@ function findUniqueDatasets() {
       </div>
       </p>
 
-    </div>
-    <div class="container">
-      <div class="row">
-        <h4>Metrics</h4>
+      <p>
+        Metrics shown:
+      <div class="form-check" v-for="metric in availableMetrics">
+        <input v-model="visibleMetrics" class="form-check-input" type="checkbox" :value="metric" :id="metric" />
+        <label class="form-check-label" :id="metric">
+          {{ metric }}
+        </label>
+      </div>
+      </p>
 
+    </div>
+    <b-container>
+      <h4>Metrics</h4>
+
+      <b-row>
         <!--Show first two dataset results for now TODO-->
-        <template v-for="(datasetResult, index) in result.result[1]
-        ? [result.result[0], result.result[1]]
-        : [result.result[0]]" :key="datasetResult">
-          <p> {{ datasetResult.results[0].dataset }}</p>
-          <div :class="result.length > 1 ? 'col-6' : 'col'">
+        <template v-for="(datasetResult, index) in result.result" :key="datasetResult">
+          <b-col :cols="result.result.length > 1 ? '6' : '12'">
+            <p> {{ datasetResult.results[0].dataset }}</p>
             <template v-if="visibleDatasets.includes(datasetResult.dataset.dataset)" :key="visibleDatasets">
-              <Table :caption="userTables[index]" :results="datasetResult.results" :headers="datasetResult.headers"
-                :removable="false" />
+              <Table :caption="userTables[index]" :results="hideResults(datasetResult.results)"
+                :headers="hideHeaders(datasetResult.headers)" :removable="false" />
               <b-button @click="exportTable(index)">Export table</b-button>
             </template>
-          </div>
+          </b-col>
+          <!--<p> {{ datasetResult.results }}</p>-->
         </template>
-      </div>
-    </div>
+      </b-row>
+    </b-container>
 
     <div class="container">
       <div class="row">
