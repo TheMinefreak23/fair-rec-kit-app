@@ -4,7 +4,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
 import Table from './Table.vue'
-import { onMounted, ref} from 'vue'
+import { onMounted, ref } from 'vue'
 import { emptyFormGroup } from '../helpers/optionsFormatter'
 import { makeHeader } from '../helpers/resultFormatter'
 import { API_URL } from '../api'
@@ -23,7 +23,7 @@ const runID = ref(0)
 const startIndex = ref(0)
 const sortIndex = ref(0)
 const ascending = ref(true)
-const entryAmount = ref(20)
+const entryAmount = ref(10)
 const optionalHeaders = ref([[]])
 const availableFilters = ref([])
 const filters = ref(emptyFormGroup(false))
@@ -33,7 +33,7 @@ const itemHeaderOptions = ref([[]])
 const userTables = combineResults(props.result.result)
 const visibleDatasets = ref([])
 const visibleMetrics = ref([])
-const availableMetrics =ref([])
+const availableMetrics = ref([])
 const uniqueDatasets = findUniqueDatasets()
 const visibleMatrices = ref([])
 
@@ -56,7 +56,7 @@ onMounted(() => {
  * @param {Int}  index  - index of the current result table
  */
 async function getHeaderOptions(index) {
-  const requestOptions = { 
+  const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -159,7 +159,7 @@ async function exportTable(currentTable) {
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-type': 'application/json' },
-    body: JSON.stringify({ results: props.result.result[currentTable].results}),
+    body: JSON.stringify({ results: props.result.result[currentTable].results }),
   }
   const response = await fetch(
     API_URL + '/all-results/export',
@@ -269,16 +269,16 @@ function getDatasetName(string) {
 /**
  * Fill array of datasets that are shown so that all are shown upon loading the page
  */
-function fillVisibleDatasets(){
+function fillVisibleDatasets() {
   visibleDatasets.value = findUniqueDatasets()
-   
+
 }
 
 /**
  * Create an array that has all unique datasets in the result
  * @returns {string}         - a list of all datasets in the experiments without duplicates
  */
-function findUniqueDatasets(){
+function findUniqueDatasets() {
   let datasetnames = userTables.map(getDatasetName)
   return Array.from(new Set(datasetnames))
 }
@@ -286,18 +286,18 @@ function findUniqueDatasets(){
 /**
  * Fill array of metrics that are shown so that all are shown upon loading the page
  */
-function fillShownMetrics(){
+function fillShownMetrics() {
   let result = props.result.result
-  let i=0
-  for(let dataset in result) {
-     for(let metric in result[dataset].headers)
-      
-       if (!(result[dataset].headers[metric].name.includes("Approach")) && !(visibleMetrics.value.includes(result[dataset].headers[metric].name))) {
-             visibleMetrics.value[i] = result[dataset].headers[metric].name
-              availableMetrics.value[i] = result[dataset].headers[metric].name
-              i++
-     }        
-  } 
+  let i = 0
+  for (let dataset in result) {
+    for (let metric in result[dataset].headers)
+
+      if (!(result[dataset].headers[metric].name.includes("Approach")) && !(visibleMetrics.value.includes(result[dataset].headers[metric].name))) {
+        visibleMetrics.value[i] = result[dataset].headers[metric].name
+        availableMetrics.value[i] = result[dataset].headers[metric].name
+        i++
+      }
+  }
 
 }
 
@@ -305,14 +305,13 @@ function fillShownMetrics(){
  * Return an array of filtered headers, so that only those selected are shown
  * @param {Array} headers  - array of headers that have to be checked
  */
-function hideHeaders(headers){
+function hideHeaders(headers) {
   let result = []
-     for(let i=0; i<headers.length; i++){
-        if (visibleMetrics.value.includes(headers[i].name) || headers[i].name == "Approach")
-        {
-          result.push(headers[i])
-        }
-      }
+  for (let i = 0; i < headers.length; i++) {
+    if (visibleMetrics.value.includes(headers[i].name) || headers[i].name == "Approach") {
+      result.push(headers[i])
+    }
+  }
 
   return result
 }
@@ -322,14 +321,14 @@ function hideHeaders(headers){
  * headers are shown
  * @param {Array} results  - array of results that have to be filtered
  */
-function hideResults(results){
+function hideResults(results) {
   let result = []
-    for(let i=0; i<results.length; i++) {
-      const object_as_array = Object.entries(results[i]).filter(([property, value]) => {
-        return property.startsWith('approach') || contains(property, visibleMetrics.value)
-      })
-      result.push(Object.fromEntries(object_as_array))
-    }
+  for (let i = 0; i < results.length; i++) {
+    const object_as_array = Object.entries(results[i]).filter(([property, value]) => {
+      return property.startsWith('approach') || contains(property, visibleMetrics.value)
+    })
+    result.push(Object.fromEntries(object_as_array))
+  }
 
   return result
 }
@@ -340,7 +339,7 @@ function hideResults(results){
  * @param {String} string - string that might start with element of array
  * @param {Array} array - array of strings that might be part of the string
  */
-function contains(string, array){
+function contains(string, array) {
   return array.some(element => string.startsWith(element))
 }
 
@@ -366,82 +365,63 @@ async function getInfo() {
   <div>
     <div class="container">
       <b-row>
-        <b-col><p class="lead" > Results for </p>
-      <h1 class="display-3"> {{ result.metadata.name }}    </h1>
-      <h3 class="text-muted"> {{ result.metadata.datetime}} </h3>
-      </b-col>
-      <b-col>
-        <div class="float-end">
-          <SettingsModal :resultId="result.id"/>
-            </div>
-      </b-col>
+        <b-col>
+          <p class="lead"> Results for </p>
+          <h1 class="display-3"> {{ result.metadata.name }} </h1>
+          <h3 class="text-muted"> {{ result.metadata.datetime }} </h3>
+        </b-col>
+        <b-col>
+          <div class="float-end">
+            <SettingsModal :resultId="result.id" />
+          </div>
+        </b-col>
       </b-row>
       <p class="lead">
         Tags:
         <template v-if="!result.metadata.tags">None</template>
         <template v-for="tag in result.metadata.tags">
-          <b-button disabled> {{ tag }} </b-button
-          >
+          <b-button disabled> {{ tag }} </b-button>
         </template>
       </p>
       <b-button @click="validate()">Validate run</b-button>
       <p>
         Datasets showing items per user:
-        <div class="form-check" v-for="dataset in uniqueDatasets">
-          <input
-            v-model = "visibleDatasets"
-            class = "form-check-input"
-            type="checkbox"
-            :value="dataset"
-            :id="dataset"
-          />
-          <label class="form-check-label" :id="dataset">
-            {{dataset}}
-          </label>
-        </div>
+      <div class="form-check" v-for="dataset in uniqueDatasets">
+        <input v-model="visibleDatasets" class="form-check-input" type="checkbox" :value="dataset" :id="dataset" />
+        <label class="form-check-label" :id="dataset">
+          {{ dataset }}
+        </label>
+      </div>
       </p>
 
       <p>
         Metrics shown:
-        <div class="form-check" v-for="metric in availableMetrics">
-          <input
-            v-model = "visibleMetrics"
-            class = "form-check-input"
-            type = "checkbox"
-            :value="metric"
-            :id="metric"
-            />
-          <label class="form-check-label" :id="metric">
-            {{metric}}
-          </label>
-        </div>
+      <div class="form-check" v-for="metric in availableMetrics">
+        <input v-model="visibleMetrics" class="form-check-input" type="checkbox" :value="metric" :id="metric" />
+        <label class="form-check-label" :id="metric">
+          {{ metric }}
+        </label>
+      </div>
       </p>
 
     </div>
     <div class="container">
       <div class="row">
-      <h4>Metrics</h4>
-          
-          <!--Show first two dataset results for now TODO-->
-        <template
-          v-for="(datasetResult, index) in result.result[1]
-            ? [result.result[0], result.result[1]]
-            : [result.result[0]]"
-          :key="datasetResult"
-        >
-          <p> {{datasetResult.results[0].dataset}}</p>
+        <h4>Metrics</h4>
+
+        <!--Show first two dataset results for now TODO-->
+        <template v-for="(datasetResult, index) in result.result[1]
+        ? [result.result[0], result.result[1]]
+        : [result.result[0]]" :key="datasetResult">
+          <p> {{ datasetResult.results[0].dataset }}</p>
           <div :class="result.length > 1 ? 'col-6' : 'col'">
             <template v-if="visibleDatasets.includes(datasetResult.dataset.dataset)" :key="visibleDatasets">
-              <Table
-                :caption="userTables[index]"
-                :results="hideResults(datasetResult.results)"
-                :headers="hideHeaders(datasetResult.headers)"
-                :removable="false"
-              />
+              <Table :caption="userTables[index]" :results="hideResults(datasetResult.results)"
+                :headers="hideHeaders(datasetResult.headers)" :removable="false" />
               <b-button @click="exportTable(index)">Export table</b-button>
             </template>
-          </div>  
-          <p> {{datasetResult.results}}</p>
+          </div>
+          <p> {{ datasetResult.results }}</p>
         </template>
       </div>
     </div>
@@ -454,21 +434,15 @@ async function getInfo() {
         </h4>
         <h4 v-else>Predicted rating per user</h4>
       </div>
-      
-     <p>
+
+      <p>
         Select items to be shown:
-        <div class="form-check" v-for="(entry, index) in userTables">
-          <input
-            v-model = "visibleMatrices"
-            class = "form-check-input"
-            type="checkbox"
-            :value="entry"
-            :id="entry"
-          />
-          <label class="form-check-label" :id="entry">
-            {{entry}}
-          </label>
-        </div>
+      <div class="form-check" v-for="(entry, index) in userTables">
+        <input v-model="visibleMatrices" class="form-check-input" type="checkbox" :value="entry" :id="entry" />
+        <label class="form-check-label" :id="entry">
+          {{ entry }}
+        </label>
+      </div>
       </p>
 
 
@@ -478,31 +452,18 @@ async function getInfo() {
         <template v-for="(entry, index) in userTables" :key="data">
           <template v-if="visibleDatasets.includes(getDatasetName(entry))" :key="visibleDatasets">
             <template v-if="visibleMatrices.includes(entry)" :key="visibleMatrices">
-          <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
-            <div :class="visibleMatrices.length > 1 ? 'col-6' : 'col'">
-              <Table
-                v-if="selectedHeaders[index]"
-                :key="props.result.id"
-                :caption="entry"
-                :results="data.results[index]"
-                :headers="selectedHeaders[index].map(makeHeader)"
-                :filters="filters"
-                :filterOptions="availableFilters"
-                :headerOptions="optionalHeaderOptions[index]"
-                :userOptions="userHeaderOptions[index]"
-                :itemOptions="itemHeaderOptions[index]"
-                pagination
-                expandable
-                @paginationSort="(i) => paginationSort(i, index)"
-                @loadMore="
-                  (increase, amount) => loadMore(increase, amount, index)
-                "
-                @changeFilters="
-                  (changedFilters) => changeFilters(changedFilters, index)
-                "
-                @updateHeaders="(headers) => updateHeaders(headers, index)"
-              />
-            </div>
+              <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
+              <div :class="visibleMatrices.length > 1 ? 'col-6' : 'col'">
+                <Table v-if="selectedHeaders[index]" :key="props.result.id" :caption="entry"
+                  :results="data.results[index]" :headers="selectedHeaders[index].map(makeHeader)" :filters="filters"
+                  :filterOptions="availableFilters" :headerOptions="optionalHeaderOptions[index]"
+                  :userOptions="userHeaderOptions[index]" :itemOptions="itemHeaderOptions[index]" pagination expandable
+                  @paginationSort="(i) => paginationSort(i, index)" @loadMore="
+                    (increase, amount) => loadMore(increase, amount, index)
+                  " @changeFilters="
+  (changedFilters) => changeFilters(changedFilters, index)
+" @updateHeaders="(headers) => updateHeaders(headers, index)" />
+              </div>
             </template>
           </template>
         </template>
