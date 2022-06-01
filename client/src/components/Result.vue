@@ -10,7 +10,6 @@ import { makeHeader } from '../helpers/resultFormatter';
 import { API_URL } from '../api';
 import { loadResult } from '../helpers/resultRequests';
 import SettingsModal from './Table/SettingsModal.vue';
-import DictionaryDisplay from './Table/DictionaryDisplay.vue';
 
 const props = defineProps({ headers: Array, result: Object });
 
@@ -380,7 +379,7 @@ function findUniqueDatasets() {
             <template v-if="visibleMatrices.includes(entry)" :key="visibleMatrices">
               <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
               <div :class="visibleMatrices.length > 1 ? 'col-6' : 'col'">
-                <Table v-if="selectedHeaders[index]" :key="props.result.id" :caption="entry"
+                <Table v-if="selectedHeaders[index]" :key="props.result.id" :caption="entry" recs
                   :results="data.results[index]" :headers="selectedHeaders[index].map(makeHeader)" :filters="filters"
                   :filterOptions="availableFilters" :headerOptions="optionalHeaderOptions[index]"
                   :userOptions="userHeaderOptions[index]" :itemOptions="itemHeaderOptions[index]" pagination expandable

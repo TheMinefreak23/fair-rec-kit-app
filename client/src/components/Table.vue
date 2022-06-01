@@ -25,6 +25,7 @@ const emit = defineEmits([
   'updateHeaders',
 ])
 const props = defineProps({
+  recs: Boolean,
   overview: Boolean,
   results: Array,
   headers: Array,
@@ -324,7 +325,7 @@ function isRecsHeader(key) {
 
 // TODO computed ?
 const filteredHeaders = () => {
-  return props.overview || infoHeaders.value.length == 0
+  return !props.recs || infoHeaders.value.length === 0
     ? props.headers
     : infoHeaders.value
 }
@@ -434,7 +435,7 @@ const filteredHeaders = () => {
         <template v-for="[key, value] in Object.entries(item)" :key="`${descending}_${sortindex}_${index}-${key}`">
           <!-- For recs tables, show filtered columns -->
           <!-- TODO refactor -->
-          <b-td v-if="overview || isRecsHeader(key)" class="text-center" :style="colItemStyle">
+          <b-td v-if="!recs || isRecsHeader(key)" class="text-center" :style="colItemStyle">
             <!--Special pill format for status-->
             <!-- TODO refactor-->
             <template v-if="typeof value === 'string' && value.startsWith(statusPrefix)">
@@ -481,8 +482,8 @@ const filteredHeaders = () => {
             <b-col md="auto" class="mx-0 px-0">
               <b-button v-if="editable" variant="primary" class="mx-1" @click="
                 ; (editModalShow = !editModalShow),
-  (selectedEntry = index),
-  getNameTagsMail(item.id)
+                (selectedEntry = index),
+                getNameTagsMail(item.id)
               " data-testid="edit"><i class="bi bi-pencil-square"></i></b-button>
             </b-col>
             <b-col md="auto" class="mx-0 px-0">
