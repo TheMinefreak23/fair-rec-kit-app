@@ -1,38 +1,33 @@
 <script setup>
-import MusicModal from './ItemDetail/MusicModal.vue'
-/*This program has been developed by students from the bachelor Computer Science at
+/* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
-© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+© Copyright Utrecht University (Department of Information and Computing Sciences) */
 
 import { onMounted, ref } from 'vue'
-import { getSpotifyToken, getSongInfo } from '../helpers/songInfo'
-const track = ref({})
+import MusicModal from './ItemDetail/MusicModal.vue'
+import { getSpotifyToken, getSpotifyInfo } from '../helpers/songInfo'
+const track = ref()
 const token = ref('test')
 const tracks = ref([])
 const query = ref({ track: 'orion', artist: 'metallica' })
-const highlevelFeatures = ref()
-const songInfo = ref()
+
 const modalShow = ref(false)
 
 onMounted(async () => {
   token.value = await getSpotifyToken()
-  getInfo()
+  getSpotifyTrack()
 })
 
-// Get music detail info
-async function getInfo() {
-  songInfo.value = await getSongInfo(
+// Get Spotify track info from track and artist query
+async function getSpotifyTrack() {
+  tracks.value = await getSpotifyInfo(
     token.value,
     query.value.track,
     query.value.artist
   )
 
-  tracks.value = await songInfo.value.Spotify
   track.value = tracks.value.items[0]
-  //get AcousticBrainz highlevel features using LastFM's mbid
-  highlevelFeatures.value = await songInfo.value.AcousticBrainz[
-    songInfo.value.LastFM.track.mbid
-  ][0]['highlevel']
+  // console.log('track from music detail info', track.value)
 }
 </script>
 
@@ -40,7 +35,7 @@ async function getInfo() {
   <b-container>
     <h1 class="text-center">Music Detail</h1>
     <b-row>
-      <b-form @submit="getInfo">
+      <b-form @submit="getSpotifyTrack">
         <b-row>
           <b-col>
             <b-form-group label="Track">
@@ -67,13 +62,13 @@ async function getInfo() {
     <b-card>
       <h3>Found tracks:</h3>
       <ul>
-        <li v-for="queryTrack in tracks.items">
+        <li v-for="queryTrack in tracks.items" :key="queryTrack">
           {{ queryTrack.name }}
         </li>
       </ul>
     </b-card>
 
-    <template v-if="track && highlevelFeatures && songInfo">
+    <template v-if="track">
       <b-button
         style="width: 20vw; display: block"
         class="mx-auto"
@@ -81,12 +76,7 @@ async function getInfo() {
         @click="modalShow = !modalShow"
         >Show track
       </b-button>
-      <MusicModal
-        :show="modalShow"
-        :track="track"
-        :lastFmTrack="songInfo.LastFM.track"
-        :highlevelFeatures="highlevelFeatures"
-      />
+      <MusicModal v-model="modalShow" :track="track" />
     </template>
   </b-container>
 </template>

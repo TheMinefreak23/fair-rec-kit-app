@@ -40,7 +40,7 @@ async function getOptions() {
   const response = await fetch(API_URL + '/experiment/options')
   const data = await response.json()
   options.value = data.options
-  console.log('options', options.value)
+  // console.log('options', options.value)
 }
 
 // POST request: Send form to server.

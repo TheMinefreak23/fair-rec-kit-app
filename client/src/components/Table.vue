@@ -1,7 +1,7 @@
 <script setup>
-/*This program has been developed by students from the bachelor Computer Science at
+/* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
-© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+© Copyright Utrecht University (Department of Information and Computing Sciences) */
 import { computed, onMounted, ref } from 'vue'
 import sortBy from 'just-sort-by'
 import { API_URL } from '../api'
@@ -13,8 +13,8 @@ import { makeHeader, capitalise } from '../helpers/resultFormatter'
 import { statusPrefix, statusVariant, status } from '../helpers/queueFormatter'
 import { loadResult } from '../helpers/resultRequests'
 import SettingsModal from './Table/SettingsModal.vue'
-import { getInfoFromSpotifyID, getSpotifyToken } from '../helpers/songInfo'
-import MusicModal from './ItemDetail/MusicModal.vue'
+import MusicItem from './ItemDetail/MusicItem.vue'
+import AudioSnippet from './ItemDetail/AudioSnippet.vue'
 
 const emit = defineEmits([
   'viewResult',
@@ -25,6 +25,7 @@ const emit = defineEmits([
   'updateHeaders',
 ])
 const props = defineProps({
+  recs: Boolean,
   overview: Boolean,
   results: Array,
   headers: Array,
@@ -44,17 +45,12 @@ const props = defineProps({
   defaultSort: Number,
 })
 
-const colWidth = '6em'
-const colItemStyle = {
-  minWidth: colWidth,
-  width: colWidth,
-  maxWidth: colWidth,
-  inlineSize: colWidth,
-  overflowWrap: 'break-word',
-}
+// Column width
+const colWidth = 6
+
 // Pagination
-const caption = ref('')
-const entryAmount = ref(20)
+// const caption = ref('')
+const entryAmount = ref(10)
 
 // Modals
 const deleteModalShow = ref(false)
@@ -81,11 +77,10 @@ const selectedEntry = ref(0)
 const sortindex = ref(0)
 const descending = ref(false)
 
-// Item (music) detail
-const track = ref()
-const highlevelFeatures = ref()
-const songInfo = ref({ lastFM: {} }) // TODO
-const musicModalShow = ref(false)
+// Item detail
+const infoHeaders = ref([])
+const itemsInfo = ref([])
+const additionalInfoAmount = ref(0)
 
 const subheaders = computed(() => {
   const result = []
@@ -101,21 +96,44 @@ const subheaders = computed(() => {
 })
 
 const sorted = computed(() => {
-  //console.log(props.results)
+  // console.log(props.results)
 
   if (!props.pagination) return sort(sortindex.value)
   else return props.results
 })
 
 onMounted(() => {
-  /*if (props.caption == 'Testcaption')
-    console.log('filterOptions', props.filterOptions)*/
+  /* if (props.caption == 'Testcaption')
+    console.log('filterOptions', props.filterOptions) */
   // Sort on default column if it is given
   if (props.defaultSort) {
     sortindex.value = props.defaultSort
     descending.value = true // For now sort by descending on default, TODO refactor
   }
+  /* console.log(
+    'HEADERS',
+    props.headers.map((header) => header.name)
+  ) */
+  // TODO refactor includes
+  if (
+    props.headers
+      .map((header) => header.name)
+      .some((name) => name.includes('spotify-uri'))
+  ) {
+    toggleInfoColumns(['Album', 'Snippet'])
+  }
 })
+
+function colItemStyle(colWidth) {
+  const width = colWidth + 'em'
+  return {
+    minWidth: width,
+    width,
+    maxWidth: width,
+    inlineSize: width,
+    overflowWrap: 'break-word',
+  }
+}
 
 /**
  * Turns a string into an array separated by comma's
@@ -140,7 +158,7 @@ function checkEmail(Email) {
 }
 
 async function editEntry() {
-  //Inform the server of the new values at the selected index
+  // Inform the server of the new values at the selected index
   newTagsList.value = stringToList(newTags.value)
   newEmail.value = checkEmail(newEmail.value)
   const requestOptions = {
@@ -174,9 +192,11 @@ async function removeEntry() {
   if (entry.remove) {
     // Remove first matching item from store
     const list = entry.fromQueue ? store.allResults : store.queue
-    for (let i in list) {
-      if (list[i].id == entry.id) list.splice(i, 1)
-      break
+    for (const i in list) {
+      if (list[i].id === entry.id) {
+        list.splice(i, 1)
+        break
+      }
     }
   }
 
@@ -233,7 +253,7 @@ function setsorting(i) {
   sortindex.value = i
   emit('paginationSort', i)
 }
-//console.log('propsfilteroptions', props.filterOptions)
+// console.log('propsfilteroptions', props.filterOptions)
 
 // TODO refactor
 function setEntryRemoval(item) {
@@ -255,10 +275,10 @@ function setEntryRemoval(item) {
   }
   selectedEntry.value = {
     id: item.id,
-    title: title,
-    description: description,
-    removeFromStore: removeFromStore,
-    fromQueue: fromQueue,
+    title,
+    description,
+    removeFromStore,
+    fromQueue,
   }
   deleteModalShow.value = !deleteModalShow.value
 }
@@ -276,47 +296,64 @@ function getTooltipText(item) {
   if (status == status.toDo) return 'Cancel'
   else return 'Cancel'
 }
+
 // Get music detail info
 // TODO refactor
 async function showMusicDetail(spotifyId) {
   const token = await getSpotifyToken()
   track.value = await getInfoFromSpotifyID(token, spotifyId)
   //console.log('track', track.value)
+  function isItemKey(key) {
+    const lowerKey = key.toLowerCase()
+    const itemKeys = ['item']
+    return itemKeys.includes(lowerKey) || lowerKey.includes('id')
+  }
 
-  // TODO
-  /*
-  //get AcousticBrainz highlevel features using LastFM's mbid
-  highlevelFeatures.value = await songInfo.value.AcousticBrainz[
-    songInfo.value.LastFM.track.mbid
-  ][0]['highlevel']*/
+  // Hide item (ID) columns and show info columns
+  function toggleInfoColumns(addHeaders) {
+    infoHeaders.value = [
+      ...props.headers.filter((header) => !isItemKey(header.name)),
+      ...addHeaders.map((header) => ({ name: header })),
+    ]
+    additionalInfoAmount.value = addHeaders.length // TODO refactor
+    // console.log('additional info amount', additionalInfoAmount.value)
+    console.log('toggleInfo infoHeaders', infoHeaders.value)
+    // emit('updateHeaders', newHeaders)
+  }
 
-  musicModalShow.value = !musicModalShow.value
-}
+  function isRecsHeader(key) {
+    // console.log('infoHeaders', infoHeaders.value)
+    /* console.log(
+      'filteredHeaders',
+      filteredHeaders().map((header) => header.name.toLowerCase())
+    )
+    console.log('filteredHeaders', key) */
+    return (
+      key &&
+      filteredHeaders()
+        .map((header) => header.name.toLowerCase())
+        .includes(key.split('_').join(' ')) // TODO refactor
+    )
+  }
+
+  // TODO computed ?
+  const filteredHeaders = () => {
+    return !props.recs || infoHeaders.value.length === 0
+      ? props.headers
+      : infoHeaders.value
+  }
 </script>
 
 <template>
   <!--Shows when the user wants to delete an entry-->
-  <b-modal
-    id="deletion-modal"
-    v-model="deleteModalShow"
-    :title="selectedEntry.title"
-    ok-title="Yes"
-    ok-variant="danger"
-    cancel-title="No"
-    @ok="removeEntry()"
-  >
+  <b-modal id="deletion-modal" v-model="deleteModalShow" :title="selectedEntry.title" ok-title="Yes" ok-variant="danger"
+    cancel-title="No" @ok="removeEntry()">
     <p>{{ selectedEntry.description }}</p>
   </b-modal>
 
   <!--Shows when the user wants to edit an entry-->
-  <b-modal
-    id="edit-modal"
-    v-model="editModalShow"
-    title="Editing results"
-    size="lg"
-    @ok="editEntry()"
-    @cancel="emptyVmodels()"
-  >
+  <b-modal id="edit-modal" v-model="editModalShow" title="Editing results" size="lg" @ok="editEntry()"
+    @cancel="emptyVmodels()">
     <h6>Please type in the new values. Blank fields will be left unchanged.</h6>
     Name:
     <b-form-input v-model="newName" placeholder="Enter new name"></b-form-input>
@@ -331,11 +368,7 @@ async function showMusicDetail(spotifyId) {
     <p v-else-if="newEmail != '' && newEmail != null" style="color: red">
       This is not a valid E-mail :(
     </p>
-    <b-form-input
-      v-model="newEmail"
-      placeholder="Enter new e-mail"
-      type="email"
-    ></b-form-input>
+    <b-form-input v-model="newEmail" placeholder="Enter new e-mail" type="email"></b-form-input>
     <br />
     <!--
     Color (this doesn't do anything):
@@ -344,85 +377,44 @@ async function showMusicDetail(spotifyId) {
   </b-modal>
 
   <!-- Shows the metadata and experiment configuration of the designated entry -->
-  <b-modal
-    id="view-modal"
-    v-model="viewModalShow"
-    title="Result information"
-    ok-only
-  >
+  <b-modal id="view-modal" v-model="viewModalShow" title="Result information" ok-only>
     <h5>Here is the metadata and experiment configuration:</h5>
     <span style="white-space: pre-wrap">{{ metadataStr }}</span>
   </b-modal>
 
   <!-- Modal used for changing the headers of the user recommendations table -->
-  <b-modal
-    v-if="props.headerOptions"
-    id="change-columns-modal"
-    v-model="updateHeadersModalShow"
-    title="Select headers"
-    @ok="$emit('updateHeaders', checkedColumns)"
-  >
+  <b-modal v-if="props.headerOptions" id="change-columns-modal" v-model="updateHeadersModalShow" title="Select headers"
+    @ok="$emit('updateHeaders', checkedColumns)">
     <p>Select the extra headers you want to be shown</p>
     <template v-for="category in Object.keys(props.headerOptions)">
       <p>{{ capitalise(category) }} specific:</p>
-      <div
-        class="form-check form-switch"
-        v-for="header in props.headerOptions[category]"
-        :key="header"
-      >
-        <input
-          v-model="checkedColumns"
-          class="form-check-input"
-          type="checkbox"
-          :value="header"
-          :id="header"
-        />
-        <label class="form-check-label" :id="header">
-          {{ makeHeader(header).name }}
-        </label>
-      </div>
+      <div class="form-check form-switch" v-for="header in props.headerOptions[category]" :key="header">
+        <input v-model="checkedColumns" class="form-check-input" type="checkbox" :value="header" :id="header" />
+        <div class="form-check form-switch" v-for="header in props.headerOptions[category]" :key="header">
+          <input v-model="checkedColumns" class="form-check-input" type="checkbox" :value="header" :id="header" />
+          <label class="form-check-label" :id="header">
+            {{ makeHeader(header).name }}
+          </label>
+        </div>
     </template>
   </b-modal>
 
-  <b-modal
-    id="change-columns-modal"
-    v-model="filtersModalShow"
-    title="Change filters"
-    @ok="$emit('changeFilters', filters)"
-  >
-    <FormGroupList
-      v-model="filters"
-      name="filter"
-      title="filters"
-      :options="filterOptions"
-    />
+  <b-modal id="change-columns-modal" v-model="filtersModalShow" title="Change filters"
+    @ok="$emit('changeFilters', filters)">
+    <FormGroupList v-model="filters" name="filter" title="filters" :options="filterOptions" />
   </b-modal>
-
-  <MusicModal
-    v-if="track"
-    v-model:show="musicModalShow"
-    :track="track"
-    :lastFmTrack="songInfo.lastFM.track"
-    :highlevelFeatures="highlevelFeatures"
-  />
 
   <b-table-simple hover striped responsive caption-top>
     <caption>
       {{
-        props.caption
+          props.caption
       }}
 
       <template v-if="expandable">
-        <link
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
-          rel="stylesheet"
-        />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" rel="stylesheet" />
 
         <div class="float-end">
-          <b-button
-            @click="updateHeadersModalShow = !updateHeadersModalShow"
-            class="m-1"
-          >
+          <b-button @click="updateHeadersModalShow = !updateHeadersModalShow" class="m-1">
             Select Headers
           </b-button>
           <b-button @click="filtersModalShow = !filterModalShow" class="m-1">
@@ -433,172 +425,131 @@ async function showMusicDetail(spotifyId) {
     </caption>
     <b-thead head-variant="dark">
       <b-tr>
-        <b-th v-if="overview" :style="colItemStyle"></b-th>
-        <b-th
-          v-for="(header, index) in headers"
-          :key="header"
-          class="text-center"
-          :colspan="header.subheaders ? header.subheaders.length : 1"
-          :style="{ ...colItemStyle, cursor: 'pointer' }"
-          @click="setsorting(index)"
-        >
-          {{ header.name }}
-        </b-th>
+        <b-th v-if="overview" :style="colItemStyle(colWidth)"></b-th>
+        <template v-for="(header, index) in filteredHeaders()" :key="header">
+          <b-th class="text-center" :colspan="header.subheaders ? header.subheaders.length : 1"
+            :style="{ ...colItemStyle(colWidth), cursor: 'pointer' }" @click="setsorting(index)">
+            {{ header.name }}
+          </b-th>
+        </template>
         <b-th v-if="overview"></b-th>
       </b-tr>
-      <b-tr>
-        <b-th v-if="overview" :style="colItemStyle"></b-th>
-        <b-th
-          v-for="subheader in subheaders"
-          :key="subheader"
-          class="text-center"
-          :style="colItemStyle"
-        >
-          {{ subheader }}
-        </b-th>
+      <b-tr v-if="overview">
+        <b-th :style="colItemStyle(colWidth)"></b-th>
+        <template v-for="subheader in subheaders" :key="subheader">
+          <b-th class="text-center" :style="colItemStyle(colWidth)">
+            {{ subheader }}
+          </b-th>
+        </template>
         <b-th v-if="overview"></b-th>
       </b-tr>
     </b-thead>
     <b-tbody>
-      <b-tr v-for="(item, index) in sorted" :key="item"
-        ><b-td class="align-middle" v-if="overview" :style="colItemStyle">
-        </b-td>
-        <b-td
-          v-for="[key, value] in Object.entries(item)"
-          :key="`${descending}_${sortindex}_${index}-${key}`"
-          class="text-center align-middle"
-          :style="colItemStyle"
-        >
-          <!--Special pill format for status-->
-          <!-- TODO refactor-->
-          <template
-            v-if="typeof value === 'string' && value.startsWith(statusPrefix)"
-          >
-            <b-button
-              disabled
-              :variant="statusVariant(value)"
-              :class="
+      <b-tr v-for="(item, index) in sorted" :key="item">
+        <!-- Table results content -->
+        <template v-for="[key, value] in Object.entries(item)" :key="`${descending}_${sortindex}_${index}-${key}`">
+          <!-- For recs tables, show filtered columns -->
+          <!-- TODO refactor -->
+          <b-td v-if="!recs || isRecsHeader(key)" class="text-center" :style="colItemStyle">
+            <!--Special pill format for status-->
+            <!-- TODO refactor-->
+            <template v-if="typeof value === 'string' && value.startsWith(statusPrefix)">
+              <b-button disabled :variant="statusVariant(value)" :class="
                 value.slice(statusPrefix.length) == status.active
                   ? 'status-blinking'
                   : 'status'
-              "
-              class="fw-bold"
-            >
-              {{ value.slice(statusPrefix.length) }}
-            </b-button>
-          </template>
-          <template v-else>
-            <template v-if="key == 'track_spotify-uri'">
-              <template v-if="value">
-                <b-button @click="showMusicDetail(item['track_spotify-uri'])"
-                  >View track</b-button
-                >
+              " class="fw-bold">
+                {{ value.slice(statusPrefix.length) }}
+              </b-button>
+            </template>
+            <!-- Non-status columns -->
+            <template v-else>
+              <!-- Spotify column -->
+              <template v-if="key === 'track_spotify-uri'">
+                <template v-if="value">
+                  <MusicItem v-model="itemsInfo[index]" :uri="item[key]" />
+                </template>
+                <template v-else></template>
+              </template>
+              <!-- Regular column -->
+              <template v-else>
+                {{ value }}
               </template>
             </template>
-            <template v-else>{{ value }} </template></template
-          >
-        </b-td>
-        <b-td
-          class="align-middle"
-          style="width: 150px"
-          v-if="overview || removable"
-        >
+            <template v-else>{{ value }} </template>
+        </template>
+        <!-- Additional item info -->
+        <!-- TODO refactor -->
+        <template v-for="i in additionalInfoAmount">
+          <b-td v-if="itemsInfo[index]" :style="colItemStyle(colWidth * 3)">
+            <template v-if="
+              itemsInfo[index][i - 1] &&
+              itemsInfo[index][i - 1].header.toLowerCase() === 'snippet'
+            ">
+              <AudioSnippet :trackId="itemsInfo[index][i - 1].value" />
+            </template>
+            <template v-else=""> {{ itemsInfo[index][i - 1].value }}</template>
+          </b-td>
+          <b-td :style="colItemStyle(colWidth)" v-else></b-td>
+        </template>
+        <b-td class="align-middle" style="width: 150px" v-if="overview || removable">
           <b-row class="m-0 float-end d-block">
-            <b-button
-              variant="primary"
-              @click="$emit('loadResult', item.id)"
-              class="m-1"
-              style="width: 142px"
-              >View result
+            <b-button variant="primary" @click="$emit('loadResult', item.id)" class="m-1" style="width: 142px">View
+              result
             </b-button>
             <div class="p-0" style="width: 150px">
               <b-col md="auto" class="mx-0 px-0 d-inline">
-                <b-button
-                  v-if="overview && editable"
-                  variant="outline-primary"
-                  class="mx-1"
-                  v-b-tooltip.hover
-                  title="Edit data"
-                  @click="
-                    ;(editModalShow = !editModalShow),
-                      (selectedEntry = index),
-                      getNameTagsMail(item.id)
-                  "
-                  data-testid="edit"
-                  ><i class="bi bi-pencil-square"></i
-                ></b-button>
+                <b-button v-if="overview && editable" variant="outline-primary" class="mx-1" v-b-tooltip.hover
+                  title="Edit data" @click="
+                    ; (editModalShow = !editModalShow),
+  (selectedEntry = index),
+  getNameTagsMail(item.id)
+                  " data-testid="edit"><i class="bi bi-pencil-square"></i></b-button>
               </b-col>
               <b-col md="auto" class="mx-0 px-0 d-inline">
-                <b-button
-                  v-if="
-                    overview ||
-                    (item.status &&
-                      item.status.slice(statusPrefix.length) == status.done)
-                  "
-                  variant="outline-primary"
-                  class="mx-1"
-                  v-b-tooltip.hover
-                  title="Show information"
-                  @click="
-                    ;(viewModalShow = !viewModalShow), getMetadata(item.id)
-                  "
-                  data-testid="view-meta"
-                  ><i class="bi bi-info-circle-fill"></i
-                ></b-button>
+                <b-button v-if="
+                  overview ||
+                  (item.status &&
+                    item.status.slice(statusPrefix.length) == status.done)
+                " variant="outline-primary" class="mx-1" v-b-tooltip.hover title="Show information" @click="
+  ; (viewModalShow = !viewModalShow), getMetadata(item.id)
+" data-testid="view-meta"><i class="bi bi-info-circle-fill"></i></b-button>
               </b-col>
               <b-col md="auto" class="mx-0 px-0 d-inline">
                 <!--REFACTOR status condition-->
-                <b-button
-                  v-if="
-                    removable &&
-                    (!item.status ||
-                      [status.toDo, status.active].includes(
-                        item.status.slice(statusPrefix.length)
-                      ))
-                  "
-                  variant="outline-danger"
-                  class="mx-1 float-end"
-                  v-b-tooltip.hover
-                  :title="getTooltipText(item)"
-                  @click="setEntryRemoval(item)"
-                  data-testid="delete"
-                >
+                <b-button v-if="
+                  removable &&
+                  (!item.status ||
+                    [status.toDo, status.active].includes(
+                      item.status.slice(statusPrefix.length)
+                    ))
+                " variant="outline-danger" class="mx-1 float-end" v-b-tooltip.hover :title="getTooltipText(item)"
+                  @click="setEntryRemoval(item)" data-testid="delete">
                   <i :class="'bi ' + getCancelIcon(item)"></i>
                 </b-button>
               </b-col>
             </div>
           </b-row>
         </b-td>
-        <b-td class="align-middle" v-if="overview" :style="colItemStyle">
+        <b-td class="align-middle" v-if="overview" :style="colItemStyle(colWidth)">
+          <b-button variant="outline-primary fw-bold" @click="$emit('viewResult', item.id)">View result</b-button>
+        </b-td>
+        <b-td class="align-middle" v-if="overview" :style="colItemStyle(colWidth)">
           <SettingsModal :resultId="item.id" />
         </b-td>
       </b-tr>
     </b-tbody>
   </b-table-simple>
 
-  <b-button
-    v-if="pagination"
-    @click="$emit('loadMore', false, entryAmount)"
-    variant="outline-primary"
-    :disabled="entryAmount < 1"
-  >
+  <b-button v-if="pagination" @click="$emit('loadMore', false, entryAmount)" variant="outline-primary"
+    :disabled="entryAmount < 1">
     Show previous {{ entryAmount }} items
   </b-button>
-  <b-button
-    v-if="pagination"
-    @click="$emit('loadMore', true, entryAmount)"
-    variant="outline-primary"
-    :disabled="entryAmount < 1"
-  >
+  <b-button v-if="pagination" @click="$emit('loadMore', true, entryAmount)" variant="outline-primary"
+    :disabled="entryAmount < 1">
     Show next {{ entryAmount }} items
   </b-button>
-  <b-form-input
-    v-model="entryAmount"
-    v-if="pagination"
-    :state="entryAmount >= 1"
-    type="number"
-    >20</b-form-input
-  >
+  <b-form-input v-model="entryAmount" v-if="pagination" :state="entryAmount >= 1" type="number">20</b-form-input>
 </template>
 
 <style scoped>
@@ -607,20 +558,24 @@ async function showMusicDetail(spotifyId) {
 .status-blinking {
   background-color: #28a745;
 }
+
 @keyframes glowing {
   0% {
     background-color: #28a745;
     box-shadow: 0 0 5px #28a745;
   }
+
   50% {
     background-color: #28a745;
     box-shadow: 0 0 20px #28a745;
   }
+
   100% {
     background-color: #28a745;
     box-shadow: 0 0 5px #28a745;
   }
 }
+
 .status-blinking {
   animation: glowing 1300ms infinite;
 }

@@ -13,7 +13,28 @@ from fairreckitlib.data.set.dataset import add_dataset_columns as add_data_colum
 from . import result_storage
 from .experiment import options, recommender_system, validate_experiment
 
+#from fairreckitlib.data.filter.filter_factory import create_filter_factory
+#from fairreckitlib.data.filter.filter_constants import *
+
+
 results_bp = Blueprint('results', __name__, url_prefix='/api/all-results')
+
+
+def filter_results(dataframe, filters):
+    """Filter a dataframe with results using specified filters
+
+    Args:
+        dataframe: a dataframe containing results that need to be filtered
+        filters: an array that contains filters
+
+    Returns:
+        results after filtering
+    """
+    #filter = fairreckitlib.data.filter
+    #filter(dataframe, filters)
+
+    return dataframe
+
 
 
 @results_bp.route('/', methods=['GET'])
@@ -39,7 +60,7 @@ def old_result_by_id():
 
 @results_bp.route('/result-by-id', methods=['POST', 'GET'])
 def result_by_id():
-    if request.method == 'POST':    
+    if request.method == 'POST':
         data = request.get_json()
         print('result_by_id data', data)
         result_storage.result_by_id(int(data['id']))
@@ -81,18 +102,19 @@ def set_recs():
     result_id = json.get("id")  # Result timestamp TODO use to get result
     run_id = json.get("runid")
     pair_id = json.get("pairid")
-    path = result_storage.get_overview(result_id, run_id)[pair_id]['ratings_path'] 
-    result_storage.current_recs[pair_id] = pd.read_csv(path, sep='\t', header=0)
-    return {'status': 'success', 'availableFilters' : options['filters']}
+    path = result_storage.get_overview(result_id, run_id)[
+        pair_id]['ratings_path']
+    result_storage.current_recs[pair_id] = pd.read_csv(
+        path, sep='\t', header=0)
+    return {'status': 'success', 'availableFilters': options['filters']}
 
 
-## get recommender results per user
+# get recommender results per user
 @results_bp.route('/result', methods=['POST'])
 def user_result():
     json = request.json
     pair_id = json.get("pairid")
     filters = json.get("filters")
-    #TODO implement backend filtering
 
     chunk_size = json.get("amount", 20)
     chunk_size = int(chunk_size)
@@ -101,7 +123,7 @@ def user_result():
     dataset_name = json.get("dataset", "")
     sortIndex = json.get("sortindex", 0)
 
-    #read mock dataframe
+    # read mock dataframe
     recs = result_storage.current_recs[pair_id]
     print(list(recs))
     dataset = recommender_system.data_registry.get_set(dataset_name)
@@ -111,6 +133,8 @@ def user_result():
     if dataset_name in spotify_datasets:
         recs=add_spotify_columns(dataset_name, recs)
 
+    recs = filter_results(recs, filters)
+
     #Add optional columns to the dataframe (if any)
     if (len(chosen_headers) > 0):
       recs=add_dataset_columns(dataset_name, recs, chosen_headers, matrix_name)
@@ -118,10 +142,10 @@ def user_result():
     #Make sure not to sort on a column that does not exist anymore
     if (len(recs.columns) <= sortIndex):
         sortIndex = 0
-    ##sort dataframe based on index and ascending or not
-    df_sorted = recs.sort_values(by=recs.columns[sortIndex], ascending=json.get("ascending"))
+    # sort dataframe based on index and ascending or not
+    df_sorted = recs.sort_values(
+        by=recs.columns[sortIndex], ascending=json.get("ascending"))
 
-    
     # getting only chunk of data
     start_rows = json.get("start", 0)
     start_rows = int(start_rows)
