@@ -3,23 +3,23 @@
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
-import Table from "./Table.vue";
-import { onMounted, ref } from "vue";
-import { emptyFormGroup } from "../helpers/optionsFormatter";
-import { makeHeader } from "../helpers/resultFormatter";
-import { API_URL } from "../api";
-import { loadResult } from "../helpers/resultRequests";
-import SettingsModal from "./Table/SettingsModal.vue";
-import DictionaryDisplay from "./Table/DictionaryDisplay.vue";
+import Table from './Table.vue';
+import { onMounted, ref } from 'vue';
+import { emptyFormGroup } from '../helpers/optionsFormatter';
+import { makeHeader } from '../helpers/resultFormatter';
+import { API_URL } from '../api';
+import { loadResult } from '../helpers/resultRequests';
+import SettingsModal from './Table/SettingsModal.vue';
+import DictionaryDisplay from './Table/DictionaryDisplay.vue';
 
 const props = defineProps({ headers: Array, result: Object });
 
 //Default headers for recommendation experiments.
 const selectedHeaders = ref([
-  [{ name: "Rank" }, { name: "User" }, { name: "Item" }, { name: "Score" }],
+  [{ name: 'Rank' }, { name: 'User' }, { name: 'Item' }, { name: 'Score' }],
 ]);
 
-const experiment_tags = ref(["tag1 ", "tag2 ", "tag3 ", "tag4 "]);
+const experiment_tags = ref(['tag1 ', 'tag2 ', 'tag3 ', 'tag4 ']);
 
 const data = ref({ results: [[]] });
 const startIndex = ref(0);
@@ -36,16 +36,16 @@ const visibleDatasets = ref([]);
 const uniqueDatasets = findUniqueDatasets();
 
 onMounted(() => {
-  console.log("result", props.result);
-  console.log("result id", props.result.id);
+  console.log('result', props.result);
+  console.log('result id', props.result.id);
   //loadEvaluations()
   //loadResult(props.result.id)
   fillVisibleDatasets();
-  //Load in all the user recommendation/prediction tables
+  // Load in all the user recommendation/prediction tables
   for (let index in userTables) {
     setRecs(parseInt(index));
   }
-  console.log("availableFilters", availableFilters.value);
+  console.log('availableFilters', availableFilters.value);
 });
 
 // GET request: Get available header options for selection from server
@@ -60,21 +60,21 @@ async function getHeaderOptions(index) {
 //POST request: Send result ID to the server to set current shown recommendations.
 async function setRecs(currentTable) {
   const requestOptions = {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       id: props.result.id,
       runid: 0,
       pairid: currentTable,
     }),
   };
-  console.log("sending to server:", requestOptions.body);
+  console.log('sending to server:', requestOptions.body);
   const response = await fetch(
-    API_URL + "/all-results/set-recs",
+    API_URL + '/all-results/set-recs',
     requestOptions
   );
   //console.log('resultfetch', response)
-  if (response.status == "200") {
+  if (response.status == '200') {
     const data = await response.json();
     availableFilters.value = data.availableFilters;
     getUserRecs(currentTable);
@@ -111,8 +111,8 @@ async function getEvaluations() {
 //POST request: Ask server for next part of user recommendation table.
 async function getUserRecs(currentTable) {
   const requestOptions = {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       id: props.result.id,
       pairid: currentTable,
@@ -126,7 +126,7 @@ async function getUserRecs(currentTable) {
     }),
   };
 
-  const response = await fetch(API_URL + "/all-results/result", requestOptions);
+  const response = await fetch(API_URL + '/all-results/result', requestOptions);
   data.value.results[currentTable] = await response.json();
   selectedHeaders.value[currentTable] = Object.keys(
     data.value.results[currentTable][0]
@@ -199,8 +199,8 @@ function combineResults() {
     for (let approach in props.result.result[dataset].results) {
       tables.push(
         props.result.result[dataset].caption +
-          "_" +
-          props.result.result[dataset].results[approach].approach
+        "_" +
+        props.result.result[dataset].results[approach].approach
       );
     }
   }
@@ -258,55 +258,51 @@ async function getInfo() {
   <div>
     <div class="container">
       <b-row>
-        <b-col><p class="lead" > Results for </p>
-      <h1 class="display-3"> {{ result.metadata.name }}    </h1>
-      <h3 class="text-muted"> {{ result.metadata.datetime}} </h3>
-      </b-col>
-      <b-col>
-        <div class="float-end">
-          <SettingsModal :resultId="result.id"/>
-            </div>
-      </b-col>
+        <b-col>
+          <p class="lead"> Results for </p>
+          <h1 class="display-3"> {{ result.metadata.name }} </h1>
+          <h3 class="text-muted"> {{ result.metadata.datetime }} </h3>
+        </b-col>
+        <b-col>
+          <div class="float-end">
+            <SettingsModal :resultId="result.id" />
+          </div>
+        </b-col>
       </b-row>
       <p class="lead">
         Tags:
         <template v-if="!result.metadata.tags">None</template>
         <template v-for="tag in result.metadata.tags">
-          <b-button disabled> {{ tag }} </b-button
-          >
+          <b-button disabled> {{ tag }} </b-button>
         </template>
       </p>
       <h2>Filters:</h2>
       <b-list-group horizontal>
-        <b-list-group-item v-for="datasetResult in result.result"  > <!-- Filter for each dataset-->
-        {{datasetResult.dataset.name}}
-        <b-list-group>
-          <b-list-group-item v-for="filter in datasetResult.dataset.filters">
-            {{filter.name}}: {{Object.values( filter.params)[0]}}
-          </b-list-group-item>
-          <ul>
-            <li v-for="evale in datasetResult.evals"> <!-- Filter for each metric-->
-            {{evale.evaluation.filtered}}
-            </li>
-          </ul>
-        </b-list-group>
+        <b-list-group-item v-for="datasetResult in result.result">
+          <!-- Filter for each dataset-->
+          {{ datasetResult.dataset.name }}
+          <b-list-group>
+            <b-list-group-item v-for="filter in datasetResult.dataset.filters">
+              {{ filter.name }}: {{ Object.values(filter.params)[0] }}
+            </b-list-group-item>
+            <ul>
+              <li v-for="evale in datasetResult.evals">
+                <!-- Filter for each metric-->
+                {{ evale.evaluation.filtered }}
+              </li>
+            </ul>
+          </b-list-group>
         </b-list-group-item>
       </b-list-group>
 
       <p>
         Datasets showing items per user:
-        <div class="form-check" v-for="dataset in uniqueDatasets">
-          <input
-            v-model = "visibleDatasets"
-            class = "form-check-input"
-            type="checkbox"
-            :value="dataset"
-            :id="dataset"
-          />
-          <label class="form-check-label" :id="dataset">
-            {{dataset}}
-          </label>
-        </div>
+      <div class="form-check" v-for="dataset in uniqueDatasets">
+        <input v-model="visibleDatasets" class="form-check-input" type="checkbox" :value="dataset" :id="dataset" />
+        <label class="form-check-label" :id="dataset">
+          {{ dataset }}
+        </label>
+      </div>
       </p>
 
     </div>
@@ -316,21 +312,14 @@ async function getInfo() {
         <h4>Metrics</h4>
 
         <!--Show first two dataset results for now TODO-->
-        <template
-          v-for="datasetResult in result.result[1]
-            ? [result.result[0], result.result[1]]
-            : [result.result[0]]"
-          :key="datasetResult"
-        >
-          <p> {{datasetResult.results[0].dataset}}</p>
+        <template v-for="datasetResult in result.result[1]
+        ? [result.result[0], result.result[1]]
+        : [result.result[0]]" :key="datasetResult">
+          <p> {{ datasetResult.results[0].dataset }}</p>
           <div class="col-6">
 
-            <Table
-              :caption="datasetResult.caption"
-              :results="datasetResult.results"
-              :headers="datasetResult.headers"
-              :removable="false"
-            />
+            <Table :caption="datasetResult.caption" :results="datasetResult.results" :headers="datasetResult.headers"
+              :removable="false" />
           </div>
         </template>
       </div>
@@ -349,31 +338,19 @@ async function getInfo() {
         <!--Currently only shows the results of the first dataset-->
         <template v-for="(entry, index) in userTables" :key="data">
           <template v-if="visibleDatasets.includes(getDatasetName(entry))" :key="visibleDatasets">
-          <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
+            <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
             <div class="col-6">
-              <Table
-                v-if="selectedHeaders[index]"
-                :key="props.result.id"
-                :caption="entry"
-                :results="data.results[index]"
-                :headers="selectedHeaders[index].map(makeHeader)"
-                :filters="filters"
-                :filterOptions="availableFilters"
-                :userOptions="userHeaderOptions[index]"
-                :itemOptions="itemHeaderOptions[index]"
-                pagination
-                expandable
-                @paginationSort="(i) => paginationSort(i, index)"
-                @loadMore="
+              <Table v-if="selectedHeaders[index]" :key="props.result.id" :caption="entry"
+                :results="data.results[index]" :headers="selectedHeaders[index].map(makeHeader)" :filters="filters"
+                :filterOptions="availableFilters" :userOptions="userHeaderOptions[index]"
+                :itemOptions="itemHeaderOptions[index]" pagination expandable
+                @paginationSort="(i) => paginationSort(i, index)" @loadMore="
                   (increase, amount) => loadMore(increase, amount, index)
-                "
-                @changeFilters="
-                  (changedFilters) => changeFilters(changedFilters, index)
-                "
-                @updateHeaders="(headers) => updateHeaders(headers, index)"
-              />
+                " @changeFilters="
+  (changedFilters) => changeFilters(changedFilters, index)
+" @updateHeaders="(headers) => updateHeaders(headers, index)" />
             </div>
-            </template>
+          </template>
         </template>
       </div>
     </div>
