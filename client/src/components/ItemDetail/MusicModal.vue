@@ -116,8 +116,8 @@ async function generateChart(highlevelFeatures) {
                 <h2>{{ track.name }}</h2>
                 <h4 class="fst-italic">
                   <!--TODO refactor into component with dynamic formatting-->
-                  <template v-for="artist in track.artists">{{
-                    artist.name
+                  <template v-for="(artist, index) in track.artists">{{
+                    (index == 0? "" : ", ") + artist.name
                   }}</template>
                 </h4>
                 <h4>Album: {{ track.album.name }}</h4>
