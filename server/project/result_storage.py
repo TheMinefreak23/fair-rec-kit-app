@@ -138,16 +138,35 @@ def result_by_id(result_id):
                     header=None).to_dict(orient='records')
                 dataset_index = name_to_index(data['result'],
                                               run_overview['overview'][pair_id]['dataset'],
-                                              'dataset', True)
+                                              'dataset', by_name=True)
                 approach_index = name_to_index(
                     data['result'][dataset_index]['recs'],
-                    run_overview['overview'][pair_id]['recommender_system'], 'approach')
-                data['result'][dataset_index]['recs'][approach_index]['evals'] = evaluation_data[
-                    'evaluations'] if evaluation_data else []
+                    run_overview['overview'][pair_id]['recommender_system'], 'recommendation')
+                data['result'][dataset_index]['recs'][approach_index]['evals'] = add_evaluation(
+                    data['result'][dataset_index]['recs'][approach_index]['evals'],
+                    evaluation_data['evaluations'])
 
     global current_result
     current_result = data
-    # print('current result', json.dumps(current_result, indent=4))
+    print('current result', json.dumps(current_result, indent=4))
+
+
+def add_evaluation(data, evaluation):
+    if not evaluation:
+        return data
+    if not data:
+        return format_evaluation(evaluation)
+    for index, value in enumerate(evaluation):
+        data[index]['evaluations'].append(value['evaluation'])
+    return data
+
+
+def format_evaluation(evaluation):
+    for e in evaluation:
+        evaluation_list = [e['evaluation']]
+        e.pop('evaluation')
+        e['evaluations'] = evaluation_list
+    return evaluation
 
 
 def get_overview(evaluation_id, runid):
@@ -218,6 +237,7 @@ def name_to_index(json_data, name, key, by_name=False):
     current_index = -1
     for i, data in enumerate(json_data):
         result_value = json_data[i][key]
+
         if by_name and result_value['name'] == name or result_value == name:
             current_index = i
     return current_index
