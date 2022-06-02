@@ -13,6 +13,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 import os
+import json
 import pandas as pd
 from .result_storage import RESULTS_ROOT_FOLDER, load_results_overview, load_json
 from . import result_storage 
@@ -52,15 +53,33 @@ def result_by_id(result_id):
                     header=None).to_dict(orient='records')
                 dataset_index = name_to_index(data['result'],
                                               run_overview['overview'][pair_id]['dataset'],
-                                              'dataset', True)
+                                              'dataset', by_name=True)
                 approach_index = name_to_index(
                     data['result'][dataset_index]['recs'],
                     run_overview['overview'][pair_id]['recommender_system'], 'approach')
-                data['result'][dataset_index]['recs'][approach_index]['evals'] = evaluation_data[
-                    'evaluations'] if evaluation_data else []
+                data['result'][dataset_index]['recs'][approach_index]['evals'] = add_evaluation(
+                    data['result'][dataset_index]['recs'][approach_index]['evals'],
+                    evaluation_data['evaluations'])
 
-    result_storage.current_result = data
+    global current_result
+    current_result = data
+    print('current result', json.dumps(current_result, indent=4))
 
+def add_evaluation(data, evaluation):
+    if not evaluation:
+        return data
+    if not data:
+        return format_evaluation(evaluation)
+    for index, value in enumerate(evaluation):
+        data[index]['evaluations'].append(value['evaluation'])
+    return data
+
+def format_evaluation(evaluation):
+    for e in evaluation:
+        evaluation_list = [e['evaluation']]
+        e.pop('evaluation')
+        e['evaluations'] = evaluation_list
+    return evaluation
 
 def get_overview(evaluation_id, runid):
     """Return a specific entry from a specific overview.json.

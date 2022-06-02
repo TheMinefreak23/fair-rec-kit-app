@@ -161,7 +161,7 @@ function toggleInfoColumns(addHeaders) {
   ]
   additionalInfoAmount.value = addHeaders.length // TODO refactor
   // console.log('additional info amount', additionalInfoAmount.value)
-  console.log('toggleInfo infoHeaders', infoHeaders.value)
+  // console.log('toggleInfo infoHeaders', infoHeaders.value)
   // emit('updateHeaders', newHeaders)
 }
 

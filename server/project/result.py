@@ -56,14 +56,14 @@ def result_by_id():
         data = request.get_json()
         print('result_by_id data', data)
         result_loader.result_by_id(int(data['id']))
-        if result_storage.current_result:
+        if result_loader.current_result:
             response = {'status': 'success'}
         else:
             response = {'status': 'result not found'}
 
     else:  # GET request
-        print('current result', json.dumps(result_storage.current_result, indent=4))
-        response = {'result': result_storage.current_result}
+        print('current result', json.dumps(result_loader.current_result, indent=4))
+        response = {'result': result_loader.current_result}
 
     return response
 
