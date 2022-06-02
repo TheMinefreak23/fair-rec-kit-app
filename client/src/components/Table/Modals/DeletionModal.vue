@@ -74,11 +74,24 @@ function getCancelIcon(item) {
   if (status === status.toDo) return 'bi-x-lg'
   else return 'bi-x-octagon-fill'
 }
+
+function getTooltipText(item) {
+  if (!item.status) return 'Delete'
+  const status = item.status.slice(statusPrefix.length)
+  if (status === status.toDo) return 'Cancel'
+  else return 'Cancel'
+}
 </script>
 
 <template>
-  <div>
-    <!--Shows when the user wants to delete an entry-->
+  <b-button
+    variant="outline-danger"
+    class="mx-1 float-end"
+    v-b-tooltip.hover
+    :title="getTooltipText(item)"
+    @click="setEntryRemoval(item)"
+    data-testid="delete"
+    ><!--Shows when the user wants to delete an entry-->
     <b-modal
       v-if="entry"
       id="deletion-modal"
@@ -92,13 +105,6 @@ function getCancelIcon(item) {
       <p>{{ entry.description }}</p>
     </b-modal>
 
-    <b-button
-      variant="danger"
-      class="mx-1 float-end"
-      @click="setEntryRemoval(item)"
-      data-testid="delete"
-    >
-      <i :class="'bi ' + getCancelIcon(item)"></i>
-    </b-button>
-  </div>
+    <i :class="'bi ' + getCancelIcon(item)"></i>
+  </b-button>
 </template>
