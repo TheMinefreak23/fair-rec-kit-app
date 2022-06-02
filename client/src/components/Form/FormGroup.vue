@@ -12,6 +12,7 @@ import FormSelect from './FormSelect.vue'
 
 const emit = defineEmits(['copy', 'scroll', 'update:modelValue'])
 const props = defineProps({
+  groupId: String, // group ID for scrolling
   index: Number, // group index for scrolling
   name: String,
   title: String,
@@ -42,21 +43,22 @@ onMounted(() => {
     blink.value = false
   }, timeoutMs)
 
-  // console.log(`#group-${props.name.split()[0]}-${props.index}`)
+  console.log(`#group-${props.groupId.split(' ').join('-')}-${props.index}`)
   // TODO refactor to ID function?
   const element = document.querySelector(
-    `#group-${props.name.split()[0]}-${props.index}`
+    `#group-${props.groupId.split(' ').join('-')}-${props.index}`
   )
-  // console.log(element)
-  if (element) element.scrollIntoView({ behavior: 'smooth' })
+  console.log(element)
+  if (!props.single) element.scrollIntoView({ behavior: 'smooth' })
 })
 
+/*
 onUnmounted(() => {
   // console.log(props.index)
-  const element = document.querySelector(`#group-${props.index - 1}`)
-  // console.log(element)
-  if (element) element.scrollIntoView({ behavior: 'smooth' })
-})
+  const element = document.querySelector(`#group-${props.index}`)
+  console.log(element)
+  element.scrollIntoView({ behavior: 'smooth' })
+})*/
 
 const form = computed({
   // getter
@@ -220,7 +222,9 @@ function hasParams() {
               v-if="option.single"
               single
               v-model="form.lists[index].choices[0]"
-              :name="option.name"
+              :groupId="name + ' ' + props.index + ' ' + option.name"
+              :name="form.main.name + ' ' + option.name"
+              :index="index"
               :title="option.title"
               :options="option.options"
               :defaultOption="option.default"
@@ -229,7 +233,9 @@ function hasParams() {
             <FormGroupList
               v-else
               v-model="form.lists[index]"
-              :name="option.name"
+              :groupId="name + ' ' + props.index + ' ' + option.name"
+              :name="form.main.name + ' ' + option.name"
+              :index="index"
               :title="option.title"
               :description="
                 option.title + ' for ' + name + ' ' + form.main.name

@@ -107,10 +107,12 @@ function showFormToast(object, actionMessage) {
   // TODO delay and variant don't work?
   const mainOptions = {
     title:
-        capitalise(props.name) + ' ' + 
-        //If the metric doesn't have a value, don't mention it
-        (object.name == undefined ?  '' : object.name + ' ') +
-         actionMessage + '!',
+      capitalise(props.name) +
+      ' ' +
+      //If the metric doesn't have a value, don't mention it
+      (object.name == undefined ? '' : object.name + ' ') +
+      actionMessage +
+      '!',
   }
   const otherOptions = { pos: 'top-right', delay: 800, variant: 'warning' }
   showToast(mainOptions, otherOptions)
@@ -221,12 +223,13 @@ function addGroup() {
       </p>-->
           <b-row>
             <b-col
-              :id="`group-${name.split()[0]}-${i - 1}`"
+              :id="`group-${name.split(' ').join('-')}-${i - 1}`"
               cols="12"
               role="tablist"
               v-for="i in form.groupCount"
               :key="i - 1"
             >
+              <!-- {{ `group-${name.split(' ').join('-')}-${i - 1}` }} -->
               <b-container class="g-0">
                 <!--Collapsable group toggle button with remove button-->
                 <b-row md="auto">
@@ -283,6 +286,7 @@ function addGroup() {
                     v-model="form.choices[i - 1]"
                     :index="i - 1"
                     :name="name"
+                    :groupId="name"
                     :options="options"
                     :required="
                       // If the option is needed, at least one selection must've been made
