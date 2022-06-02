@@ -33,7 +33,7 @@ watch(
 )
 
 async function getResults() {
-  const response = await fetch(API_URL + '/all-results')
+  const response = await fetch(API_URL + '/all-results/')
   const data = await response.json()
   store.allResults = formatResults(data.all_results)
 }
@@ -43,9 +43,19 @@ async function getResults() {
   <b-card>
     <div class="text-center py-2 mx-5">
       <h3>Previous results</h3>
-      <Table @viewResult="viewResult" @loadResults="getResults" :results="store.allResults" :headers="headers"
-        removeText="Remove" removable editable overview serverFile="/all-results/delete" serverFile2="/all-results/edit"
-        :defaultSort="1" />
+      <Table
+        @viewResult="viewResult"
+        @loadResults="getResults"
+        :results="store.allResults"
+        :headers="headers"
+        removeText="Remove"
+        removable
+        editable
+        overview
+        serverFile="/all-results/delete"
+        serverFile2="/all-results/edit"
+        :defaultSort="1"
+      />
     </div>
   </b-card>
 </template>

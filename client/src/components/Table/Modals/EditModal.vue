@@ -105,7 +105,14 @@ function checkEmail(Email) {
 </script>
 
 <template>
-  <div>
+  <b-button
+    variant="outline-primary"
+    class="mx-1"
+    v-b-tooltip.hover
+    title="Edit data"
+    @click=";(editModalShow = !editModalShow), getNameTagsMail()"
+    data-testid="edit"
+  >
     <!--Shows when the user wants to edit an entry-->
     <b-modal
       id="edit-modal"
@@ -142,14 +149,6 @@ function checkEmail(Email) {
     <b-form-input type="color"></b-form-input>
     <br />-->
     </b-modal>
-
-    <b-button
-      variant="primary"
-      class="mx-1"
-      @click=";(editModalShow = !editModalShow), getNameTagsMail()"
-      data-testid="edit"
-    >
-      <i class="bi bi-pencil-square" />
-    </b-button>
-  </div>
+    <i class="bi bi-pencil-square" />
+  </b-button>
 </template>

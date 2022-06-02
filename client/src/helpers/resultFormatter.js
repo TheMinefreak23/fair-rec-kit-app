@@ -51,6 +51,23 @@ export function formatMultipleItems(items) {
   return string
 }
 
+export function statusVariant(rawStatus) {
+  const experimentStatus = rawStatus.slice(statusPrefix.length)
+  //console.log('statusVariant experimentStatus', experimentStatus)
+  switch (experimentStatus) {
+    case status.toDo:
+      return 'outline-warning'
+    case status.active:
+      return 'success'
+    case status.aborted:
+      return 'secondary'
+    case status.cancelled:
+      return 'secondary'
+    case status.done:
+      return 'outline-success'
+  }
+}
+
 // Format a result for the result tab
 export function formatResult(result) {
   console.log('before format', JSON.parse(JSON.stringify(result)))

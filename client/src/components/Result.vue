@@ -68,7 +68,7 @@ async function getHeaderOptions(index) {
       name: props.result.result[index].dataset.dataset,
     }),
   }
-  const response = await fetch(API_URL + '/all-results/headers', requestOptions)
+  const response = await fetch(API_URL + '/result/headers', requestOptions)
   const data = await response.json()
   const headerOptions = data
   optionalHeaderOptions.value[index] = headerOptions
@@ -87,7 +87,7 @@ async function setRecs(currentTable, runID) {
   };
   console.log('sending to server:', requestOptions.body);
   const response = await fetch(
-    API_URL + '/all-results/set-recs',
+    API_URL + '/result/set-recs',
     requestOptions
   );
   if (response.status == '200') {
@@ -108,7 +108,7 @@ async function setRecs(currentTable, runID) {
 //     body: JSON.stringify({ id: props.result.id }),
 //   }
 //   const response = await fetch(
-//     API_URL + '/all-results/result-by-id',
+//     API_URL + '/result/result-by-id',
 //     requestOptions
 //   ).then(() => {
 //     console.log('succesful POST request to API to retrieve evaluation data')
@@ -120,7 +120,7 @@ async function setRecs(currentTable, runID) {
 
 //GET request: Ask server for currently loaded evaluations
 async function getEvaluations() {
-  const response = await fetch(API_URL + '/all-results/result-by-id')
+  const response = await fetch(API_URL + '/result/result-by-id')
   console.log('succesfully retrieved evaluation data.')
   const resultsData = await response.json()
   console.log('results data', resultsData)
@@ -148,7 +148,7 @@ async function getUserRecs(currentTable, runID) {
       matrix: props.result.result[currentTable].dataset.matrix
     }),
   };
-  const response = await fetch(API_URL + '/all-results/result', requestOptions);
+  const response = await fetch(API_URL + '/result/', requestOptions);
   data.value.results[runID][currentTable] = await response.json()
   selectedHeaders.value[runID][currentTable] = Object.keys(
     data.value.results[0][currentTable][0]
@@ -162,7 +162,7 @@ async function exportTable(currentTable) {
     body: JSON.stringify({ results: props.result.result[currentTable].results }),
   }
   const response = await fetch(
-    API_URL + '/all-results/export',
+    API_URL + '/result/export',
     requestOptions
   )
   const confirmation = await response.json()
@@ -177,7 +177,7 @@ async function validate() {
     body: JSON.stringify({ filepath: file, amount: validationAmount.value }),
   }
   const response = await fetch(
-    API_URL + '/all-results/validate',
+    API_URL + '/result/validate',
     requestOptions
   ).then(() => {
     console.log('Validation added to the queue')
