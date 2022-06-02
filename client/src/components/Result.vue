@@ -35,6 +35,7 @@ const availableMetrics = ref([])
 const uniqueDatasets = findUniqueDatasets()
 const visibleMatrices = ref([])
 const validationAmount = ref(1)
+const snippet = ref(false)
 
 onMounted(() => {
   console.log('result', props.result);
@@ -151,8 +152,7 @@ async function getUserRecs(currentTable, runID) {
   data.value.results[runID][currentTable] = await response.json();
   selectedHeaders.value[runID][currentTable] = Object.keys(
     data.value.results[0][currentTable][0]
-  ).concat(["Album", "Snippet"]);
-  console.log(selectedHeaders.value[runID][currentTable])
+  )
 }
 
 async function exportTable(currentTable) {
@@ -439,7 +439,10 @@ function contains(string, array) {
         </h4>
         <h4 v-else>Predicted rating per user</h4>
       </div>
-
+      <div class="form-check">
+      <input v-model="snippet" class="form-check-input" type="checkbox" :id="snippet" />
+      <label class="form-check-label" :id="snippet">Show snippets</label>
+      </div>
       <p>
         Select items to be shown:
       <div class="form-check" v-for="entry in userTables">
@@ -461,8 +464,8 @@ function contains(string, array) {
               <div :class="visibleMatrices.length > 1 ? 'col-6' : 'col'">
                 <Table v-if="selectedHeaders[run][index]" :key="props.result.id" :caption="entry"
                   :results="data.results[run][index]" :headers="selectedHeaders[run][index].map(makeHeader)"
-                  :filters="filters" :filterOptions="availableFilters" :headerOptions="optionalHeaderOptions[index]"
-                  pagination expandable @paginationSort="(i) => paginationSort(i, index, run)" @loadMore="
+                  :filters="filters" :filterOptions="availableFilters" :headerOptions="optionalHeaderOptions[index]" defaultSort="0"
+                  pagination expandable :recs="snippet" @paginationSort="(i) => paginationSort(i, index, run)" @loadMore="
                     (increase, amount) => loadMore(increase, amount, index, run)
                   " @changeFilters="
   (changedFilters) => changeFilters(changedFilters, index, run)
