@@ -54,7 +54,10 @@ onMounted(async () => {
   }
 })
 
-// Generate the data for the audiofeatures Bar-chart
+/**
+ * Generate the data for the Audio Features Bar-chart
+ * @param {Array}  highlevelFeatures    -Array with high-Level features from AcousticBrainz 
+ */
 async function generateChart(highlevelFeatures) {
   chartInfo.value = { labels: [], datasets: [], options: {responsive: true}}
   // available moods from AcousticBrainz
