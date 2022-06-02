@@ -60,7 +60,6 @@ def result_by_id(result_id):
                     'evaluations'] if evaluation_data else []
 
     result_storage.current_result = data
-    # print('current result', json.dumps(current_result, indent=4))
 
 
 def get_overview(evaluation_id, runid):

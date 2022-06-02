@@ -41,7 +41,11 @@ def set_recs():
     pair_id = json.get("pairid")
     path = result_loader.get_overview(result_id, run_id)[
         pair_id]['ratings_path']
-    result_storage.current_recs[pair_id] = pd.read_csv(
+    # Declare current_recs as a dictionary in a dictionary
+    if not run_id in result_storage.current_recs:
+        result_storage.current_recs[run_id] = {}
+    # Load the correct ratings file
+    result_storage.current_recs[run_id][pair_id] = pd.read_csv(
         path, sep='\t', header=0)
     return {'status': 'success', 'availableFilters': options['filters']}
 
@@ -75,6 +79,7 @@ def user_result():
     """
     json = request.json
     pair_id = json.get("pairid")
+    run_id = json.get("runid")
     filters = json.get("filters")
 
     chunk_size = int(json.get("amount", 20))
@@ -84,22 +89,20 @@ def user_result():
     sortIndex = json.get("sortindex", 0)
 
     # read mock dataframe
-    recs = result_storage.current_recs[pair_id]
-    print(list(recs))
+    recs = result_storage.current_recs[run_id][pair_id]
     dataset = recommender_system.data_registry.get_set(dataset_name)
-
-    # TODO refactor/do dynamically
+    #TODO refactor/do dynamically
     spotify_datasets = ['LFM-2B']
     if dataset_name in spotify_datasets:
         recs = add_spotify_columns(dataset_name, recs)
 
     recs = filter_results(recs, filters)
 
-    # Add optional columns to the dataframe (if any)
+    #Add optional columns to the dataframe (if any)
     if (len(chosen_headers) > 0):
-        recs = add_dataset_columns(dataset_name, recs, chosen_headers, matrix_name)
+      recs=add_dataset_columns(dataset_name, recs, chosen_headers, matrix_name)
 
-    # Make sure not to sort on a column that does not exist anymore
+    #Make sure not to sort on a column that does not exist anymore
     if (len(recs.columns) <= sortIndex):
         sortIndex = 0
     # sort dataframe based on index and ascending or not
@@ -108,7 +111,8 @@ def user_result():
 
     # getting only chunk of data
     start_rows = int(json.get("start", 0))
-    end_rows = int(start_rows + chunk_size)
+    end_rows = start_rows + chunk_size
+    end_rows = int(end_rows)
 
     # determine if at the end of the dataset
     rows_number = len(df_sorted)
@@ -121,7 +125,7 @@ def user_result():
     # rename the user and item headers so they reflect their respective content
     item = dataset.get_matrix_config(matrix_name).item.key
     user = dataset.get_matrix_config(matrix_name).user.key
-    df_subset.rename(columns={'user': user, 'item': item}, inplace=True)
+    df_subset.rename(columns = {'user': user, 'item': item}, inplace = True)
     return df_subset.to_json(orient='records')
 
 
@@ -193,6 +197,6 @@ def export():
 def validate():
     json = request.json
     filepath = json.get('filepath') 
-    amount = json.get('amount', 1)
+    amount = int(json.get('amount', 1))
     add_validation(filepath, amount)
     return "Validated"
