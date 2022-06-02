@@ -47,6 +47,12 @@ describe('format multiple items', () => {
   })
 })
 
+/*
+describe('format result', () => {
+  // TODO
+  //test('', () => {})
+})*/
+
 /**
  * Test the short string description of a dataset
  */
@@ -66,13 +72,11 @@ describe('show dataset info', () => {
   })
 })
 
-/**
- * Test evaluation formatting
- */
+/*
 describe('format evaluation', () => {
   //TODO
   //test('', () => {})
-})
+})*/
 
 /**
  * Test string formatting (new name) of a metric
@@ -101,7 +105,7 @@ describe('format metric', () => {
  * Test correct header configuration
  */
 describe('configure header', () => {
-  test('multiple underscores', () => {
+  test('multiple words', () => {
     const header = 'a_b_c_d'
     expect(makeHeader(header).name).toBe('A b c d')
     expect(makeHeader('these_are_multiple_words').name).toBe(
