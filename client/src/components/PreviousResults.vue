@@ -28,7 +28,6 @@ onMounted(() => {
 watch(
   () => store.currentResults.length,
   () => {
-    // console.log('previousResults watch currentResults')
     getResults()
   }
 )
@@ -37,7 +36,6 @@ async function getResults() {
   const response = await fetch(API_URL + '/all-results')
   const data = await response.json()
   store.allResults = formatResults(data.all_results)
-  // console.log('all results', store.allResults)
 }
 </script>
 

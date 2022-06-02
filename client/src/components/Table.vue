@@ -58,6 +58,8 @@ const filters = ref(emptyFormGroup(false))
 // Sorting
 const sortindex = ref(0)
 const descending = ref(false)
+//TODO enter correct icons
+const sortIcon = ref({false: ' ↑', true: ' ↓'})
 
 // Item detail
 const infoHeaders = ref([])
@@ -244,7 +246,8 @@ const filteredHeaders = () => {
               :style="{ ...colItemStyle(colWidth), cursor: 'pointer' }"
               @click="setsorting(index)"
             >
-              {{ header.name }}
+              
+              {{ header.name + (index == sortindex ? sortIcon[descending] : '' ) }}
             </b-th>
           </template>
           <b-th v-if="overview"></b-th>
