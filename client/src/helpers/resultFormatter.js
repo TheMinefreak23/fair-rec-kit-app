@@ -201,9 +201,7 @@ export function formatEvaluation(e, index, result, runID) {
 export function formatMetric(evaluation) {
   // If it is a K metric, replace K with the parameter
   const name = evaluation.name
-  if (name.toLowerCase()[name.length - 1] === 'k') {
-    // console.log(evaluation)
-    // TODO refactor K condition
+  if (name.slice(-1).toLowerCase() === 'k') {
     return name.slice(0, -1) + evaluation.params.K
   } else return name
 }

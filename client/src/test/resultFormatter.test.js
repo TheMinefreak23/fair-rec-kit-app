@@ -10,6 +10,7 @@ import {
   formatMetric,
   formatEvaluation,
   makeHeader,
+  capitalise
 } from '../helpers/resultFormatter'
 
 /**
@@ -72,11 +73,13 @@ describe('show dataset info', () => {
   })
 })
 
-/*
+/**
+ * Test evaluation data formatting
+ */
 describe('format evaluation', () => {
   //TODO
   //test('', () => {})
-})*/
+})
 
 /**
  * Test string formatting (new name) of a metric
@@ -99,6 +102,10 @@ describe('format metric', () => {
   test('no parameter metric', () => {
     expect(formatMetric({ name: 'foo' })).toBe('foo')
   })
+  // If an empty name is assigned, an empty name is returned
+  test('no name', () => {
+    expect(formatMetric({ name: '' }).length.toBe(0))
+  })
 })
 
 /**
@@ -115,5 +122,28 @@ describe('configure header', () => {
   test('starts with number', () => {
     const header = '2_isanumber'
     expect(makeHeader(header).name).toBe('2 isanumber')
+  })
+})
+
+/**
+ * Test the capitalise function
+ */
+ describe('capitalise', () => {
+  test('several words', () => {
+    const string = 'a random set of words'
+    expect(capitalise(string).toBe("A Random Set Of Words"))
+  
+  })
+  test('abbreviations', () => {
+    const string = "da"
+    expect(capitalise(string).toBe("DA"))
+  })
+  test('contains numbers', () => {
+    const string = "123"
+    expect(capitalise(string).toBe("123"))
+  })
+  test('only spaces', () => {
+    const string = "       "
+    expect((capitalise(string).length == string.length).toBe(true))
   })
 })
