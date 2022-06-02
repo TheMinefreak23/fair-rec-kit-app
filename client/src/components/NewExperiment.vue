@@ -156,6 +156,7 @@ function reformat(property) {
                   <b-form-radio-group
                     v-model="form.experimentMethod"
                     :options="experimentMethods"
+                    v-b-tooltip.hover title = "explanation"
                   >
                   </b-form-radio-group>
                 </b-col>
