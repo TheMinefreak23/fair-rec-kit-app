@@ -247,7 +247,6 @@ const filteredHeaders = () => {
               {{ header.name }}
             </b-th>
           </template>
-          <b-th v-if="overview"></b-th>
         </b-tr>
         <!-- Subheaders -->
         <b-tr v-if="overview">
@@ -257,7 +256,6 @@ const filteredHeaders = () => {
               {{ subheader }}
             </b-th>
           </template>
-          <b-th v-if="overview" :style="colItemStyle(colWidth)"></b-th>
         </b-tr>
       </b-thead>
 
@@ -328,7 +326,7 @@ const filteredHeaders = () => {
               >
                 <AudioSnippet :trackId="itemsInfo[index][i - 1].value" />
               </template>
-              <template v-else> {{ itemsInfo[index][i - 1].value }}</template>
+              <template v-else> {{ itemsInfo[index][i - 1].value }} </template>
             </b-td>
             <b-td :style="colItemStyle(colWidth * 3)" v-else></b-td>
           </template>
@@ -376,17 +374,7 @@ const filteredHeaders = () => {
               </div>
             </b-row>
           </b-td>
-          <b-td
-            class="align-middle"
-            v-if="overview"
-            :style="colItemStyle(colWidth)"
-          >
-            <b-button
-              variant="outline-primary fw-bold"
-              @click="$emit('viewResult', item.id)"
-              >View result</b-button
-            >
-          </b-td>
+
           <b-td
             class="align-middle"
             v-if="overview"
