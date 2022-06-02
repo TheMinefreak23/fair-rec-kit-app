@@ -90,31 +90,37 @@ async function generateChart(highlevelFeatures) {
 
 <template>
   <b-modal
-    body-bg-variant="dark"
+    body-bg-variant="secondary"
     header-bg-variant="dark"
     footer-bg-variant="dark"
-    body-text-variant="info"
-    header-text-variant="info"
-    footer-text-variant="info"
+    body-text-variant="white"
+    header-text-variant="white"
+    footer-text-variant="white"
     v-if="track.artists"
     v-model="modalShow"
-    :title="track.name + ' by ' + track.artists[0].name"
+    :title="track.name + ' - ' + track.artists[0].name"
     size="lg"
   >
     <div class="wrap">
       <div class="content">
         <b-container class="p-3">
           <b-card style="background-color: rgba(0, 0, 0, 0.6)">
-            <b-row class="p-3">
-              <h1>{{ track.name }}</h1>
-              <h2>
-                <!--TODO refactor into component with dynamic formatting-->
-                Artist(s):
-                <template v-for="artist in track.artists">{{
-                  artist.name
-                }}</template>
-              </h2>
-              <h4>Album: {{ track.album.name }}</h4>
+            <b-row class="p-3 align-middle">
+              <b-col cols="6" class="text-center">
+                <!--Using medium sized image-->
+                <img :src="track.album.images[1].url" style="height: 250px;"/>
+              </b-col>
+              <b-col>
+                <h1>{{ track.name }}</h1>
+                <h2>
+                  <!--TODO refactor into component with dynamic formatting-->
+                  Artist(s):
+                  <template v-for="artist in track.artists">{{
+                    artist.name
+                  }}</template>
+                </h2>
+                <h4>Album: {{ track.album.name }}</h4>
+              </b-col>
             </b-row>
 
             <b-row class="p-3">
@@ -131,10 +137,6 @@ async function generateChart(highlevelFeatures) {
                   <Bar :chartData="chartInfo"> </Bar>
                 </b-card>
                 <h4 v-else>(No chart available)</h4>
-              </b-col>
-              <b-col cols="6">
-                <!--Using medium sized image-->
-                <img :src="track.album.images[1].url" />
               </b-col>
             </b-row>
             <b-row v-if="lastFmTrack">
@@ -196,7 +198,6 @@ async function generateChart(highlevelFeatures) {
   height: 100%;
   opacity: 0.3;
   filter: blur(1px);
-  background-image: url('public/background.png');
   background-repeat: repeat;
   background-position: 50% 0;
   background-size: 100%;
