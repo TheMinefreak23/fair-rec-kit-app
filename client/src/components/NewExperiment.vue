@@ -9,6 +9,7 @@ import { store, pollForResult } from '../store.js'
 import { API_URL } from '../api'
 import { emptyFormGroup, validateEmail } from '../helpers/optionsFormatter'
 import { progress } from '../helpers/queueFormatter'
+import Tags from './Tags.vue'
 
 const options = ref()
 
@@ -134,7 +135,9 @@ function reformat(property) {
 <template>
   <div class="py-2 mx-5">
     <b-card>
-      <b-row class="text-center"> <h3>New Experiment</h3></b-row>
+      <b-row class="text-center">
+        <h3>New Experiment</h3>
+      </b-row>
       <!--This form contains all the necessary parameters for a user to submit a request for a experiment-->
       <b-form
         v-if="options"
@@ -189,15 +192,9 @@ function reformat(property) {
                 </b-col>
                 <b-col cols="12">
                   <b-form-group label-cols-md="2" label="Tags (optional)">
-                    <b-form-tags
-                      v-model="metadata.tags"
-                      tag-pills
-                      tag-variant="dark"
-                      remove-on-delete
-                      separator=" ,;"
-                      no-add-on-enter
-                    ></b-form-tags> </b-form-group
-                ></b-col>
+                    <Tags v-model="metadata.tags" />
+                  </b-form-group>
+                </b-col>
               </b-row>
             </b-col>
           </b-row>
@@ -260,10 +257,11 @@ function reformat(property) {
                       buttons
                       button-variant="outline-primary"
                       required
-                      >Include already rated items in
+                    >
+                      Include already rated items in
                       recommendations</b-form-checkbox
-                    ></b-col
-                  >
+                    >
+                  </b-col>
                 </b-row>
               </b-row>
             </div>

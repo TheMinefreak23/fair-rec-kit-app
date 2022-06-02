@@ -34,7 +34,7 @@ async function getSongInfo(track, artist, mbid) {
   // TODO use spotifyId here?
 
   //console.log('mbid', musicbrainzId)
-  if (mbid == undefined) {
+  if (mbid == undefined && lastFMData.track) {
     mbid = lastFMData.track.mbid
     // console.log('mbid', mbid)
   } /* else {
@@ -53,7 +53,7 @@ async function getSongInfo(track, artist, mbid) {
 async function getSpotifyToken() {
   const response = await fetch(API_URL + '/music/token')
   const data = await response.json()
-  console.log('token:', data)
+  // console.log('token:', data)
   return data
 }
 

@@ -1,7 +1,7 @@
 <script setup>
-/*This program has been developed by students from the bachelor Computer Science at
+/* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
-© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+© Copyright Utrecht University (Department of Information and Computing Sciences) */
 import Table from './Table.vue'
 import { onMounted, ref, watch } from 'vue'
 import { formatResults, formatResult } from '../helpers/resultFormatter.js'
@@ -10,16 +10,6 @@ import { addResult, store } from '../store.js'
 import { API_URL } from '../api'
 import { viewResult } from '../helpers/resultRequests.js'
 
-const oldResultsFormat = ref(true) // TODO DEV
-//const emit = defineEmits(['goToResult'])
-
-const exResults = ref([
-  { id: 1, age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
-  { id: 2, age: 21, first_name: 'Larsen', last_name: 'Shaw' },
-  { id: 3, age: 89, first_name: 'Geneva', last_name: 'Wilson' },
-  { id: 4, age: 38, first_name: 'Jami', last_name: 'Carney' },
-])
-const exHeaders = ref(['id', 'age', 'first_name', 'last_name'])
 const headers = ref([
   { name: 'ID' },
   { name: 'Date Time' },
@@ -31,10 +21,6 @@ const headers = ref([
   { name: '' },
 ])
 
-const ex1CurrentPage = ref(1)
-const ex1PerPage = ref(10)
-const ex1Rows = ref(100)
-
 onMounted(() => {
   getResults()
 })
@@ -42,16 +28,16 @@ onMounted(() => {
 watch(
   () => store.currentResults.length,
   () => {
-    //console.log('previousResults watch currentResults')
+    // console.log('previousResults watch currentResults')
     getResults()
   }
 )
 
 async function getResults() {
-  const response = await fetch(API_URL + '/all-results')
+  const response = await fetch(API_URL + '/all-results/')
   const data = await response.json()
   store.allResults = formatResults(data.all_results)
-  //console.log('all results', store.allResults)
+  // console.log('all results', store.allResults)
 }
 </script>
 

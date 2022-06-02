@@ -6,12 +6,9 @@ Utrecht University within the Software Project course.
 import enum
 import json
 import os
-import threading
 import time
 from dataclasses import dataclass
 from datetime import datetime
-from tkinter.ttk import Progressbar
-from click import progressbar
 import yaml
 from fairreckitlib.experiment.experiment_config_parsing import Parser
 
@@ -20,6 +17,7 @@ from fairreckitlib.recommender_system import RecommenderSystem
 from flask import (Blueprint, request)
 
 from . import result_storage
+from . import result_loader
 from .events import ProgressStatus, Status, EventHandler
 from .options_formatter import create_available_options, config_dict_from_settings
 
@@ -46,6 +44,7 @@ class QueueItem:
     status: Status
     progress: ProgressStatus
     name: str
+    validating: bool = False
 
 
 def formatted_queue():
@@ -78,7 +77,10 @@ def calculate_first():
 
     # If there is a queue item to do, run it.
     if first:
-        run_new_experiment(first)
+        if first.validating:
+            validate_experiment(first)
+        else:
+            run_new_experiment(first)
         # mock_experiment(experiment)
 
 
@@ -101,8 +103,8 @@ def run_experiment(experiment):
 
     return EventHandler(current_experiment, end_experiment).events
 
-def run_new_experiment(experiment):    
-    events = run_experiment(experiment)
+def run_new_experiment(experiment):  
+    events = run_experiment(experiment)  
     # Create config files directory if it doesn't exist yet.
     if not os.path.isdir(CONFIG_DIR):
         os.mkdir(CONFIG_DIR)
@@ -118,17 +120,20 @@ def run_new_experiment(experiment):
                                                      recommender_system.data_registry,
                                                      recommender_system.experiment_factory)
 
-    event_handler = EventHandler(current_experiment, end_experiment)
-    recommender_system.run_experiment(config, events=event_handler.events)
+    recommender_system.run_experiment(config, events=events)
 
     # TODO USE THIS FUNCTION INSTEAD OF PARSING
     # recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)
 
-def validate_experiment(filepath):
-    experiment = QueueItem(job={}, config={}, name='',status=Status.DONE, progress=ProgressStatus.NA)
-    print(experiment)
+def validate_experiment(experiment):
     events = run_experiment(experiment)
-    recommender_system.validate_experiment(result_dir=filepath, num_runs=1, events=events)
+    recommender_system.validate_experiment(result_dir=experiment.job['filepath'], num_runs=experiment.job['amount'], events=events)
+
+def add_validation(filepath, amount):
+    experiment = QueueItem(job={'filepath': filepath, 'amount': amount}, config={}, name='',status=Status.TODO, progress=ProgressStatus.NA, validating=True)
+    experiment_queue.append(experiment)
+    calculate_first()
+
 
 def send_email(metadata, timestamp):
     print("llanfairpwlchfairgwyngychgogerychchwryrndrwbwchllantisiligogogoch")
@@ -187,7 +192,7 @@ def calculate():
         if current_experiment:
             if current_experiment.status == Status.DONE:
                 # Set current result, TODO hacky
-                result_storage.result_by_id(current_experiment.job['timestamp']['stamp'])
+                result_loader.result_by_id(current_experiment.job['timestamp']['stamp'])
                 response['calculation'] = result_storage.current_result
             if current_experiment.status == Status.DONE or current_experiment.status == Status.ABORTED:
                 current_experiment = None
@@ -290,7 +295,7 @@ def mock_evaluate(approach, metric):
 
 def append_queue(metadata, settings):
     """
-    Add a experiment item (settings) to the queue.
+    Add an experiment item (settings) to the queue.
 
     :param metadata: the experiment metadata
     :param settings: the experiment settings
