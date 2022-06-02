@@ -241,6 +241,6 @@ def export():
 def validate(): 
     json = request.json
     filepath = json.get('filepath')
-    amount = json.get('amount', 1)
+    amount = int(json.get('amount', 1))
     add_validation(filepath, amount)
     return "Validated"

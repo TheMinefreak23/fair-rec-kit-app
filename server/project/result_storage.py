@@ -141,7 +141,7 @@ def result_by_id(result_id):
                                               'dataset', by_name=True)
                 approach_index = name_to_index(
                     data['result'][dataset_index]['recs'],
-                    run_overview['overview'][pair_id]['recommender_system'], 'recommendation')
+                    run_overview['overview'][pair_id]['recommender_system'], 'approach')
                 data['result'][dataset_index]['recs'][approach_index]['evals'] = add_evaluation(
                     data['result'][dataset_index]['recs'][approach_index]['evals'],
                     evaluation_data['evaluations'])
@@ -235,6 +235,8 @@ def name_to_index(json_data, name, key, by_name=False):
     key(str): the object that the function should match on (either 'dataset' or 'recommender_system')
     """
     current_index = -1
+    print("amogus")
+    print(json_data)
     for i, data in enumerate(json_data):
         result_value = json_data[i][key]
 

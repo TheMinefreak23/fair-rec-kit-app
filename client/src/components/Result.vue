@@ -149,7 +149,7 @@ async function getUserRecs(currentTable, runID) {
     }),
   };
   const response = await fetch(API_URL + '/all-results/result', requestOptions);
-  data.value.results[runID][currentTable] = await response.json();
+  data.value.results[runID][currentTable] = await response.json()
   selectedHeaders.value[runID][currentTable] = Object.keys(
     data.value.results[0][currentTable][0]
   )
