@@ -42,14 +42,6 @@ onMounted(() => {
   setTimeout(() => {
     blink.value = false
   }, timeoutMs)
-
-  console.log(`#group-${props.groupId.split(' ').join('-')}-${props.index}`)
-  // TODO refactor to ID function?
-  const element = document.querySelector(
-    `#group-${props.groupId.split(' ').join('-')}-${props.index}`
-  )
-  console.log(element)
-  if (!props.single) element.scrollIntoView({ behavior: 'smooth' })
 })
 
 /*
@@ -77,7 +69,7 @@ watch(
   () => form.value.main,
   () => {
     // console.log('form', form.value)
-    setParameter()
+    setParameterDefaults()
   }
 )
 
@@ -99,12 +91,20 @@ watch(
 )
 
 // Set default values for the group parameters.
-function setParameter() {
+function setParameterDefaults() {
+  function formSet() {
+    return form.value.values || form.value.options || form.value.lists
+  }
+
   const option = form.value.main
   // console.log('setting parameter', props.name, props.options, form.value.main)
   let choices
   // console.log(option)
-  if (option.params) {
+  // Only set defaults if the form hasn't been set (when copying)
+  /* if (formSet()) {
+    console.log('BINGO')
+  } */
+  if (option.params && !formSet()) {
     // console.log('option', props.name, option.name, 'params', option.params)
     if (option.params.values && option.params.values.length > 0) {
       choices = option.params.values

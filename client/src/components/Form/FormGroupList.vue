@@ -3,7 +3,7 @@
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
 
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { capitalise } from '../../helpers/resultFormatter'
 
 import FormGroup from './FormGroup.vue'
@@ -12,6 +12,7 @@ import { showToast } from '../../store'
 const emit = defineEmits(['update:modelValue'])
 const props = defineProps({
   name: String,
+  groupId: String,
   title: String,
   description: String,
   options: Array,
@@ -30,6 +31,11 @@ const form = computed({
     console.log('local form change to', localValue)
     emit('update:modelValue', localValue)
   },
+})
+
+const scrollId = computed(() => {
+  // console.log(props.groupId)
+  return props.groupId ? props.groupId : props.name
 })
 
 // const visibleGroup = ref(1)
@@ -92,11 +98,15 @@ function copyItem(i) {
   form.value.groupCount++ // Add a new item
   // Deep-copy the selected value to the new item
   const item = JSON.parse(JSON.stringify(form.value.choices[i]))
+  console.log(item)
+  // Insert item
   form.value.choices.splice(i, 0, item)
   // visibleGroup.value = i + 2 // Show newly copied item
   groupVisible.value[i + 1] = true
   // console.log('copy', form.value.choices[i].main)
   showFormToast(form.value.choices[i].main, 'copied')
+
+  scrollToGroup(i + 1)
 }
 
 /**
@@ -188,6 +198,22 @@ function addGroup() {
   form.value.visible = true
   // (visibleGroup.value = form.value.groupCount
   groupVisible.value[form.value.groupCount - 1] = true
+
+  // Scroll to newly added group
+  scrollToGroup(form.value.groupCount - 1)
+}
+
+// Scroll to group index
+function scrollToGroup(index) {
+  nextTick(() => {
+    // console.log(`#group-${scrollId.value.split(' ').join('-')}-${index}`)
+    // TODO refactor to ID function?
+    const element = document.querySelector(
+      `#group-${scrollId.value.split(' ').join('-')}-${index}`
+    )
+    // console.log(element)
+    element.scrollIntoView({ behavior: 'smooth' })
+  })
 }
 </script>
 
@@ -223,13 +249,13 @@ function addGroup() {
       </p>-->
           <b-row>
             <b-col
-              :id="`group-${name.split(' ').join('-')}-${i - 1}`"
+              :id="`group-${scrollId.split(' ').join('-')}-${i - 1}`"
               cols="12"
               role="tablist"
               v-for="i in form.groupCount"
               :key="i - 1"
             >
-              <!-- {{ `group-${name.split(' ').join('-')}-${i - 1}` }} -->
+              <!--{{ `group-${scrollId.split(' ').join('-')}-${i - 1}` }}-->
               <b-container class="g-0">
                 <!--Collapsable group toggle button with remove button-->
                 <b-row md="auto">
@@ -248,7 +274,7 @@ function addGroup() {
                           "
                           :variant="
                             //visibleGroup == i ? 'secondary' : 'dark'
-                            groupVisible[i - 1]
+                            groupVisible[i - 1] ? 'secondary' : 'dark'
                           "
                         >
                           <!-- TODO refactor-->
