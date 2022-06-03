@@ -34,10 +34,11 @@ def get_spotify_token():
         message = (spotify_id + ':' + spotify_secret).encode()
         encoded = base64.b64encode(message)
         # print('encoded',encoded)
-        headers = {'Authorization': 'Basic ' + encoded.decode()
-            , 'Content-Type': 'application/x-www-form-urlencoded'}
+        headers = {'Authorization': 'Basic ' + encoded.decode(),
+                   'Content-Type': 'application/x-www-form-urlencoded'}
         data = 'grant_type=client_credentials'
-        res = requests.post('https://accounts.spotify.com/api/token', data=data, headers=headers)
+        res = requests.post(
+            'https://accounts.spotify.com/api/token', data=data, headers=headers)
         # print(res.text)
         token = json.loads(res.text)
         token['expiration_time'] = time.time() + token['expires_in']
@@ -68,8 +69,8 @@ def get_background():
     Returns:
         Image: Background-image
     """
-    playlist1 = '6KnSfElksjrqygPIc4TDmf' # Playlist with nice album art
-    #TOP_50 = '37i9dQZEVXbMDoHDwVN2tF' # Spotify top 50 chart
+    playlist1 = '6KnSfElksjrqygPIc4TDmf'  # Playlist with nice album art
+    # TOP_50 = '37i9dQZEVXbMDoHDwVN2tF' # Spotify top 50 chart
 
     playlist_id = playlist1
 
@@ -79,13 +80,13 @@ def get_background():
     playlist_length = 0
     while offset < playlist_length or offset == 0:
         url = SPOTIFY_API + '/playlists/' \
-              + playlist_id + '/tracks?limit=' \
-              + str(MAX_TRACK_LIMIT) + '&offset=' \
-              + str(offset)
+            + playlist_id + '/tracks?limit=' \
+            + str(MAX_TRACK_LIMIT) + '&offset=' \
+            + str(offset)
         playlist = request_spotify_data(url)
 
         items += playlist['items']
-        if offset == 0: # TODO refactor into separate request and for loop?
+        if offset == 0:  # TODO refactor into separate request and for loop?
             playlist_length = playlist['total']
             print('playlist length', playlist_length)
         offset += MAX_TRACK_LIMIT
@@ -123,7 +124,7 @@ def collage(urls):
                 index = 0
     background.save('../client/public/background.png')
 
-    #return "Background saved"
+    # return "Background saved"
     # TODO why do we need to go back once tho
     return send_file('../background.png', mimetype='image/png')
 
@@ -156,7 +157,8 @@ def get_unique_n(query, amount, category, image):
     """
     # Amount of items returned are a multiple of 10.
     limit = 10
-    url = SPOTIFY_API + '/search?' + query + '&type=' + category + '&limit=' + str(limit)
+    url = SPOTIFY_API + '/search?' + query + \
+        '&type=' + category + '&limit=' + str(limit)
 
     items = []
     # Get next until we have n items.
@@ -165,11 +167,13 @@ def get_unique_n(query, amount, category, image):
         category_data = query[category+'s']
         print('total items', category_data['total'])
         if image:
-            items = list(set(items+[item['images'][1]['url'] for item in category_data['items']]))
+            items = list(set(items+[item['images'][1]['url']
+                         for item in category_data['items']]))
         else:
-            items += list(set(items+[item['id'] for item in category_data['items']]))
+            items += list(set(items+[item['id']
+                          for item in category_data['items']]))
         if len(items) < limit:
-            break # Stop if there are less items left than the limit
+            break  # Stop if there are less items left than the limit
         url = category_data['next']
     print('items length', len(items))
 

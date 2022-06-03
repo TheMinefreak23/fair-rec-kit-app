@@ -127,7 +127,7 @@ async function getLastFMinfo(artist, track, mbid) {
 }
 
 /**
- * 
+ * Request AcousticBrainz data
  * @param {String} musicbrainzId - Unique MusicBrainz identifier, which can be retrieved from LastFM 
  * @returns {Object} data containing AcousticBrainz data, including high/low-level audio features
  */
