@@ -161,7 +161,7 @@ function toggleInfoColumns(addHeaders) {
   ]
   additionalInfoAmount.value = addHeaders.length // TODO refactor
   // console.log('additional info amount', additionalInfoAmount.value)
-  console.log('toggleInfo infoHeaders', infoHeaders.value)
+  // console.log('toggleInfo infoHeaders', infoHeaders.value)
   // emit('updateHeaders', newHeaders)
 }
 
@@ -182,6 +182,8 @@ function isRecsHeader(key) {
 
 // TODO computed ?
 const filteredHeaders = () => {
+  // console.log('INFO HEADERS', infoHeaders.value)
+  // console.log('recs', props.recs)
   return !props.recs || infoHeaders.value.length === 0
     ? props.headers
     : infoHeaders.value
@@ -236,7 +238,6 @@ const filteredHeaders = () => {
       <b-thead head-variant="dark">
         <!-- Main headers -->
         <b-tr>
-          <b-th v-if="overview" :style="colItemStyle(colWidth)"></b-th>
           <template v-for="(header, index) in filteredHeaders()" :key="header">
             <b-th
               class="text-center"
@@ -247,15 +248,16 @@ const filteredHeaders = () => {
               {{ header.name }}
             </b-th>
           </template>
+          <b-th v-if="overview" :style="colItemStyle(colWidth)"></b-th>
         </b-tr>
         <!-- Subheaders -->
         <b-tr v-if="overview">
-          <b-th :style="colItemStyle(colWidth)"></b-th>
           <template v-for="subheader in subheaders" :key="subheader">
             <b-th class="text-center" :style="colItemStyle(colWidth)">
               {{ subheader }}
             </b-th>
           </template>
+          <b-th v-if="overview" :style="colItemStyle(colWidth)"></b-th>
         </b-tr>
       </b-thead>
 

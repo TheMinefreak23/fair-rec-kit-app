@@ -251,7 +251,7 @@ function combineResults(results) {
   const tables = []
   for (const dataset in results) {
     for (const approach in results[dataset].results) {
-      tables.push(results[dataset].dataset.dataset + '_' + results[dataset].results[approach].approach + '_run' + runID.value)
+      tables.push(results[dataset].dataset.dataset + '_' + results[dataset].results[approach].approach + '_run' + runID.value + '_' + dataset)
     }
   }
   console.log(tables)
@@ -426,13 +426,11 @@ function contains(string, array) {
         <template v-for="(datasetResult, index) in result.result" :key="datasetResult">
           <b-col :cols="result.result.length > 1 ? '6' : '12'">
             <p> {{ datasetResult.results[0].dataset }}</p>
-            <template v-if="visibleDatasets.includes(datasetResult.dataset.dataset)" :key="visibleDatasets">
+            <!-- <template v-if="visibleDatasets.includes(datasetResult.dataset.dataset)" :key="visibleDatasets"> -->
               <Table :caption="userTables[index]" :results="hideResults(datasetResult.results)"
                 :headers="hideHeaders(datasetResult.headers)" :removable="false" />
               <b-button @click="exportTable(index)">Export table</b-button>
-            </template>
           </b-col>
-          <!--<p> {{ datasetResult.results }}</p>-->
         </template>
       </b-row>
     </b-container>
@@ -469,6 +467,7 @@ function contains(string, array) {
           <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
             <div :class="visibleMatrices.length > 1 ? 'col-6' : 'col'">
               <Table
+                recs
                 v-if="selectedHeaders[index]"
                 :key="props.result.id"
                 :caption="entry"
