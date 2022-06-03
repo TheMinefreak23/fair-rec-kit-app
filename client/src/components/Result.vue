@@ -467,6 +467,7 @@ function contains(string, array) {
           <!--<template v-for="(entry, index) in props.result.result" :key="data">-->
             <div :class="visibleMatrices.length > 1 ? 'col-6' : 'col'">
               <Table
+                recs
                 v-if="selectedHeaders[index]"
                 :key="props.result.id"
                 :caption="entry"
