@@ -247,7 +247,6 @@ const filteredHeaders = () => {
               {{ header.name }}
             </b-th>
           </template>
-          <b-th v-if="overview"></b-th>
         </b-tr>
         <!-- Subheaders -->
         <b-tr v-if="overview">
@@ -257,7 +256,6 @@ const filteredHeaders = () => {
               {{ subheader }}
             </b-th>
           </template>
-          <b-th v-if="overview"></b-th>
         </b-tr>
       </b-thead>
 
@@ -328,55 +326,55 @@ const filteredHeaders = () => {
               >
                 <AudioSnippet :trackId="itemsInfo[index][i - 1].value" />
               </template>
-              <template v-else> {{ itemsInfo[index][i - 1].value }}</template>
+              <template v-else> {{ itemsInfo[index][i - 1].value }} </template>
             </b-td>
             <b-td :style="colItemStyle(colWidth * 3)" v-else></b-td>
           </template>
           <b-td
             class="align-middle"
             v-if="overview || removable"
-            :style="colItemStyle(colWidth)"
+            style="width: 150px"
           >
-            <b-row class="m-0 float-end">
-              <b-col md="auto" class="mx-0 px-0">
-                <InfoModal :id="item.id" />
-              </b-col>
-              <b-col md="auto" class="mx-0 px-0">
-                <EditModal
-                  v-if="editable"
-                  :id="item.id"
-                  :index="index"
-                  :editUrl="serverFile2"
-                  @loadResults="emit('loadResults')"
-                />
-              </b-col>
-              <b-col md="auto" class="mx-0 px-0">
-                <!--REFACTOR status condition-->
-                <DeletionModal
-                  v-if="
-                    removable &&
-                    (!item.status ||
-                      [status.toDo, status.active].includes(
-                        item.status.slice(statusPrefix.length)
-                      ))
-                  "
-                  :item="item"
-                  :removalUrl="serverFile"
-                />
-              </b-col>
+            <b-row class="m-0 float-end d-block">
+              <b-button
+                variant="primary"
+                @click="$emit('viewResult', item.id)"
+                class="m-1"
+                style="width: 142px"
+                >View result
+              </b-button>
+              <div class="p-0" style="width: 150px">
+                <b-col md="auto" class="mx-0 px-0 d-inline">
+                  <EditModal
+                    v-if="editable"
+                    :id="item.id"
+                    :index="index"
+                    :editUrl="serverFile2"
+                    @loadResults="emit('loadResults')"
+                  />
+                </b-col>
+                <b-col md="auto" class="mx-0 px-0 d-inline">
+                  <InfoModal :id="item.id" />
+                </b-col>
+
+                <b-col md="auto" class="mx-0 px-0 d-inline">
+                  <!--REFACTOR status condition-->
+                  <DeletionModal
+                    v-if="
+                      removable &&
+                      (!item.status ||
+                        [status.toDo, status.active].includes(
+                          item.status.slice(statusPrefix.length)
+                        ))
+                    "
+                    :item="item"
+                    :removalUrl="serverFile"
+                  />
+                </b-col>
+              </div>
             </b-row>
           </b-td>
-          <b-td
-            class="align-middle"
-            v-if="overview"
-            :style="colItemStyle(colWidth)"
-          >
-            <b-button
-              variant="outline-primary fw-bold"
-              @click="$emit('viewResult', item.id)"
-              >View result</b-button
-            >
-          </b-td>
+
           <b-td
             class="align-middle"
             v-if="overview"
