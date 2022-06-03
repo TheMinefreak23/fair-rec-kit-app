@@ -75,8 +75,8 @@ const form = computed({
         :step="1"
         :ruler="false"
         :label="true"
-        :minValue="value.minValue"
-        :maxValue="value.maxValue"
+        :minValue="value[0]"
+        :maxValue="value[1]"
         @input="form.value = [$event.minValue, $event.maxValue]"
       />
       <!--Display the seed label for the seed option.-->
