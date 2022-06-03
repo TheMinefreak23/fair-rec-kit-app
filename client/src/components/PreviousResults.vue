@@ -10,6 +10,8 @@ import { addResult, store } from '../store.js'
 import { API_URL } from '../api'
 import { viewResult } from '../helpers/resultRequests.js'
 
+defineProps({ viewItem: Boolean })
+
 const headers = ref([
   { name: 'ID' },
   { name: 'Date Time' },
@@ -46,6 +48,7 @@ async function getResults() {
     <div class="text-center py-2 mx-5">
       <h3>Previous results</h3>
       <Table
+        :viewItem="viewItem"
         @viewResult="viewResult"
         @loadResults="getResults"
         :results="store.allResults"

@@ -24,6 +24,7 @@ const emit = defineEmits([
   'updateHeaders',
 ])
 const props = defineProps({
+  viewItem: Boolean,
   recs: Boolean,
   overview: Boolean,
   results: Array,
@@ -341,7 +342,8 @@ const filteredHeaders = () => {
                 @click="$emit('viewResult', item.id)"
                 class="m-1"
                 style="width: 142px"
-                >View result
+              >
+                {{ viewItem ? 'View result' : 'Open result' }}
               </b-button>
               <div class="p-0" style="width: 150px">
                 <b-col md="auto" class="mx-0 px-0 d-inline">
