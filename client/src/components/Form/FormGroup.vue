@@ -3,8 +3,8 @@
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
 import FormGroupList from './FormGroupList.vue'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { article, capitalise } from '../../helpers/resultFormatter'
+import { computed, onMounted, ref, watch } from 'vue'
+import { article } from '../../helpers/resultFormatter'
 import { emptyFormGroup } from '../../helpers/optionsFormatter'
 import '../../../node_modules/multi-range-slider-vue/MultiRangeSliderBlack.css'
 import FormInput from './FormInput.vue'
@@ -24,8 +24,6 @@ const props = defineProps({
   single: { type: Boolean, default: false }, // single form group or multi (form group list)
 })
 
-const blink = ref(false) // whether items should blink
-
 onMounted(() => {
   form.value.single = props.single
   form.value.name = props.title
@@ -34,23 +32,7 @@ onMounted(() => {
   }
   // console.log('form', form.value)
   // scroll to new group
-
-  // Make new group blink
-  // TODO multiple usage, refactor to function/composable?
-  blink.value = true
-  const timeoutMs = 1500
-  setTimeout(() => {
-    blink.value = false
-  }, timeoutMs)
 })
-
-/*
-onUnmounted(() => {
-  // console.log(props.index)
-  const element = document.querySelector(`#group-${props.index}`)
-  console.log(element)
-  element.scrollIntoView({ behavior: 'smooth' })
-})*/
 
 const form = computed({
   // getter
@@ -250,21 +232,3 @@ function hasParams() {
     </b-col>
   </b-row>
 </template>
-
-<style>
-.subtle-blink {
-  animation: subtle-glowing 1300ms infinite;
-}
-
-@keyframes subtle-glowing {
-  0% {
-    background-color: #ffffffd6;
-  }
-  50% {
-    background-color: #58b3e4d7;
-  }
-  100% {
-    background-color: #ffffffd6;
-  }
-}
-</style>

@@ -248,85 +248,87 @@ function scrollToGroup(index) {
         {{ formatMultipleItems(form.main) }}
       </p>-->
           <b-row>
-            <b-col
-              :id="`group-${scrollId.split(' ').join('-')}-${i - 1}`"
-              cols="12"
-              role="tablist"
-              v-for="i in form.groupCount"
-              :key="i - 1"
-            >
-              <!--{{ `group-${scrollId.split(' ').join('-')}-${i - 1}` }}-->
-              <b-container class="g-0">
-                <!--Collapsable group toggle button with remove button-->
-                <b-row md="auto">
-                  <b-row class="pe-0">
-                    <b-col class="pe-0">
-                      <b-card no-body class="mb-1">
-                        <b-button
-                          class="text-start"
-                          block
-                          @click="
-                            // TODO this is pretty hacky
-                            /*visibleGroup == i
+            <TransitionGroup name="list">
+              <b-col
+                :id="`group-${scrollId.split(' ').join('-')}-${i - 1}`"
+                cols="12"
+                role="tablist"
+                v-for="i in form.groupCount"
+                :key="i - 1"
+              >
+                <!--{{ `group-${scrollId.split(' ').join('-')}-${i - 1}` }}-->
+                <b-container class="g-0">
+                  <!--Collapsable group toggle button with remove button-->
+                  <b-row md="auto">
+                    <b-row class="pe-0">
+                      <b-col class="pe-0">
+                        <b-card no-body class="mb-1">
+                          <b-button
+                            class="text-start"
+                            block
+                            @click="
+                              // TODO this is pretty hacky
+                              /*visibleGroup == i
                               ? (visibleGroup = -1)
                               : (visibleGroup = i)*/
-                            groupVisible[i - 1] = !groupVisible[i - 1]
-                          "
-                          :variant="
-                            //visibleGroup == i ? 'secondary' : 'dark'
-                            groupVisible[i - 1] ? 'secondary' : 'dark'
-                          "
-                        >
-                          <!-- TODO refactor-->
-                          <template
-                            v-if="
-                              //visibleGroup == i
-                              groupVisible[i - 1]
+                              groupVisible[i - 1] = !groupVisible[i - 1]
                             "
-                            ><i class="bi bi-caret-down" /> |
-                          </template>
-                          <template v-else
-                            ><i class="bi bi-caret-up" /> |
-                          </template>
-                          {{ shortGroupDescription(i - 1) }}
-                        </b-button>
-                      </b-card>
-                    </b-col>
-                    <!--Remove button-->
-                    <b-col cols="1" v-if="!(i == 1 && required)" class="p-0">
-                      <b-button
-                        data-testid="remove-button"
-                        @click="removeGroup(i - 1)"
-                        variant="danger"
-                        class="mb-2 mr-sm-2 mb-sm-0 float-end"
-                        style="width: 90%"
-                        >X</b-button
-                      >
-                    </b-col>
+                            :variant="
+                              //visibleGroup == i ? 'secondary' : 'dark'
+                              groupVisible[i - 1] ? 'secondary' : 'dark'
+                            "
+                          >
+                            <!-- TODO refactor-->
+                            <template
+                              v-if="
+                                //visibleGroup == i
+                                groupVisible[i - 1]
+                              "
+                              ><i class="bi bi-caret-down" /> |
+                            </template>
+                            <template v-else
+                              ><i class="bi bi-caret-up" /> |
+                            </template>
+                            {{ shortGroupDescription(i - 1) }}
+                          </b-button>
+                        </b-card>
+                      </b-col>
+                      <!--Remove button-->
+                      <b-col cols="1" v-if="!(i == 1 && required)" class="p-0">
+                        <b-button
+                          data-testid="remove-button"
+                          @click="removeGroup(i - 1)"
+                          variant="danger"
+                          class="mb-2 mr-sm-2 mb-sm-0 float-end"
+                          style="width: 90%"
+                          >X</b-button
+                        >
+                      </b-col>
+                    </b-row>
                   </b-row>
-                </b-row>
-                <!--Collapsable group-->
-                <!--<b-collapse :visible="visibleGroup == i" role="tabpanel">-->
-                <b-collapse :visible="groupVisible[i - 1]" role="tabpanel">
-                  <FormGroup
-                    v-model="form.choices[i - 1]"
-                    :index="i - 1"
-                    :name="name"
-                    :groupId="name"
-                    :options="options"
-                    :required="
-                      // If the option is needed, at least one selection must've been made
-                      required &&
-                      (!form.choices.main ||
-                        form.choices.every((x) => x.main == ''))
-                    "
-                    :default="defaultOption"
-                    :maxK="maxK"
-                    @copy="copyItem(i - 1)"
-                  />
-                </b-collapse>
-              </b-container>
-            </b-col>
+                  <!--Collapsable group-->
+                  <!--<b-collapse :visible="visibleGroup == i" role="tabpanel">-->
+                  <b-collapse :visible="groupVisible[i - 1]" role="tabpanel">
+                    <FormGroup
+                      v-model="form.choices[i - 1]"
+                      :index="i - 1"
+                      :name="name"
+                      :groupId="name"
+                      :options="options"
+                      :required="
+                        // If the option is needed, at least one selection must've been made
+                        required &&
+                        (!form.choices.main ||
+                          form.choices.every((x) => x.main == ''))
+                      "
+                      :default="defaultOption"
+                      :maxK="maxK"
+                      @copy="copyItem(i - 1)"
+                    />
+                  </b-collapse>
+                </b-container>
+              </b-col>
+            </TransitionGroup>
           </b-row>
         </b-card>
       </b-collapse>
@@ -347,20 +349,47 @@ function scrollToGroup(index) {
 </template>
 
 <style>
-/*
-.removed {
-  animation: red-glowing 1800ms;
+.list-enter-active {
+  transition: all 0.5s ease;
+  animation: subtle-glowing 1300ms infinite;
 }
 
-@keyframes red-glowing {
+.list-leave-active {
+  transition: all 0.5s ease;
+  animation: subtle-glowing-red 800ms infinite;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.subtle-blink {
+  animation: subtle-glowing 1300ms infinite;
+}
+
+@keyframes subtle-glowing {
   0% {
-    background-color: #ffb4b4d6;
+    background-color: #ffffffd6;
   }
   50% {
-    background-color: #ff5353d7;
+    background-color: #77bfe6d7;
   }
   100% {
-    background-color: #ff9898d6;
+    background-color: #ffffffd6;
   }
-}*/
+}
+
+@keyframes subtle-glowing-red {
+  0% {
+    background-color: #ffffffd6;
+  }
+  50% {
+    background-color: #e67777d7;
+  }
+  100% {
+    background-color: #ffffffd6;
+  }
+}
 </style>
