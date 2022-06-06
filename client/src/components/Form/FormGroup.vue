@@ -3,8 +3,8 @@
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
 import FormGroupList from './FormGroupList.vue'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { article, capitalise } from '../../helpers/resultFormatter'
+import { computed, onMounted, ref, watch } from 'vue'
+import { article } from '../../helpers/resultFormatter'
 import { emptyFormGroup } from '../../helpers/optionsFormatter'
 import '../../../node_modules/multi-range-slider-vue/MultiRangeSliderBlack.css'
 import FormInput from './FormInput.vue'
@@ -12,6 +12,7 @@ import FormSelect from './FormSelect.vue'
 
 const emit = defineEmits(['copy', 'scroll', 'update:modelValue'])
 const props = defineProps({
+  groupId: String, // group ID for scrolling
   index: Number, // group index for scrolling
   name: String,
   title: String,
@@ -23,8 +24,6 @@ const props = defineProps({
   single: { type: Boolean, default: false }, // single form group or multi (form group list)
 })
 
-const blink = ref(false) // whether items should blink
-
 onMounted(() => {
   form.value.single = props.single
   form.value.name = props.title
@@ -33,29 +32,6 @@ onMounted(() => {
   }
   // console.log('form', form.value)
   // scroll to new group
-
-  // Make new group blink
-  // TODO multiple usage, refactor to function/composable?
-  blink.value = true
-  const timeoutMs = 1500
-  setTimeout(() => {
-    blink.value = false
-  }, timeoutMs)
-
-  // console.log(`#group-${props.name.split()[0]}-${props.index}`)
-  // TODO refactor to ID function?
-  const element = document.querySelector(
-    `#group-${props.name.split()[0]}-${props.index}`
-  )
-  // console.log(element)
-  if (element) element.scrollIntoView({ behavior: 'smooth' })
-})
-
-onUnmounted(() => {
-  // console.log(props.index)
-  const element = document.querySelector(`#group-${props.index - 1}`)
-  // console.log(element)
-  if (element) element.scrollIntoView({ behavior: 'smooth' })
 })
 
 const form = computed({
@@ -75,7 +51,7 @@ watch(
   () => form.value.main,
   () => {
     // console.log('form', form.value)
-    setParameter()
+    setParameterDefaults()
   }
 )
 
@@ -97,12 +73,20 @@ watch(
 )
 
 // Set default values for the group parameters.
-function setParameter() {
+function setParameterDefaults() {
+  function formSet() {
+    return form.value.values || form.value.options || form.value.lists
+  }
+
   const option = form.value.main
   // console.log('setting parameter', props.name, props.options, form.value.main)
   let choices
   // console.log(option)
-  if (option.params) {
+  // Only set defaults if the form hasn't been set (when copying)
+  /* if (formSet()) {
+    console.log('BINGO')
+  } */
+  if (option.params && !formSet()) {
     // console.log('option', props.name, option.name, 'params', option.params)
     if (option.params.values && option.params.values.length > 0) {
       choices = option.params.values
@@ -220,7 +204,9 @@ function hasParams() {
               v-if="option.single"
               single
               v-model="form.lists[index].choices[0]"
-              :name="option.name"
+              :groupId="name + ' ' + props.index + ' ' + option.name"
+              :name="form.main.name + ' ' + option.name"
+              :index="index"
               :title="option.title"
               :options="option.options"
               :defaultOption="option.default"
@@ -229,7 +215,9 @@ function hasParams() {
             <FormGroupList
               v-else
               v-model="form.lists[index]"
-              :name="option.name"
+              :groupId="name + ' ' + props.index + ' ' + option.name"
+              :name="form.main.name + ' ' + option.name"
+              :index="index"
               :title="option.title"
               :description="
                 option.title + ' for ' + name + ' ' + form.main.name
@@ -244,21 +232,3 @@ function hasParams() {
     </b-col>
   </b-row>
 </template>
-
-<style>
-.subtle-blink {
-  animation: subtle-glowing 1300ms infinite;
-}
-
-@keyframes subtle-glowing {
-  0% {
-    background-color: #ffffffd6;
-  }
-  50% {
-    background-color: #58b3e4d7;
-  }
-  100% {
-    background-color: #ffffffd6;
-  }
-}
-</style>

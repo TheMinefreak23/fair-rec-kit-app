@@ -159,7 +159,7 @@ function callToast() {
           <Results @toast="onNewResult"
         /></b-tab>
         <b-tab title="All results">
-          <PreviousResults />
+          <PreviousResults viewItem />
         </b-tab>
         <b-tab title="Music Detail">
           <MusicDetail />
