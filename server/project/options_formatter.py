@@ -31,6 +31,16 @@ def create_model_api_dict(predictors, recommenders):
     return model_to_api
 
 
+def format_categorised(settings):
+    formatted_settings = []
+    for (header, options) in settings.items():
+        # print(settings[header])
+        # options['header'] = header TODO handle categories/APIs differently
+        formatted_settings.append({'name': header, 'options': options})
+    # print(formatted_settings)
+    return formatted_settings
+
+
 def create_available_options(recommender_system):
     """Gets options from FairRecKitLib and formats them for usage on the client side
 
@@ -60,15 +70,6 @@ def create_available_options(recommender_system):
 
     global model_API_dict
     model_API_dict = create_model_api_dict(predictors, recommenders)
-
-    def format_categorised(settings):
-        formatted_settings = []
-        for (header, options) in settings.items():
-            # print(settings[header])
-            # options['header'] = header TODO handle categories/APIs differently
-            formatted_settings.append({'name': header, 'options': options})
-        # print(formatted_settings)
-        return formatted_settings
 
     # Format categorised settings (most settings are categorised once)
     # TODO refactor
@@ -220,6 +221,7 @@ def form_to_data(settings):
         reformat_list(settings, option_name, option_list)
     del settings['lists']
 
+
 def parse_if_number(string):
     if string:
         if isinstance(string, float) or isinstance(string,int):
@@ -260,12 +262,12 @@ def reformat(options, nested):
             option['options'] = reformat_options(option['options'])
 
             # Disable Elliot options
-            if option['name'] == ELLIOT_API:
-                for disable_option in option['options']:
-                    disable_option['disabled'] = True
+            #if option['name'] == ELLIOT_API:
+                #for disable_option in option['options']:
+                    #disable_option['disabled'] = True
                     # print(disable_option)
 
-                option['name'] = option['name'] + ' (unavailable)'
+                #option['name'] = option['name'] + ' (unavailable)'
     else:
         options = reformat_options(options)
 
