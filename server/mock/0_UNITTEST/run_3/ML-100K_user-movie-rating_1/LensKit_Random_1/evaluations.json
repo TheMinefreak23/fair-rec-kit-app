@@ -1,0 +1,24 @@
+{
+    "evaluations": [
+        {
+            "name": "P@K",
+            "params": {
+                "K": 10
+            },
+            "evaluation": {
+                "global": 0.0,
+                "filtered": []
+            }
+        },
+        {
+            "name": "R@K",
+            "params": {
+                "K": 6
+            },
+            "evaluation": {
+                "global": 0.0,
+                "filtered": []
+            }
+        }
+    ]
+}
