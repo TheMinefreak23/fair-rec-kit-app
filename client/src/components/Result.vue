@@ -43,7 +43,7 @@ onMounted(() => {
   fillShownMetrics()
   // Load in all the user recommendation/prediction tables
   // Also initialize the components for table storage
-  console.log('run numbers array', runNumbers)
+  // console.log('run numbers array', runNumbers)
   for (const run in runNumbers) {
     // console.log(run)
     data.value.results[run] = []
@@ -92,10 +92,11 @@ async function setRecs(currentTable, runID) {
   const response = await fetch(
     API_URL + '/result/set-recs',
     requestOptions
-  );
-  if (response.status === '200') {
+  )
+  if (response.status === 200) {
     const data = await response.json()
     availableFilters.value = data.availableFilters
+    // console.log('set recs current table', currentTable)
     getUserRecs(currentTable, runID)
     getHeaderOptions(currentTable)
   }
