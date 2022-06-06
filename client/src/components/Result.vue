@@ -19,7 +19,7 @@ const selectedHeaders = ref([[
 
 
 const data = ref({ results: [] })
-const runNumbers = [...Array(props.result.result[0].results.length).keys()]
+const runNumbers = [...Array(props.result.metadata.runs).keys()]
 const startIndex = ref(0)
 const sortIndex = ref(0)
 const ascending = ref(true)
@@ -43,13 +43,16 @@ onMounted(() => {
   fillShownMetrics()
   // Load in all the user recommendation/prediction tables
   // Also initialize the components for table storage
+  console.log('run numbers array', runNumbers)
   for (const run in runNumbers) {
+    // console.log(run)
     data.value.results[run] = []
     selectedHeaders.value[run] = []
     for (const index in userTables) {
+      // console.log(index, run)
       selectedHeaders.value[run][index] = []
       data.value.results[run][index] = []
-      setRecs(parseInt(index), parseInt(run));
+      setRecs(parseInt(index), parseInt(run))
     }
   }
 
@@ -90,11 +93,11 @@ async function setRecs(currentTable, runID) {
     API_URL + '/result/set-recs',
     requestOptions
   );
-  if (response.status == '200') {
-    const data = await response.json();
-    availableFilters.value = data.availableFilters;
-    getUserRecs(currentTable, runID);
-    getHeaderOptions(currentTable);
+  if (response.status === '200') {
+    const data = await response.json()
+    availableFilters.value = data.availableFilters
+    getUserRecs(currentTable, runID)
+    getHeaderOptions(currentTable)
   }
 }
 
@@ -354,6 +357,8 @@ function contains(string, array) {
           <p class="lead"> Results for </p>
           <h1 class="display-3"> {{ result.metadata.name }} </h1>
           <h3 class="text-muted"> {{ result.metadata.datetime }} </h3>
+          <!--TODO elapsed time-->
+          <!--<h4> done in {{ result.metadata.elapsed_time }} seconds </h4>-->
         </b-col>
         <b-col>
           <div class="float-end">
@@ -401,21 +406,21 @@ function contains(string, array) {
       </div>
       </p>
 
-      <p>
-        Metrics shown:
-      <div class="form-check" v-for="metric in availableMetrics">
-        <input v-model="visibleMetrics" class="form-check-input" type="checkbox" :value="metric" :id="metric" />
-        <label class="form-check-label" :id="metric">
-          {{ metric }}
-        </label>
-      </div>
-      </p>
-
     </div>
     <b-container>
       <h4>Metrics</h4>
+      <template v-if="availableMetrics.length > 0">
+        <p>
+        Metrics shown:
+        <div class="form-check" v-for="metric in availableMetrics">
+          <input v-model="visibleMetrics" class="form-check-input" type="checkbox" :value="metric" :id="metric" />
+          <label class="form-check-label" :id="metric">
+            {{ metric }}
+          </label>
+        </div>
+        </p>
 
-      <b-row>
+        <b-row>
         <template v-for="runID in runNumbers">
           <template v-for="(datasetResult, index) in result.result" :key="datasetResult">
             <b-col :cols="result.result.length > 1 ? '6' : '12'">
@@ -428,7 +433,9 @@ function contains(string, array) {
             </b-col>
           </template>
         </template>
-      </b-row>
+        </b-row>
+      </template>
+      <template v-else>(None)</template>
     </b-container>
 
     <div class="container">

@@ -34,6 +34,7 @@ def result_by_id(result_id):
     relative_path = results_root_folder + str(result_id) + "_" + \
                     id_to_name(results_overview, result_id)
     data = results_overview['all_results'][id_to_index(results_overview, result_id)]
+    data['metadata']['runs'] = 0 # Store runs
     # loops through all the subdirectories, and thus - runs, of a certain calculation
     for subdir in [f.path for f in os.scandir(relative_path) if f.is_dir()]:
         run_overview = load_json(subdir + "/overview.json")
@@ -60,6 +61,7 @@ def result_by_id(result_id):
                 data['result'][dataset_index]['recs'][approach_index]['evals'] = add_evaluation(
                     data['result'][dataset_index]['recs'][approach_index]['evals'],
                     evaluation_data['evaluations'])
+        data['metadata']['runs'] += 1
 
     global current_result
     current_result = data

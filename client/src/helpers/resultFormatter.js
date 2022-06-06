@@ -1,7 +1,7 @@
 /* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
-import { statusPrefix } from './queueFormatter'
+import { statusPrefix, status } from './queueFormatter'
 
 // Format data for a results overview
 // TODO refactor so headers are dynamic (no separate case for status header)
@@ -78,8 +78,7 @@ export function formatResult(result) {
       // Format result per dataset
       .map((datasetResult) => {
         datasetResult.results = []
-        for (let runID in datasetResult.recs[0].evals[0].evaluations) {
-          
+        for (let runID = 0; runID < result.metadata.runs; runID++) {
           // Format result per approach
           datasetResult.results.push(
             datasetResult.recs.map((result) => {
@@ -97,6 +96,7 @@ export function formatResult(result) {
             })
           )
         }
+
         // datasetResult.headers = makeHeaders(datasetResult.results[0])
         datasetResult.caption = showDatasetInfo(datasetResult.dataset)
         return datasetResult

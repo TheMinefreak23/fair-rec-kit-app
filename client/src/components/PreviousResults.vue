@@ -8,7 +8,7 @@ import { formatResults, formatResult } from '../helpers/resultFormatter.js'
 
 import { addResult, store } from '../store.js'
 import { API_URL } from '../api'
-import { viewResult } from '../helpers/resultRequests.js'
+import { addResultById } from '../helpers/resultRequests.js'
 
 const headers = ref([
   { name: 'ID' },
@@ -44,7 +44,7 @@ async function getResults() {
     <div class="text-center py-2 mx-5">
       <h3>Previous results</h3>
       <Table
-        @viewResult="viewResult"
+        @viewResult="addResultById"
         @loadResults="getResults"
         :results="store.allResults"
         :headers="headers"
