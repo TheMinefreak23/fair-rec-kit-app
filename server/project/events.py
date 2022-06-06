@@ -5,19 +5,18 @@ Utrecht University within the Software Project course.
 """
 import enum
 
-from fairreckitlib.experiment.experiment_event import ON_END_EXPERIMENT_PIPELINE, ON_END_EXPERIMENT_THREAD, \
-    ON_BEGIN_EXPERIMENT_PIPELINE, ON_BEGIN_EXPERIMENT_THREAD
-from fairreckitlib.model.pipeline.model_event import ON_BEGIN_MODEL_PIPELINE, ON_BEGIN_TRAIN_MODEL, \
-    ON_BEGIN_LOAD_TRAIN_SET
+from fairreckitlib.experiment.experiment_event import ON_END_EXPERIMENT_PIPELINE, \
+    ON_END_EXPERIMENT_THREAD, ON_BEGIN_EXPERIMENT_PIPELINE, ON_BEGIN_EXPERIMENT_THREAD
+from fairreckitlib.model.pipeline.model_event import ON_BEGIN_MODEL_PIPELINE, \
+    ON_BEGIN_TRAIN_MODEL, ON_BEGIN_LOAD_TRAIN_SET
 from fairreckitlib.data.pipeline.data_event import ON_BEGIN_DATA_PIPELINE, \
-    ON_END_DATA_PIPELINE, ON_BEGIN_FILTER_DATASET, ON_BEGIN_SPLIT_DATASET
+    ON_BEGIN_FILTER_DATASET, ON_BEGIN_SPLIT_DATASET
 from fairreckitlib.core.parsing.parse_event import ON_PARSE
-from .mail import send_mail
-from .result_storage import save_result, format_result
+from project.mail import send_mail
+from project.result_storage import save_result, format_result
 
-
-# Experiment status in queue
 class Status(enum.Enum):
+    """Experiment status in queue"""
     TODO = 'To Do'
     ACTIVE = 'Active'
     ABORTED = 'Aborted'
@@ -26,18 +25,17 @@ class Status(enum.Enum):
     NA = 'Not Available'
 
 
-""" TODO send enums to client?
-def enum_to_dict(enum):
-    return {i.name: i.value for i in enum}
+# """ TODO send enums to client?
+# def enum_to_dict(enum):
+#     return {i.name: i.value for i in enum}
 
-@compute_bp.route('/statuses', methods=['GET'])
-def get_statuses():
-    return 
-    """
+# @compute_bp.route('/statuses', methods=['GET'])
+# def get_statuses():
+#     return
+#     """
 
-
-# Experiment progress status
 class ProgressStatus(enum.Enum):
+    """Experiment progress status"""
     STARTED = 'Started'
     PARSING = 'Parsing'
     PROCESSING_DATA = 'Processing Data'
@@ -52,6 +50,7 @@ class ProgressStatus(enum.Enum):
 
 
 class EventHandler():
+    """Handles the events"""
     def __init__(self, experiment, end_experiment):
         self.experiment = experiment
         self.end_experiment = end_experiment
@@ -70,42 +69,53 @@ class EventHandler():
         }
 
     def on_parse(self, event_listener, **kwargs):
-        # print('epic')
+        """Change progress status to parsing."""
+        do_nothing(event_listener, kwargs)
         self.experiment.progress = ProgressStatus.PARSING
 
     def on_data(self, event_listener, **kwargs):
-        # print('super')
+        """Change progress status to processing data."""
+        do_nothing(event_listener, kwargs)
         self.experiment.progress = ProgressStatus.PROCESSING_DATA
 
     def on_filter(self, event_listener, **kwargs):
-        # print('dangan')
+        """Change progress status to filtering data."""
+        do_nothing(event_listener, kwargs)
         self.experiment.progress = ProgressStatus.FILTERING_DATA
 
     def on_split(self, event_listener, **kwargs):
-        # print('ronpa')
+        """Change progress status to splitting data."""
+        do_nothing(event_listener, kwargs)
         self.experiment.progress = ProgressStatus.SPLITTING_DATA
 
     def on_model(self, event_listener, **kwargs):
-        # print('2')
+        """Change progress status to model."""
+        do_nothing(event_listener, kwargs)
         self.experiment.progress = ProgressStatus.MODEL
 
     def on_load(self, event_listener, **kwargs):
-        # print('2')
+        """Change progress status to model load."""
+        do_nothing(event_listener, kwargs)
         self.experiment.progress = ProgressStatus.MODEL_LOAD
 
     def on_train(self, event_listener, **kwargs):
-        # print('2')
+        """Change progress status to training."""
+        do_nothing(event_listener, kwargs)
         self.experiment.progress = ProgressStatus.TRAINING
 
     def on_begin_experiment(self, event_listener, **kwargs):
-        # Update experiment status
+        """Change progress status to started
+        and update the experiment status to active."""
+        do_nothing(event_listener, kwargs)
         self.experiment.status = Status.ACTIVE
         self.experiment.progress = ProgressStatus.STARTED
 
     def on_end_experiment(self, event_listener, **kwargs):
-        # Update status
+        """Change progress status to finished
+        and experiment status to done.
+        Also sends an email if possible."""
+        do_nothing(event_listener, kwargs)
         if self.experiment.status is not Status.ABORTED:
-            #print('==END EXPERIMENT', self.experiment)
             self.experiment.status = Status.DONE
             self.experiment.progress = ProgressStatus.FINISHED
 
@@ -117,3 +127,8 @@ class EventHandler():
                           self.experiment.job['timestamp']['datetime'])
 
         self.end_experiment()
+
+def do_nothing(event_listener, kwargs):
+    """This function only exits so that pylint stops complaining."""
+    event_listener
+    kwargs
