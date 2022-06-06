@@ -56,10 +56,10 @@ class EventHandler():
         self.experiment = experiment
         self.end_experiment = end_experiment
         self.events = {
-            ON_BEGIN_EXPERIMENT_PIPELINE: lambda x, **kwargs: print('uwu'),
-            ON_END_EXPERIMENT_PIPELINE: lambda x, **kwargs: print('owo'),
+            #ON_BEGIN_EXPERIMENT_PIPELINE: lambda x, **kwargs: print('uwu'),
+            #ON_END_EXPERIMENT_PIPELINE: self.on_end_experiment,
             ON_BEGIN_EXPERIMENT_THREAD: self.on_begin_experiment,
-            ON_END_EXPERIMENT_THREAD: self.on_end_experiment,
+            ON_END_EXPERIMENT_THREAD: self.on_end_experiment_thread,
             ON_PARSE: self.on_parse,  # NOTE TODO doesn't work in backend
             ON_BEGIN_DATA_PIPELINE: self.on_data,
             ON_BEGIN_FILTER_DATASET: self.on_filter,
@@ -102,17 +102,27 @@ class EventHandler():
         self.experiment.status = Status.ACTIVE
         self.experiment.progress = ProgressStatus.STARTED
 
-    def on_end_experiment(self, event_listener, **kwargs):
+    #def on_end_experiment(self, event_listener, **kwargs):
+        # Add run
+        #self.experiment.job['runs'] = 1 if 'runs' not in self.experiment.job else self.experiment.job['runs'] + 1
+
+    def on_end_experiment_thread(self, event_listener, **kwargs):
         # Update status
         if self.experiment.status is not Status.ABORTED:
             #print('==END EXPERIMENT', self.experiment)
-            self.experiment.status = Status.DONE
-            self.experiment.progress = ProgressStatus.FINISHED
-            if not(self.experiment.validating):
-                save_result(self.experiment.job, format_result(self.experiment.config))
+
+
+            if not self.experiment.validating:
+                # TODO Update experiment data: Save elapsed time
+                #self.experiment.job['metadata']['duration'] = kwargs['elapsed_time']
+                save_result(self.experiment.job, self.experiment.config)
                 if 'email' in self.experiment.job['metadata']:
                     send_mail(self.experiment.job['metadata']['email'],
                           self.experiment.job['metadata']['name'],
                           self.experiment.job['timestamp']['datetime'])
+            #else: self.experiment.job['runs'] = kwargs['num_runs']
+
+            self.experiment.status = Status.DONE
+            self.experiment.progress = ProgressStatus.FINISHED
                           
         self.end_experiment()

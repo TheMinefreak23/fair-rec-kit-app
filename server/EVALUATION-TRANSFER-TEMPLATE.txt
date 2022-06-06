@@ -72,10 +72,15 @@
                             "evals": [
                                 {
                                     "name"
-                                    "evaluation": {
-                                        "global"
-                                        "filtered"
-                                    },
+                                    "evaluations": [
+                                        {
+                                            "global"
+                                            "filtered"
+                                        },
+                                        [further evaluations of subsequent runs]
+                                    ]
+
+                                    ,
                                     "params": {
                                         "K": "10"
                                     }

@@ -2,6 +2,7 @@ import { reactive } from 'vue'
 import { API_URL } from './api'
 import { formatResult } from './helpers/resultFormatter'
 import { status } from './helpers/queueFormatter'
+import { addResultById } from './helpers/resultRequests'
 
 const store = reactive({
   settings: {}, // experiment settings (NOTE: only used for copying settings for now)
@@ -29,27 +30,24 @@ function pollForResult() {
  */
 function getCalculation() {
   if (store.currentExperiment.status != status.notAvailable) {
-    //console.log('fetching result')
+    // console.log('fetching result')
     try {
       fetch(API_URL + '/experiment/calculation')
         .then((response) => response.json())
         .then((data) => {
+          console.log('polling experiment, status:', data.status)
           store.currentExperiment.status = data.status
           if ([status.done, status.aborted].includes(data.status)) {
             clearInterval(store.resultPoll)
-            if (data.status == status.done)
-              addResult(formatResult(data.calculation))
+            if (data.status === status.done)
+              // addResult(formatResult(data.calculation))
+              // addResultById(data.calculation.timestamp.stamp, false)
+              addResultById(data.experimentID, false)
             console.log('DONE or ABORTED!!')
           }
 
           // Update queue and progress while waiting for a result
           getQueue()
-          console.log(
-            'polling experiment, status:',
-            data.status,
-            'progress:',
-            store.currentExperiment && store.currentExperiment.progress
-          )
         })
     } catch (e) {
       console.log(e) // TODO better error handling, composable
@@ -68,6 +66,7 @@ async function getQueue() {
   if (data.current && data.current.status != status.notAvailable) {
     //console.log(data.current)
     store.currentExperiment = data.current
+    console.log('progress:', data.current.progress)
     //store.queue[store.queue.length - 1] = data.current
   }
   store.queue = data.queue

@@ -60,16 +60,16 @@ def format_result(settings):
     return result
 
 
-def save_result(experiment, result):
+def save_result(experiment, config):
     """Save result to overview.
 
     Args:
-    experiment(dict): the experiment settings
-    result(dict): the computed result
+    experiment(dict): the experiment input settings
+    config(dict): the final experiment configuration
     """
-    global current_result
-    experiment['result'] = result
+    experiment['result'] = format_result(config)
 
+    global current_result
     current_result = experiment
     add_result(current_result)
     #print('current result', current_result)
