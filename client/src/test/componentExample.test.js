@@ -11,7 +11,9 @@ import ExperimentQueue from '../components/ExperimentQueue.vue'
  */
 test('Queue', async () => {
   // get utilities to query component
-  const { getByText } = render(ExperimentQueue)
+  const { getByText, progressNumber } = render(ExperimentQueue)
+
+  progressNumber('test')
 
   getByText('Queue')
   getByText('Current experiment: None')
