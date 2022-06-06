@@ -3,27 +3,55 @@
 # © Copyright Utrecht University (Department of Information and Computing Sciences)
 import unittest
 from unittest.mock import MagicMock
+from io import BytesIO
+from sewar.full_ref import uqi
+from PIL import Image
+import requests
+    
+from project.music_detail import collage
 
-url_prefix = '/api/music'
+
+URL_PREFIX = '/api/music'
 
 
 def test_spotify_token(client):
-    response = client.post(url_prefix + '/token')
+    """ Tests the generating of a Spotify Auth token
+
+    Args:
+        client (Client): The client
+    """
+    response = client.post(URL_PREFIX + '/token')
     assert response.status_code == 200
 
 
 def test_acousticbrainz_data(client):
-    response = client.get(url_prefix + '/token')
+    """ Tests if acousticbrainz gets succesfully requested
+
+    Args:
+        client (Client): The client
+    """
+    response = client.get(URL_PREFIX + '/token')
     assert response.status_code == 200
 
 
 def test_background(client):
-    response = client.get(url_prefix + '/background')
+    """ Tests if a background is succesfully generated
+
+    Args:
+        client (Client): The client
+    """
+    response = client.get(URL_PREFIX + '/background')
     assert response.status_code == 200
 
 
 def test_collage():
-    from project.music_detail import collage
-    from sewar.full_ref import uqi
+    """Tests if the collage method works properly
+    """
+    input_img = 'https://i.imgur.com/ejJgMEw.jpg'
+    output_img = 'https://i.imgur.com/QbY6IJV.jpg'
 
-    assert uqi()
+    test_input = Image.open(BytesIO(requests.get(input_img).content))
+    test_output = Image.open(BytesIO(requests.get(output_img).content))
+
+    result = collage([test_input,test_input,test_input,test_input])
+    assert uqi(test_output, result) > 0.8
