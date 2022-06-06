@@ -57,8 +57,9 @@ const filtersModalShow = ref(false)
 const filters = ref(emptyFormGroup(false))
 
 // Sorting
-const sortindex = ref(0)
-const descending = ref(false)
+const sortindex = ref()
+const descending = ref()
+const sortIcon = ref({true: ' ▲', false: ' ▼'})
 
 // Item detail
 const infoHeaders = ref([])
@@ -86,9 +87,8 @@ const sorted = computed(() => {
 })
 
 onMounted(() => {
-  /* if (props.caption == 'Testcaption')
-    console.log('filterOptions', props.filterOptions) */
   // Sort on default column if it is given
+  // If no column is given, the table is not sortable
   if (props.defaultSort) {
     sortindex.value = props.defaultSort
     descending.value = true // For now sort by descending on default, TODO refactor
@@ -143,7 +143,7 @@ function setsorting(i) {
   if (i === sortindex.value) {
     descending.value = !descending.value
   }
-  sortindex.value = i
+  else {sortindex.value = i}
   emit('paginationSort', i)
 }
 // console.log('propsfilteroptions', props.filterOptions)
@@ -246,7 +246,8 @@ const filteredHeaders = () => {
               :style="{ ...colItemStyle(colWidth), cursor: 'pointer' }"
               @click="setsorting(index)"
             >
-              {{ header.name }}
+              
+              {{ header.name + (index == sortindex ? sortIcon[descending] : '' ) }}
             </b-th>
           </template>
           <b-th v-if="overview" :style="colItemStyle(colWidth)"></b-th>
@@ -315,6 +316,7 @@ const filteredHeaders = () => {
           </template>
           <!-- Additional item info -->
           <!-- TODO refactor -->
+          <template v-if="recs">
           <template v-for="i in additionalInfoAmount" :key="i">
             <b-td
               v-if="itemsInfo[index]"
@@ -332,6 +334,7 @@ const filteredHeaders = () => {
               <template v-else> {{ itemsInfo[index][i - 1].value }} </template>
             </b-td>
             <b-td :style="colItemStyle(colWidth * 3)" v-else></b-td>
+          </template>
           </template>
           <b-td
             class="align-middle"
