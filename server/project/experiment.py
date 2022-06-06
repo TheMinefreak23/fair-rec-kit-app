@@ -232,7 +232,7 @@ def abort():
     data = request.get_json()
     item_id = data.get('id')
     print('trying to cancel', item_id)
-    # Find the first experiment with the ID in the queue
+    # Find the first experiment with the ID in the queue (should be unique)
     experiment = next(
         filter(
             lambda item:
@@ -248,6 +248,7 @@ def abort():
         recommender_system.abort_computation(experiment.name)
         experiment.status = Status.ABORTED
     return "Removed index"
+    # TODO handle item not in queue
 
 
 def append_queue(metadata, settings):
