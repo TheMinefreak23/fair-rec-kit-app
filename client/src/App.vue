@@ -40,7 +40,7 @@ watch(
 
 // Change UI on new result
 function onNewResult() {
-  done.value = store.currentExperiment.status == status.done
+  done.value = store.currentExperiment.status === status.done
   if (done.value) {
     // Make result tab blink
     blink.value = true

@@ -8,7 +8,7 @@ import { onMounted, ref, watch } from 'vue'
 import { formatResults } from '../helpers/resultFormatter.js'
 import { status, progress } from '../helpers/queueFormatter.js'
 import { store, getQueue, pollForResult } from '../store.js'
-import { viewResult } from '../helpers/resultRequests.js'
+import { addResultById } from '../helpers/resultRequests.js'
 
 //const emit = defineEmits(['computing', 'done', 'stop'])
 const props = defineProps({
@@ -116,7 +116,7 @@ function progressNumber(progressStatus) {
         </b-progress-bar>
       </b-progress>
       <Table
-        @viewResult="viewResult"
+        @viewResult="addResultById"
         :results="formatResults(store.queue, true)"
         :headers="headers"
         buttonText="Cancel"

@@ -29,11 +29,11 @@ export async function getResult() {
   return data
 }
 
-export async function viewResult(resultId) {
+export async function addResultById(resultId, view = true) {
   const data = await loadResult(resultId)
   console.log('Result fetched', data.result)
   addResult(formatResult(data.result))
-  viewResultTab()
+  if (view) viewResultTab()
 }
 
 export function viewResultTab() {
