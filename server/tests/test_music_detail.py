@@ -1,14 +1,13 @@
-# This program has been developed by students from the bachelor Computer Science at
-# Utrecht University within the Software Project course.
-# © Copyright Utrecht University (Department of Information and Computing Sciences)
-import unittest
-from unittest.mock import MagicMock
-from io import BytesIO
+"""
+This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)
+"""
+
 from sewar.full_ref import uqi
 from PIL import Image
-import requests
-    
 from project.music_detail import collage
+from project.music_detail import request_spotify_data
 
 
 URL_PREFIX = '/api/music'
@@ -20,7 +19,7 @@ def test_spotify_token(client):
     Args:
         client (Client): The client
     """
-    response = client.post(URL_PREFIX + '/token')
+    response = client.get(URL_PREFIX + '/token')
     assert response.status_code == 200
 
 
@@ -30,7 +29,8 @@ def test_acousticbrainz_data(client):
     Args:
         client (Client): The client
     """
-    response = client.get(URL_PREFIX + '/token')
+    params = {'mbid' : 'bab7f3de-56e3-42fd-be0d-f122960e6a13'}
+    response = client.post(URL_PREFIX + '/AcousticBrainz', json=params)
     assert response.status_code == 200
 
 
@@ -47,11 +47,28 @@ def test_background(client):
 def test_collage():
     """Tests if the collage method works properly
     """
-    input_img = 'https://i.imgur.com/ejJgMEw.jpg'
-    output_img = 'https://i.imgur.com/QbY6IJV.jpg'
+    input_img = "tests/thisisbingus.jpg"
+    output_img = "tests/4bingus.jpg"
 
-    test_input = Image.open(BytesIO(requests.get(input_img).content))
-    test_output = Image.open(BytesIO(requests.get(output_img).content))
+    test_input = Image.open(input_img)
+    test_output = Image.open(output_img)
 
     result = collage([test_input,test_input,test_input,test_input])
     assert uqi(test_output, result) > 0.8
+
+def test_unique_album_background(client):
+    """ Tests if a background is succesfully generated
+
+    Args:
+        client (Client): The client
+    """
+    response = client.get(URL_PREFIX + '/unique-album-background')
+    assert response.status_code == 200
+
+def test_spotify_data():
+    """ Tests if spotify track data gets succesfully requested
+    """
+    url = 'https://api.spotify.com/v1/search?q=scatman%20john&type=track'
+    result = request_spotify_data(url)
+    assert "Scatman" in result['tracks']['items'][0]['album']['name']
+    

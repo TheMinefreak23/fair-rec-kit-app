@@ -15,7 +15,7 @@ from flask import Blueprint, request, send_file
 
 detail_bp = Blueprint('music', __name__, url_prefix='/api/music')
 
-token = None
+TOKEN = None
 
 SPOTIFY_API = 'https://api.spotify.com/v1'
 MAX_TRACK_LIMIT = 50
@@ -23,12 +23,12 @@ MAX_TRACK_LIMIT = 50
 
 @detail_bp.route('/token', methods=['GET'])
 def get_spotify_token():
-    """Route: Get Spotify auth token using id and secret
+    """Route: Get Spotify auth TOKEN using id and secret
 
-    Returns: the spotify token
+    Returns: the spotify TOKEN
     """
-    global token
-    if not (token and token['expiration_time'] - 100 > time.time()):
+    global TOKEN
+    if not (TOKEN and TOKEN['expiration_time'] - 100 > time.time()):
         spotify_id = '7e49545dfb45473cbe595d8bb1e22071'
         spotify_secret = 'd5a9e8febef2468b94a5edabe2c5ddeb'
         message = (spotify_id + ':' + spotify_secret).encode()
@@ -40,10 +40,10 @@ def get_spotify_token():
         res = requests.post(
             'https://accounts.spotify.com/api/token', data=data, headers=headers)
         # print(res.text)
-        token = json.loads(res.text)
-        token['expiration_time'] = time.time() + token['expires_in']
-    print(time.time(), token['expiration_time'])
-    return token
+        TOKEN = json.loads(res.text)
+        TOKEN['expiration_time'] = time.time() + TOKEN['expires_in']
+    print(time.time(), TOKEN['expiration_time'])
+    return TOKEN
 
 
 @detail_bp.route('/AcousticBrainz', methods=['POST'])
@@ -86,7 +86,7 @@ def get_background():
         playlist = request_spotify_data(url)
 
         items += playlist['items']
-        if offset == 0:  # TODO refactor into separate request and for loop?
+        if offset == 0:
             playlist_length = playlist['total']
             print('playlist length', playlist_length)
         offset += MAX_TRACK_LIMIT
@@ -123,9 +123,6 @@ def collage(urls):
                 np.flip(images)
                 index = 0
     background.save('../client/public/background.png')
-
-    # return "Background saved"
-    # TODO why do we need to go back once tho
     return send_file('../background.png', mimetype='image/png')
 
 
@@ -136,7 +133,6 @@ def first_100_album_collage():
     Returns:
         an PNG image with the collage
     """
-    # TODO can we get all items a different way?
     # Get all items by setting year to maximal span.
     # Going negative in the year causes a non-year query.
     albums = get_unique_n('q=year:0-10000', 100, 'album', True)
@@ -189,10 +185,9 @@ def request_spotify_data(url):
     Returns:
         the response text
     """
-    # TODO exception
-    if not token:
+    if not TOKEN:
         get_spotify_token()
-    headers = {'Authorization': 'Bearer ' + token['access_token'],
+    headers = {'Authorization': 'Bearer ' + TOKEN['access_token'],
                'Content-Type': 'application/json'}
     res = requests.get(url, headers=headers)
     return json.loads(res.text)
