@@ -102,7 +102,7 @@ def set_up_experiment(experiment):
         experiment(QueueItem): the experiment we are about to run
 
     Returns:
-        (dict) the experiment events
+        experiment(dict) the experiment events
     """
 
     # print('run experiment:', experiment)
@@ -162,7 +162,7 @@ def params():
     """Route: Provide selection options.
 
     Returns:
-         (dict) options response
+         (dict) the options response
     """
     response = {'options': options}
     # print(response)
@@ -288,8 +288,8 @@ def add_validation(file_path, amount):
     """Add a validation experiment to the queue.
 
     Args:
-        file_path: the path to the existing experiment result
-        amount: the amount of runs for validation
+        file_path(str): the path to the existing experiment result
+        amount(int): the amount of runs for validation
 
     """
     experiment = QueueItem(job={'file_path': file_path, 'amount': amount},

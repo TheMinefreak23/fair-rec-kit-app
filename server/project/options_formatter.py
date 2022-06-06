@@ -22,6 +22,15 @@ dataset_matrices = {}
 
 # TODO do this in another way
 def create_model_api_dict(predictors, recommenders):
+    """Generate a dictionary that maps approaches (models) to an API.
+
+    Args:
+        predictors(dict): the predictor approaches
+        recommenders(dict): the recommender approaches
+
+    Returns:
+        (dict) the model-to-API dictionary
+    """
     approaches = list(predictors.items()) + list(recommenders.items())
     model_to_api = {}
     for (header, options) in approaches:
@@ -32,6 +41,15 @@ def create_model_api_dict(predictors, recommenders):
 
 
 def format_categorised(settings):
+    """Format categorised (has a 'parent' key) settings.
+
+    Args:
+        settings(dict): the categorised settings
+
+    Returns:
+        (dict) the formatted settings
+
+    """
     formatted_settings = []
     for (header, options) in settings.items():
         # print(settings[header])
@@ -50,7 +68,6 @@ def create_available_options(recommender_system):
     Returns:
         (dict) the formatted options
     """
-    options = {}
 
     datasets = recommender_system.get_available_datasets()
     #print(json.dumps(datasets, indent=4))
@@ -126,7 +143,7 @@ def create_available_options(recommender_system):
         ('recMetrics', rec_metrics),
         ('predMetrics', pred_metrics)
     ]
-    options = reformat_all(options, uncategorised, categorised)
+    options = reformat_all(uncategorised, categorised)
     options['defaults'] = DEFAULTS
     options['filters'] = formatted_filters
 
@@ -137,7 +154,17 @@ def create_available_options(recommender_system):
     return options
 
 
-def reformat_all(options, uncategorised, categorised):
+def reformat_all(uncategorised, categorised):
+    """Reformat all (uncategorised and categorised) options.
+
+    Args:
+        uncategorised(list(tuple(str, list)): uncategorised (option type, options) tuples
+        categorised(list(tuple(str, list)): categorised (option type, options) tuples
+
+    Returns:
+        (dict) the formatted options
+    """
+    options = {}
     for (option_type, inner_options) in uncategorised:
         options[option_type] = reformat(inner_options, False)
     for (option_type, inner_options) in categorised:
@@ -145,8 +172,48 @@ def reformat_all(options, uncategorised, categorised):
     return options
 
 
+def reformat(options, nested):
+    """Reformat options for form usage.
+
+    Args:
+        options(list(dict)): the options
+        nested(bool): whether the options are nested or not
+
+    Returns:
+        (dict) the formatted options
+    """
+    if nested:
+        for option in options:
+            option['options'] = reformat_options(option['options'])
+
+            # Disable Elliot options
+            #if option['name'] == ELLIOT_API:
+                #for disable_option in option['options']:
+                    #disable_option['disabled'] = True
+                    # print(disable_option)
+
+                #option['name'] = option['name'] + ' (unavailable)'
+    else:
+        options = reformat_options(options)
+
+    return options
+
+
+def reformat_options(options):
+    """Reformat an options list from data to form.
+
+    Args:
+        options: the data options to format
+
+    Returns:
+        (list(dict)) the formatted 'name, value' options
+    """
+    # Add text and value fields
+    return [{'name': option['name'], 'value': option} for option in options]
+
+
 def config_dict_from_settings(experiment):
-    """Create a configuration dictionary from client settings
+    """Create a configuration dictionary from client settings.
 
     Args:
         experiment(dict): the experiment settings sent from the client
@@ -215,7 +282,12 @@ def config_dict_from_settings(experiment):
 
 
 def form_to_data(settings):
-    # Format from group list form data
+    """Format from group list form format to data format.
+
+    Args:
+        settings(dict(dict)): the settings from which to reformat the lists
+
+    """
     for option_name, option_list in settings['lists'].items():
         # print(option_list)
         reformat_list(settings, option_name, option_list)
@@ -223,6 +295,14 @@ def form_to_data(settings):
 
 
 def parse_if_number(string):
+    """Cast a string to an int/float if it is one, or don't.
+
+    Args:
+        string: the string to parse
+
+    Returns:
+        the parsed string
+    """
     if string:
         if isinstance(string, list):
             return [parse_if_number(s) for s in string]
@@ -238,8 +318,15 @@ def parse_if_number(string):
     return string
 
 
-# Reformat settings list from form to data
 def reformat_list(settings, option_name, option_list):
+    """Reformat option list in settings from form to data.
+
+    Args:
+        settings(dict): the settings in which to store the option
+        option_name(str): the name of the option list to format
+        option_list(list): the option list
+
+    """
     for option in option_list:
         # print(option)
         option['params'] = {param['name']: parse_if_number(param['value']) for param in option['params']}
@@ -250,27 +337,3 @@ def reformat_list(settings, option_name, option_list):
                 reformat_list(option, inner_option_name, inner_option_list)
     settings[option_name] = option_list
 
-
-# Reformat an options list from data to form
-def reformat_options(options):
-    # Add text and value fields
-    return [{'name': option['name'], 'value': option} for option in options]
-
-
-# Reformat options for form usage
-def reformat(options, nested):
-    if nested:
-        for option in options:
-            option['options'] = reformat_options(option['options'])
-
-            # Disable Elliot options
-            #if option['name'] == ELLIOT_API:
-                #for disable_option in option['options']:
-                    #disable_option['disabled'] = True
-                    # print(disable_option)
-
-                #option['name'] = option['name'] + ' (unavailable)'
-    else:
-        options = reformat_options(options)
-
-    return options
