@@ -9,7 +9,6 @@
         }
       ],
       "filters": [],
-      "conversion": [],
       "splitting": [
         {
           "name": "random",

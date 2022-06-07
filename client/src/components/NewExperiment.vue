@@ -66,10 +66,7 @@ async function sendToServer() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(store.currentExperiment),
   }
-  const response = await fetch(
-    API_URL + '/experiment/calculation',
-    requestOptions
-  )
+  const response = await fetch(API_URL + '/experiment/', requestOptions)
   // Update queue
   const data = await response.json()
   store.queue = data.queue
