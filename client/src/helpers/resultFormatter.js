@@ -1,7 +1,7 @@
 /* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
-import { statusPrefix } from './queueFormatter'
+import { statusPrefix, status } from './queueFormatter'
 
 // Format data for a results overview
 // TODO refactor so headers are dynamic (no separate case for status header)
@@ -51,6 +51,23 @@ export function formatMultipleItems(items) {
   return string
 }
 
+export function statusVariant(rawStatus) {
+  const experimentStatus = rawStatus.slice(statusPrefix.length)
+  //console.log('statusVariant experimentStatus', experimentStatus)
+  switch (experimentStatus) {
+    case status.toDo:
+      return 'outline-warning'
+    case status.active:
+      return 'success'
+    case status.aborted:
+      return 'secondary'
+    case status.cancelled:
+      return 'secondary'
+    case status.done:
+      return 'outline-success'
+  }
+}
+
 // Format a result for the result tab
 export function formatResult(result) {
   console.log('before format', JSON.parse(JSON.stringify(result)))
@@ -61,8 +78,7 @@ export function formatResult(result) {
       // Format result per dataset
       .map((datasetResult) => {
         datasetResult.results = []
-        for (let runID in datasetResult.recs[0].evals[0].evaluations) {
-          
+        for (let runID = 0; runID < result.metadata.runs; runID++) {
           // Format result per approach
           datasetResult.results.push(
             datasetResult.recs.map((result) => {
@@ -80,6 +96,7 @@ export function formatResult(result) {
             })
           )
         }
+
         // datasetResult.headers = makeHeaders(datasetResult.results[0])
         datasetResult.caption = showDatasetInfo(datasetResult.dataset)
         return datasetResult
@@ -201,9 +218,7 @@ export function formatEvaluation(e, index, result, runID) {
 export function formatMetric(evaluation) {
   // If it is a K metric, replace K with the parameter
   const name = evaluation.name
-  if (name.toLowerCase()[name.length - 1] === 'k') {
-    // console.log(evaluation)
-    // TODO refactor K condition
+  if (name.slice(-1).toLowerCase() === 'k') {
     return name.slice(0, -1) + evaluation.params.K
   } else return name
 }

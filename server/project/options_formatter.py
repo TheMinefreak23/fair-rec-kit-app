@@ -160,7 +160,7 @@ def config_dict_from_settings(experiment):
     experiment_id = experiment['timestamp']['stamp'] + '_' + name
 
     form_to_data(settings)
-    #print('formatted from form', json.dumps(settings, indent=4))
+    print('formatted from form', json.dumps(settings, indent=4))
 
     # Format datasets
     # Add generic split to all dataset
@@ -220,8 +220,11 @@ def form_to_data(settings):
         reformat_list(settings, option_name, option_list)
     del settings['lists']
 
+
 def parse_if_number(string):
     if string:
+        if isinstance(string, list):
+            return [parse_if_number(s) for s in string]
         if isinstance(string, float) or isinstance(string,int):
             return string
         if string.isnumeric():
@@ -231,7 +234,7 @@ def parse_if_number(string):
             return number
         except ValueError:
             return string
-    return None
+    return string
 
 
 # Reformat settings list from form to data

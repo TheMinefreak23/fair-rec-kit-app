@@ -19,7 +19,14 @@ async function getMetadata(selectedID) {
 </script>
 
 <template>
-  <div>
+  <b-button
+    variant="outline-primary"
+    class="mx-1"
+    v-b-tooltip.hover
+    title="Show information"
+    @click=";(viewModalShow = !viewModalShow), getMetadata(id)"
+    data-testid="view-meta"
+    ><i class="bi bi-info-circle"></i>
     <!-- Shows the metadata and experiment configuration of the designated entry -->
     <b-modal
       id="view-modal"
@@ -30,12 +37,5 @@ async function getMetadata(selectedID) {
       <h5>Here is the metadata and experiment configuration:</h5>
       <span style="white-space: pre-wrap">{{ metadataStr }}</span>
     </b-modal>
-    <b-button
-      variant="primary"
-      class="mx-1"
-      @click=";(viewModalShow = !viewModalShow), getMetadata(id)"
-      data-testid="view-meta"
-      ><i class="bi bi-info-circle"></i
-    ></b-button>
-  </div>
+  </b-button>
 </template>

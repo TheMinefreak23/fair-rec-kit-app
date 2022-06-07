@@ -6,12 +6,9 @@ Utrecht University within the Software Project course.
 import enum
 import json
 import os
-import threading
 import time
 from dataclasses import dataclass
 from datetime import datetime
-from tkinter.ttk import Progressbar
-from click import progressbar
 import yaml
 from fairreckitlib.experiment.experiment_config_parsing import Parser
 
@@ -20,6 +17,7 @@ from fairreckitlib.recommender_system import RecommenderSystem
 from flask import (Blueprint, request)
 
 from . import result_storage
+from . import result_loader
 from .events import ProgressStatus, Status, EventHandler
 from .options_formatter import create_available_options, config_dict_from_settings
 
@@ -105,8 +103,8 @@ def run_experiment(experiment):
 
     return EventHandler(current_experiment, end_experiment).events
 
-def run_new_experiment(experiment):  
-    events = run_experiment(experiment)  
+def run_new_experiment(experiment):
+    events = run_experiment(experiment)
     # Create config files directory if it doesn't exist yet.
     if not os.path.isdir(CONFIG_DIR):
         os.mkdir(CONFIG_DIR)
@@ -188,14 +186,18 @@ def calculate():
     else:
         # TODO catch error
         global current_experiment
-        if not current_experiment: 
+        if not current_experiment:
             print('Current experiment should have started but is None')
-        response['status'] = current_experiment.status.value if current_experiment else Status.NA.value
+            response['status'] = Status.NA.value
+
         if current_experiment:
+            response['status'] = current_experiment.status.value
             if current_experiment.status == Status.DONE:
+                experiment_id = current_experiment.job['timestamp']['stamp']
+                response['experimentID'] = experiment_id
                 # Set current result, TODO hacky
-                result_storage.result_by_id(current_experiment.job['timestamp']['stamp'])
-                response['calculation'] = result_storage.current_result
+                #result_loader.result_by_id(experiment_id)
+                #response['calculation'] = result_storage.current_result
             if current_experiment.status == Status.DONE or current_experiment.status == Status.ABORTED:
                 current_experiment = None
     # print('calculation response:', response)

@@ -40,7 +40,7 @@ watch(
 
 // Change UI on new result
 function onNewResult() {
-  done.value = store.currentExperiment.status == status.done
+  done.value = store.currentExperiment.status === status.done
   if (done.value) {
     // Make result tab blink
     blink.value = true
@@ -159,7 +159,7 @@ function callToast() {
           <Results @toast="onNewResult"
         /></b-tab>
         <b-tab title="All results">
-          <PreviousResults />
+          <PreviousResults viewItem />
         </b-tab>
         <b-tab title="Music Detail">
           <MusicDetail />

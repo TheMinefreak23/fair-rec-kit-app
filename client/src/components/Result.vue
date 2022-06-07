@@ -19,7 +19,7 @@ const selectedHeaders = ref([[
 
 
 const data = ref({ results: [] })
-const runNumbers = [...Array(props.result.result[0].results.length).keys()]
+const runNumbers = [...Array(props.result.metadata.runs).keys()]
 const startIndex = ref(0)
 const sortIndex = ref(0)
 const ascending = ref(true)
@@ -43,13 +43,16 @@ onMounted(() => {
   fillShownMetrics()
   // Load in all the user recommendation/prediction tables
   // Also initialize the components for table storage
+  // console.log('run numbers array', runNumbers)
   for (const run in runNumbers) {
+    // console.log(run)
     data.value.results[run] = []
     selectedHeaders.value[run] = []
     for (const index in userTables) {
+      // console.log(index, run)
       selectedHeaders.value[run][index] = []
       data.value.results[run][index] = []
-      setRecs(parseInt(index), parseInt(run));
+      setRecs(parseInt(index), parseInt(run))
     }
   }
 
@@ -68,7 +71,7 @@ async function getHeaderOptions(index) {
       name: props.result.result[index].dataset.dataset,
     }),
   }
-  const response = await fetch(API_URL + '/all-results/headers', requestOptions)
+  const response = await fetch(API_URL + '/result/headers', requestOptions)
   const data = await response.json()
   const headerOptions = data
   optionalHeaderOptions.value[index] = headerOptions
@@ -87,14 +90,15 @@ async function setRecs(currentTable, runID) {
   };
   console.log('sending to server:', requestOptions.body);
   const response = await fetch(
-    API_URL + '/all-results/set-recs',
+    API_URL + '/result/set-recs',
     requestOptions
-  );
-  if (response.status == '200') {
-    const data = await response.json();
-    availableFilters.value = data.availableFilters;
-    getUserRecs(currentTable, runID);
-    getHeaderOptions(currentTable);
+  )
+  if (response.status === 200) {
+    const data = await response.json()
+    availableFilters.value = data.availableFilters
+    // console.log('set recs current table', currentTable)
+    getUserRecs(currentTable, runID)
+    getHeaderOptions(currentTable)
   }
 }
 
@@ -108,7 +112,7 @@ async function setRecs(currentTable, runID) {
 //     body: JSON.stringify({ id: props.result.id }),
 //   }
 //   const response = await fetch(
-//     API_URL + '/all-results/result-by-id',
+//     API_URL + '/result/result-by-id',
 //     requestOptions
 //   ).then(() => {
 //     console.log('succesful POST request to API to retrieve evaluation data')
@@ -120,7 +124,7 @@ async function setRecs(currentTable, runID) {
 
 //GET request: Ask server for currently loaded evaluations
 async function getEvaluations() {
-  const response = await fetch(API_URL + '/all-results/result-by-id')
+  const response = await fetch(API_URL + '/result/result-by-id')
   console.log('succesfully retrieved evaluation data.')
   const resultsData = await response.json()
   console.log('results data', resultsData)
@@ -148,8 +152,8 @@ async function getUserRecs(currentTable, runID) {
       matrix: props.result.result[currentTable].dataset.matrix
     }),
   };
-  const response = await fetch(API_URL + '/all-results/result', requestOptions);
-  data.value.results[runID][currentTable] = await response.json()
+  const response = await fetch(API_URL + '/result/', requestOptions);
+  data.value.results[runID][currentTable] = await response.json();
   selectedHeaders.value[runID][currentTable] = Object.keys(
     data.value.results[0][currentTable][0]
   )
@@ -162,7 +166,7 @@ async function exportTable(currentTable) {
     body: JSON.stringify({ results: props.result.result[currentTable].results }),
   }
   const response = await fetch(
-    API_URL + '/all-results/export',
+    API_URL + '/result/export',
     requestOptions
   )
   const confirmation = await response.json()
@@ -177,7 +181,7 @@ async function validate() {
     body: JSON.stringify({ filepath: file, amount: validationAmount.value }),
   }
   const response = await fetch(
-    API_URL + '/all-results/validate',
+    API_URL + '/result/validate',
     requestOptions
   ).then(() => {
     console.log('Validation added to the queue')
@@ -354,6 +358,8 @@ function contains(string, array) {
           <p class="lead"> Results for </p>
           <h1 class="display-3"> {{ result.metadata.name }} </h1>
           <h3 class="text-muted"> {{ result.metadata.datetime }} </h3>
+          <!--TODO elapsed time-->
+          <!--<h4> done in {{ result.metadata.elapsed_time }} seconds </h4>-->
         </b-col>
         <b-col>
           <div class="float-end">
@@ -401,21 +407,21 @@ function contains(string, array) {
       </div>
       </p>
 
-      <p>
-        Metrics shown:
-      <div class="form-check" v-for="metric in availableMetrics">
-        <input v-model="visibleMetrics" class="form-check-input" type="checkbox" :value="metric" :id="metric" />
-        <label class="form-check-label" :id="metric">
-          {{ metric }}
-        </label>
-      </div>
-      </p>
-
     </div>
     <b-container>
       <h4>Metrics</h4>
+      <template v-if="availableMetrics.length > 0">
+        <p>
+        Metrics shown:
+        <div class="form-check" v-for="metric in availableMetrics">
+          <input v-model="visibleMetrics" class="form-check-input" type="checkbox" :value="metric" :id="metric" />
+          <label class="form-check-label" :id="metric">
+            {{ metric }}
+          </label>
+        </div>
+        </p>
 
-      <b-row>
+        <b-row>
         <template v-for="runID in runNumbers">
           <template v-for="(datasetResult, index) in result.result" :key="datasetResult">
             <b-col :cols="result.result.length > 1 ? '6' : '12'">
@@ -428,7 +434,9 @@ function contains(string, array) {
             </b-col>
           </template>
         </template>
-      </b-row>
+        </b-row>
+      </template>
+      <template v-else>(None)</template>
     </b-container>
 
     <div class="container">

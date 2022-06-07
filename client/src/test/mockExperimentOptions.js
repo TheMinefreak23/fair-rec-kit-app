@@ -39,7 +39,8 @@ async function sendMockData(options, simple = false, metrics = false) {
 
   metadata = {
     name: 'Test' + rand() + '_' + randomWord(),
-    email: randomWord() + '@' + randomWord() + '.com',
+    //email: randomWord() + '@' + randomWord() + '.com',
+    email: 'rajauitlimburg@hotmail.com',
     tags: randomWords(),
   }
 
