@@ -55,10 +55,10 @@ def test_collage():
     test_output = Image.open(output_img)
 
     result = collage([test_input, test_input, test_input, test_input], 2)
-    result.save('../client/public/bingusresult.png')
+    # result.save('../client/public/bingusresult.png')
 
-    print(test_output.size)
-    print(result.size)
+    # print(test_output.size)
+    # print(result.size)
     assert (uqi(np.asanyarray(test_output), np.asanyarray(result)) > 0.8)
 
 
