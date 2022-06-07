@@ -1,4 +1,5 @@
 <script setup>
+/* An option for which multiple groups can be added (list of form groups) */
 /* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
@@ -11,17 +12,18 @@ import { showToast } from '../../store'
 
 const emit = defineEmits(['update:modelValue'])
 const props = defineProps({
-  name: String,
-  groupId: String,
-  title: String,
-  description: String,
-  options: Array,
-  required: Boolean,
-  default: String,
-  maxK: Number,
-  modelValue: { type: Object, required: true },
+  name: String, // List name for display in the buttons
+  groupId: String, // Group ID for autoscroll
+  title: String, // List title for display in the header
+  options: Array, // The available options to choose from
+  required: Boolean, // Whether the list option is required
+  maxK: Number, // The amount of  recommendations (caps K)
+  modelValue: { type: Object, required: true }, // The local form linked to the form component
 })
 
+/**
+ * Form per group list
+ */
 const form = computed({
   get() {
     // console.log(props.name, props.title, props.modelValue)
@@ -33,24 +35,32 @@ const form = computed({
   },
 })
 
+/**
+ * Unique group ID for autoscroll handling.
+ */
 const scrollId = computed(() => {
   // console.log(props.groupId)
   return props.groupId ? props.groupId : props.name
 })
 
-// const visibleGroup = ref(1)
+/**
+ * Array mapping group index to whether the group is visible.
+ */
 const groupVisible = ref([true]) // TODO refactor
 
-// const removedGroup = ref(false) // for animation on group removal
-
+/**
+ * Set the form name
+ */
 onMounted(() => {
   // TODO separate 1-sized formgrouplists
   form.value.name = props.title
 })
 
+/**
+ *  Watch for the changing of options.
+ */
 watch(
   () => {
-    // Watch for the changing of options
     return props.options
   },
   () => {
@@ -59,14 +69,14 @@ watch(
     if (props.name === 'approach' || props.name === 'metric') update()
   },
   {
-    // Make sure this does not trigger on initialization
+    // Make sure this does not trigger on initialization.
     immediate: false,
     deep: true,
   }
 )
 
 /**
- * Splice groups array to remove a group
+ * Splice groups array to remove a group.
  * @param {Int} i - The index of the group.
  */
 function removeGroup(i) {
@@ -83,17 +93,12 @@ function removeGroup(i) {
   groupVisible.value[i] = true
 
   showFormToast(mainOption, 'removed')
-
-  /*
-  // TODO multiple usage, refactor to function/composable?
-  removedGroup.value = 'removed'
-  const timeoutMs = 500
-  setTimeout(() => {
-    removedGroup.value = ''
-  }, timeoutMs) */
 }
 
-// Copies the selected item and puts it at the end of the list
+/**
+ * Copies the selected item and puts it next to the item.
+ * @param {Int} i - The index of the group to copy
+ */
 function copyItem(i) {
   form.value.groupCount++ // Add a new item
   // Deep-copy the selected value to the new item
@@ -110,7 +115,9 @@ function copyItem(i) {
 }
 
 /**
- * TODO document
+ * Show a Toast message.
+ * @param {Object} object - An object with a name
+ * @param {String} actionMessage - The message of the action that prompted the toast
  */
 function showFormToast(object, actionMessage) {
   // Show toast
@@ -119,8 +126,8 @@ function showFormToast(object, actionMessage) {
     title:
       capitalise(props.name) +
       ' ' +
-      //If the metric doesn't have a value, don't mention it
-      (object.name == undefined ? '' : object.name + ' ') +
+      // If the metric doesn't have a value, don't mention it
+      (object.name === undefined ? '' : object.name + ' ') +
       actionMessage +
       '!',
   }
@@ -128,7 +135,9 @@ function showFormToast(object, actionMessage) {
   showToast(mainOptions, otherOptions)
 }
 
-// Update the options that cannot be be submitted due to changing experiment type (
+/**
+ * Update the options that cannot be be submitted due to changing experiment type.
+ */
 function update() {
   const entries = props.options
     .map((category) => category.options)
@@ -156,8 +165,10 @@ function update() {
   // console.log('after update', form.value.choices)
 }
 
-// A brief description of the group option
-// TODO REALLY NEEDS REFACTOR
+/**
+ * Give a brief description of the group option.
+ * @param {Int} i - The index of the group
+ */
 function shortGroupDescription(i) {
   const option = form.value.choices[i]
   let desc = capitalise(props.name) + ' ' + (i + 1)
@@ -192,6 +203,9 @@ function shortGroupDescription(i) {
   }
 }
 
+/**
+ * Add a group to the list.
+ */
 function addGroup() {
   form.value.groupCount++
   form.value.choices.push({})
@@ -203,7 +217,10 @@ function addGroup() {
   scrollToGroup(form.value.groupCount - 1)
 }
 
-// Scroll to group index
+/**
+ * Scroll to a group.
+ * @param {Int} index - The index of the group
+ */
 function scrollToGroup(index) {
   nextTick(() => {
     // console.log(`#group-${scrollId.value.split(' ').join('-')}-${index}`)
