@@ -20,8 +20,11 @@ onMounted(() => {
   getTrackItemInfo(props.uri)
 })
 
-// Get music detail info for a table item
-// TODO refactor
+/**
+ * Get music detail info for a table item
+ * @param {String}  spotifyId - the spotifyID of the item you want music details for
+ */
+
 async function getTrackItemInfo(spotifyId) {
   const token = await getSpotifyToken()
   track.value = await getInfoFromSpotifyID(token, spotifyId)
@@ -29,15 +32,10 @@ async function getTrackItemInfo(spotifyId) {
   const info = [
     { header: 'Album', value: track.value.album.name },
     { header: 'Snippet', value: spotifyId },
-    // track.value.name,
-    // track.value.artists.map((artist) => artist.name).join(', '),
+
   ]
   emit('update:modelValue', info)
-  // emit('changeColumns', ['Track', 'Album', 'Artist'])
-  /* emit(
-    'changeColumns',
-    info.map((item) => item.header)
-  ) */
+
 }
 </script>
 
