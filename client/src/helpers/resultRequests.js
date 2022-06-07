@@ -6,7 +6,7 @@ import { API_URL } from '../api'
 import { addResult, store } from '../store'
 import { formatResult } from './resultFormatter'
 
-const resultsRoute = '/all-results/result-by-id'
+const resultsRoute = '/result/result-by-id'
 const url = API_URL + resultsRoute
 
 // Request full result from result ID (timestamp)
@@ -29,11 +29,11 @@ export async function getResult() {
   return data
 }
 
-export async function viewResult(resultId) {
+export async function addResultById(resultId, view = true) {
   const data = await loadResult(resultId)
   console.log('Result fetched', data.result)
   addResult(formatResult(data.result))
-  viewResultTab()
+  if (view) viewResultTab()
 }
 
 export function viewResultTab() {
