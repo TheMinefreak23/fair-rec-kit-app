@@ -1,4 +1,4 @@
-import SplitRange from '../components/Form/SplitRange.vue'
+import SplitRange from '../../components/Form/SplitRange.vue'
 import { render, fireEvent } from '@testing-library/vue'
 
 test('Range text', async () => {

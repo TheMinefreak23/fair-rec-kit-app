@@ -1,6 +1,6 @@
-/*This program has been developed by students from the bachelor Computer Science at
+/* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
-© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+© Copyright Utrecht University (Department of Information and Computing Sciences) */
 
 import { describe, test, expect } from 'vitest'
 import {
@@ -11,7 +11,7 @@ import {
   formatMetric,
   formatEvaluation,
   makeHeader,
-} from '../helpers/resultFormatter'
+} from '../../helpers/resultFormatter'
 
 /**
  * Test the formatting of all results
@@ -52,7 +52,7 @@ describe('format multiple items', () => {
 describe('format result', () => {
   // TODO
   //test('', () => {})
-})*/
+}) */
 
 /**
  * Test the short string description of a dataset
@@ -77,8 +77,8 @@ describe('show dataset info', () => {
  * Test evaluation data formatting
  */
 describe('format evaluation', () => {
-  //TODO
-  //test('', () => {})
+  // TODO
+  // test('', () => {})
 })
 
 /**
