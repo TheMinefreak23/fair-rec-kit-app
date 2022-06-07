@@ -7,7 +7,7 @@ import {
   article,
   capitalise,
   underscoreToSpace,
-} from '../helpers/resultFormatter'
+} from '../../helpers/resultFormatter'
 
 const testWord = 'foo'
 
