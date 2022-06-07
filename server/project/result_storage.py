@@ -161,7 +161,6 @@ def edit_result(result_id, new_name, new_tags, new_email):
     def makepath(result_id, to_edit_result):
         return RESULTS_ROOT_FOLDER + str(result_id) + '_' + to_edit_result['metadata']['name']
 
-    #old_name = deepcopy(to_edit_result['metadata']['name'])
     old_name = to_edit_result['metadata']['name']
     old_path = makepath(result_id, to_edit_result)
     
