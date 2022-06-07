@@ -33,3 +33,11 @@ def index():
     #print(msg)
     return 'owo'
 
+
+# TODO Is this a mock?
+def send_email(metadata, timestamp):
+    print("llanfairpwlchfairgwyngychgogerychchwryrndrwbwchllantisiligogogoch")
+    print(metadata["name"])
+    print(metadata["email"])
+    print(timestamp)
+
