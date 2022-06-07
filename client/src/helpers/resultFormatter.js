@@ -137,7 +137,6 @@ export function shortResultDescription(result) {
   const datetime = result.metadata.datetime
 
   function formatNames(list) {
-    //console.log(Array.from(new Set(list)))
     const formattedList = []
     for (const name of Array.from(new Set(list))) {
       // Remove index (part after last underscore)
@@ -162,7 +161,6 @@ export function showDatasetInfo(dataset) {
 // Format evaluations (including filtered ones)
 export function formatEvaluation(e, index, result, runID) {
   // TODO refactor and/or give option to set decimal precision in UI
-  // TODO support several runs
   // Add index for unique metric key
   result[formatMetric(e) + '_' + index] = e.evaluations[runID].global.toFixed(2)
 
@@ -186,13 +184,6 @@ export function formatEvaluation(e, index, result, runID) {
       }
     }
   }
-  /*
-  const filtered = e.evaluation.filtered
-    .map((filter) => Object.entries(filter))
-    .map(([mainName, param] => { mainName + } ))
-    .flat()
-    .flat() */
-  // console.log(filtered)
 
   // Get filtered values and make subheaders
   if (filtered.length === 0) {

@@ -30,7 +30,8 @@ def edit():
 def delete():
     data = request.get_json()
     result_id = data.get('id')
-    result_storage.delete_result(result_id)
+    name = data.get('name')
+    result_storage.delete_result(result_id, name)
     return "Removed index"
 
     

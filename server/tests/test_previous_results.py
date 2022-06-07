@@ -11,11 +11,12 @@ url_prefix = '/api/all-results'
 
 
 # Test getting the results overview GET route
+@patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 def test_results(client):
     save_mock_result()
     url = url_prefix + '/'
     response = client.get(url)
-    assert len(response.json) == 1
+    assert len(json.loads(response.data)) == 1
 
     delete_test_results()
 
@@ -41,25 +42,36 @@ def test_result_by_id(client):
 @patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 def test_edit(client):
     save_mock_result()
-    index = 0
+    index = -1
     # New metadata (that we expect)
-    metadata = {'name': 'foo', 'tags': 'bar', 'email': 'foo@bar.com'}
+    metadata = {'name': 'bar', 'tags': 'bar', 'email': 'foo@bar.com'}
     # Use the metadata to create the edit settings
     edit_settings = \
-        {'index': index, 'new_name': metadata['name'],
+        {'id': index, 'new_name': metadata['name'],
          'new_tags': metadata['tags'], 'new_email': metadata['email']}
     # POST edit request
     response = client.post(url_prefix + '/edit', json=edit_settings)
     edited_results = load_results_overview()
 
     # Check success response
-    assert b'Edited index' in response.data
+    assert b'Edited index' == response.data
 
     # Check if the edited result in the stored results is as expected
-    assert edited_results['all_results'][index]['metadata'] == metadata
+    assert edited_results['all_results'][0]['metadata'] == metadata
 
 
 # TODO: delete test
+@patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
+def test_delete(client):
+    initial_results = load_results_overview()
+    save_mock_result()
+    index = 0
+    delete_settings = { 'name': 'foo', 'id': index}
+    response = client.post(url_prefix + '/delete', json=delete_settings)
+    edited_results = load_results_overview()
 
+     # Check success response
+    assert b'Removed index' == response.data
 
-
+     # Check if the removed result is no longer in the results overview
+    assert len(edited_results) == len(initial_results)

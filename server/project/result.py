@@ -35,6 +35,11 @@ def filter_results(dataframe, filters):
 # Set current shown recommendations
 @result_bp.route('/set-recs', methods=['POST'])
 def set_recs():
+    """Set the recommendations for the current shown result
+    
+    Returns:
+        (JSON) A status message and the possible filters for this dataset
+    """
     json = request.json
     result_id = json.get("id")  # Result timestamp TODO use to get result
     run_id = json.get("runid")
@@ -52,6 +57,11 @@ def set_recs():
 
 @result_bp.route('/result-by-id', methods=['POST', 'GET'])
 def result_by_id():
+    """Retrieve a requested result by its ID
+    
+    Returns:
+        (JSON) The result that belongs to the requested ID
+    """
     if request.method == 'POST':
         data = request.get_json()
         print('result_by_id data', data)
@@ -71,7 +81,7 @@ def result_by_id():
 # get recommender results per user
 @result_bp.route('/', methods=['POST'])
 def user_result():
-    """"Get recommender results per user
+    """"Get recommender results per user for the shown result
 
     Returns:
         (JSON) user item data
@@ -80,11 +90,11 @@ def user_result():
     json = request.json
     pair_id = json.get("pairid")
     run_id = json.get("runid")
-    filters = json.get("filters")
+    filters = json.get("filters", [])
 
     chunk_size = int(json.get("amount", 20))
     chosen_headers = json.get("optionalHeaders", [])
-    matrix_name = json.get("matrix")
+    matrix_name = json.get("matrix" "")
     dataset_name = json.get("dataset", "")
     sortIndex = json.get("sortindex", 0)
 
@@ -123,14 +133,25 @@ def user_result():
     df_subset = df_sorted[start_rows:end_rows]
 
     # rename the user and item headers so they reflect their respective content
-    item = dataset.get_matrix_config(matrix_name).item.key
-    user = dataset.get_matrix_config(matrix_name).user.key
-    df_subset.rename(columns = {'user': user, 'item': item}, inplace = True)
+    if not dataset is None and not dataset.get_matrix_config(matrix_name) is None:
+        item = dataset.get_matrix_config(matrix_name).item.key
+        user = dataset.get_matrix_config(matrix_name).user.key
+        df_subset.rename(columns = {'user': user, 'item': item}, inplace = True)
     return df_subset.to_json(orient='records')
 
 
 def add_dataset_columns(dataset_name, dataframe, columns, matrix_name):
-    # print(dataset_name)
+    """Add columns to the requested result based on its dataset
+
+    Args:
+        dataset_name: the name of dataset belonging to the dataframe
+        dataframe: a pandas dataframe of the requested user results
+        columns: the current list of columns
+        matrix_name: the name of the matrix belonging to the dataframe
+
+    Returns:
+        The updated dataframe
+    """
     dataset = recommender_system.data_registry.get_set(dataset_name)
     if dataset is None:
         return dataframe
@@ -144,17 +165,33 @@ def add_dataset_columns(dataset_name, dataframe, columns, matrix_name):
 
 @result_bp.route('/headers', methods=['POST'])
 def headers():
+    """Load the optional headers for the requested dataset
+    
+    Returns:
+       (JSON) A list of the available headers for this dataset
+    """
     json = request.json
     dataset_name = json.get("name")
+    columns = {}
     dataset = recommender_system.data_registry.get_set(dataset_name)
-    for matrix_name in dataset.get_available_matrices():
-        columns = dataset.get_available_columns(matrix_name)
-        #print(columns)
+    if dataset:
+        for matrix_name in dataset.get_available_matrices():
+            columns = dataset.get_available_columns(matrix_name)
     return columns
 
 
-# test
+
 def add_spotify_columns(dataset_name, dataframe):
+    """Add columns from the Spotify integration to the dataframe
+
+    Args:
+        dataset_name: the name of dataset belonging to the dataframe
+        dataframe: a pandas dataframe of the requested user results
+        
+
+    Returns:
+        The updated dataframe
+    """
     dataset = recommender_system.data_registry.get_set(dataset_name)
     matrix_name = 'user-track-count'
     columns = ['track_id', 'track_spotify-uri']
@@ -165,6 +202,12 @@ def add_spotify_columns(dataset_name, dataframe):
 
 @result_bp.route('/export', methods=['POST'])
 def export():
+    """Give the user the option to export the current shown results to a .tsv file
+
+    Returns:
+        A message indicating if the export was succesful
+    """
+    #TODO rework this
     # Load results from json
     json = request.json
     results = json.get('results', '{}')
@@ -194,7 +237,13 @@ def export():
 
 
 @result_bp.route('/validate', methods=['POST'])
+
 def validate():
+    """Give the server the task of running a requested experiment again  
+
+    Returns:
+        A message indicating the operation was succesful
+    """
     json = request.json
     filepath = json.get('filepath') 
     amount = int(json.get('amount', 1))
