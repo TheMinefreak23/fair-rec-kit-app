@@ -16,27 +16,10 @@ def test_results(client):
     save_mock_result()
     url = url_prefix + '/'
     response = client.get(url)
+    # Check if a result has been loaded
     assert len(json.loads(response.data)) == 1
 
     delete_test_results()
-
-
-# Test getting a result by id POST and GET routes
-# TODO use mock result
-"""
-def test_result_by_id(client):
-    save_mock_result()
-    url = url_prefix + '/result-by-id'
-    response = client.post(url,
-                           json={'id': test_id})  # Check if the result we just saved can be retrieved
-    assert response.status_code == 200  # Assert success
-    print(response.data)
-    assert b'success' in response.data  # Result found
-    get_response = client.get(url)  # Check if the result we just saved can be retrieved
-    assert get_response.json.get('result', test_experiment)
-    
-    delete_test_results()
-"""
 
 # Test editing a result POST route
 @patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
@@ -60,12 +43,12 @@ def test_edit(client):
     assert edited_results['all_results'][0]['metadata'] == metadata
 
 
-# TODO: delete test
 @patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 def test_delete(client):
     initial_results = load_results_overview()
     save_mock_result()
     index = 0
+    #Create the settings required to remove an entry
     delete_settings = { 'name': 'foo', 'id': index}
     response = client.post(url_prefix + '/delete', json=delete_settings)
     edited_results = load_results_overview()
