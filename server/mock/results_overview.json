@@ -109,27 +109,7 @@
                           "approach": "BiasedMF",
                           "recommendation": "ML-100KFMdesaiB",
                           "evals": [
-                              {
-                                  "name": "P@K",
-                                  "evaluation": {
-                                      "global": 2.4,
-                                      "filtered": [
-                                          {
-                                              "User Gender": [
-                                                  {
-                                                      "Gender Male": 6.6
-                                                  }
-                                              ]
-                                          }
-                                      ]
-                                  },
-                                  "params": [
-                                      {
-                                          "name": "k",
-                                          "value": 10
-                                      }
-                                  ]
-                              }
+
                           ]
                       }
                   ]
