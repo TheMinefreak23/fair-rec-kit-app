@@ -4,7 +4,9 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 import base64
+from cmath import sqrt
 import json
+from logging import root
 import time
 from io import BytesIO
 import requests
@@ -90,12 +92,14 @@ def get_background():
             playlist_length = playlist['total']
             print('playlist length', playlist_length)
         offset += MAX_TRACK_LIMIT
+    urls = [item['track']['album']['images'][1]['url'] for item in items]
+    images = [Image.open(BytesIO(requests.get(url).content)) for url in urls]
+    collage(images)
+    return send_file('../background.png', mimetype='image/png')
 
-    return collage([item['track']['album']['images'][1]['url'] for item in items])
 
-
-def collage(urls):
-    """Create collage from image urls
+def collage(images, size=10):
+    """Create collage from images
 
     Args:
         urls: the image urls
@@ -103,27 +107,23 @@ def collage(urls):
     Returns:
         the collage in PNG format
     """
-    images = [Image.open(BytesIO(requests.get(url).content)) for url in urls]
 
     print('image size', images[0].size)
-    image_count = MAX_TRACK_LIMIT*2
-    image_scale = image_count // 10
     image_width, image_height = images[0].size
-    width, height = image_width*image_scale, image_height*image_scale
-    w_step, h_step = width // image_scale, height // image_scale
+    width = image_width * size
+    height = image_width * size
     background = Image.new('RGB', (width, height))
-
     index = 0
-    for i in range(0, width, w_step):
-        for j in range(0, height, h_step):
+    for i in range(0, width, image_width):
+        for j in range(0, height, image_height):
             background.paste(images[index], (i, j))
             index += 1
             # Handle contents size smaller than image count (flip).
-            if index == len(urls) - 1:
+            if index == len(images) - 1:
                 np.flip(images)
                 index = 0
     background.save('../client/public/background.png')
-    return send_file('../background.png', mimetype='image/png')
+    return background
 
 
 @detail_bp.route('/unique-album-background', methods=['GET'])
@@ -136,7 +136,10 @@ def first_100_album_collage():
     # Get all items by setting year to maximal span.
     # Going negative in the year causes a non-year query.
     albums = get_unique_n('q=year:0-10000', 100, 'album', True)
-    return collage(albums)
+    images = [Image.open(BytesIO(requests.get(url).content)) for url in albums]
+
+    collage(images)
+    return send_file('../background.png', mimetype='image/png')
 
 
 def get_unique_n(query, amount, category, image):
