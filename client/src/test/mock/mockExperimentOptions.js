@@ -3,12 +3,12 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
 import words from 'an-array-of-english-words'
-import { API_URL } from '../api'
-import { getCalculation, pollForResult, store } from '../store'
+import { API_URL } from '../../api'
+import { getCalculation, pollForResult, store } from '../../store'
 import { ref, onMounted } from 'vue'
 import mockLists from './mockLists.json'
 import mockMetrics from './mockMetrics.json'
-import { progress } from '../helpers/queueFormatter'
+import { progress } from '../../helpers/queueFormatter'
 
 let metadata = {}
 let form = {}

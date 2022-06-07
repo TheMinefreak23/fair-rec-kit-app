@@ -4,7 +4,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
 import { onMounted, ref, watch } from 'vue'
 import FormGroupList from './Form/FormGroupList.vue'
-import { sendMockData } from '../test/mockExperimentOptions.js'
+import { sendMockData } from '../test/mock/mockExperimentOptions.js'
 import { store, pollForResult } from '../store.js'
 import { API_URL } from '../api'
 import { emptyFormGroup, validateEmail } from '../helpers/optionsFormatter'
