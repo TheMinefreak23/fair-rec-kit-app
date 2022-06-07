@@ -5,15 +5,15 @@ Utrecht University within the Software Project course.
 """
 import enum
 
-from fairreckitlib.experiment.experiment_event import ON_END_EXPERIMENT_PIPELINE, \
-    ON_END_EXPERIMENT_THREAD, ON_BEGIN_EXPERIMENT_PIPELINE, ON_BEGIN_EXPERIMENT_THREAD
+from fairreckitlib.experiment.experiment_event import \
+    ON_END_EXPERIMENT_THREAD, ON_BEGIN_EXPERIMENT_THREAD
 from fairreckitlib.model.pipeline.model_event import ON_BEGIN_MODEL_PIPELINE, \
     ON_BEGIN_TRAIN_MODEL, ON_BEGIN_LOAD_TRAIN_SET
 from fairreckitlib.data.pipeline.data_event import ON_BEGIN_DATA_PIPELINE, \
     ON_BEGIN_FILTER_DATASET, ON_BEGIN_SPLIT_DATASET
 from fairreckitlib.core.parsing.parse_event import ON_PARSE
 from project.mail import send_mail
-from project.result_storage import save_result, format_result
+from project.result_storage import save_result
 
 class Status(enum.Enum):
     """Experiment status in queue"""
@@ -25,14 +25,13 @@ class Status(enum.Enum):
     NA = 'Not Available'
 
 
-# """ TODO send enums to client?
+# TODO send enums to client?
 # def enum_to_dict(enum):
 #     return {i.name: i.value for i in enum}
 
 # @compute_bp.route('/statuses', methods=['GET'])
 # def get_statuses():
 #     return
-#     """
 
 class ProgressStatus(enum.Enum):
     """Experiment progress status"""
@@ -128,7 +127,6 @@ class EventHandler():
 
             self.experiment.status = Status.DONE
             self.experiment.progress = ProgressStatus.FINISHED
-                          
         self.end_experiment()
 
 def do_nothing(event_listener, kwargs):
