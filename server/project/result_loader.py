@@ -15,9 +15,10 @@ Utrecht University within the Software Project course.
 import os
 import json
 import pandas as pd
-from .result_storage import RESULTS_ROOT_FOLDER, load_results_overview, load_json
+from .result_storage import RESULTS_ROOT_FOLDER, load_results_overview, load_json, current_result
 from . import result_storage 
 
+RESULTS_PATH = RESULTS_ROOT_FOLDER
 
 def result_by_id(result_id):
     """Set the current result to a result in the results overview by its id.
@@ -27,11 +28,8 @@ def result_by_id(result_id):
     """
     # TODO DEV
     results_overview = load_results_overview()
-    results_root_folder = RESULTS_ROOT_FOLDER
-    if result_id == 0:
-        results_root_folder = 'mock/'
-        results_overview = load_json(results_root_folder + "results_overview.json")
-    relative_path = results_root_folder + str(result_id) + "_" + \
+    results_path = result_storage.RESULTS_ROOT_FOLDER
+    relative_path = results_path + str(result_id) + "_" + \
                     id_to_name(results_overview, result_id)
     data = results_overview['all_results'][id_to_index(results_overview, result_id)]
     data['metadata']['runs'] = 0 # Store runs
@@ -63,9 +61,8 @@ def result_by_id(result_id):
                     evaluation_data['evaluations'])
         data['metadata']['runs'] += 1
 
-    global current_result
-    current_result = data
-    print('current result', json.dumps(current_result, indent=4))
+    result_storage.current_result = data
+    #print('current result', json.dumps(current_result, indent=4))
 
 def add_evaluation(data, evaluation):
     if not evaluation:
@@ -83,6 +80,7 @@ def format_evaluation(evaluation):
         e['evaluations'] = evaluation_list
     return evaluation
 
+
 def get_overview(evaluation_id, runid):
     """Return a specific entry from a specific overview.json.
 
@@ -91,18 +89,10 @@ def get_overview(evaluation_id, runid):
     runid(int): the id of the specific dataset-recommender approach pair
     """
     results_overview = load_results_overview()
-    # TODO DEV: Mock
-    if evaluation_id == 0:
-        results_overview = load_json('mock/results_overview.json')
 
     name = id_to_name(results_overview, evaluation_id)
 
-    # TODO DEV: Mock
-    results_root_folder = RESULTS_ROOT_FOLDER
-    if evaluation_id == 0:
-        results_root_folder = 'mock/'
-
-    relative_path = results_root_folder + str(evaluation_id) + \
+    relative_path = RESULTS_PATH + str(evaluation_id) + \
                     "_" + name + "/" + "run_" + str(runid)
     overview_path = relative_path + "/overview.json"
     run_overview = load_json(overview_path)

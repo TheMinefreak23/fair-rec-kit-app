@@ -68,7 +68,11 @@ export function statusVariant(rawStatus) {
   }
 }
 
-// Format a result for the result tab
+/**
+ * Format a result for the result tab
+ * @param {Object} result - The unformatted result
+ * @return {Object} The formatted result
+ */
 export function formatResult(result) {
   console.log('before format', JSON.parse(JSON.stringify(result)))
   const formattedResult = {
@@ -108,22 +112,11 @@ export function formatResult(result) {
   return formattedResult
 }
 
-/*
-// Omit the recommendation key from the result metric table
-function omitRecommendation(arr) {
-  return arr.map(
-    // Omit recommendation
-    (r) => ({
-      ...r,
-      recs: r.recs.map((rec) => {
-        const { recommendation, ...rest } = rec
-        return rest
-      }),
-    })
-  )
-} */
-
-// Short result description, e.g. for a result tab
+/**
+ * Short result description, e.g. for a result tab
+ * @param {Object} result - The result
+ * @return {String} - The short description
+ */
 export function shortResultDescription(result) {
   //console.log(result)
   const datasets = []
@@ -162,7 +155,9 @@ export function showDatasetInfo(dataset) {
 export function formatEvaluation(e, index, result, runID) {
   // TODO refactor and/or give option to set decimal precision in UI
   // Add index for unique metric key
-  result[formatMetric(e) + '_' + index] = e.evaluations[runID].global.toFixed(2)
+  result[formatMetric(e) + '_' + index] = parseFloat(
+    e.evaluations[runID].global
+  ).toFixed(2)
 
   // Flatten filters
   // console.log(e.evaluation, e.evaluation.filtered)

@@ -1,0 +1,36 @@
+{
+    "overview": [
+        {
+            "name": "ML-100K_user-movie-rating_0 - LensKit_Random_0",
+            "dataset": "ML-100K_user-movie-rating_0",
+            "recommender_system": "LensKit_Random_0",
+            "evaluation_path": "mock\\0_UNITTEST\\run_3\\ML-100K_user-movie-rating_0\\LensKit_Random_0\\evaluations.json",
+            "ratings_path": "mock\\0_UNITTEST\\run_3\\ML-100K_user-movie-rating_0\\LensKit_Random_0\\ratings.tsv",
+            "ratings_settings_path": "mock\\0_UNITTEST\\run_3\\ML-100K_user-movie-rating_0\\LensKit_Random_0\\settings.json"
+        },
+        {
+            "name": "ML-100K_user-movie-rating_0 - LensKit_Random_1",
+            "dataset": "ML-100K_user-movie-rating_0",
+            "recommender_system": "LensKit_Random_1",
+            "evaluation_path": "mock\\0_UNITTEST\\run_3\\ML-100K_user-movie-rating_0\\LensKit_Random_1\\evaluations.json",
+            "ratings_path": "mock\\0_UNITTEST\\run_3\\ML-100K_user-movie-rating_0\\LensKit_Random_1\\ratings.tsv",
+            "ratings_settings_path": "mock\\0_UNITTEST\\run_3\\ML-100K_user-movie-rating_0\\LensKit_Random_1\\settings.json"
+        },
+        {
+            "name": "ML-100K_user-movie-rating_1 - LensKit_Random_0",
+            "dataset": "ML-100K_user-movie-rating_1",
+            "recommender_system": "LensKit_Random_0",
+            "evaluation_path": "mock\\0_UNITTEST\\run_3\\ML-100K_user-movie-rating_1\\LensKit_Random_0\\evaluations.json",
+            "ratings_path": "mock\\0_UNITTEST\\run_3\\ML-100K_user-movie-rating_1\\LensKit_Random_0\\ratings.tsv",
+            "ratings_settings_path": "mock\\0_UNITTEST\\run_3\\ML-100K_user-movie-rating_1\\LensKit_Random_0\\settings.json"
+        },
+        {
+            "name": "ML-100K_user-movie-rating_1 - LensKit_Random_1",
+            "dataset": "ML-100K_user-movie-rating_1",
+            "recommender_system": "LensKit_Random_1",
+            "evaluation_path": "mock\\0_UNITTEST\\run_3\\ML-100K_user-movie-rating_1\\LensKit_Random_1\\evaluations.json",
+            "ratings_path": "mock\\0_UNITTEST\\run_3\\ML-100K_user-movie-rating_1\\LensKit_Random_1\\ratings.tsv",
+            "ratings_settings_path": "mock\\0_UNITTEST\\run_3\\ML-100K_user-movie-rating_1\\LensKit_Random_1\\settings.json"
+        }
+    ]
+}

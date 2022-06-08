@@ -109,11 +109,11 @@ class EventHandler():
         self.experiment.status = Status.ACTIVE
         self.experiment.progress = ProgressStatus.STARTED
 
-    def on_end_experiment_thread(self, event_listener, **kwargs):
+    def on_end_experiment_thread(self, event_listener, event_args, **kwargs):
         """Change progress status to finished
         and experiment status to done.
         Also sends an email if possible."""
-        do_nothing(event_listener, kwargs)
+        do_nothing(event_listener, event_args, kwargs)
         if self.experiment.status is not Status.ABORTED:
             if not self.experiment.validating:
                 # TODO Update experiment data: Save elapsed time
