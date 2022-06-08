@@ -16,8 +16,10 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
+from copy import deepcopy
 import json
 import os
+import shutil
 
 # Global current result variables
 current_result = {}
@@ -121,11 +123,12 @@ def add_result(result):
     write_results_overview(file_results)    
 
 
-def delete_result(result_id):
+def delete_result(result_id, result_name):
     """Delete a result by its id.
 
     Args:
-        index(int): the index of the result
+        result_id(int): the id of the specified result
+        result_name(string): the name of the specified result
     """
     file_results = load_results_overview()
     # Remove from list
@@ -133,8 +136,12 @@ def delete_result(result_id):
         result for result in file_results['all_results']
         if result['timestamp']['stamp'] != result_id
     ]
-    # TODO delete actual result
     write_results_overview(file_results)
+    # Remove from results folder
+    path = RESULTS_ROOT_FOLDER + str(result_id) + '_' + result_name
+    if (os.path.isdir(path)):
+        shutil.rmtree(path)
+    
 
 
 def edit_result(result_id, new_name, new_tags, new_email):
@@ -151,6 +158,12 @@ def edit_result(result_id, new_name, new_tags, new_email):
     index = next((i for i in range(len(file_results)) if file_results[i]['timestamp']['stamp'] == result_id), None)
     to_edit_result = file_results[index]
 
+    def makepath(result_id, to_edit_result):
+        return RESULTS_ROOT_FOLDER + str(result_id) + '_' + to_edit_result['metadata']['name']
+
+    old_name = to_edit_result['metadata']['name']
+    old_path = makepath(result_id, to_edit_result)
+    
     def edit_metadata(attr, new_val):
         # Don't change the attribute if the input field has been left empty
         if new_val != '':
@@ -164,8 +177,23 @@ def edit_result(result_id, new_name, new_tags, new_email):
     file_results[index] = to_edit_result
 
     write_results_overview({'all_results': file_results})
+    
+    #Update the folder name to match the new name
+    new_path = makepath(result_id, to_edit_result)
+    if (os.path.isdir(old_path)):
+        os.rename(old_path, new_path)
+    
+    #Update the name in all overview.json files
+    for subdir in [f.path for f in os.scandir(new_path) if f.is_dir()]:
+        run_overview = load_json(subdir + '/overview.json')
+        for pair in run_overview['overview']:
+            pair['evaluation_path'] = pair['evaluation_path'].replace(old_name, new_name)
+            pair['ratings_path'] = pair['ratings_path'].replace(old_name, new_name)
+            pair['ratings_settings_path'] = pair['ratings_settings_path'].replace(old_name, new_name)
+        file = open(subdir + '/overview.json','w')
+        file.write(json.dumps(run_overview))
 
-
+        
 def create_results_overview():
     """Create a results file if it doesn't exist yet or is empty."""
     if not os.path.exists(RESULTS_ROOT_FOLDER):

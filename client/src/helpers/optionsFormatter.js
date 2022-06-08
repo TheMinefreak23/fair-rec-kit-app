@@ -5,6 +5,10 @@ function selectionOptions(options) {
   return [emptyOption, ...options]
 }
 
+/**
+ * Returns an empty formgroup
+ * @return {object} A javascript object with the required fields 
+ */
 function emptyFormGroup(required) {
   return {
     visible: required, // Show option if it is required

@@ -33,7 +33,7 @@ async function removeEntry() {
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: entry.value.id }),
+    body: JSON.stringify({ id: entry.value.id, name: props.item.name }),
   }
   fetch(API_URL + props.removalUrl, requestOptions).then(() => {
     console.log('Item', entry.value.id, 'removed succesfully')

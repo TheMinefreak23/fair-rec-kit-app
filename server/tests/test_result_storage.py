@@ -4,7 +4,6 @@
 import json
 import random
 from unittest.mock import patch
-
 import pytest
 
 from project.result_storage import *
@@ -17,7 +16,7 @@ test_results_path = 'tests/test_results.json'
 
 @patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 def save_mock_result():
-    save_result(test_experiment, 'foo')  # Save a result with the id
+    save_result(test_experiment, {'data' : []})  # Save a result with the id
 
 
 # Delete all results by emptying the file
