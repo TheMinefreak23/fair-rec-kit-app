@@ -3,12 +3,12 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
 import words from 'an-array-of-english-words'
-import { API_URL } from '../api'
-import { getCalculation, pollForResult, store } from '../store'
+import { API_URL } from '../../api'
+import { getCalculation, pollForResult, store } from '../../store'
 import { ref, onMounted } from 'vue'
 import mockLists from './mockLists.json'
 import mockMetrics from './mockMetrics.json'
-import { progress } from '../helpers/queueFormatter'
+import { progress } from '../../helpers/queueFormatter'
 
 let metadata = {}
 let form = {}
@@ -55,10 +55,7 @@ async function sendMockData(options, simple = false, metrics = false) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(store.currentExperiment),
   }
-  const response = await fetch(
-    API_URL + '/experiment/calculation',
-    requestOptions
-  )
+  const response = await fetch(API_URL + '/experiment/', requestOptions)
   // Update queue
   const data = await response.json()
   store.queue = data.queue
@@ -145,14 +142,13 @@ function generateRandomMetrics(options) {
 function generateRandomDatasets(options) {
   //generate random settings for the Datasets part of a experiment
   let result = []
-  var n = 1 + Math.floor(Math.random() * 3)
+  const n = 1 + Math.floor(Math.random() * 3)
   for (let i = 0; i < n; i++) {
     console.log(options.datasets)
-    var randomDataset = randomItems(options.datasets, 1)[0].value
+    const randomDataset = randomItems(options.datasets, 1)[0].value
     console.log('random dataset', randomDataset)
 
-    var randomDatasetName = randomDataset.name
-    var randomDatasetParams = {
+    const randomDatasetParams = {
       name: randomDataset.params.values[0].name,
       value: randomDataset.params.values[0].default,
     }
@@ -161,9 +157,21 @@ function generateRandomDatasets(options) {
     const splitting = randomDataset.params.dynamic[2].options[0].value
     console.log('splitting', splitting)
 
+    // TODO refactor
+    const randomMatrix = randomItems(
+      randomDataset.params.dynamic[0].options,
+      1
+    )[0].value
+    const matrix = {
+      name: randomMatrix.name,
+      params: [],
+      conversion: [],
+    }
+
     result[i] = {
-      name: randomDatasetName,
+      name: randomDataset.name,
       params: [randomDatasetParams],
+      matrix: [matrix],
       splitting: [
         {
           // TODO actual random choice, this is just a temp quick fix
@@ -179,7 +187,6 @@ function generateRandomDatasets(options) {
           ],
         },
       ],
-      conversion: [],
     }
     console.log('dataset', result)
   }
