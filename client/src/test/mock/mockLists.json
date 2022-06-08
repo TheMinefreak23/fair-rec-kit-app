@@ -5,11 +5,17 @@
       "params": [
         {
           "name": "Train/testsplit",
-          "value": 80
+          "value": "80"
+        }
+      ],
+      "matrix": [
+        {
+          "name": "user-track-count",
+          "params": [],
+          "conversion": []
         }
       ],
       "filters": [],
-      "conversion": [],
       "splitting": [
         {
           "name": "random",
@@ -29,7 +35,7 @@
       "name": "Random",
       "params": [
         {
-          "name": "random_seed",
+          "name": "seed",
           "value": null
         }
       ]

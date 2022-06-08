@@ -1,0 +1,24 @@
+data:
+- dataset: ML-100K
+  matrix: user-movie-rating
+  splitting:
+    name: random
+    params:
+      seed: null
+    test_ratio: 0.2
+evaluation:
+- name: P@K
+  params:
+    K: 10
+- name: P@K
+  params:
+    K: 5
+models:
+  LensKit:
+  - name: Random
+    params:
+      seed: null
+name: 1654537796_Test487_unsourced
+rated_items_filter: false
+top_K: 63
+type: recommendation

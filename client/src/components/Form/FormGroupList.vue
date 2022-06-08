@@ -1,9 +1,10 @@
 <script setup>
+/* An option for which multiple groups can be added (list of form groups) */
 /* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
 
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { capitalise } from '../../helpers/resultFormatter'
 
 import FormGroup from './FormGroup.vue'
@@ -11,16 +12,18 @@ import { showToast } from '../../store'
 
 const emit = defineEmits(['update:modelValue'])
 const props = defineProps({
-  name: String,
-  title: String,
-  description: String,
-  options: Array,
-  required: Boolean,
-  default: String,
-  maxK: Number,
-  modelValue: { type: Object, required: true },
+  name: String, // List name for display in the buttons
+  groupId: String, // Group ID for autoscroll
+  title: String, // List title for display in the header
+  options: Array, // The available options to choose from
+  required: Boolean, // Whether the list option is required
+  maxK: Number, // The amount of  recommendations (caps K)
+  modelValue: { type: Object, required: true }, // The local form linked to the form component
 })
 
+/**
+ * Form per group list
+ */
 const form = computed({
   get() {
     // console.log(props.name, props.title, props.modelValue)
@@ -32,19 +35,32 @@ const form = computed({
   },
 })
 
-// const visibleGroup = ref(1)
+/**
+ * Unique group ID for autoscroll handling.
+ */
+const scrollId = computed(() => {
+  // console.log(props.groupId)
+  return props.groupId ? props.groupId : props.name
+})
+
+/**
+ * Array mapping group index to whether the group is visible.
+ */
 const groupVisible = ref([true]) // TODO refactor
 
-// const removedGroup = ref(false) // for animation on group removal
-
+/**
+ * Set the form name
+ */
 onMounted(() => {
   // TODO separate 1-sized formgrouplists
   form.value.name = props.title
 })
 
+/**
+ *  Watch for the changing of options.
+ */
 watch(
   () => {
-    // Watch for the changing of options
     return props.options
   },
   () => {
@@ -53,14 +69,14 @@ watch(
     if (props.name === 'approach' || props.name === 'metric') update()
   },
   {
-    // Make sure this does not trigger on initialization
+    // Make sure this does not trigger on initialization.
     immediate: false,
     deep: true,
   }
 )
 
 /**
- * Splice groups array to remove a group
+ * Splice groups array to remove a group.
  * @param {Int} i - The index of the group.
  */
 function removeGroup(i) {
@@ -77,46 +93,51 @@ function removeGroup(i) {
   groupVisible.value[i] = true
 
   showFormToast(mainOption, 'removed')
-
-  /*
-  // TODO multiple usage, refactor to function/composable?
-  removedGroup.value = 'removed'
-  const timeoutMs = 500
-  setTimeout(() => {
-    removedGroup.value = ''
-  }, timeoutMs) */
 }
 
-// Copies the selected item and puts it at the end of the list
+/**
+ * Copies the selected item and puts it next to the item.
+ * @param {Int} i - The index of the group to copy
+ */
 function copyItem(i) {
   form.value.groupCount++ // Add a new item
   // Deep-copy the selected value to the new item
   const item = JSON.parse(JSON.stringify(form.value.choices[i]))
+  console.log(item)
+  // Insert item
   form.value.choices.splice(i, 0, item)
   // visibleGroup.value = i + 2 // Show newly copied item
   groupVisible.value[i + 1] = true
   // console.log('copy', form.value.choices[i].main)
   showFormToast(form.value.choices[i].main, 'copied')
+
+  scrollToGroup(i + 1)
 }
 
 /**
- * TODO document
+ * Show a Toast message.
+ * @param {Object} object - An object with a name
+ * @param {String} actionMessage - The message of the action that prompted the toast
  */
 function showFormToast(object, actionMessage) {
   // Show toast
   // TODO delay and variant don't work?
   const mainOptions = {
     title:
-        capitalise(props.name) + ' ' + 
-        //If the metric doesn't have a value, don't mention it
-        (object.name == undefined ?  '' : object.name + ' ') +
-         actionMessage + '!',
+      capitalise(props.name) +
+      ' ' +
+      // If the metric doesn't have a value, don't mention it
+      (object.name === undefined ? '' : object.name + ' ') +
+      actionMessage +
+      '!',
   }
   const otherOptions = { pos: 'top-right', delay: 800, variant: 'warning' }
   showToast(mainOptions, otherOptions)
 }
 
-// Update the options that cannot be be submitted due to changing experiment type (
+/**
+ * Update the options that cannot be be submitted due to changing experiment type.
+ */
 function update() {
   const entries = props.options
     .map((category) => category.options)
@@ -144,8 +165,10 @@ function update() {
   // console.log('after update', form.value.choices)
 }
 
-// A brief description of the group option
-// TODO REALLY NEEDS REFACTOR
+/**
+ * Give a brief description of the group option.
+ * @param {Int} i - The index of the group
+ */
 function shortGroupDescription(i) {
   const option = form.value.choices[i]
   let desc = capitalise(props.name) + ' ' + (i + 1)
@@ -180,12 +203,34 @@ function shortGroupDescription(i) {
   }
 }
 
+/**
+ * Add a group to the list.
+ */
 function addGroup() {
   form.value.groupCount++
   form.value.choices.push({})
   form.value.visible = true
   // (visibleGroup.value = form.value.groupCount
   groupVisible.value[form.value.groupCount - 1] = true
+
+  // Scroll to newly added group
+  scrollToGroup(form.value.groupCount - 1)
+}
+
+/**
+ * Scroll to a group.
+ * @param {Int} index - The index of the group
+ */
+function scrollToGroup(index) {
+  nextTick(() => {
+    // console.log(`#group-${scrollId.value.split(' ').join('-')}-${index}`)
+    // TODO refactor to ID function?
+    const element = document.querySelector(
+      `#group-${scrollId.value.split(' ').join('-')}-${index}`
+    )
+    // console.log(element)
+    element.scrollIntoView({ behavior: 'smooth' })
+  })
 }
 </script>
 
@@ -220,83 +265,87 @@ function addGroup() {
         {{ formatMultipleItems(form.main) }}
       </p>-->
           <b-row>
-            <b-col
-              :id="`group-${name.split()[0]}-${i - 1}`"
-              cols="12"
-              role="tablist"
-              v-for="i in form.groupCount"
-              :key="i - 1"
-            >
-              <b-container class="g-0">
-                <!--Collapsable group toggle button with remove button-->
-                <b-row md="auto">
-                  <b-row class="pe-0">
-                    <b-col class="pe-0">
-                      <b-card no-body class="mb-1">
-                        <b-button
-                          class="text-start"
-                          block
-                          @click="
-                            // TODO this is pretty hacky
-                            /*visibleGroup == i
+            <TransitionGroup name="list">
+              <b-col
+                :id="`group-${scrollId.split(' ').join('-')}-${i - 1}`"
+                cols="12"
+                role="tablist"
+                v-for="i in form.groupCount"
+                :key="i - 1"
+              >
+                <!--{{ `group-${scrollId.split(' ').join('-')}-${i - 1}` }}-->
+                <b-container class="g-0">
+                  <!--Collapsable group toggle button with remove button-->
+                  <b-row md="auto">
+                    <b-row class="pe-0">
+                      <b-col class="pe-0">
+                        <b-card no-body class="mb-1">
+                          <b-button
+                            class="text-start"
+                            block
+                            @click="
+                              // TODO this is pretty hacky
+                              /*visibleGroup == i
                               ? (visibleGroup = -1)
                               : (visibleGroup = i)*/
-                            groupVisible[i - 1] = !groupVisible[i - 1]
-                          "
-                          :variant="
-                            //visibleGroup == i ? 'secondary' : 'dark'
-                            groupVisible[i - 1]
-                          "
-                        >
-                          <!-- TODO refactor-->
-                          <template
-                            v-if="
-                              //visibleGroup == i
-                              groupVisible[i - 1]
+                              groupVisible[i - 1] = !groupVisible[i - 1]
                             "
-                            ><i class="bi bi-caret-down" /> |
-                          </template>
-                          <template v-else
-                            ><i class="bi bi-caret-up" /> |
-                          </template>
-                          {{ shortGroupDescription(i - 1) }}
-                        </b-button>
-                      </b-card>
-                    </b-col>
-                    <!--Remove button-->
-                    <b-col cols="1" v-if="!(i == 1 && required)" class="p-0">
-                      <b-button
-                        data-testid="remove-button"
-                        @click="removeGroup(i - 1)"
-                        variant="danger"
-                        class="mb-2 mr-sm-2 mb-sm-0 float-end"
-                        style="width: 90%"
-                        >X</b-button
-                      >
-                    </b-col>
+                            :variant="
+                              //visibleGroup == i ? 'secondary' : 'dark'
+                              groupVisible[i - 1] ? 'secondary' : 'dark'
+                            "
+                          >
+                            <!-- TODO refactor-->
+                            <template
+                              v-if="
+                                //visibleGroup == i
+                                groupVisible[i - 1]
+                              "
+                              ><i class="bi bi-caret-down" /> |
+                            </template>
+                            <template v-else
+                              ><i class="bi bi-caret-up" /> |
+                            </template>
+                            {{ shortGroupDescription(i - 1) }}
+                          </b-button>
+                        </b-card>
+                      </b-col>
+                      <!--Remove button-->
+                      <b-col cols="1" v-if="!(i == 1 && required)" class="p-0">
+                        <b-button
+                          data-testid="remove-button"
+                          @click="removeGroup(i - 1)"
+                          variant="danger"
+                          class="mb-2 mr-sm-2 mb-sm-0 float-end"
+                          style="width: 90%"
+                          >X</b-button
+                        >
+                      </b-col>
+                    </b-row>
                   </b-row>
-                </b-row>
-                <!--Collapsable group-->
-                <!--<b-collapse :visible="visibleGroup == i" role="tabpanel">-->
-                <b-collapse :visible="groupVisible[i - 1]" role="tabpanel">
-                  <FormGroup
-                    v-model="form.choices[i - 1]"
-                    :index="i - 1"
-                    :name="name"
-                    :options="options"
-                    :required="
-                      // If the option is needed, at least one selection must've been made
-                      required &&
-                      (!form.choices.main ||
-                        form.choices.every((x) => x.main == ''))
-                    "
-                    :default="defaultOption"
-                    :maxK="maxK"
-                    @copy="copyItem(i - 1)"
-                  />
-                </b-collapse>
-              </b-container>
-            </b-col>
+                  <!--Collapsable group-->
+                  <!--<b-collapse :visible="visibleGroup == i" role="tabpanel">-->
+                  <b-collapse :visible="groupVisible[i - 1]" role="tabpanel">
+                    <FormGroup
+                      v-model="form.choices[i - 1]"
+                      :index="i - 1"
+                      :name="name"
+                      :groupId="name"
+                      :options="options"
+                      :required="
+                        // If the option is needed, at least one selection must've been made
+                        required &&
+                        (!form.choices.main ||
+                          form.choices.every((x) => x.main == ''))
+                      "
+                      :default="defaultOption"
+                      :maxK="maxK"
+                      @copy="copyItem(i - 1)"
+                    />
+                  </b-collapse>
+                </b-container>
+              </b-col>
+            </TransitionGroup>
           </b-row>
         </b-card>
       </b-collapse>
@@ -317,20 +366,47 @@ function addGroup() {
 </template>
 
 <style>
-/*
-.removed {
-  animation: red-glowing 1800ms;
+.list-enter-active {
+  transition: all 0.5s ease;
+  animation: subtle-glowing 1300ms infinite;
 }
 
-@keyframes red-glowing {
+.list-leave-active {
+  transition: all 0.5s ease;
+  animation: subtle-glowing-red 800ms infinite;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.subtle-blink {
+  animation: subtle-glowing 1300ms infinite;
+}
+
+@keyframes subtle-glowing {
   0% {
-    background-color: #ffb4b4d6;
+    background-color: #ffffffd6;
   }
   50% {
-    background-color: #ff5353d7;
+    background-color: #77bfe6d7;
   }
   100% {
-    background-color: #ff9898d6;
+    background-color: #ffffffd6;
   }
-}*/
+}
+
+@keyframes subtle-glowing-red {
+  0% {
+    background-color: #ffffffd6;
+  }
+  50% {
+    background-color: #e67777d7;
+  }
+  100% {
+    background-color: #ffffffd6;
+  }
+}
 </style>

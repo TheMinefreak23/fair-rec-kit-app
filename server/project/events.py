@@ -67,45 +67,45 @@ class EventHandler():
             ON_BEGIN_TRAIN_MODEL: self.on_train,
         }
 
-    def on_parse(self, event_listener, **kwargs):
+    def on_parse(self, event_listener, event_args, **kwargs):
         """Change progress status to parsing."""
-        do_nothing(event_listener, kwargs)
+        do_nothing(event_listener, event_args, kwargs)
         self.experiment.progress = ProgressStatus.PARSING
 
-    def on_data(self, event_listener, **kwargs):
+    def on_data(self, event_listener, event_args, **kwargs):
         """Change progress status to processing data."""
-        do_nothing(event_listener, kwargs)
+        do_nothing(event_listener, event_args, kwargs)
         self.experiment.progress = ProgressStatus.PROCESSING_DATA
 
-    def on_filter(self, event_listener, **kwargs):
+    def on_filter(self, event_listener, event_args, **kwargs):
         """Change progress status to filtering data."""
-        do_nothing(event_listener, kwargs)
+        do_nothing(event_listener, event_args, kwargs)
         self.experiment.progress = ProgressStatus.FILTERING_DATA
 
-    def on_split(self, event_listener, **kwargs):
+    def on_split(self, event_listener, event_args, **kwargs):
         """Change progress status to splitting data."""
-        do_nothing(event_listener, kwargs)
+        do_nothing(event_listener, event_args, kwargs)
         self.experiment.progress = ProgressStatus.SPLITTING_DATA
 
-    def on_model(self, event_listener, **kwargs):
+    def on_model(self, event_listener, event_args, **kwargs):
         """Change progress status to model."""
-        do_nothing(event_listener, kwargs)
+        do_nothing(event_listener, event_args, kwargs)
         self.experiment.progress = ProgressStatus.MODEL
 
-    def on_load(self, event_listener, **kwargs):
+    def on_load(self, event_listener, event_args, **kwargs):
         """Change progress status to model load."""
-        do_nothing(event_listener, kwargs)
+        do_nothing(event_listener, event_args, kwargs)
         self.experiment.progress = ProgressStatus.MODEL_LOAD
 
-    def on_train(self, event_listener, **kwargs):
+    def on_train(self, event_listener, event_args, **kwargs):
         """Change progress status to training."""
-        do_nothing(event_listener, kwargs)
+        do_nothing(event_listener, event_args, kwargs)
         self.experiment.progress = ProgressStatus.TRAINING
 
-    def on_begin_experiment(self, event_listener, **kwargs):
+    def on_begin_experiment(self, event_listener, event_args, **kwargs):
         """Change progress status to started
         and update the experiment status to active."""
-        do_nothing(event_listener, kwargs)
+        do_nothing(event_listener, event_args, kwargs)
         self.experiment.status = Status.ACTIVE
         self.experiment.progress = ProgressStatus.STARTED
 
@@ -129,7 +129,8 @@ class EventHandler():
             self.experiment.progress = ProgressStatus.FINISHED
         self.end_experiment()
 
-def do_nothing(event_listener, kwargs):
-    """This function only exits so that pylint stops complaining."""
+def do_nothing(event_listener, event_args, kwargs):
+    """This function only exists so that pylint stops complaining."""
     event_listener
+    event_args
     kwargs
