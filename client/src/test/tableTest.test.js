@@ -3,7 +3,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
 import { render, fireEvent, getByTestId } from '@testing-library/vue'
-import { test } from 'vitest'
+import { expect, it, test } from 'vitest'
 import Table from '../components/Table.vue'
 
 test('deleteTableItem', async () => {
