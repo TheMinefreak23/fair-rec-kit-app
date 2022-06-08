@@ -2,20 +2,46 @@
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
-import { render, fireEvent, getByTestId } from '@testing-library/vue'
-import { expect, it, test } from 'vitest'
+import { render, fireEvent, getByTestId, getByText } from '@testing-library/vue'
+import { describe, expect, it, test } from 'vitest'
 import Table from '../components/Table.vue'
+import HeadersModal from '../components/Table/Modals/HeadersModal.vue'
+import DeletionModal from '../components/Table/Modals/DeletionModal.vue'
+import EditModal from '../components/Table/Modals/EditModal.vue'
+import InfoModal from '../components/Table/Modals/InfoModal.vue'
+
+test('Filter button', async () => {
+  const {getByText, getByTitle} = render(Table, {
+    props: {
+      expendable: true,
+      results: [{ foo: 1, bar: 1 }],
+      headers: [{ name: 'foo' }, { name: 'bar' }],
+    }
+  })
+
+  const button = getByText('Filters')
+  await fireEvent.click(button)
+  getByTitle('Change filters')
+})
+
+test('Header button', async () => {
+  const{getByText, getByTitle} = render(HeadersModal, {
+    props: {
+      headerOptions: true,
+    }
+  })
+
+  const button = getByText('Select Headers')
+  await fireEvent.click(button)
+  getByText('Select the extra headers you want to be shown')
+})
 
 test('deleteTableItem', async () => {
   // get utilities to query component
-  const { getByTestId, getByTitle } = render(Table, {
+  const { getByTestId, getByTitle } = render(DeletionModal, {
     props: {
-      overview: false,
-      results: [{ foo: 1, bar: 1 }],
-      headers: [{ name: 'foo' }, { name: 'bar' }],
-      buttonText: 'owo',
-      removable: true,
-    },
+      entry: true,
+    }
   })
 
   // get deletion button
@@ -28,20 +54,10 @@ test('deleteTableItem', async () => {
 })
 
 test('editTableItem', async () => {
-  const { getByTestId, getByTitle } = render(Table, {
-    props: {
-      overview: true,
-      results: [{ foo: 2, bar: 2 }],
-      headers: [{ name: 'hello' }, { name: 'world' }],
-      buttonText: 'button',
-      removable: false,
-    },
-  })
+  const { getByTestId, getByTitle } = render(EditModal)
 
   const button = getByTestId('edit')
-
   await fireEvent.click(button)
-
   getByTitle('Editing results')
 })
 
@@ -63,7 +79,7 @@ test('userItemTable', async () => {
 
   const prevbutton = getByText(/previous/i)
   const nextbutton = getByText(/next/i)
-  const headerbutton = getByText('change headers', { exact: false })
+  const headerbutton = getByText('Select Headers', { exact: false })
 
   await fireEvent.click(prevbutton)
   await fireEvent.click(nextbutton)
@@ -73,16 +89,7 @@ test('userItemTable', async () => {
 })
 
 test('viewMetadata', async () => {
-  const { getByTestId, getByTitle } = render(Table, {
-    props: {
-      overview: true,
-      results: [{ foo: 3, bar: 3 }],
-      headers: [{ name: 'whats' }, { name: 'up' }],
-      buttonText:
-        'this part doesnt matter so I could put anything here and no-one will ever notice hehehe',
-      removable: false,
-    },
-  })
+  const { getByTestId, getByTitle } = render(InfoModal)
 
   const button = getByTestId('view-meta')
 
@@ -91,3 +98,4 @@ test('viewMetadata', async () => {
   // check if the modal shows up
   getByTitle('Result information')
 })
+
