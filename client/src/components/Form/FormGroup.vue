@@ -1,9 +1,10 @@
 <script setup>
+/* A form option */
 /* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
 import FormGroupList from './FormGroupList.vue'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { article } from '../../helpers/resultFormatter'
 import { emptyFormGroup } from '../../helpers/optionsFormatter'
 import '../../../node_modules/multi-range-slider-vue/MultiRangeSliderBlack.css'
@@ -12,28 +13,21 @@ import FormSelect from './FormSelect.vue'
 
 const emit = defineEmits(['copy', 'scroll', 'update:modelValue'])
 const props = defineProps({
-  groupId: String, // group ID for scrolling
-  index: Number, // group index for scrolling
-  name: String,
-  title: String,
-  options: Array,
-  required: Boolean,
-  defaultOption: String,
-  maxK: Number,
-  modelValue: { type: Object, required: true },
+  groupId: String, // The group ID for scrolling
+  index: Number, // The group index for scrolling
+  name: String, // The name of the group for usage in the buttons
+  title: String, // The title of the group for usage in the header
+  options: Array, // The available options to choose from
+  required: Boolean, // WHether the group option is required
+  defaultOption: String, // The default main option
+  maxK: Number, // The amount of  recommendations (caps K)
+  modelValue: { type: Object, required: true }, // The local form linked to the form component
   single: { type: Boolean, default: false }, // single form group or multi (form group list)
 })
 
-onMounted(() => {
-  form.value.single = props.single
-  form.value.name = props.title
-  if (props.defaultOption) {
-    form.value.main = props.defaultOption.value
-  }
-  // console.log('form', form.value)
-  // scroll to new group
-})
-
+/**
+ * Form per group
+ */
 const form = computed({
   // getter
   get() {
@@ -47,6 +41,22 @@ const form = computed({
   },
 })
 
+/**
+ * Initialise form values: single, name and default option.
+ */
+onMounted(() => {
+  form.value.single = props.single
+  form.value.name = props.title
+  if (props.defaultOption) {
+    form.value.main = props.defaultOption.value
+  }
+  // console.log('form', form.value)
+  // scroll to new group
+})
+
+/**
+ * Set the parameter defaults when the main option changes.
+ */
 watch(
   () => form.value.main,
   () => {
@@ -55,9 +65,12 @@ watch(
   }
 )
 
+/**
+ * Cap metrics K values to the recommendation amount.
+ */
 watch(
   () =>
-    // Watch for the changing of max K (recommendations) value
+    // Watch for the changing of max K (recommendations) value.
     props.maxK,
   (newK, oldK) => {
     if (!form.value.inputs) return
@@ -72,8 +85,13 @@ watch(
   }
 )
 
-// Set default values for the group parameters.
+/**
+ * Set default values for the group parameters.
+ */
 function setParameterDefaults() {
+  /**
+   * Whether the form options have already been set.
+   */
   function formSet() {
     return form.value.values || form.value.options || form.value.lists
   }
@@ -82,10 +100,10 @@ function setParameterDefaults() {
   // console.log('setting parameter', props.name, props.options, form.value.main)
   let choices
   // console.log(option)
-  // Only set defaults if the form hasn't been set (when copying)
   /* if (formSet()) {
     console.log('BINGO')
   } */
+  // Only set defaults if the form hasn't been set (when copying)
   if (option.params && !formSet()) {
     // console.log('option', props.name, option.name, 'params', option.params)
     if (option.params.values && option.params.values.length > 0) {
@@ -112,7 +130,9 @@ function setParameterDefaults() {
   }
 }
 
-// Check whether the option has values/options params (not dynamic params)
+/**
+ * Check whether the option has parameters
+ */
 function hasParams() {
   const option = form.value.main
   // console.log('hasParams option at', index, ':', option)

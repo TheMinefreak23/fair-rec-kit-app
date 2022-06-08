@@ -32,7 +32,7 @@ function getCalculation() {
   if (store.currentExperiment.status != status.notAvailable) {
     // console.log('fetching result')
     try {
-      fetch(API_URL + '/experiment/calculation')
+      fetch(API_URL + '/experiment/')
         .then((response) => response.json())
         .then((data) => {
           console.log('polling experiment, status:', data.status)

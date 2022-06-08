@@ -1,0 +1,17 @@
+data:
+- dataset: LFM-2B
+  matrix: user-track-count
+  splitting:
+    name: random
+    params:
+      seed: null
+    test_ratio: 0.2
+models:
+  LensKit:
+  - name: Random
+    params:
+      seed: null
+name: 1654518468_Test938_pef
+rated_items_filter: false
+top_K: 6
+type: recommendation

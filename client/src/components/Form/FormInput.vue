@@ -56,6 +56,7 @@ const form = computed({
         number
         :placeholder="'Enter ' + underscoreToSpace(value.name)"
         validated="true"
+        data-testid="input"
       />
       <!--Use a range slider if it's a train/test split option-->
       <SplitRange

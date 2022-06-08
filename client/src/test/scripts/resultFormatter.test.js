@@ -1,7 +1,8 @@
-/*This program has been developed by students from the bachelor Computer Science at
+/* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
-© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+© Copyright Utrecht University (Department of Information and Computing Sciences) */
 
+import { describe, test, expect } from 'vitest'
 import {
   formatResults,
   formatMultipleItems,
@@ -10,8 +11,7 @@ import {
   formatMetric,
   formatEvaluation,
   makeHeader,
-  capitalise
-} from '../helpers/resultFormatter'
+} from '../../helpers/resultFormatter'
 
 /**
  * Test the formatting of all results
@@ -52,7 +52,7 @@ describe('format multiple items', () => {
 describe('format result', () => {
   // TODO
   //test('', () => {})
-})*/
+}) */
 
 /**
  * Test the short string description of a dataset
@@ -77,8 +77,8 @@ describe('show dataset info', () => {
  * Test evaluation data formatting
  */
 describe('format evaluation', () => {
-  //TODO
-  //test('', () => {})
+  // TODO
+  // test('', () => {})
 })
 
 /**
@@ -89,12 +89,9 @@ describe('format metric', () => {
   test('k metric', () => {
     const metric = {
       name: 'P@K',
-      params: [
-        {
-          name: 'K',
-          value: '10',
-        },
-      ],
+      params: {
+        K: '10',
+      },
     }
     expect(formatMetric(metric)).toBe('P@10')
   })
@@ -104,7 +101,7 @@ describe('format metric', () => {
   })
   // If an empty name is assigned, an empty name is returned
   test('no name', () => {
-    expect(formatMetric({ name: '' }).length.toBe(0))
+    expect(formatMetric({ name: '' })).length.toBe('')
   })
 })
 
@@ -122,28 +119,5 @@ describe('configure header', () => {
   test('starts with number', () => {
     const header = '2_isanumber'
     expect(makeHeader(header).name).toBe('2 isanumber')
-  })
-})
-
-/**
- * Test the capitalise function
- */
- describe('capitalise', () => {
-  test('several words', () => {
-    const string = 'a random set of words'
-    expect(capitalise(string).toBe("A Random Set Of Words"))
-  
-  })
-  test('abbreviations', () => {
-    const string = "da"
-    expect(capitalise(string).toBe("DA"))
-  })
-  test('contains numbers', () => {
-    const string = "123"
-    expect(capitalise(string).toBe("123"))
-  })
-  test('only spaces', () => {
-    const string = "       "
-    expect((capitalise(string).length == string.length).toBe(true))
   })
 })

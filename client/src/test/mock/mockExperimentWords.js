@@ -33,10 +33,7 @@ async function sendMockData() {
     body: JSON.stringify({ metadata: metadata, settings: form }),
   }
   console.log(form)
-  const response = await fetch(
-    API_URL + '/experiment/calculation',
-    requestOptions
-  )
+  const response = await fetch(API_URL + '/experiment/', requestOptions)
 
   // Update queue
   const data = response.json()

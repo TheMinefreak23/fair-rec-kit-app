@@ -1,10 +1,10 @@
-/*This program has been developed by students from the bachelor Computer Science at
+/* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
-© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+© Copyright Utrecht University (Department of Information and Computing Sciences) */
 
 import { render, fireEvent, within } from '@testing-library/vue'
 import { expect, test } from 'vitest'
-import FormGroupList from '../components/FormGroupList.vue'
+import FormGroupList from '../components/Form/FormGroupList.vue'
 import { emptyFormGroup } from '../helpers/optionsFormatter'
 
 /**
@@ -15,7 +15,7 @@ import { emptyFormGroup } from '../helpers/optionsFormatter'
 function getProps() {
   const form = emptyFormGroup(true)
   return {
-    data: form,
+    modelValue: form,
     name: 'foo',
     title: 'foos',
     options: [],

@@ -18,7 +18,10 @@ onMounted(async () => {
   getSpotifyTrack()
 })
 
-// Get Spotify track info from track and artist query
+/**
+ * Get Spotify track info from track and artist query
+
+ */
 async function getSpotifyTrack() {
   tracks.value = await getSpotifyInfo(
     token.value,

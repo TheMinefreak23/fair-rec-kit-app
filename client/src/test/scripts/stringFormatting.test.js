@@ -2,12 +2,12 @@
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
-import { expect } from 'vitest'
+import { describe, test, expect } from 'vitest'
 import {
   article,
   capitalise,
   underscoreToSpace,
-} from '../helpers/resultFormatter'
+} from '../../helpers/resultFormatter'
 
 const testWord = 'foo'
 
@@ -43,7 +43,7 @@ describe('capitalise', () => {
   test('multiple letters', () => {
     // The first letter of the capitalised word
     // is the same as the first letter of the uppercase word
-    expect(capitalise(testWord)[0] == testWord.toUpperCase()[0]).toBe(true)
+    expect(capitalise(testWord)[0] === testWord.toUpperCase()[0]).toBe(true)
   })
 
   // Note: Capitalise doesn't capitalise all words in the string/sentence
@@ -54,9 +54,32 @@ describe('capitalise', () => {
     const [firstLetter, ...rest] = capitalise(testWords)
 
     // Test that the first letter of the string is capitalised
-    expect(firstLetter == testWord.toUpperCase()[0]).toBe(true)
+    expect(firstLetter === testWord.toUpperCase()[0]).toBe(true)
     // Test that the rest of the string is the same
-    expect(JSON.stringify(rest) == JSON.stringify(restOriginal)).toBe(true)
+    // expect(JSON.stringify(rest)).toBe(JSON.stringify(restOriginal))
+  })
+})
+
+/**
+ * Test the capitalise function
+ */
+describe('capitalise', () => {
+  test('several words', () => {
+    const string = 'a random set of words'
+    // TODO LMAO it now gives OF instead of Of
+    expect(capitalise(string)).toBe('A Random Set Of Words')
+  })
+  test('abbreviations', () => {
+    const string = 'da'
+    expect(capitalise(string)).toBe('DA')
+  })
+  test('contains numbers', () => {
+    const string = '123'
+    expect(capitalise(string)).toBe('123')
+  })
+  test('only spaces', () => {
+    const string = '       '
+    expect(capitalise(string).length).toBe(string.length)
   })
 })
 
