@@ -63,7 +63,7 @@ def result_by_id():
 
     else:  # GET request
         print('current result', json.dumps(result_loader.current_result, indent=4))
-        response = {'result': result_loader.current_result}
+        response = {'result': result_storage.current_result}
 
     return response
 
