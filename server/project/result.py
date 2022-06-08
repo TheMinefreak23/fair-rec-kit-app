@@ -17,7 +17,7 @@ result_bp = Blueprint('result', __name__, url_prefix='/api/result')
 
 
 def filter_results(dataframe, filters):
-    """Filter a dataframe with results using specified filters
+    """Filter a dataframe with results using specified filters.
 
     Args:
         dataframe: a dataframe containing results that need to be filtered
@@ -35,7 +35,7 @@ def filter_results(dataframe, filters):
 # Set current shown recommendations
 @result_bp.route('/set-recs', methods=['POST'])
 def set_recs():
-    """Set the recommendations for the current shown result
+    """Set the recommendations for the current shown result.
     
     Returns:
         (JSON) A status message and the possible filters for this dataset
@@ -57,7 +57,7 @@ def set_recs():
 
 @result_bp.route('/result-by-id', methods=['POST', 'GET'])
 def result_by_id():
-    """Retrieve a requested result by its ID
+    """Retrieve a requested result by its ID.
     
     Returns:
         (JSON) The result that belongs to the requested ID
@@ -81,7 +81,7 @@ def result_by_id():
 # get recommender results per user
 @result_bp.route('/', methods=['POST'])
 def user_result():
-    """"Get recommender results per user for the shown result
+    """"Get recommender results per user for the shown result.
 
     Returns:
         (JSON) user item data
@@ -141,7 +141,7 @@ def user_result():
 
 
 def add_dataset_columns(dataset_name, dataframe, columns, matrix_name):
-    """Add columns to the requested result based on its dataset
+    """Add columns to the requested result based on its dataset.
 
     Args:
         dataset_name: the name of dataset belonging to the dataframe
@@ -165,7 +165,7 @@ def add_dataset_columns(dataset_name, dataframe, columns, matrix_name):
 
 @result_bp.route('/headers', methods=['POST'])
 def headers():
-    """Load the optional headers for the requested dataset
+    """Load the optional headers for the requested dataset.
     
     Returns:
        (JSON) A list of the available headers for this dataset
@@ -182,7 +182,7 @@ def headers():
 
 
 def add_spotify_columns(dataset_name, dataframe):
-    """Add columns from the Spotify integration to the dataframe
+    """Add columns from the Spotify integration to the dataframe.
 
     Args:
         dataset_name: the name of dataset belonging to the dataframe
@@ -202,7 +202,7 @@ def add_spotify_columns(dataset_name, dataframe):
 
 @result_bp.route('/export', methods=['POST'])
 def export():
-    """Give the user the option to export the current shown results to a .tsv file
+    """Give the user the option to export the current shown results to a .tsv file.
 
     Returns:
         A message indicating if the export was succesful
@@ -239,7 +239,7 @@ def export():
 @result_bp.route('/validate', methods=['POST'])
 
 def validate():
-    """Give the server the task of running a requested experiment again  
+    """Give the server the task of running a requested experiment again.
 
     Returns:
         A message indicating the operation was succesful

@@ -15,7 +15,7 @@ url_prefix = '/api/result'
 @patch('project.result_storage.RESULTS_OVERVIEW_PATH', 'mock/results_overview.json')
 @patch("project.result_storage.RESULTS_ROOT_FOLDER", 'mock/')
 def test_setrecs(client):
-    """Test if the server-side loading of user recommendations is functional
+    """Test if the server-side loading of user recommendations is functional.
     
     Args:
         client: The client component used to send requests to the server
@@ -29,7 +29,7 @@ def test_setrecs(client):
     assert current_recs[0]
 
 def test_result_by_id(client):
-    """Test if the server-side retrieval of a result by its ID is functional
+    """Test if the server-side retrieval of a result by its ID is functional.
     
     Args:
         client: The client component used to send requests to the server
@@ -45,7 +45,7 @@ def test_result_by_id(client):
     assert json.loads(response2.data)
 
 def test_getrecs(client):
-    """Test if the server-side retrieval of user recommendations is functional
+    """Test if the server-side retrieval of user recommendations is functional.
     
     Args:
         client: The client component used to send requests to the server
@@ -89,7 +89,7 @@ def test_getrecs(client):
     assert len(result[0]) < len(result3[0])
 
 def test_headers(client):
-    """Test if the server-side header retrieval component is functional
+    """Test if the server-side header retrieval component is functional.
     
     Args:
         client: The client component used to send requests to the server
@@ -106,7 +106,7 @@ def test_headers(client):
 
 @patch("project.experiment.recommender_system", RecommenderSystem('datasets', 'mock/'))
 def test_validate(client):
-    """Test if the server-side validation component is functional
+    """Test if the server-side validation component is functional.
 
     Args:
         client: The client component used to send requests to the server

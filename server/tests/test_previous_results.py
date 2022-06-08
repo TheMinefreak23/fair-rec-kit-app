@@ -13,7 +13,7 @@ url_prefix = '/api/all-results'
 # Test getting the results overview GET route
 @patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 def test_results(client):
-    """Test if the server-side result loading component is functional
+    """Test if the server-side result loading component is functional.
     
     Args:
         client: The client component used to send requests to the server
@@ -29,7 +29,7 @@ def test_results(client):
 # Test editing a result POST route
 @patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 def test_edit(client):
-    """Test if the server-side result editing component is functional
+    """Test if the server-side result editing component is functional.
     
     Args:
         client: The client component used to send requests to the server
@@ -55,7 +55,7 @@ def test_edit(client):
 
 @patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 def test_delete(client):
-    """Test if the server-side result deletion component is functional
+    """Test if the server-side result deletion component is functional.
     
     Args:
         client: The client component used to send requests to the server

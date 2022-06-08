@@ -12,7 +12,7 @@ results_bp = Blueprint('results', __name__, url_prefix='/api/all-results')
 
 @results_bp.route('/', methods=['GET'])
 def results():
-    """Load in the results overview
+    """Load in the results overview.
 
     Returns:
         The requested results overview
@@ -22,7 +22,7 @@ def results():
 
 @results_bp.route('/edit', methods=['POST'])
 def edit():
-    """Change the metadata of a selected experiment
+    """Change the metadata of a selected experiment.
 
     Returns:
         A message indicating the operation was succesful
@@ -38,7 +38,7 @@ def edit():
 
 @results_bp.route('/delete', methods=['POST'])
 def delete():
-    """Delete a selected result from the results
+    """Delete a selected result from the results.
 
     Returns:
         A message indicating the operation was succesful
