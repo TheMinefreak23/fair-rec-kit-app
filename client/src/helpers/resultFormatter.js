@@ -157,7 +157,9 @@ export function formatEvaluation(e, index, result, runID) {
   // TODO refactor and/or give option to set decimal precision in UI
   // TODO support several runs
   // Add index for unique metric key
-  result[formatMetric(e) + '_' + index] = e.evaluations[runID].global.toFixed(2)
+  result[formatMetric(e) + '_' + index] = parseFloat(
+    e.evaluations[runID].global
+  ).toFixed(2)
 
   // Flatten filters
   // console.log(e.evaluation, e.evaluation.filtered)
