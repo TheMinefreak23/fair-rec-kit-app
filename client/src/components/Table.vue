@@ -148,6 +148,11 @@ function setsorting(i) {
 }
 // console.log('propsfilteroptions', props.filterOptions)
 
+/**
+ * Checks whether a given string is a key.
+ * @param {String}	key	- the string that needs to be checked
+ * @return	{Bool} boolean stating whether the string is a key.
+ */
 function isItemKey(key) {
   const lowerKey = key.toLowerCase()
   const itemKeys = ['item']
@@ -228,7 +233,7 @@ const filteredHeaders = () => {
               :headerOptions="headerOptions"
               @updateHeaders="(e) => emit('updateHeaders', e)"
             />
-            <b-button @click="filtersModalShow = !filterModalShow" class="m-1">
+            <b-button @click="filtersModalShow = !filterModalShow" class="m-1" data-testid="filterButton">
               Filters
             </b-button>
           </div>

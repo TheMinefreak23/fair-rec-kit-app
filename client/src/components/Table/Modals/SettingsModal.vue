@@ -79,12 +79,12 @@ function cleanSettings() {
     <p>Do you want to use these settings for a new experiment?</p>
   </b-modal>
 
-  <!--Click on the copy settings button to show the modal.-->
   <b-button
     variant="outline-primary fw-bold"
-    @click="loadSettings(resultId)"
     v-b-tooltip.hover
     title="Copy result settings to new experiment"
+    data-testid="copy-settings"
+    @click="loadSettings(resultId)"
   >
     Copy settings
   </b-button>
