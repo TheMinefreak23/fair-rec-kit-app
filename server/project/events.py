@@ -69,35 +69,36 @@ class EventHandler():
             ON_BEGIN_TRAIN_MODEL: self.on_train,
         }
 
-    def on_parse(self, event_listener, **kwargs):
-        # print('epic')
+    def on_parse(self, event_listener, event_args, **kwargs):
+        print('epic')
         self.experiment.progress = ProgressStatus.PARSING
 
-    def on_data(self, event_listener, **kwargs):
-        # print('super')
+    def on_data(self, event_listener, event_args, **kwargs):
+        print('super')
         self.experiment.progress = ProgressStatus.PROCESSING_DATA
 
-    def on_filter(self, event_listener, **kwargs):
-        # print('dangan')
+    def on_filter(self, event_listener, event_args, **kwargs):
+        print('dangan')
         self.experiment.progress = ProgressStatus.FILTERING_DATA
 
-    def on_split(self, event_listener, **kwargs):
-        # print('ronpa')
+    def on_split(self, event_listener, event_args, **kwargs):
+        print('ronpa')
         self.experiment.progress = ProgressStatus.SPLITTING_DATA
 
-    def on_model(self, event_listener, **kwargs):
-        # print('2')
+    def on_model(self, event_listener, event_args, **kwargs):
+        print('2')
         self.experiment.progress = ProgressStatus.MODEL
 
-    def on_load(self, event_listener, **kwargs):
-        # print('2')
+    def on_load(self, event_listener, event_args, **kwargs):
+        print('load')
         self.experiment.progress = ProgressStatus.MODEL_LOAD
 
-    def on_train(self, event_listener, **kwargs):
-        # print('2')
+    def on_train(self, event_listener, event_args, **kwargs):
+        print('train')
         self.experiment.progress = ProgressStatus.TRAINING
 
-    def on_begin_experiment(self, event_listener, **kwargs):
+    def on_begin_experiment(self, event_listener, event_args, **kwargs):
+        print('the amogus')
         # Update experiment status
         self.experiment.status = Status.ACTIVE
         self.experiment.progress = ProgressStatus.STARTED
@@ -106,11 +107,10 @@ class EventHandler():
         # Add run
         #self.experiment.job['runs'] = 1 if 'runs' not in self.experiment.job else self.experiment.job['runs'] + 1
 
-    def on_end_experiment_thread(self, event_listener, **kwargs):
+    def on_end_experiment_thread(self, event_listener, event_args, **kwargs):
         # Update status
         if self.experiment.status is not Status.ABORTED:
             #print('==END EXPERIMENT', self.experiment)
-
 
             if not self.experiment.validating:
                 # TODO Update experiment data: Save elapsed time

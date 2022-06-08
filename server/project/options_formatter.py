@@ -4,8 +4,8 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 import json
-from fairreckitlib.core.apis import ELLIOT_API
-from fairreckitlib.core.config_constants import TYPE_PREDICTION, TYPE_RECOMMENDATION
+# from fairreckitlib.core.core_constants import ELLIOT_API
+from fairreckitlib.core.core_constants import TYPE_PREDICTION, TYPE_RECOMMENDATION
 
 model_API_dict = {}
 
@@ -68,20 +68,20 @@ def create_available_options(recommender_system):
     Returns:
         (dict) the formatted options
     """
-
+    
     datasets = recommender_system.get_available_datasets()
-    #print(json.dumps(datasets, indent=4))
     global dataset_matrices
     dataset_matrices = {dataset: list(matrices.keys()) for (dataset, matrices) in datasets.items()}
-    print(dataset_matrices)
+    # print(dataset_matrices)
     predictors = recommender_system.get_available_algorithms(TYPE_PREDICTION)
     recommenders = recommender_system.get_available_algorithms(TYPE_RECOMMENDATION)
     # TODO different metrics for diff types
     pred_metrics = recommender_system.get_available_metrics(TYPE_PREDICTION)
     rec_metrics = recommender_system.get_available_metrics(TYPE_RECOMMENDATION)
+    # print(json.dumps(pred_metrics, indent=4))
     converters = recommender_system.get_available_rating_converters()
     # print('recommenders', recommenders)
-    # print('rating converters', converters)
+    print('rating converters', converters)
     splits = recommender_system.get_available_splitters()
     # print('splits', splits)
 
@@ -90,7 +90,9 @@ def create_available_options(recommender_system):
 
     # Format categorised settings (most settings are categorised once)
     # TODO refactor
+    # print('before format categ.', json.dumps(list(datasets.items())[0], indent=4))
     datasets = format_categorised(datasets)
+    # print('after format categ.', json.dumps(datasets[0], indent=4))
     recommenders = format_categorised(recommenders)
     predictors = format_categorised(predictors)
     pred_metrics = format_categorised(pred_metrics)
@@ -98,26 +100,21 @@ def create_available_options(recommender_system):
 
     # Add dynamic (nested settings) settings
     formatted_filters = reformat(filters, False)
-    formatted_converters = reformat(converters, False)
+    #formatted_converters = reformat(converters, False)
     formatted_splits = reformat(splits, False)
-    print(formatted_splits)
+    # print(formatted_splits)
 
     # MOCK: for now use all filters/metrics per dataset
     filter_option = {'name': 'filter',
                      'title': 'filters',
-                     'article': 'a',
+                     #'article': 'a',
                      'options': formatted_filters}
-    converter_option = {'name': 'rating converter',
-                        'single': True,
-                        'title': 'conversion',
-                        'article': 'a',
-                        'options': formatted_converters}
     # split_types = ['Random'] + (['Time'] if params['timestamp'] else [])
     split_type_option = {'name': 'type of split',
                          'single': True,
                          'required': True,
                          'title': 'splitting',
-                         'article': 'a',
+                         #'article': 'a',
                          'default': formatted_splits[0],
                          'options': formatted_splits}
 
@@ -126,7 +123,27 @@ def create_available_options(recommender_system):
         dataset['params'] = dataset['options']
         del dataset['options']
         dataset['params']['values'] = [DEFAULT_SPLIT]
-        dataset['params']['dynamic'] = [filter_option, converter_option, split_type_option]
+        # print('dataset', dataset)
+        # TODO refactor
+        matrices = []
+        for matrix_name in dataset_matrices[dataset['name']]:
+            dataset_matrix_converters = converters[dataset['name']][matrix_name]
+            converter_option = {'name': 'rating converter',
+                                'single': True,
+                                'title': 'conversion',
+                                # 'article': 'a',
+                                'options': reformat(dataset_matrix_converters, False)}
+            matrices.append({'name': matrix_name, 'params': {'dynamic': [converter_option] }})
+        matrix_option = {
+            'name': 'matrix',
+            'single': True,
+            'required': True,
+            'title': 'matrix',
+            #'article': 'a',
+            'options': reformat(matrices, False),
+        }
+        #converter_option
+        dataset['params']['dynamic'] = [matrix_option, filter_option,  split_type_option]
         # print(dataset['params']['options'])
 
     for metric in rec_metrics + pred_metrics:
@@ -222,7 +239,7 @@ def config_dict_from_settings(experiment):
     """
     settings = experiment['settings']
 
-    #print('raw experiment settings:', json.dumps(settings, indent=4))
+    print('experiment settings from client:', json.dumps(settings, indent=4))
 
     name = experiment['metadata']['name']
     experiment_id = experiment['timestamp']['stamp'] + '_' + name
@@ -236,13 +253,16 @@ def config_dict_from_settings(experiment):
         # print(dataset)
         # TODO refactor
         dataset['dataset'] = dataset['name']
+        matrix = dataset['matrix'][0]
+        dataset['matrix'] = matrix['name']
+         # TODO refactor = dataset['name'] = reformat_list(dataset['matrix'])
         # TODO for now pick item matrix if available, else first matrix
         #print(dataset_matrices)
         #print(dataset['dataset'])
-        available_matrices = dataset_matrices[dataset['dataset']]
-        dataset['matrix'] = 'user-track-count' if 'user-track-count' in available_matrices else available_matrices[0]
-        if 'conversion' in dataset and dataset['conversion'] != []:
-            dataset['rating_converter'] = dataset['conversion'][0]
+        # available_matrices = dataset_matrices[dataset['dataset']]
+        # dataset['matrix'] = 'user-track-count' if 'user-track-count' in available_matrices else available_matrices[0]
+        if 'conversion' in matrix and matrix['conversion'] != []:
+            dataset['rating_converter'] = matrix['conversion'][0]
         dataset['splitting'] = dataset['splitting'][0]
         # TODO rename split param
         dataset['splitting']['test_ratio'] = (100 - int(dataset['params']['Train/testsplit'])) / 100
