@@ -55,7 +55,7 @@ function cleanSettings() {
 </script>
 
 <template>
-  <!--Shows when the user wants to make settings from a result-->
+  <!--Show when the user wants to make settings from a result.-->
   <b-modal
     scrollable
     size="lg"
@@ -69,6 +69,7 @@ function cleanSettings() {
     cancel-title="No"
     @ok="setSettings"
   >
+    <!--Display the result settings in a readable way.-->
     <b-container v-if="settings">
       <h2>Settings for {{ settings.metadata.name }}:</h2>
       <b-row>
@@ -78,6 +79,7 @@ function cleanSettings() {
     <p>Do you want to use these settings for a new experiment?</p>
   </b-modal>
 
+  <!--Click on the copy settings button to show the modal.-->
   <b-button
     variant="outline-primary fw-bold"
     @click="loadSettings(resultId)"
