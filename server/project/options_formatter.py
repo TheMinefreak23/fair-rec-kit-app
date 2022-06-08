@@ -72,7 +72,7 @@ def create_available_options(recommender_system):
     datasets = recommender_system.get_available_datasets()
     global dataset_matrices
     dataset_matrices = {dataset: list(matrices.keys()) for (dataset, matrices) in datasets.items()}
-    print(dataset_matrices)
+    # print(dataset_matrices)
     predictors = recommender_system.get_available_algorithms(TYPE_PREDICTION)
     recommenders = recommender_system.get_available_algorithms(TYPE_RECOMMENDATION)
     # TODO different metrics for diff types
@@ -239,7 +239,7 @@ def config_dict_from_settings(experiment):
     """
     settings = experiment['settings']
 
-    #print('raw experiment settings:', json.dumps(settings, indent=4))
+    print('experiment settings from client:', json.dumps(settings, indent=4))
 
     name = experiment['metadata']['name']
     experiment_id = experiment['timestamp']['stamp'] + '_' + name
@@ -250,7 +250,7 @@ def config_dict_from_settings(experiment):
     # Format datasets
     # Add generic split to all dataset
     for dataset in settings['datasets']:
-        print(dataset)
+        # print(dataset)
         # TODO refactor
         dataset['dataset'] = dataset['name']
         matrix = dataset['matrix'][0]
