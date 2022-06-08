@@ -1,5 +1,5 @@
 ﻿Cython>=0.29.28
-fairreckitlib==0.4.1
+fairreckitlib==0.5.0
 Flask>=2.1.2
 Flask-Cors>=3.0.10
 Flask-Mail>=0.9.1
@@ -9,3 +9,5 @@ polling>=0.3.2
 pytest>=7.1.2
 PyYAML>=6.0
 requests>=2.27.1
+sewar>=0.4.5
+imageio>=2.19.3
