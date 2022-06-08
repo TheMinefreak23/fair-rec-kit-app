@@ -68,7 +68,11 @@ export function statusVariant(rawStatus) {
   }
 }
 
-// Format a result for the result tab
+/**
+ * Format a result for the result tab
+ * @param {Object} result - The unformatted result
+ * @return {Object} The formatted result
+ */
 export function formatResult(result) {
   console.log('before format', JSON.parse(JSON.stringify(result)))
   const formattedResult = {
@@ -108,22 +112,11 @@ export function formatResult(result) {
   return formattedResult
 }
 
-/*
-// Omit the recommendation key from the result metric table
-function omitRecommendation(arr) {
-  return arr.map(
-    // Omit recommendation
-    (r) => ({
-      ...r,
-      recs: r.recs.map((rec) => {
-        const { recommendation, ...rest } = rec
-        return rest
-      }),
-    })
-  )
-} */
-
-// Short result description, e.g. for a result tab
+/**
+ * Short result description, e.g. for a result tab
+ * @param {Object} result - The result
+ * @return {String} - The short description
+ */
 export function shortResultDescription(result) {
   //console.log(result)
   const datasets = []

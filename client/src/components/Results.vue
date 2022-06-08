@@ -14,22 +14,17 @@ const emit = defineEmits(['toast'])
 const showResultModal = ref(false)
 const currentTab = ref(0)
 
+/**
+ * Show a toast and set the status when the experiment is finished
+ */
 watch(
   () => store.currentExperiment.status,
   // New result added
   (newStatus, oldStatus) => {
-    if (newStatus == status.done || newStatus == status.aborted) {
+    if (newStatus === status.done || newStatus === status.aborted) {
       emit('toast')
       store.currentExperiment.status = status.notAvailable
     }
-  }
-)
-
-watch(
-  () => store.currentResultTab,
-  // New result added
-  (newTab) => {
-    currentTab.value = newTab
   }
 )
 
@@ -101,7 +96,7 @@ function closeResult(index) {
         </div>
         <div class="border">
           <template v-if="store.currentResults.length > 0">
-            <b-tabs v-model="currentTab" card content-class="mt-3">
+            <b-tabs v-model="store.currentResultTab" card content-class="mt-3">
               <!-- Show opened results in tabs.-->
               <b-tab v-for="(result, index) in store.currentResults">
                 <template #title
