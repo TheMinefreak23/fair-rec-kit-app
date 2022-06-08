@@ -56,6 +56,7 @@ const form = computed({
         number
         :placeholder="'Enter ' + underscoreToSpace(value.name)"
         validated="true"
+        data-testid="input"
       />
       <!--Use a range slider if it's a train/test split option-->
       <SplitRange
@@ -75,8 +76,8 @@ const form = computed({
         :step="1"
         :ruler="false"
         :label="true"
-        :minValue="value.minValue"
-        :maxValue="value.maxValue"
+        :minValue="value[0]"
+        :maxValue="value[1]"
         @input="form.value = [$event.minValue, $event.maxValue]"
       />
       <!--Display the seed label for the seed option.-->

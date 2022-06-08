@@ -1,6 +1,6 @@
-/*This program has been developed by students from the bachelor Computer Science at
+/* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
-© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+© Copyright Utrecht University (Department of Information and Computing Sciences) */
 
 import { render, fireEvent, within } from '@testing-library/vue'
 import { expect, test } from 'vitest'
@@ -11,7 +11,7 @@ function getProps(options) {
     data: {},
     name: 'foo',
     title: 'foos',
-    options: options,
+    options,
     required: 'true',
   }
 }
@@ -22,7 +22,7 @@ const params = {
 }
 
 const options = [
-  { name: 'foo', value: { name: 'foo', params: params } },
+  { name: 'foo', value: { name: 'foo', params } },
   { name: 'hi', value: { name: 'hivalue' } },
   { name: 'foo3', value: { name: 'bar3' } },
 ]
@@ -82,9 +82,9 @@ test('select main option', async () => {
     // Check if the slider is there and the standard value
     //const slider = getByTestId('split-input')
     expect(slider.value).toBe('20')
-  })*/
+  }) */
 
-/*test('copy', async () => {
+/* test('copy', async () => {
     // Render FormGroupList
     const count = 1 // Start with one option
     form.groupCount = count
@@ -104,4 +104,4 @@ test('select main option', async () => {
     const dropdowns = getAllByTestId('main-select')
     // There should be two empty options now
     expect(dropdowns.length).toBe(count + 1)
-  })*/
+  }) */

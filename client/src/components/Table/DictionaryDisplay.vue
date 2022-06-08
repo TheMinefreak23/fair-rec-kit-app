@@ -1,13 +1,17 @@
 <script setup>
-/*This program has been developed by students from the bachelor Computer Science at
+/* Display a dictionary in a human-readable way */
+/* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
-© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+© Copyright Utrecht University (Department of Information and Computing Sciences) */
 
 const props = defineProps({
-  dict: Object,
-  alternateBg: Boolean,
+  dict: Object, // The dictionary to display
+  alternateBg: Boolean, // TODO use Whether to alternate the background
 })
 
+/**
+ * Format the dictionary
+ */
 function format() {
   const formatted = props.dict
   if ('name' in props.dict) {
@@ -25,6 +29,7 @@ function format() {
     cols="2"
     v-for="[key, value] in Object.entries(format(dict))"
   >
+    <!-- Don't show empty option lists -->
     <b-card
       v-if="!Array.isArray(value) || value.length > 0"
       header-bg-variant="dark"
@@ -33,12 +38,14 @@ function format() {
       class="text-center pt-1 mt-1"
     >
       <b-col>
+        <!-- Loop if the value is an array -->
         <template v-if="value && Array.isArray(value)">
           <DictionaryDisplay
             v-for="val in value"
             :dict="val"
             :alternateBg="!alternateBg"
         /></template>
+        <!-- Display the value using a display if it's an object -->
         <template v-else>
           <DictionaryDisplay
             v-if="value && typeof value == 'object'"
