@@ -15,6 +15,11 @@ url_prefix = '/api/result'
 @patch('project.result_storage.RESULTS_OVERVIEW_PATH', 'mock/results_overview.json')
 @patch("project.result_storage.RESULTS_ROOT_FOLDER", 'mock/')
 def test_setrecs(client):
+    """Test if the server-side loading of user recommendations is functional
+    
+    Args:
+        client: The client component used to send requests to the server
+    """
     url = url_prefix + '/set-recs'
     settings = {'id' : 0, 'runid' : 0, 'pairid' : 0}
     response = client.post(url, json=settings)
@@ -24,6 +29,11 @@ def test_setrecs(client):
     assert current_recs[0]
 
 def test_result_by_id(client):
+    """Test if the server-side retrieval of a result by its ID is functional
+    
+    Args:
+        client: The client component used to send requests to the server
+    """
     url = url_prefix + '/result-by-id'
     #Check the post response
     settings = {'id' : 0}
@@ -35,6 +45,11 @@ def test_result_by_id(client):
     assert json.loads(response2.data)
 
 def test_getrecs(client):
+    """Test if the server-side retrieval of user recommendations is functional
+    
+    Args:
+        client: The client component used to send requests to the server
+    """
     url = url_prefix + '/'
     amount = 10
     settings = {
@@ -74,6 +89,11 @@ def test_getrecs(client):
     assert len(result[0]) < len(result3[0])
 
 def test_headers(client):
+    """Test if the server-side header retrieval component is functional
+    
+    Args:
+        client: The client component used to send requests to the server
+    """
     url = url_prefix + '/headers'
     response = client.post(url, json={'name' : 'foo'})
     result1 = json.loads(response.data)
@@ -86,6 +106,11 @@ def test_headers(client):
 
 @patch("project.experiment.recommender_system", RecommenderSystem('datasets', 'mock/'))
 def test_validate(client):
+    """Test if the server-side validation component is functional
+
+    Args:
+        client: The client component used to send requests to the server
+    """
     url = url_prefix + '/validate'
     response = client.post(url, json={'filepath' : '0_Foobar', 'amount' : 0})
     assert b'Validated' == response.data

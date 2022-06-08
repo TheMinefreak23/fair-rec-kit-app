@@ -4,7 +4,7 @@
 from unittest.mock import patch
 
 from project.result_storage import *
-from tests.test_result_storage import test_experiment, test_id, save_mock_result, delete_test_results, \
+from tests.test_result_storage import save_mock_result, delete_test_results, \
     test_results_path
 
 url_prefix = '/api/all-results'
@@ -13,6 +13,11 @@ url_prefix = '/api/all-results'
 # Test getting the results overview GET route
 @patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 def test_results(client):
+    """Test if the server-side result loading component is functional
+    
+    Args:
+        client: The client component used to send requests to the server
+    """
     save_mock_result()
     url = url_prefix + '/'
     response = client.get(url)
@@ -24,6 +29,11 @@ def test_results(client):
 # Test editing a result POST route
 @patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 def test_edit(client):
+    """Test if the server-side result editing component is functional
+    
+    Args:
+        client: The client component used to send requests to the server
+    """
     save_mock_result()
     index = -1
     # New metadata (that we expect)
@@ -45,6 +55,11 @@ def test_edit(client):
 
 @patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 def test_delete(client):
+    """Test if the server-side result deletion component is functional
+    
+    Args:
+        client: The client component used to send requests to the server
+    """
     initial_results = load_results_overview()
     save_mock_result()
     index = 0
