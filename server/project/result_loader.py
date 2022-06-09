@@ -15,10 +15,9 @@ Utrecht University within the Software Project course.
 import os
 import json
 import pandas as pd
-from .result_storage import RESULTS_ROOT_FOLDER, load_results_overview, load_json, current_result
-from . import result_storage 
+from .result_storage import RESULTS_ROOT_FOLDER, load_results_overview, load_json
+from . import result_storage
 
-RESULTS_PATH = RESULTS_ROOT_FOLDER
 
 def result_by_id(result_id):
     """Set the current result to a result in the results overview by its id.
@@ -26,10 +25,8 @@ def result_by_id(result_id):
     Args:
     result_id(int): the result id
     """
-    # TODO DEV
     results_overview = load_results_overview()
-    results_path = result_storage.RESULTS_ROOT_FOLDER
-    relative_path = results_path + str(result_id) + "_" + \
+    relative_path = RESULTS_ROOT_FOLDER + str(result_id) + "_" + \
                     id_to_name(results_overview, result_id)
     data = results_overview['all_results'][id_to_index(results_overview, result_id)]
     data['metadata']['runs'] = 0 # Store runs
@@ -92,7 +89,7 @@ def get_overview(evaluation_id, runid):
 
     name = id_to_name(results_overview, evaluation_id)
 
-    relative_path = RESULTS_PATH + str(evaluation_id) + \
+    relative_path = RESULTS_ROOT_FOLDER + str(evaluation_id) + \
                     "_" + name + "/" + "run_" + str(runid)
     overview_path = relative_path + "/overview.json"
     run_overview = load_json(overview_path)
@@ -125,7 +122,11 @@ def id_to_index(json_data, result_id):
     for iteration_id, data in enumerate(json_data['all_results']):
         if int(data['timestamp']['stamp']) == int(result_id):
             current_result_overview_id = iteration_id
-            #print('==ID TO INDEX','ID',result_id,'INDEX',iteration_id,'NAME',data['metadata']['name'])
+            #print('==ID TO INDEX',
+            # 'ID',result_id,'INDEX',
+            # iteration_id,
+            # 'NAME',
+            # data['metadata']['name'])
     return current_result_overview_id
 
 
@@ -136,7 +137,8 @@ def name_to_index(json_data, name, key, by_name=False):
     Args:
     json_data(dict): the loaded json data from results_overview
     name(str): the name of the dataset or the name of the approach
-    key(str): the object that the function should match on (either 'dataset' or 'recommender_system')
+    key(str): the object that the function
+                should match on (either 'dataset' or 'recommender_system')
     """
     current_index = -1
     for i, data in enumerate(json_data):
@@ -144,4 +146,3 @@ def name_to_index(json_data, name, key, by_name=False):
         if by_name and result_value['name'] == name or result_value == name:
             current_index = i
     return current_index
-
