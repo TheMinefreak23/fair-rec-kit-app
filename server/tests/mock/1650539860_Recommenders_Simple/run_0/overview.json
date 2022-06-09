@@ -2,9 +2,9 @@
     "overview": [
         {
             "name": "ML-100K_0_Implicit_AlternatingLeastSquares_0",
-            "evaluation_path": "results\\1650539860_Recommenders_Simple\\run_0\\ML-100K_0\\Implicit_AlternatingLeastSquares_0\\evaluations.json",
-            "ratings_path": "results\\1650539860_Recommenders_Simple\\run_0\\ML-100K_0\\Implicit_AlternatingLeastSquares_0\\ratings.tsv",
-            "ratings_settings_path": "results\\1650539860_Recommenders_Simple\\run_0\\ML-100K_0\\Implicit_AlternatingLeastSquares_0\\settings.json"
+            "evaluation_path": "results/1650539860_Recommenders_Simple/run_0/ML-100K_0/Implicit_AlternatingLeastSquares_0/evaluations.json",
+            "ratings_path": "results/1650539860_Recommenders_Simple/run_0/ML-100K_0/Implicit_AlternatingLeastSquares_0/ratings.tsv",
+            "ratings_settings_path": "results/1650539860_Recommenders_Simple/run_0/ML-100K_0/Implicit_AlternatingLeastSquares_0/settings.json"
         }
     ]
 }
