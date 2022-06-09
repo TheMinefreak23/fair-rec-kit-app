@@ -159,29 +159,6 @@ function closeNav() {
   document.getElementById("main").style.marginLeft= "0";
 }
 
-
-// ------------------------- //
-// XML Documentation attempt //
-// ------------------------- //
-
-/* 
-function displayItem(i) {
-  var xmlhttp = new XMLHttpRequest();
-  xmlhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      myFunction(this, i);
-    }
-  };
-  xmlhttp.open("GET", "documentation_items.xml", true);
-  xmlhttp.send();
-}
-
-function myFunction(xml, i) {
-  var xmlDoc = xml.responseXML;
-  x = xmlDoc.getElementsByTagName("item");
-}
-*/
-
 </script>
 
 <style>
@@ -225,7 +202,7 @@ tr:nth-child(even) {
 }
 
 .sidenav a:hover {
-  color: #f1f1f1;
+  color: #017C8E;
 }
 
 .sidenav .closebtn {
@@ -253,6 +230,7 @@ pre {
   padding: 5px;
   margin: 5px;
 }
+
 /*
 pre {
   counter-reset: line;
@@ -274,10 +252,9 @@ code:before {
   <!-- Open-close button -->
   <span class="position-fixed bg-dark text-white px-2 rounded-end" style="font-size:30px;cursor:pointer" v-on:click="openCloseNav()">&#9776;</span>
   <!-- Navigation sidebar -->
-  <div id="docSidenav" class="sidenav bg-dark">
-    <!-- Close button -->
+  <div id="docSidenav" class="sidenav bg-secondary">
     <!--<a href="javascript:void(0)" class="closebtn float-end m-0" v-on:click="closeNav()">&times;</a>-->
-    <b-link class="position-relative text-white py-0" :href='"#"+header.name' v-for="header in structure1D" :key="header">
+    <b-link class="position-relative py-0" :href='"#"+header.name' v-for="header in structure1D" :key="header">
       <!-- Indentation to indicate items and subitems -->
       <span style="-webkit-user-select: none">{{"&nbsp;&nbsp;&nbsp;".repeat(header.depth)}}</span>{{header.name}}
     </b-link>

@@ -59,4 +59,21 @@ body {
   color: var(--color-text);
 }
 
+// custom documentation sidenav scrollbar 
+#docSidenav::-webkit-scrollbar-track
+{
+	background-color: #D0D0D0;
+}
+
+#docSidenav::-webkit-scrollbar
+{
+	width: 12px;
+	background-color: #D0D0D0;
+}
+
+#docSidenav::-webkit-scrollbar-thumb
+{
+	background-color: #017C8E;
+}
+
 @import 'bootstrap/scss/bootstrap';
