@@ -64,7 +64,7 @@ def get_acousticbrainz_data():
     return json.loads(res.text)
 
 
-@detail_bp.route('/background', methods=['GET'])
+@detail_bp.route('/background', methods=['POST'])
 def get_background():
     """Generates a background from the album covers of a Spotify Playlist
 
@@ -95,7 +95,8 @@ def get_background():
     urls = [item['track']['album']['images'][1]['url'] for item in items]
     images = [Image.open(BytesIO(requests.get(url).content)) for url in urls]
     collage(images)
-    return send_file('../background.png', mimetype='image/png')
+    return 'Background saved'
+    # return send_file('../background.png', mimetype='image/png')
 
 
 def collage(images, size=10):
@@ -139,7 +140,8 @@ def first_100_album_collage():
     images = [Image.open(BytesIO(requests.get(url).content)) for url in albums]
 
     collage(images)
-    return send_file('../background.png', mimetype='image/png')
+    return 'Background saved'
+    # return send_file('../background.png', mimetype='image/png')
 
 
 def get_unique_n(query, amount, category, image):

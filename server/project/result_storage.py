@@ -97,7 +97,7 @@ def load_results_overview():
     """
     # Ensure the results overview exists.
     create_results_overview()
-    return load_json(RESULTS_ROOT_FOLDER + 'results_overview.json')
+    return load_json(RESULTS_OVERVIEW_PATH)
 
 
 def write_results_overview(results):

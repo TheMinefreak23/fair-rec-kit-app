@@ -22,7 +22,7 @@ def save_mock_result():
 # Delete all results by emptying the file
 def delete_test_results():
     open(test_results_path, 'w').close()
-
+    # TODO doesn't empty?
 
 # Test saving a result to the result overview
 def test_save_result():
@@ -54,11 +54,11 @@ def test_no_path_json():
 # Test updating of results overview
 @patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 def test_update_results():
-    print(load_results_overview())
+    # print(load_results_overview())
     old_results_length = len(load_results_overview()['all_results'])
     add_result(test_experiment)
     new_results_length = len(load_results_overview()['all_results'])
-    print(load_results_overview())
+    # print(load_results_overview())
     assert new_results_length == old_results_length+1
 
     delete_test_results()
