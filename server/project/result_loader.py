@@ -35,9 +35,9 @@ def result_by_id(result_id):
         run_overview = load_json(subdir + "/overview.json")
         # loops through individual results by looping through each entry in the overview.json
         for pair_id, pair_data in enumerate(run_overview['overview']):
-            evaluation_path_full = os.getcwd() + "\\" + \
+            evaluation_path_full = os.getcwd() + "/" + \
                                    pair_data['evaluation_path']
-            ratings_settings_path_full = os.getcwd() + "\\" + \
+            ratings_settings_path_full = os.getcwd() + "/" + \
                                          pair_data['ratings_settings_path']
 
             if os.path.exists(evaluation_path_full):
