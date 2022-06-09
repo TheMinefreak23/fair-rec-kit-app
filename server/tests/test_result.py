@@ -16,7 +16,7 @@ url_prefix = '/api/result'
 @patch('project.result_storage.RESULTS_OVERVIEW_PATH', MOCK_RESULTS_DIR + 'results_overview.json')
 @patch("project.result_storage.RESULTS_ROOT_FOLDER", MOCK_RESULTS_DIR)
 @patch('project.result_loader.RESULTS_ROOT_FOLDER', MOCK_RESULTS_DIR)
-def test_setrecs(client):
+def test_set_recs(client):
     """Test if the server-side loading of user recommendations is functional.
     
     Args:
@@ -50,7 +50,7 @@ def test_result_by_id(client):
     response2 = client.get(url)
     assert json.loads(response2.data)
 
-def test_getrecs(client):
+def test_get_recs(client):
     """Test if the server-side retrieval of user recommendations is functional.
     
     Args:
