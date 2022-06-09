@@ -5,13 +5,14 @@ from unittest.mock import patch
 
 from project.result_storage import *
 from tests.test_result_storage import save_mock_result, delete_test_results, \
-    test_results_path
+    test_results_path, test_results_root, test_id
 
 url_prefix = '/api/all-results'
 
 
 # Test getting the results overview GET route
 @patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
+@patch('project.result_storage.RESULTS_ROOT_FOLDER', test_results_root)
 def test_results(client):
     """Test if the server-side result loading component is functional.
     
@@ -28,6 +29,7 @@ def test_results(client):
 
 # Test editing a result POST route
 @patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
+@patch('project.result_storage.RESULTS_ROOT_FOLDER', test_results_root)
 def test_edit(client):
     """Test if the server-side result editing component is functional.
     
@@ -35,12 +37,11 @@ def test_edit(client):
         client: The client component used to send requests to the server
     """
     save_mock_result()
-    index = -1
     # New metadata (that we expect)
     metadata = {'name': 'bar', 'tags': 'bar', 'email': 'foo@bar.com'}
     # Use the metadata to create the edit settings
     edit_settings = \
-        {'id': index, 'new_name': metadata['name'],
+        {'id': test_id, 'new_name': metadata['name'],
          'new_tags': metadata['tags'], 'new_email': metadata['email']}
     # POST edit request
     response = client.post(url_prefix + '/edit', json=edit_settings)
@@ -51,6 +52,11 @@ def test_edit(client):
 
     # Check if the edited result in the stored results is as expected
     assert edited_results['all_results'][0]['metadata'] == metadata
+
+    delete_test_results()
+
+    # Delete new test result directory
+    os.removedirs(test_results_root+'-1_bar')
 
 
 @patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)

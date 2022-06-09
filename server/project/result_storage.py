@@ -141,7 +141,6 @@ def delete_result(result_id, result_name):
     path = RESULTS_ROOT_FOLDER + str(result_id) + '_' + result_name
     if (os.path.isdir(path)):
         shutil.rmtree(path)
-    
 
 
 def edit_result(result_id, new_name, new_tags, new_email):
@@ -157,12 +156,14 @@ def edit_result(result_id, new_name, new_tags, new_email):
     # Get index of the first item with the ID
     index = next((i for i in range(len(file_results)) if file_results[i]['timestamp']['stamp'] == result_id), None)
     to_edit_result = file_results[index]
+    print('result to edit in overview:', to_edit_result)
 
     def makepath(result_id, to_edit_result):
         return RESULTS_ROOT_FOLDER + str(result_id) + '_' + to_edit_result['metadata']['name']
 
     old_name = to_edit_result['metadata']['name']
     old_path = makepath(result_id, to_edit_result)
+    print('old path', old_path)
     
     def edit_metadata(attr, new_val):
         # Don't change the attribute if the input field has been left empty
@@ -180,8 +181,11 @@ def edit_result(result_id, new_name, new_tags, new_email):
     
     #Update the folder name to match the new name
     new_path = makepath(result_id, to_edit_result)
-    if (os.path.isdir(old_path)):
-        os.rename(old_path, new_path)
+
+    # TODO catch error
+    #if os.path.isdir(old_path):
+    print('renaming path', old_path, 'to', new_path)
+    os.rename(old_path, new_path)
     
     #Update the name in all overview.json files
     for subdir in [f.path for f in os.scandir(new_path) if f.is_dir()]:

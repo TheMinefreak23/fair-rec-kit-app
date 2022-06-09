@@ -14,6 +14,7 @@ url_prefix = '/api/result'
 # Test setting of current shown recommendations POST route
 @patch('project.result_storage.RESULTS_OVERVIEW_PATH', 'mock/results_overview.json')
 @patch("project.result_storage.RESULTS_ROOT_FOLDER", 'mock/')
+@patch('project.result_loader.RESULTS_ROOT_FOLDER', 'mock/')
 def test_setrecs(client):
     """Test if the server-side loading of user recommendations is functional.
     
@@ -28,6 +29,10 @@ def test_setrecs(client):
     # Check that something has been stored in current current_recs at the given runid
     assert current_recs[0]
 
+# TODO refactor
+@patch('project.result_storage.RESULTS_OVERVIEW_PATH', 'mock/results_overview.json')
+@patch('project.result_storage.RESULTS_ROOT_FOLDER', 'mock/')
+@patch('project.result_loader.RESULTS_ROOT_FOLDER', 'mock/')
 def test_result_by_id(client):
     """Test if the server-side retrieval of a result by its ID is functional.
     
@@ -112,5 +117,5 @@ def test_validate(client):
         client: The client component used to send requests to the server
     """
     url = url_prefix + '/validate'
-    response = client.post(url, json={'filepath' : '0_Foobar', 'amount' : 0})
+    response = client.post(url, json={'filepath' : '1654518468_Test938_perturbance', 'amount' : 0})
     assert b'Validated' == response.data
