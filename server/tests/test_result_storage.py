@@ -11,16 +11,25 @@ from project.result_storage import *
 
 test_id = -1
 test_experiment = {'result': None, 'timestamp': {'stamp': test_id}, 'metadata': {'name': 'foo'}}
-test_results_path = 'tests/test_results.json'
+test_results_root = 'tests/'
+test_results_path = test_results_root + 'test_results.json'
+
+# TODO refactor get from result_storage?
+test_result_directory = test_results_root+str(test_id)+'_'+test_experiment['metadata']['name']
 
 
 @patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 def save_mock_result():
-    save_result(test_experiment, {'data' : []})  # Save a result with the id
+    # Make directory.
+    if not os.path.exists(test_result_directory):
+        os.makedirs(test_result_directory)
+
+    # Save a result with the id.
+    save_result(test_experiment, {'data': []})
 
 
-# Delete all results by emptying the file
 def delete_test_results():
+    # Delete all results in overview by emptying the file
     open(test_results_path, 'w').close()
 
 
@@ -54,11 +63,11 @@ def test_no_path_json():
 # Test updating of results overview
 @patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 def test_update_results():
-    print(load_results_overview())
+    # print(load_results_overview())
     old_results_length = len(load_results_overview()['all_results'])
     add_result(test_experiment)
     new_results_length = len(load_results_overview()['all_results'])
-    print(load_results_overview())
+    # print(load_results_overview())
     assert new_results_length == old_results_length+1
 
     delete_test_results()

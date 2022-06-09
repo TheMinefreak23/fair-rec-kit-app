@@ -8,13 +8,15 @@ from project.result_storage import *
 from project.experiment import RecommenderSystem
 from tests.test_result_storage import test_experiment, test_id, save_mock_result, delete_test_results, \
     test_results_path
+from tests.test_result_loader import MOCK_RESULTS_DIR
 
 url_prefix = '/api/result'
 
 # Test setting of current shown recommendations POST route
-@patch('project.result_storage.RESULTS_OVERVIEW_PATH', 'mock/results_overview.json')
-@patch("project.result_storage.RESULTS_ROOT_FOLDER", 'mock/')
-def test_setrecs(client):
+@patch('project.result_storage.RESULTS_OVERVIEW_PATH', MOCK_RESULTS_DIR + 'results_overview.json')
+@patch("project.result_storage.RESULTS_ROOT_FOLDER", MOCK_RESULTS_DIR)
+@patch('project.result_loader.RESULTS_ROOT_FOLDER', MOCK_RESULTS_DIR)
+def test_set_recs(client):
     """Test if the server-side loading of user recommendations is functional.
     
     Args:
@@ -28,6 +30,10 @@ def test_setrecs(client):
     # Check that something has been stored in current current_recs at the given runid
     assert current_recs[0]
 
+# TODO refactor
+@patch('project.result_storage.RESULTS_OVERVIEW_PATH', MOCK_RESULTS_DIR + 'results_overview.json')
+@patch('project.result_storage.RESULTS_ROOT_FOLDER', MOCK_RESULTS_DIR)
+@patch('project.result_loader.RESULTS_ROOT_FOLDER', MOCK_RESULTS_DIR)
 def test_result_by_id(client):
     """Test if the server-side retrieval of a result by its ID is functional.
     
@@ -44,7 +50,7 @@ def test_result_by_id(client):
     response2 = client.get(url)
     assert json.loads(response2.data)
 
-def test_getrecs(client):
+def test_get_recs(client):
     """Test if the server-side retrieval of user recommendations is functional.
     
     Args:
@@ -104,7 +110,7 @@ def test_headers(client):
     # Check that a valid name does return something 
     assert result2
 
-@patch("project.experiment.recommender_system", RecommenderSystem('datasets', 'mock/'))
+@patch("project.experiment.recommender_system", RecommenderSystem('datasets', MOCK_RESULTS_DIR))
 def test_validate(client):
     """Test if the server-side validation component is functional.
 
@@ -112,5 +118,5 @@ def test_validate(client):
         client: The client component used to send requests to the server
     """
     url = url_prefix + '/validate'
-    response = client.post(url, json={'filepath' : '0_Foobar', 'amount' : 0})
+    response = client.post(url, json={'filepath' : '1654518468_Test938_perturbance', 'amount' : 0})
     assert b'Validated' == response.data

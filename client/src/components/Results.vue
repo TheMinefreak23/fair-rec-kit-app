@@ -28,27 +28,16 @@ watch(
   }
 )
 
-//onMounted(() => (store.currentResults = [mockResult()]))
-
-// Mockdata result
-function mockResult() {
-  const testcaption = 'Dataset: LFM-1b, Algorithm: ALS'
-
-  // Add mockdata result to current results
-  const mock = {
-    caption: testcaption,
-    results: mockdata.body,
-    headers: mockdata.headers,
+/**
+ * Switch to the new result tab when it's updated (added)
+ */
+watch(
+  () => store.currentResultTab,
+  // New result added
+  (newTab) => {
+    currentTab.value = newTab
   }
-  return {
-    id: 0,
-    metadata: {
-      name: 'computation1',
-      tags: ['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '],
-    },
-    result: [mock, mock],
-  }
-}
+)
 
 /**
  * Close an inner result tab by index
@@ -96,7 +85,7 @@ function closeResult(index) {
         </div>
         <div class="border">
           <template v-if="store.currentResults.length > 0">
-            <b-tabs v-model="store.currentResultTab" card content-class="mt-3">
+            <b-tabs v-model="currentTab" card content-class="mt-3">
               <!-- Show opened results in tabs.-->
               <b-tab v-for="(result, index) in store.currentResults">
                 <template #title

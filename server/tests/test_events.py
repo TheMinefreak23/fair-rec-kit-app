@@ -22,27 +22,27 @@ eventListener = Any
 
 def test_events():
     """Tests the events to see if they correctly change the status and progress attributes."""
-    EventHandler.on_parse(Self, eventListener)
+    EventHandler.on_parse(Self, eventListener, {})
     assert Self.experiment.progress == ProgressStatus.PARSING
 
-    EventHandler.on_data(Self, eventListener)
+    EventHandler.on_data(Self, eventListener, {})
     assert Self.experiment.progress == ProgressStatus.PROCESSING_DATA
 
-    EventHandler.on_filter(Self, eventListener)
+    EventHandler.on_filter(Self, eventListener, {})
     assert Self.experiment.progress == ProgressStatus.FILTERING_DATA
 
-    EventHandler.on_split(Self, eventListener)
+    EventHandler.on_split(Self, eventListener, {})
     assert Self.experiment.progress == ProgressStatus.SPLITTING_DATA
 
-    EventHandler.on_model(Self, eventListener)
+    EventHandler.on_model(Self, eventListener, {})
     assert Self.experiment.progress == ProgressStatus.MODEL
 
-    EventHandler.on_load(Self, eventListener)
+    EventHandler.on_load(Self, eventListener, {})
     assert Self.experiment.progress == ProgressStatus.MODEL_LOAD
 
-    EventHandler.on_train(Self, eventListener)
+    EventHandler.on_train(Self, eventListener, {})
     assert Self.experiment.progress == ProgressStatus.TRAINING
 
-    EventHandler.on_begin_experiment(Self, eventListener)
+    EventHandler.on_begin_experiment(Self, eventListener, {})
     assert Self.experiment.status == Status.ACTIVE
     assert Self.experiment.progress == ProgressStatus.STARTED
