@@ -132,8 +132,7 @@ class EventHandler():
         self.end_experiment()
 
 
-def do_nothing(_event_listener, _event_args, _kwargs):
+def do_nothing(event_listener, event_args, kwargs):
     """This function only exists so that pylint stops complaining."""
-    _event_listener
-    _event_args
-    _kwargs
+    if event_listener or event_args or kwargs:
+        print(kwargs)
