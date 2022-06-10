@@ -16,13 +16,13 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
-from copy import deepcopy
+#from copy import deepcopy
 import json
 import os
 import shutil
 
 # Global current result variables
-current_result = {}
+CURRENT_RESULT = {}
 current_recs = {}
 
 # Storage paths
@@ -43,20 +43,22 @@ def format_result(settings):
     datasets = settings['data']
     for (dataset_index, dataset) in enumerate(datasets):
         # Add dataset identifier to name
-        dataset['name'] = dataset['dataset'] + '_' + dataset['matrix'] + '_' + str(dataset_index)
+        dataset['name'] = dataset['dataset'] + '_' + \
+            dataset['matrix'] + '_' + str(dataset_index)
         recs = []
         for (api, approaches) in settings['models'].items():
             for (approach_index, approach) in enumerate(approaches):
                 # Add approach, with index as identifier in the name
-                recommendation = {'approach': api + '_' + approach['name'] + '_' + str(approach_index),
-                                  #'recommendation': mock_recommend(dataset, approach),
+                recommendation = {'approach': api + '_' + approach['name'] + '_'
+                                  + str(approach_index),
+                                  # 'recommendation': mock_recommend(dataset, approach),
                                   'evals': []}
-                """
-                for metric in settings['metrics']:
-                    evaluation = mock_evaluate_all(approach, metric)
-                    recommendation['evals'].append(
-                        {'name': metric['name'], 'evaluation': evaluation, 'params': metric['params']})
-                    print(metric)"""
+                # for metric in settings['metrics']:
+                #     evaluation = mock_evaluate_all(approach, metric)
+                #     recommendation['evals'].append(
+                #         {'name': metric['name'], 'evaluation': evaluation,
+                #          'params': metric['params']})
+                #     print(metric)
                 recs.append(recommendation)
         result.append({'dataset': dataset, 'recs': recs})
     return result
@@ -71,10 +73,10 @@ def save_result(experiment, config):
     """
     experiment['result'] = format_result(config)
 
-    global current_result
-    current_result = experiment
-    add_result(current_result)
-    #print('current result', current_result)
+    global CURRENT_RESULT
+    CURRENT_RESULT = experiment
+    add_result(CURRENT_RESULT)
+    #print('current result', CURRENT_RESULT)
 
 
 def load_json(path):
@@ -120,7 +122,7 @@ def add_result(result):
     """
     file_results = load_results_overview()
     file_results['all_results'].append(result)
-    write_results_overview(file_results)    
+    write_results_overview(file_results)
 
 
 def delete_result(result_id, result_name):
@@ -139,7 +141,7 @@ def delete_result(result_id, result_name):
     write_results_overview(file_results)
     # Remove from results folder
     path = RESULTS_ROOT_FOLDER + str(result_id) + '_' + result_name
-    if (os.path.isdir(path)):
+    if os.path.isdir(path):
         shutil.rmtree(path)
 
 
@@ -154,7 +156,8 @@ def edit_result(result_id, new_name, new_tags, new_email):
     """
     file_results = load_results_overview()['all_results']
     # Get index of the first item with the ID
-    index = next((i for i in range(len(file_results)) if file_results[i]['timestamp']['stamp'] == result_id), None)
+    index = next((i for i in range(len(file_results))
+                 if file_results[i]['timestamp']['stamp'] == result_id), None)
     to_edit_result = file_results[index]
     print('result to edit in overview:', to_edit_result)
 
@@ -164,7 +167,7 @@ def edit_result(result_id, new_name, new_tags, new_email):
     old_name = to_edit_result['metadata']['name']
     old_path = makepath(result_id, to_edit_result)
     print('old path', old_path)
-    
+
     def edit_metadata(attr, new_val):
         # Don't change the attribute if the input field has been left empty
         if new_val != '':
@@ -178,26 +181,29 @@ def edit_result(result_id, new_name, new_tags, new_email):
     file_results[index] = to_edit_result
 
     write_results_overview({'all_results': file_results})
-    
-    #Update the folder name to match the new name
+
+    # Update the folder name to match the new name
     new_path = makepath(result_id, to_edit_result)
 
     # TODO catch error
-    #if os.path.isdir(old_path):
+    # if os.path.isdir(old_path):
     print('renaming path', old_path, 'to', new_path)
     os.rename(old_path, new_path)
-    
-    #Update the name in all overview.json files
+
+    # Update the name in all overview.json files
     for subdir in [f.path for f in os.scandir(new_path) if f.is_dir()]:
         run_overview = load_json(subdir + '/overview.json')
         for pair in run_overview['overview']:
-            pair['evaluation_path'] = pair['evaluation_path'].replace(old_name, new_name)
-            pair['ratings_path'] = pair['ratings_path'].replace(old_name, new_name)
-            pair['ratings_settings_path'] = pair['ratings_settings_path'].replace(old_name, new_name)
-        file = open(subdir + '/overview.json','w')
+            pair['evaluation_path'] = pair['evaluation_path'].replace(
+                old_name, new_name)
+            pair['ratings_path'] = pair['ratings_path'].replace(
+                old_name, new_name)
+            pair['ratings_settings_path'] = pair['ratings_settings_path'].replace(
+                old_name, new_name)
+        file = open(subdir + '/overview.json', 'w', encoding='utf-8')
         file.write(json.dumps(run_overview))
 
-        
+
 def create_results_overview():
     """Create a results file if it doesn't exist yet or is empty."""
     if not os.path.exists(RESULTS_ROOT_FOLDER):
@@ -209,6 +215,8 @@ def create_results_overview():
             json.dump({'all_results': []}, file, indent=4)
 
 # TODO UNUSED
+
+
 def parse_tags(tags_string):
     """Parse result tags (given by user as metadata).
 

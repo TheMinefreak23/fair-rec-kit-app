@@ -27,7 +27,7 @@ RESULTS_DIR = 'results'
 recommender_system = RecommenderSystem('datasets', RESULTS_DIR)
 options = create_available_options(recommender_system)
 experiment_queue = []
-current_experiment = None
+CURRENT_EXPERIMENT = None
 
 
 # TODO refactor job and config_dict overlap
@@ -76,14 +76,15 @@ def run_first():
     """Take the oldest settings in the queue and perform an experiment with them."""
 
     # Do one experiment at a time
-    if current_experiment and current_experiment.status == Status.ACTIVE:
+    if CURRENT_EXPERIMENT and CURRENT_EXPERIMENT.status == Status.ACTIVE:
         return
 
     # Get the oldest experiment from the queue.
     # experiment = experiment_queue.pop()
 
     # Get the oldest experiment from the queue that is marked to do.
-    first = next(filter(lambda item: item.status == Status.TODO, experiment_queue), None)
+    first = next(filter(lambda item: item.status ==
+                 Status.TODO, experiment_queue), None)
 
     # If there is a queue item to do, run it.
     # Either start a validation of an existing result or run a new experiment.
@@ -108,11 +109,11 @@ def set_up_experiment(experiment):
     # print('run experiment:', experiment)
 
     # Update current experiment
-    global current_experiment
-    current_experiment = experiment
+    global CURRENT_EXPERIMENT
+    CURRENT_EXPERIMENT = experiment
 
     # Make a new event handler and get experiment events
-    return EventHandler(current_experiment, run_first).events
+    return EventHandler(CURRENT_EXPERIMENT, run_first).events
 
 
 def run_new_experiment(experiment):
@@ -128,10 +129,10 @@ def run_new_experiment(experiment):
         os.mkdir(CONFIG_DIR)
 
     # Save configuration to yaml file.
-    config_file_path = CONFIG_DIR + '/' + current_experiment.name
+    config_file_path = CONFIG_DIR + '/' + CURRENT_EXPERIMENT.name
 
     with open(config_file_path + '.yml', 'w+', encoding='utf-8') as config_file:
-        yaml.dump(current_experiment.config, config_file)
+        yaml.dump(CURRENT_EXPERIMENT.config, config_file)
 
     parser = Parser(True)
     config = parser.parse_experiment_config_from_yml(config_file_path,
@@ -193,18 +194,18 @@ def handle_experiment():
         response = {'queue': formatted_queue()}
     else:
         # TODO catch error
-        global current_experiment
-        if not current_experiment:
+        global CURRENT_EXPERIMENT
+        if not CURRENT_EXPERIMENT:
             print('Current experiment should have started but is None')
             response['status'] = Status.NA.value
 
-        if current_experiment:
-            response['status'] = current_experiment.status.value
-            if current_experiment.status == Status.DONE:
-                experiment_id = current_experiment.job['timestamp']['stamp']
+        if CURRENT_EXPERIMENT:
+            response['status'] = CURRENT_EXPERIMENT.status.value
+            if CURRENT_EXPERIMENT.status == Status.DONE:
+                experiment_id = CURRENT_EXPERIMENT.job['timestamp']['stamp']
                 response['experimentID'] = experiment_id
-            if current_experiment.status in [Status.DONE, Status.ABORTED]:
-                current_experiment = None
+            if CURRENT_EXPERIMENT.status in [Status.DONE, Status.ABORTED]:
+                CURRENT_EXPERIMENT = None
     # print('calculation response:', response)
     return response
 
@@ -219,7 +220,7 @@ def queue():
     """
     # print('queue', json.dumps(formatted_queue(),indent=4))
     return {'queue': formatted_queue(),
-            'current': formatted_experiment(current_experiment) if current_experiment else None}
+            'current': formatted_experiment(CURRENT_EXPERIMENT) if CURRENT_EXPERIMENT else None}
 
 
 @compute_bp.route('/queue/abort', methods=['POST'])
@@ -265,7 +266,8 @@ def append_queue(metadata, settings):
     # Set time
     timestamp = time.time()
     now = datetime.now()
-    current_dt = now.strftime('%Y-%m-%d %H:%M:%S')  # + ('-%02d' % (now.microsecond / 10000))
+    # + ('-%02d' % (now.microsecond / 10000))
+    current_dt = now.strftime('%Y-%m-%d %H:%M:%S')
     job = {'timestamp': {'stamp': str(int(timestamp)),
                          'datetime': current_dt},
            'metadata': metadata,
