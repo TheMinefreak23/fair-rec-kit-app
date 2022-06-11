@@ -39,8 +39,8 @@ def test_save_result():
     save_mock_result()
     expected = test_experiment
     # The current result gets updated
-    from project.result_storage import current_result
-    assert current_result is expected
+    from project.result_storage import CURRENT_RESULT
+    assert CURRENT_RESULT is expected
 
     # TODO use mock result
     #result_by_id(test_id)
