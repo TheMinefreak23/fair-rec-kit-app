@@ -11,7 +11,7 @@ from fairreckitlib.data.set.dataset import add_dataset_columns as add_data_colum
 
 from . import result_loader
 from . import result_storage
-from .experiment import options, recommender_system, add_validation
+from .blueprints.experiment_bp import options, recommender_system, queue
 
 result_bp = Blueprint('result', __name__, url_prefix='/api/result')
 
@@ -247,5 +247,5 @@ def validate():
     json = request.json
     filepath = json.get('filepath') 
     amount = int(json.get('amount', 1))
-    add_validation(filepath, amount)
+    queue.add_validation(filepath, amount)
     return "Validated"

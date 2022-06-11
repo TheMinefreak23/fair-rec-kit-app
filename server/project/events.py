@@ -3,7 +3,6 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
-import enum
 
 from fairreckitlib.experiment.experiment_event import \
     ON_END_EXPERIMENT_THREAD, ON_BEGIN_EXPERIMENT_THREAD
@@ -12,40 +11,9 @@ from fairreckitlib.model.pipeline.model_event import ON_BEGIN_MODEL_PIPELINE, \
 from fairreckitlib.data.pipeline.data_event import ON_BEGIN_DATA_PIPELINE, \
     ON_BEGIN_FILTER_DATASET, ON_BEGIN_SPLIT_DATASET
 from fairreckitlib.core.parsing.parse_event import ON_PARSE
-from project.mail import send_mail
-from project.result_storage import save_result
-
-class Status(enum.Enum):
-    """Experiment status in queue"""
-    TODO = 'To Do'
-    ACTIVE = 'Active'
-    ABORTED = 'Aborted'
-    CANCELLED = 'Cancelled'
-    DONE = 'Done'
-    NA = 'Not Available'
-
-
-# TODO send enums to client?
-# def enum_to_dict(enum):
-#     return {i.name: i.value for i in enum}
-
-# @compute_bp.route('/statuses', methods=['GET'])
-# def get_statuses():
-#     return
-
-class ProgressStatus(enum.Enum):
-    """Experiment progress status"""
-    STARTED = 'Started'
-    PARSING = 'Parsing'
-    PROCESSING_DATA = 'Processing Data'
-    FILTERING_DATA = 'Filtering Data'
-    SPLITTING_DATA = 'Splitting Data'
-    MODEL = 'Starting approach'
-    MODEL_LOAD = 'Loading train set'
-    TRAINING = 'Training'
-    EVALUATING = 'Evaluating'
-    FINISHED = 'Finished'
-    NA = 'Not Available'
+from .mail import send_mail
+from .result_storage import save_result
+from .experiment import Status, ProgressStatus
 
 
 class EventHandler():
