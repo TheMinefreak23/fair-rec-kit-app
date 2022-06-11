@@ -18,12 +18,13 @@ from .experiment import Status, ProgressStatus
 
 class EventHandler():
     """Handles the events"""
+
     def __init__(self, experiment, end_experiment):
         self.experiment = experiment
         self.end_experiment = end_experiment
         self.events = {
-            #ON_BEGIN_EXPERIMENT_PIPELINE: lambda x, **kwargs: print('uwu'),
-            #ON_END_EXPERIMENT_PIPELINE: self.on_end_experiment,
+            # ON_BEGIN_EXPERIMENT_PIPELINE: lambda x, **kwargs: print('uwu'),
+            # ON_END_EXPERIMENT_PIPELINE: self.on_end_experiment,
             ON_BEGIN_EXPERIMENT_THREAD: self.on_begin_experiment,
             ON_END_EXPERIMENT_THREAD: self.on_end_experiment_thread,
             ON_PARSE: self.on_parse,  # NOTE TODO doesn't work in backend
@@ -89,16 +90,16 @@ class EventHandler():
                 save_result(self.experiment.job, self.experiment.config)
                 if 'email' in self.experiment.job['metadata']:
                     send_mail(self.experiment.job['metadata']['email'],
-                          self.experiment.job['metadata']['name'],
-                          self.experiment.job['timestamp']['datetime'])
-            #else: self.experiment.job['runs'] = kwargs['num_runs']
+                              self.experiment.job['metadata']['name'],
+                              self.experiment.job['timestamp']['datetime'])
+            # else: self.experiment.job['runs'] = kwargs['num_runs']
 
             self.experiment.status = Status.DONE
             self.experiment.progress = ProgressStatus.FINISHED
         self.end_experiment()
 
+
 def do_nothing(event_listener, event_args, kwargs):
     """This function only exists so that pylint stops complaining."""
-    event_listener
-    event_args
-    kwargs
+    if event_listener or event_args or kwargs:
+        print(kwargs)

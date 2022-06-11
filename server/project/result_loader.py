@@ -13,8 +13,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 import os
-import json
-import pandas as pd
+#import pandas as pd
 from .result_storage import RESULTS_ROOT_FOLDER, load_results_overview, load_json
 from . import result_storage
 
@@ -27,26 +26,27 @@ def result_by_id(result_id):
     """
     results_overview = load_results_overview()
     relative_path = RESULTS_ROOT_FOLDER + str(result_id) + "_" + \
-                    id_to_name(results_overview, result_id)
-    data = results_overview['all_results'][id_to_index(results_overview, result_id)]
-    data['metadata']['runs'] = 0 # Store runs
+        id_to_name(results_overview, result_id)
+    data = results_overview['all_results'][id_to_index(
+        results_overview, result_id)]
+    data['metadata']['runs'] = 0  # Store runs
     # loops through all the subdirectories, and thus - runs, of a certain calculation
     for subdir in [f.path for f in os.scandir(relative_path) if f.is_dir()]:
         run_overview = load_json(subdir + "/overview.json")
         # loops through individual results by looping through each entry in the overview.json
         for pair_id, pair_data in enumerate(run_overview['overview']):
             evaluation_path_full = os.getcwd() + "/" + \
-                                   pair_data['evaluation_path']
-            ratings_settings_path_full = os.getcwd() + "/" + \
-                                         pair_data['ratings_settings_path']
+                pair_data['evaluation_path']
+            # ratings_settings_path_full = os.getcwd() + "/" + \
+            #    pair_data['ratings_settings_path']
 
             if os.path.exists(evaluation_path_full):
                 evaluation_data = load_json(evaluation_path_full)
                 # TODO ratings_settings still needs to go somewhere
-                ratings_settings_data = pd.read_csv(
-                    ratings_settings_path_full,
-                    sep='\t',
-                    header=None).to_dict(orient='records')
+                # ratings_settings_data = pd.read_csv(
+                #    ratings_settings_path_full,
+                #    sep='\t',
+                #    header=None).to_dict(orient='records')
                 dataset_index = name_to_index(data['result'],
                                               run_overview['overview'][pair_id]['dataset'],
                                               'dataset', by_name=True)
@@ -61,7 +61,12 @@ def result_by_id(result_id):
     result_storage.current_result = data
     #print('current result', json.dumps(current_result, indent=4))
 
+
 def add_evaluation(data, evaluation):
+    """
+    Add an evaluation to the data.
+    """
+    # todo: refactor docstring
     if not evaluation:
         return data
     if not data:
@@ -70,11 +75,14 @@ def add_evaluation(data, evaluation):
         data[index]['evaluations'].append(value['evaluation'])
     return data
 
+
 def format_evaluation(evaluation):
-    for e in evaluation:
-        evaluation_list = [e['evaluation']]
-        e.pop('evaluation')
-        e['evaluations'] = evaluation_list
+    """Format an evaluation to be used in the current_result."""
+    # todo: refactor docstring
+    for eval_item in evaluation:
+        evaluation_list = [eval_item['evaluation']]
+        eval_item.pop('evaluation')
+        eval_item['evaluations'] = evaluation_list
     return evaluation
 
 
@@ -90,7 +98,7 @@ def get_overview(evaluation_id, runid):
     name = id_to_name(results_overview, evaluation_id)
 
     relative_path = RESULTS_ROOT_FOLDER + str(evaluation_id) + \
-                    "_" + name + "/" + "run_" + str(runid)
+        "_" + name + "/" + "run_" + str(runid)
     overview_path = relative_path + "/overview.json"
     run_overview = load_json(overview_path)
     return run_overview['overview']
@@ -122,7 +130,7 @@ def id_to_index(json_data, result_id):
     for iteration_id, data in enumerate(json_data['all_results']):
         if int(data['timestamp']['stamp']) == int(result_id):
             current_result_overview_id = iteration_id
-            #print('==ID TO INDEX',
+            # print('==ID TO INDEX',
             # 'ID',result_id,'INDEX',
             # iteration_id,
             # 'NAME',
