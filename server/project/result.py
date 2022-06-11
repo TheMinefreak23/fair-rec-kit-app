@@ -4,10 +4,13 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 import json
+import tkinter as tk
+from tkinter.filedialog import asksaveasfilename
 
 from flask import (Blueprint, request)
 import pandas as pd
 from fairreckitlib.data.set.dataset import add_dataset_columns as add_data_columns
+
 
 from . import result_loader
 from . import result_storage
@@ -28,7 +31,7 @@ def filter_results(dataframe, filters):
     """
     #filter = fairreckitlib.data.filter
     #filter(dataframe, filters)
-
+    #todo: filter
     return dataframe
 
 
@@ -36,14 +39,14 @@ def filter_results(dataframe, filters):
 @result_bp.route('/set-recs', methods=['POST'])
 def set_recs():
     """Set the recommendations for the current shown result.
-    
+
     Returns:
         (JSON) A status message and the possible filters for this dataset
     """
-    json = request.json
-    result_id = json.get("id")  # Result timestamp TODO use to get result
-    run_id = json.get("runid")
-    pair_id = json.get("pairid")
+    json_data = request.json
+    result_id = json_data.get("id")  # Result timestamp TODO use to get result
+    run_id = json_data.get("runid")
+    pair_id = json_data.get("pairid")
     path = result_loader.get_overview(result_id, run_id)[
         pair_id]['ratings_path']
     # Declare current_recs as a dictionary in a dictionary
@@ -58,7 +61,7 @@ def set_recs():
 @result_bp.route('/result-by-id', methods=['POST', 'GET'])
 def result_by_id():
     """Retrieve a requested result by its ID.
-    
+
     Returns:
         (JSON) The result that belongs to the requested ID
     """
@@ -72,7 +75,8 @@ def result_by_id():
             response = {'status': 'result not found'}
 
     else:  # GET request
-        print('current result', json.dumps(result_storage.current_result, indent=4))
+        print('current result', json.dumps(
+            result_storage.current_result, indent=4))
         response = {'result': result_storage.current_result}
 
     return response
@@ -87,40 +91,41 @@ def user_result():
         (JSON) user item data
 
     """
-    json = request.json
-    pair_id = json.get("pairid")
-    run_id = json.get("runid")
-    filters = json.get("filters", [])
+    json_data = request.json
+    pair_id = json_data.get("pairid")
+    run_id = json_data.get("runid")
+    filters = json_data.get("filters", [])
 
-    chunk_size = int(json.get("amount", 20))
-    chosen_headers = json.get("optionalHeaders", [])
-    matrix_name = json.get("matrix" "")
-    dataset_name = json.get("dataset", "")
-    sortIndex = json.get("sortindex", 0)
+    chunk_size = int(json_data.get("amount", 20))
+    chosen_headers = json_data.get("optionalHeaders", [])
+    matrix_name = json_data.get("matrix" "")
+    dataset_name = json_data.get("dataset", "")
+    sort_index = json_data.get("sortindex", 0)
 
     # read mock dataframe
     recs = result_storage.current_recs[run_id][pair_id]
     dataset = recommender_system.data_registry.get_set(dataset_name)
-    #TODO refactor/do dynamically
+    # TODO refactor/do dynamically
     spotify_datasets = ['LFM-2B']
     if dataset_name in spotify_datasets:
         recs = add_spotify_columns(dataset_name, recs)
 
     recs = filter_results(recs, filters)
 
-    #Add optional columns to the dataframe (if any)
-    if (len(chosen_headers) > 0):
-      recs=add_dataset_columns(dataset_name, recs, chosen_headers, matrix_name)
+    # Add optional columns to the dataframe (if any)
+    if len(chosen_headers) > 0:
+        recs = add_dataset_columns(
+            dataset_name, recs, chosen_headers, matrix_name)
 
-    #Make sure not to sort on a column that does not exist anymore
-    if (len(recs.columns) <= sortIndex):
-        sortIndex = 0
+    # Make sure not to sort on a column that does not exist anymore
+    if len(recs.columns) <= sort_index:
+        sort_index = 0
     # sort dataframe based on index and ascending or not
     df_sorted = recs.sort_values(
-        by=recs.columns[sortIndex], ascending=json.get("ascending"))
+        by=recs.columns[sort_index], ascending=json_data.get("ascending"))
 
     # getting only chunk of data
-    start_rows = int(json.get("start", 0))
+    start_rows = int(json_data.get("start", 0))
     end_rows = start_rows + chunk_size
     end_rows = int(end_rows)
 
@@ -136,7 +141,7 @@ def user_result():
     if not dataset is None and not dataset.get_matrix_config(matrix_name) is None:
         item = dataset.get_matrix_config(matrix_name).item.key
         user = dataset.get_matrix_config(matrix_name).user.key
-        df_subset.rename(columns = {'user': user, 'item': item}, inplace = True)
+        df_subset.rename(columns={'user': user, 'item': item}, inplace=True)
     return df_subset.to_json(orient='records')
 
 
@@ -166,12 +171,12 @@ def add_dataset_columns(dataset_name, dataframe, columns, matrix_name):
 @result_bp.route('/headers', methods=['POST'])
 def headers():
     """Load the optional headers for the requested dataset.
-    
+
     Returns:
        (JSON) A list of the available headers for this dataset
     """
-    json = request.json
-    dataset_name = json.get("name")
+    json_data = request.json
+    dataset_name = json_data.get("name")
     columns = {}
     dataset = recommender_system.data_registry.get_set(dataset_name)
     if dataset:
@@ -180,14 +185,13 @@ def headers():
     return columns
 
 
-
 def add_spotify_columns(dataset_name, dataframe):
     """Add columns from the Spotify integration to the dataframe.
 
     Args:
         dataset_name: the name of dataset belonging to the dataframe
         dataframe: a pandas dataframe of the requested user results
-        
+
 
     Returns:
         The updated dataframe
@@ -207,14 +211,12 @@ def export():
     Returns:
         A message indicating if the export was succesful
     """
-    #TODO rework this
+    # TODO rework this
     # Load results from json
-    json = request.json
-    results = json.get('results', '{}')
+    json_data = request.json
+    results = json_data.get('results', '{}')
 
     # Load the file selector
-    import tkinter as tk
-    from tkinter.filedialog import asksaveasfilename
     root = tk.Tk()
 
     # Focus on the file selector and hide the overlay
@@ -227,25 +229,25 @@ def export():
 
     data = [('tsv', '*.tsv')]
     try:
-        fn = asksaveasfilename(initialdir='/', title='Export Table', filetypes=data, defaultextension='.tsv',
-                               initialfile="experiment", parent=root)
-        df = pd.DataFrame(results)
-        df.to_csv(fn, index=False)
+        file_name = asksaveasfilename(initialdir='/', title='Export Table',
+                                      filetypes=data, defaultextension='.tsv',
+                                      initialfile="experiment", parent=root)
+        data_frame = pd.DataFrame(results)
+        data_frame.to_csv(file_name, index=False)
         return {'message': 'Exported succesfully'}
-    except:
+    except SystemError:
         return {'message': 'Export cancelled'}
 
 
 @result_bp.route('/validate', methods=['POST'])
-
 def validate():
     """Give the server the task of running a requested experiment again.
 
     Returns:
         A message indicating the operation was succesful
     """
-    json = request.json
-    filepath = json.get('filepath') 
-    amount = int(json.get('amount', 1))
+    json_data = request.json
+    filepath = json_data.get('filepath')
+    amount = int(json_data.get('amount', 1))
     add_validation(filepath, amount)
     return "Validated"

@@ -4,20 +4,18 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 import base64
-from cmath import sqrt
 import json
-from logging import root
 import time
 from io import BytesIO
 import requests
 import numpy as np
 from PIL import Image
 
-from flask import Blueprint, request, send_file
+from flask import Blueprint, request
 
 detail_bp = Blueprint('music', __name__, url_prefix='/api/music')
 
-TOKEN = None
+TOKEN = {}
 
 SPOTIFY_API = 'https://api.spotify.com/v1'
 MAX_TRACK_LIMIT = 50

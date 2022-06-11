@@ -7,17 +7,19 @@ import json
 # from fairreckitlib.core.core_constants import ELLIOT_API
 from fairreckitlib.core.core_constants import TYPE_PREDICTION, TYPE_RECOMMENDATION
 
-model_API_dict = {}
+MODEL_API_DICT = {}
 
 # constants
 DEFAULTS = {  # 'split': 80,
     'recCount': {'min': 1, 'max': 100, 'default': 10},
 }  # default values
-DEFAULT_SPLIT = {'name': 'Train/testsplit', 'default': '80', 'min': 0, 'max': 100}
-filters = json.load(open('parameters/resultFilter.json'))  # TODO LOAD from dataset
+DEFAULT_SPLIT = {'name': 'Train/testsplit',
+                 'default': '80', 'min': 0, 'max': 100}
+filters = json.load(open('parameters/resultFilter.json', encoding='utf-8')
+                    )  # TODO LOAD from dataset
 
 # TODO for now use this to get the dataset matrix
-dataset_matrices = {}
+DATASET_MATRICES = {}
 
 
 # TODO do this in another way
@@ -68,13 +70,15 @@ def create_available_options(recommender_system):
     Returns:
         (dict) the formatted options
     """
-    
+
     datasets = recommender_system.get_available_datasets()
-    global dataset_matrices
-    dataset_matrices = {dataset: list(matrices.keys()) for (dataset, matrices) in datasets.items()}
-    # print(dataset_matrices)
+    global DATASET_MATRICES
+    DATASET_MATRICES = {dataset: list(matrices.keys()) for (
+        dataset, matrices) in datasets.items()}
+    # print(DATASET_MATRICES)
     predictors = recommender_system.get_available_algorithms(TYPE_PREDICTION)
-    recommenders = recommender_system.get_available_algorithms(TYPE_RECOMMENDATION)
+    recommenders = recommender_system.get_available_algorithms(
+        TYPE_RECOMMENDATION)
     # TODO different metrics for diff types
     pred_metrics = recommender_system.get_available_metrics(TYPE_PREDICTION)
     rec_metrics = recommender_system.get_available_metrics(TYPE_RECOMMENDATION)
@@ -85,8 +89,8 @@ def create_available_options(recommender_system):
     splits = recommender_system.get_available_splitters()
     # print('splits', splits)
 
-    global model_API_dict
-    model_API_dict = create_model_api_dict(predictors, recommenders)
+    global MODEL_API_DICT
+    MODEL_API_DICT = create_model_api_dict(predictors, recommenders)
 
     # Format categorised settings (most settings are categorised once)
     # TODO refactor
@@ -107,14 +111,14 @@ def create_available_options(recommender_system):
     # MOCK: for now use all filters/metrics per dataset
     filter_option = {'name': 'filter',
                      'title': 'filters',
-                     #'article': 'a',
+                     # 'article': 'a',
                      'options': formatted_filters}
     # split_types = ['Random'] + (['Time'] if params['timestamp'] else [])
     split_type_option = {'name': 'type of split',
                          'single': True,
                          'required': True,
                          'title': 'splitting',
-                         #'article': 'a',
+                         # 'article': 'a',
                          'default': formatted_splits[0],
                          'options': formatted_splits}
 
@@ -126,24 +130,26 @@ def create_available_options(recommender_system):
         # print('dataset', dataset)
         # TODO refactor
         matrices = []
-        for matrix_name in dataset_matrices[dataset['name']]:
+        for matrix_name in DATASET_MATRICES[dataset['name']]:
             dataset_matrix_converters = converters[dataset['name']][matrix_name]
             converter_option = {'name': 'rating converter',
                                 'single': True,
                                 'title': 'conversion',
                                 # 'article': 'a',
                                 'options': reformat(dataset_matrix_converters, False)}
-            matrices.append({'name': matrix_name, 'params': {'dynamic': [converter_option] }})
+            matrices.append({'name': matrix_name, 'params': {
+                            'dynamic': [converter_option]}})
         matrix_option = {
             'name': 'matrix',
             'single': True,
             'required': True,
             'title': 'matrix',
-            #'article': 'a',
+            # 'article': 'a',
             'options': reformat(matrices, False),
         }
-        #converter_option
-        dataset['params']['dynamic'] = [matrix_option, filter_option,  split_type_option]
+        # converter_option
+        dataset['params']['dynamic'] = [
+            matrix_option, filter_option,  split_type_option]
         # print(dataset['params']['options'])
 
     for metric in rec_metrics + pred_metrics:
@@ -204,12 +210,12 @@ def reformat(options, nested):
             option['options'] = reformat_options(option['options'])
 
             # Disable Elliot options
-            #if option['name'] == ELLIOT_API:
-                #for disable_option in option['options']:
-                    #disable_option['disabled'] = True
-                    # print(disable_option)
+            # if option['name'] == ELLIOT_API:
+            # for disable_option in option['options']:
+            #disable_option['disabled'] = True
+            # print(disable_option)
 
-                #option['name'] = option['name'] + ' (unavailable)'
+            #option['name'] = option['name'] + ' (unavailable)'
     else:
         options = reformat_options(options)
 
@@ -255,38 +261,30 @@ def config_dict_from_settings(experiment):
         dataset['dataset'] = dataset['name']
         matrix = dataset['matrix'][0]
         dataset['matrix'] = matrix['name']
-         # TODO refactor = dataset['name'] = reformat_list(dataset['matrix'])
+        # TODO refactor = dataset['name'] = reformat_list(dataset['matrix'])
         # TODO for now pick item matrix if available, else first matrix
-        #print(dataset_matrices)
-        #print(dataset['dataset'])
-        # available_matrices = dataset_matrices[dataset['dataset']]
-        # dataset['matrix'] = 'user-track-count' if 'user-track-count' in available_matrices else available_matrices[0]
+        # print(DATASET_MATRICES)
+        # print(dataset['dataset'])
+        # available_matrices = DATASET_MATRICES[dataset['dataset']]
+        # dataset['matrix'] = 'user-track-count'
+        # if 'user-track-count' in available_matrices else available_matrices[0]
         if 'conversion' in matrix and matrix['conversion'] != []:
             dataset['rating_converter'] = matrix['conversion'][0]
         dataset['splitting'] = dataset['splitting'][0]
         # TODO rename split param
-        dataset['splitting']['test_ratio'] = (100 - int(dataset['params']['Train/testsplit'])) / 100
+        dataset['splitting']['test_ratio'] = (
+            100 - int(dataset['params']['Train/testsplit'])) / 100
 
     # Format models
     models = {}
     for approach in settings['approaches']:
         model_name = approach['name']
         if approach['params'] is None:  # handle params null
-            model_setting = {'name': model_name}  # TODO handle params null in frontend?
+            # TODO handle params null in frontend?
+            model_setting = {'name': model_name}
         else:
             model_setting = approach
-        models.setdefault(model_API_dict[model_name], []).append(model_setting)
-
-    """
-    if settings['experimentMethod'] == 'recommendation':
-        config = RecommenderExperimentConfig(datasets, models, evaluation, id,
-                                             settings['experimentMethod'], settings['recommendations'])
-    else:
-        config = PredictorExperimentConfig(datasets, models, evaluation, id,
-                                           settings['experimentMethod'])
-
-    print(config)"""
-
+        models.setdefault(MODEL_API_DICT[model_name], []).append(model_setting)
     # print(name)
     config_dict = {
         'data': settings['datasets'],
@@ -294,7 +292,8 @@ def config_dict_from_settings(experiment):
         'evaluation': settings['metrics'],
         'name': experiment_id,
         'top_K': int(settings['recommendations']),
-        'rated_items_filter': not settings['includeRatedItems'] if 'includeRatedItems' in settings else False,
+        'rated_items_filter': not settings['includeRatedItems']
+        if 'includeRatedItems' in settings else False,
         'type': settings['experimentMethod']}
 
     # print(config_dict)
@@ -326,7 +325,7 @@ def parse_if_number(string):
     if string:
         if isinstance(string, list):
             return [parse_if_number(s) for s in string]
-        if isinstance(string, float) or isinstance(string,int):
+        if isinstance(string, float) or isinstance(string, int):
             return string
         if string.isnumeric():
             return int(string)
@@ -349,11 +348,12 @@ def reformat_list(settings, option_name, option_list):
     """
     for option in option_list:
         # print(option)
-        option['params'] = {param['name']: parse_if_number(param['value']) for param in option['params']}
+        option['params'] = {param['name']: parse_if_number(
+            param['value']) for param in option['params']}
         # Format inner formgrouplists
         for inner_option_name, inner_option_list in option.items():
-            if inner_option_name not in ['name', 'params']:  # TODO use settings/lists key after all?
+            # TODO use settings/lists key after all?
+            if inner_option_name not in ['name', 'params']:
                 # print(json.dumps(option, indent=4))
                 reformat_list(option, inner_option_name, inner_option_list)
     settings[option_name] = option_list
-
