@@ -112,4 +112,3 @@ class Experiment:
         self.recommender_system.validate_experiment(result_dir=self.queue_item.job['file_path'],
                                                num_runs=self.queue_item.job['amount'],
                                                events=events)
-

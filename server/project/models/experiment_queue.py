@@ -140,4 +140,3 @@ def formatted_experiment(experiment):
     if not experiment:
         return {}
     return experiment.to_dict()
-
