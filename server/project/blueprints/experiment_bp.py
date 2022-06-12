@@ -3,23 +3,15 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
-import json
+# import json
 
 from flask import (Blueprint, request)
-from fairreckitlib.recommender_system import RecommenderSystem
-from ..options_formatter import create_available_options
-from ..experiment_queue import ExperimentQueue, formatted_experiment
-from ..experiment import Status
+
+from project.models import options_formatter, queue, recommender_system
+from project.models.experiment_queue import formatted_experiment
+from project.models.experiment import Status
 
 blueprint = Blueprint('experiment', __name__, url_prefix='/api/experiment')
-
-# Constants
-RESULTS_DIR = 'results'
-
-# Initialise
-recommender_system = RecommenderSystem('datasets', RESULTS_DIR)
-options = create_available_options(recommender_system)
-queue = ExperimentQueue(recommender_system)  # TODO refactor
 
 
 @blueprint.route('/options', methods=['GET'])
@@ -29,7 +21,7 @@ def params():
     Returns:
          (dict) the options response
     """
-    response = {'options': options}
+    response = {'options': options_formatter.options}
     # print(response)
     return response
 
@@ -64,12 +56,15 @@ def handle_experiment():
             response['status'] = Status.NA.value
 
         if queue.current_experiment:
+            # Set status
             response['status'] = queue.current_experiment.queue_item.status.value
-            if queue.current_experiment.queue_item.status == Status.DONE:
-                experiment_id = queue.current_experiment.queue_item.job['timestamp']['stamp']
-                response['experimentID'] = experiment_id
+            # Exoeriment thread has finished: reset and possibly run the next one
             if queue.current_experiment.queue_item.status in [Status.DONE, Status.ABORTED]:
+                if queue.current_experiment.queue_item.status == Status.DONE:
+                    experiment_id = queue.current_experiment.queue_item.job['timestamp']['stamp']
+                    response['experimentID'] = experiment_id
                 queue.current_experiment = None
+                queue.run_first()
     # print('calculation response:', response)
     return response
 
@@ -84,7 +79,9 @@ def get_queue():
     """
     # print('queue', queue)
     return {'queue': queue.formatted_queue(),
-            'current': formatted_experiment(queue.current_experiment) if queue.current_experiment else None}
+            'current': formatted_experiment(queue.current_experiment)
+            if queue.current_experiment
+            else None}
 
 
 @blueprint.route('/queue/abort', methods=['POST'])

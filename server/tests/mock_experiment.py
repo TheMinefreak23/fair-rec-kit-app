@@ -5,8 +5,8 @@ Utrecht University within the Software Project course.
 """
 
 import time
-from project.experiment import current_experiment
-from project import result_storage
+from project.models.experiment import current_experiment
+from project.models import result_storage
 
 
 def mock_experiment():

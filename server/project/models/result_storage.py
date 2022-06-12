@@ -16,18 +16,42 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
-#from copy import deepcopy
+# from copy import deepcopy
 import json
 import os
 import shutil
 
-# Global current result variables
-CURRENT_RESULT = {}
-current_recs = {}
-
 # Storage paths
-RESULTS_ROOT_FOLDER = 'results/'
-RESULTS_OVERVIEW_PATH = RESULTS_ROOT_FOLDER + 'results_overview.json'
+from project.models.constants import RESULTS_DIR
+
+RESULTS_OVERVIEW_PATH = RESULTS_DIR + 'results_overview.json'
+
+
+class ResultStorage:
+    """Handle the storage of the results in the result overview and store the current result"""
+    def __init__(self):
+        # current result variables
+        self.current_result = {}
+        self.current_recs = {}
+
+    def save_result(self, experiment, config):
+        """Save result to overview.
+
+        Args:
+        experiment(dict): the experiment input settings
+        config(dict): the final experiment configuration
+        """
+        experiment['result'] = format_result(config)
+
+        self.current_result = experiment
+        add_result(self.current_result)
+        # print('current result', self.current_result)
+
+    # TODO
+    @staticmethod
+    def do_nothing():
+        """This function exists to quit pylint from yappin"""
+        return None
 
 
 def format_result(settings):
@@ -38,19 +62,19 @@ def format_result(settings):
 
     Returns: (list) the mock result
     """
-    #print('== settings ==', settings)
+    # print('== settings ==', settings)
     result = []
     datasets = settings['data']
     for (dataset_index, dataset) in enumerate(datasets):
         # Add dataset identifier to name
         dataset['name'] = dataset['dataset'] + '_' + \
-            dataset['matrix'] + '_' + str(dataset_index)
+                          dataset['matrix'] + '_' + str(dataset_index)
         recs = []
         for (api, approaches) in settings['models'].items():
             for (approach_index, approach) in enumerate(approaches):
                 # Add approach, with index as identifier in the name
                 recommendation = {'approach': api + '_' + approach['name'] + '_'
-                                  + str(approach_index),
+                                              + str(approach_index),
                                   # 'recommendation': mock_recommend(dataset, approach),
                                   'evals': []}
                 # for metric in settings['metrics']:
@@ -62,21 +86,6 @@ def format_result(settings):
                 recs.append(recommendation)
         result.append({'dataset': dataset, 'recs': recs})
     return result
-
-
-def save_result(experiment, config):
-    """Save result to overview.
-
-    Args:
-    experiment(dict): the experiment input settings
-    config(dict): the final experiment configuration
-    """
-    experiment['result'] = format_result(config)
-
-    global CURRENT_RESULT
-    CURRENT_RESULT = experiment
-    add_result(CURRENT_RESULT)
-    #print('current result', CURRENT_RESULT)
 
 
 def load_json(path):
@@ -140,7 +149,7 @@ def delete_result(result_id, result_name):
     ]
     write_results_overview(file_results)
     # Remove from results folder
-    path = RESULTS_ROOT_FOLDER + str(result_id) + '_' + result_name
+    path = RESULTS_DIR + str(result_id) + '_' + result_name
     if os.path.isdir(path):
         shutil.rmtree(path)
 
@@ -157,12 +166,9 @@ def edit_result(result_id, new_name, new_tags, new_email):
     file_results = load_results_overview()['all_results']
     # Get index of the first item with the ID
     index = next((i for i in range(len(file_results))
-                 if file_results[i]['timestamp']['stamp'] == result_id), None)
+                  if file_results[i]['timestamp']['stamp'] == result_id), None)
     to_edit_result = file_results[index]
     print('result to edit in overview:', to_edit_result)
-
-    def makepath(result_id, to_edit_result):
-        return RESULTS_ROOT_FOLDER + str(result_id) + '_' + to_edit_result['metadata']['name']
 
     old_name = to_edit_result['metadata']['name']
     old_path = makepath(result_id, to_edit_result)
@@ -190,7 +196,17 @@ def edit_result(result_id, new_name, new_tags, new_email):
     print('renaming path', old_path, 'to', new_path)
     os.rename(old_path, new_path)
 
-    # Update the name in all overview.json files
+    update_overviews(new_path, old_name, new_name)
+
+
+def update_overviews(new_path, old_name, new_name):
+    """Update the name in all overview.json files
+
+    Args:
+        new_path: new result file path
+        old_name: old result name
+        new_name: new result name
+    """
     for subdir in [f.path for f in os.scandir(new_path) if f.is_dir()]:
         run_overview = load_json(subdir + '/overview.json')
         for pair in run_overview['overview']:
@@ -200,19 +216,33 @@ def edit_result(result_id, new_name, new_tags, new_email):
                 old_name, new_name)
             pair['ratings_settings_path'] = pair['ratings_settings_path'].replace(
                 old_name, new_name)
-        file = open(subdir + '/overview.json', 'w', encoding='utf-8')
-        file.write(json.dumps(run_overview))
+        with open(subdir + '/overview.json', 'w', encoding='utf-8') as file:
+            file.write(json.dumps(run_overview))
+
+
+def makepath(result_id, result):
+    """Make result path from result ID and result
+
+    Args:
+        result_id: the result ID
+        result: the result
+
+    Returns:
+        the path
+    """
+    return RESULTS_DIR + str(result_id) + '_' + result['metadata']['name']
 
 
 def create_results_overview():
     """Create a results file if it doesn't exist yet or is empty."""
-    if not os.path.exists(RESULTS_ROOT_FOLDER):
-        os.mkdir(RESULTS_ROOT_FOLDER)
+    if not os.path.exists(RESULTS_DIR):
+        os.mkdir(RESULTS_DIR)
     if not os.path.exists(RESULTS_OVERVIEW_PATH) \
             or os.stat(RESULTS_OVERVIEW_PATH).st_size == 0:
         # Open the file in write mode.
         with open(RESULTS_OVERVIEW_PATH, 'w', encoding='utf-8') as file:
             json.dump({'all_results': []}, file, indent=4)
+
 
 # TODO UNUSED
 

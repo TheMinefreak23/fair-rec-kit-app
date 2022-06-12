@@ -12,23 +12,34 @@ import numpy as np
 from PIL import Image
 
 from flask import Blueprint, request
+from project.models import token as tok
 
-detail_bp = Blueprint('music', __name__, url_prefix='/api/music')
-
-TOKEN = {}
+blueprint = Blueprint('music', __name__, url_prefix='/api/music')
 
 SPOTIFY_API = 'https://api.spotify.com/v1'
 MAX_TRACK_LIMIT = 50
 
+def token_to_dict(token):
+    """Convert a token to a dictionary format
 
-@detail_bp.route('/token', methods=['GET'])
+    Args:
+        token: the token to convert
+
+    Returns:
+        the token in dictionary form
+    """
+    return {'access_token': token.access_token,
+            'token_type': token.token_type,
+            'expiration_time': token.expiration_time}
+
+
+@blueprint.route('/token', methods=['GET'])
 def get_spotify_token():
     """Route: Get Spotify auth TOKEN using id and secret
 
     Returns: the spotify TOKEN
     """
-    global TOKEN
-    if not (TOKEN and TOKEN['expiration_time'] - 100 > time.time()):
+    if (not tok.access_token) or tok.expiration_time - 100 > time.time():
         spotify_id = '7e49545dfb45473cbe595d8bb1e22071'
         spotify_secret = 'd5a9e8febef2468b94a5edabe2c5ddeb'
         message = (spotify_id + ':' + spotify_secret).encode()
@@ -39,14 +50,16 @@ def get_spotify_token():
         data = 'grant_type=client_credentials'
         res = requests.post(
             'https://accounts.spotify.com/api/token', data=data, headers=headers)
-        # print(res.text)
-        TOKEN = json.loads(res.text)
-        TOKEN['expiration_time'] = time.time() + TOKEN['expires_in']
-    print(time.time(), TOKEN['expiration_time'])
-    return TOKEN
+        # print('spotify response', res.text)
+        token_data = json.loads(res.text)
+        tok.expiration_time = time.time() + token_data['expires_in']
+        tok.token_type = token_data['token_type']
+        tok.access_token = token_data['access_token']
+    # print(time.time(), tok.expiration_time)
+    return token_to_dict(tok)
 
 
-@detail_bp.route('/AcousticBrainz', methods=['POST'])
+@blueprint.route('/AcousticBrainz', methods=['POST'])
 def get_acousticbrainz_data():
     """Requests High-Level audio features from the AcousticBrainz API using a MusicBrainzID
 
@@ -62,7 +75,7 @@ def get_acousticbrainz_data():
     return json.loads(res.text)
 
 
-@detail_bp.route('/background', methods=['POST'])
+@blueprint.route('/background', methods=['POST'])
 def get_background():
     """Generates a background from the album covers of a Spotify Playlist
 
@@ -80,9 +93,9 @@ def get_background():
     playlist_length = 0
     while offset < playlist_length or offset == 0:
         url = SPOTIFY_API + '/playlists/' \
-            + playlist_id + '/tracks?limit=' \
-            + str(MAX_TRACK_LIMIT) + '&offset=' \
-            + str(offset)
+              + playlist_id + '/tracks?limit=' \
+              + str(MAX_TRACK_LIMIT) + '&offset=' \
+              + str(offset)
         playlist = request_spotify_data(url)
 
         items += playlist['items']
@@ -125,7 +138,7 @@ def collage(images, size=10):
     return background
 
 
-@detail_bp.route('/unique-album-background', methods=['GET'])
+@blueprint.route('/unique-album-background', methods=['GET'])
 def first_100_album_collage():
     """Route: Make a collage from the first 100 relevant albums from Spotify
 
@@ -157,20 +170,20 @@ def get_unique_n(query, amount, category, image):
     # Amount of items returned are a multiple of 10.
     limit = 10
     url = SPOTIFY_API + '/search?' + query + \
-        '&type=' + category + '&limit=' + str(limit)
+          '&type=' + category + '&limit=' + str(limit)
 
     items = []
     # Get next until we have n items.
     while len(items) < amount:
         query = request_spotify_data(url)
-        category_data = query[category+'s']
+        category_data = query[category + 's']
         print('total items', category_data['total'])
         if image:
-            items = list(set(items+[item['images'][1]['url']
-                         for item in category_data['items']]))
+            items = list(set(items + [item['images'][1]['url']
+                                      for item in category_data['items']]))
         else:
-            items += list(set(items+[item['id']
-                          for item in category_data['items']]))
+            items += list(set(items + [item['id']
+                                       for item in category_data['items']]))
         if len(items) < limit:
             break  # Stop if there are less items left than the limit
         url = category_data['next']
@@ -188,9 +201,9 @@ def request_spotify_data(url):
     Returns:
         the response text
     """
-    if not TOKEN:
+    if not tok:
         get_spotify_token()
-    headers = {'Authorization': 'Bearer ' + TOKEN['access_token'],
+    headers = {'Authorization': tok.token_type + ' ' + tok.access_token,
                'Content-Type': 'application/json'}
     res = requests.get(url, headers=headers)
     return json.loads(res.text)

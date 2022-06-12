@@ -1,12 +1,10 @@
 # This program has been developed by students from the bachelor Computer Science at
 # Utrecht University within the Software Project course.
 # © Copyright Utrecht University (Department of Information and Computing Sciences)
-import json
-import random
 from unittest.mock import patch
 import pytest
 
-from project.result_storage import *
+from project.models.result_storage import *
 
 
 test_id = -1
@@ -39,7 +37,7 @@ def test_save_result():
     save_mock_result()
     expected = test_experiment
     # The current result gets updated
-    from project.result_storage import CURRENT_RESULT
+    from project.models.result_storage import CURRENT_RESULT
     assert CURRENT_RESULT is expected
 
     # TODO use mock result

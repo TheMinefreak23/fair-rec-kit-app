@@ -7,9 +7,8 @@ Utrecht University within the Software Project course.
 import numpy as np
 from sewar.full_ref import uqi
 from PIL import Image
-from project.music_detail import collage
-from project.music_detail import request_spotify_data
-import imageio
+from project.blueprints.music_detail_bp import collage
+from project.blueprints.music_detail_bp import request_spotify_data
 
 URL_PREFIX = '/api/music'
 

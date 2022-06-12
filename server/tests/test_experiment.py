@@ -6,11 +6,8 @@ Utrecht University within the Software Project course.
 import json
 from unittest.mock import patch
 
-import polling as polling
-import requests
+from project.models.experiment import *
 
-from project.experiment import *
-from tests.test_result_storage import test_results_path, test_experiment, delete_test_results
 MOCK_RESULTS_PATH = 'mock/'
 
 # TODO add more edge cases
@@ -187,14 +184,14 @@ def test_abort(client):
 
     # Test different status experiments
     experiment.status = Status.TODO
-    from project.experiment import experiment_queue
+    from project.models.experiment import experiment_queue
     experiment_queue.append(experiment)
     client.post(url, json={'id': experiment_id})
     experiment_queue.pop() # Empty queue
     assert experiment.status == Status.CANCELLED
 
     experiment.status = Status.ACTIVE
-    from project.experiment import experiment_queue
+    from project.models.experiment import experiment_queue
     experiment_queue.append(experiment)
     client.post(url, json={'id': experiment_id})
     experiment_queue.pop() # Empty queue

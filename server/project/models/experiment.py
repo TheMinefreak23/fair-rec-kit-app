@@ -20,6 +20,7 @@ CONFIG_DIR = 'config_files'
 # def get_statuses():
 #     return
 
+
 class Status(enum.Enum):
     """Experiment status in queue"""
     TODO = 'To Do'
@@ -28,6 +29,7 @@ class Status(enum.Enum):
     CANCELLED = 'Cancelled'
     DONE = 'Done'
     NA = 'Not Available'
+
 
 class ProgressStatus(enum.Enum):
     """Experiment progress status"""
@@ -57,11 +59,17 @@ class QueueItem:
 
 
 class Experiment:
+    """For running a recommender system experiment"""
     def __init__(self, queue_item, recommender_system):
         self.queue_item = queue_item
         self.recommender_system = recommender_system
 
     def to_dict(self):
+        """Convert queue item to dictionary format
+
+        Returns:
+            The QueueItem as a dictionary
+        """
         # TODO refactor
         self.queue_item.job['status'] = self.queue_item.status.value
         self.queue_item.job['progress'] = self.queue_item.progress.value
@@ -104,6 +112,4 @@ class Experiment:
         self.recommender_system.validate_experiment(result_dir=self.queue_item.job['file_path'],
                                                num_runs=self.queue_item.job['amount'],
                                                events=events)
-
-
 

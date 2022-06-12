@@ -3,19 +3,25 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
-from .events import EventHandler
-from .experiment import Status, ProgressStatus, QueueItem, Experiment
+
 import time
 from datetime import datetime
 
-from .options_formatter import config_dict_from_settings
+from .constants import MAIL_KEY
+from .events import EventHandler
+from .experiment import Status, ProgressStatus, QueueItem, Experiment
 
 
 class ExperimentQueue:
-    def __init__(self, recommender_system):
+    """Queue for handling multiple experiments one by one"""
+    def __init__(self, recommender_system, options_formatter, result_storage, mail_sender):
+        self.options_formatter = options_formatter
+        self.recommender_system = recommender_system
+        self.result_storage = result_storage
+        self.mail_sender = mail_sender
+
         self.queue = []
         self.current_experiment = None
-        self.recommender_system = recommender_system
 
     def formatted_queue(self):
         """Format the queue to a list of formatted experiments (dictionaries).
@@ -66,7 +72,9 @@ class ExperimentQueue:
         self.current_experiment = experiment
 
         # Make a new event handler and get experiment events
-        return EventHandler(self.current_experiment.queue_item, self.run_first).events
+        return EventHandler(self.current_experiment.queue_item,
+                            self.result_storage,
+                            self.mail_sender[MAIL_KEY]).events
 
     def append_queue(self, metadata, settings):
         """Add a regular/new experiment item (settings) to the queue.
@@ -89,7 +97,7 @@ class ExperimentQueue:
                'settings': settings}
 
         # Create configuration dictionary.
-        config_dict, config_id = config_dict_from_settings(job)
+        config_dict, config_id = self.options_formatter.config_dict_from_settings(job)
 
         # TODO refactor job and config_dict overlap
         queue_item = QueueItem(job,
