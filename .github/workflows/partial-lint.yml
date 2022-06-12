@@ -40,10 +40,21 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd ./server
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
           pip install pylint
+          pip install pytest
+          pip install pandas
+          pip install PyYAML
+          pip install Flask
+          pip install Flask-Cors
+          pip install Flask-Mail
+          pip install requests
+          pip install pillow
+          pip install Cython
+          pip install fairreckitlib
+          pip install sewar
+          pip install imageio
+          pip install polling
 
       - name: Lint all changed files
         run: |
