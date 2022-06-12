@@ -4,7 +4,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 from typing import Any
-from project.events import Status, ProgressStatus, EventHandler
+from project.models.events import Status, ProgressStatus, EventHandler
 
 class TestClassHelper():
     """Class with an status and progress attribute used for testing."""

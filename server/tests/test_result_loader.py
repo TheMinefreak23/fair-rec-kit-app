@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
-from project.result_loader import *
-from project import result_storage
+from project.models.result_loader import *
+from project.models import result_storage
 
 MOCK_RESULTS_DIR = 'tests/mock/'
 
@@ -10,7 +10,7 @@ MOCK_RESULTS_DIR = 'tests/mock/'
 @patch('project.result_storage.RESULTS_ROOT_FOLDER', MOCK_RESULTS_DIR)
 @patch('project.result_loader.RESULTS_ROOT_FOLDER', MOCK_RESULTS_DIR)
 def test_result_by_id():
-    from project.result_storage import RESULTS_ROOT_FOLDER
+    from project.models.result_storage import RESULTS_ROOT_FOLDER
     print(RESULTS_ROOT_FOLDER)
     result_by_id(0)
     assert result_storage.current_result

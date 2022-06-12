@@ -11,12 +11,12 @@ from flask import (Blueprint, request)
 import pandas as pd
 from fairreckitlib.data.set.dataset import add_dataset_columns as add_data_columns
 
+from project.models import result_loader, \
+    result_storage, options_formatter, \
+    recommender_system, queue
+from project.models.result_loader import result_by_id
 
-from . import result_loader
-from . import result_storage
-from .experiment import options, recommender_system, add_validation
-
-result_bp = Blueprint('result', __name__, url_prefix='/api/result')
+blueprint = Blueprint('result', __name__, url_prefix='/api/result')
 
 
 def filter_results(dataframe, filters):
@@ -29,14 +29,15 @@ def filter_results(dataframe, filters):
     Returns:
         results after filtering
     """
-    #filter = fairreckitlib.data.filter
-    #filter(dataframe, filters)
-    #todo: filter
+    # filter = fairreckitlib.data.filter
+    # filter(dataframe, filters)
+    # todo: filter
+    print('TODO do something with the filters: ', filters)
     return dataframe
 
 
 # Set current shown recommendations
-@result_bp.route('/set-recs', methods=['POST'])
+@blueprint.route('/set-recs', methods=['POST'])
 def set_recs():
     """Set the recommendations for the current shown result.
 
@@ -55,11 +56,11 @@ def set_recs():
     # Load the correct ratings file
     result_storage.current_recs[run_id][pair_id] = pd.read_csv(
         path, sep='\t', header=0)
-    return {'status': 'success', 'availableFilters': options['filters']}
+    return {'status': 'success', 'availableFilters': options_formatter.options['filters']}
 
 
-@result_bp.route('/result-by-id', methods=['POST', 'GET'])
-def result_by_id():
+@blueprint.route('/result-by-id', methods=['POST', 'GET'])
+def set_result():
     """Retrieve a requested result by its ID.
 
     Returns:
@@ -68,7 +69,7 @@ def result_by_id():
     if request.method == 'POST':
         data = request.get_json()
         print('result_by_id data', data)
-        result_loader.result_by_id(int(data['id']))
+        result_by_id(int(data['id']), result_storage)
         if result_storage.current_result:
             response = {'status': 'success'}
         else:
@@ -82,8 +83,7 @@ def result_by_id():
     return response
 
 
-# get recommender results per user
-@result_bp.route('/', methods=['POST'])
+@blueprint.route('/', methods=['POST'])
 def user_result():
     """"Get recommender results per user for the shown result.
 
@@ -94,7 +94,6 @@ def user_result():
     json_data = request.json
     pair_id = json_data.get("pairid")
     run_id = json_data.get("runid")
-    filters = json_data.get("filters", [])
 
     chunk_size = int(json_data.get("amount", 20))
     chosen_headers = json_data.get("optionalHeaders", [])
@@ -102,15 +101,14 @@ def user_result():
     dataset_name = json_data.get("dataset", "")
     sort_index = json_data.get("sortindex", 0)
 
-    # read mock dataframe
+    # Get recs
     recs = result_storage.current_recs[run_id][pair_id]
-    dataset = recommender_system.data_registry.get_set(dataset_name)
     # TODO refactor/do dynamically
     spotify_datasets = ['LFM-2B']
     if dataset_name in spotify_datasets:
         recs = add_spotify_columns(dataset_name, recs)
 
-    recs = filter_results(recs, filters)
+    recs = filter_results(recs, json_data.get("filters", []))
 
     # Add optional columns to the dataframe (if any)
     if len(chosen_headers) > 0:
@@ -124,25 +122,52 @@ def user_result():
     df_sorted = recs.sort_values(
         by=recs.columns[sort_index], ascending=json_data.get("ascending"))
 
+    df_subset = get_chunk(int(json_data.get("start", 0)),
+                          chunk_size,
+                          df_sorted)
+
+    rename_headers(dataset_name, matrix_name, df_subset)
+
+    return df_subset.to_json(orient='records')
+
+
+def get_chunk(start_rows, chunk_size, df_sorted):
+    """Get a chunk of a dataframe
+
+    Args:
+        start_rows: rows to start at
+        chunk_size: size of the rows chunk
+        df_sorted: the sorted dataframe to get the chunk from
+
+    Returns:
+        The part of the dataframe
+    """
     # getting only chunk of data
-    start_rows = int(json_data.get("start", 0))
     end_rows = start_rows + chunk_size
     end_rows = int(end_rows)
 
     # determine if at the end of the dataset
     rows_number = len(df_sorted)
-    if end_rows > rows_number:
-        end_rows = rows_number
+    end_rows = min(end_rows, rows_number)
 
     # return part of table that should be shown
-    df_subset = df_sorted[start_rows:end_rows]
+    return df_sorted[start_rows:end_rows]
 
-    # rename the user and item headers so they reflect their respective content
+
+def rename_headers(dataset_name, matrix_name, df_subset):
+    """Rename the user and item headers so they reflect their respective content
+
+    Args:
+        dataset_name: the name of the dataset of the matrix
+        matrix_name: the matrix name of the matrix with the headers
+        df_subset: the dataframe with the headers
+
+    """
+    dataset = recommender_system.data_registry.get_set(dataset_name)
     if not dataset is None and not dataset.get_matrix_config(matrix_name) is None:
         item = dataset.get_matrix_config(matrix_name).item.key
         user = dataset.get_matrix_config(matrix_name).user.key
         df_subset.rename(columns={'user': user, 'item': item}, inplace=True)
-    return df_subset.to_json(orient='records')
 
 
 def add_dataset_columns(dataset_name, dataframe, columns, matrix_name):
@@ -168,7 +193,7 @@ def add_dataset_columns(dataset_name, dataframe, columns, matrix_name):
     return dataframe
 
 
-@result_bp.route('/headers', methods=['POST'])
+@blueprint.route('/headers', methods=['POST'])
 def headers():
     """Load the optional headers for the requested dataset.
 
@@ -204,7 +229,7 @@ def add_spotify_columns(dataset_name, dataframe):
     return dataframe
 
 
-@result_bp.route('/export', methods=['POST'])
+@blueprint.route('/export', methods=['POST'])
 def export():
     """Give the user the option to export the current shown results to a .tsv file.
 
@@ -239,7 +264,7 @@ def export():
         return {'message': 'Export cancelled'}
 
 
-@result_bp.route('/validate', methods=['POST'])
+@blueprint.route('/validate', methods=['POST'])
 def validate():
     """Give the server the task of running a requested experiment again.
 
@@ -249,5 +274,5 @@ def validate():
     json_data = request.json
     filepath = json_data.get('filepath')
     amount = int(json_data.get('amount', 1))
-    add_validation(filepath, amount)
+    queue.add_validation(filepath, amount)
     return "Validated"

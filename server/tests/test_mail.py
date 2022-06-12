@@ -4,7 +4,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 from flask import Flask
-from project.mail import _M, make_mail, send_mail
+from project.models.mail import _M, make_mail, send_mail
 
 app = Flask(__name__)
 app.config['TESTING'] = True

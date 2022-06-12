@@ -3,7 +3,7 @@
 # © Copyright Utrecht University (Department of Information and Computing Sciences)
 from unittest.mock import patch
 
-from project.result_storage import *
+from project.models.result_storage import *
 from tests.test_result_storage import save_mock_result, delete_test_results, \
     test_results_path, test_results_root, test_id
 

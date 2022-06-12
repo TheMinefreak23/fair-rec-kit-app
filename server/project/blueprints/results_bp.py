@@ -5,22 +5,22 @@ Utrecht University within the Software Project course.
 """
 from flask import (Blueprint, request)
 
-from . import result_storage
+from project.models.result_storage import edit_result, load_results_overview, delete_result
 
-results_bp = Blueprint('results', __name__, url_prefix='/api/all-results')
+blueprint = Blueprint('results', __name__, url_prefix='/api/all-results')
 
 
-@results_bp.route('/', methods=['GET'])
+@blueprint.route('/', methods=['GET'])
 def results():
     """Load in the results overview.
 
     Returns:
         The requested results overview
     """
-    return result_storage.load_results_overview()
+    return load_results_overview()
 
 
-@results_bp.route('/edit', methods=['POST'])
+@blueprint.route('/edit', methods=['POST'])
 def edit():
     """Change the metadata of a selected experiment.
 
@@ -32,11 +32,11 @@ def edit():
     new_name = data.get('new_name')
     new_tags = data.get('new_tags')
     new_email = data.get('new_email')
-    result_storage.edit_result(data_id, new_name, new_tags, new_email)
+    edit_result(data_id, new_name, new_tags, new_email)
     return "Edited index"
 
 
-@results_bp.route('/delete', methods=['POST'])
+@blueprint.route('/delete', methods=['POST'])
 def delete():
     """Delete a selected result from the results.
 
@@ -46,5 +46,5 @@ def delete():
     data = request.get_json()
     result_id = data.get('id')
     name = data.get('name')
-    result_storage.delete_result(result_id, name)
+    delete_result(result_id, name)
     return "Removed index"
