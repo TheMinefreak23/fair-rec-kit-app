@@ -56,12 +56,14 @@ def handle_experiment():
             response['status'] = Status.NA.value
 
         if queue.current_experiment:
+            # TODO refactor
+            current_queue_item = queue.current_experiment.queue_item
             # Set status
-            response['status'] = queue.current_experiment.queue_item.status.value
+            response['status'] = current_queue_item.status.value
             # Exoeriment thread has finished: reset and possibly run the next one
-            if queue.current_experiment.queue_item.status in [Status.DONE, Status.ABORTED]:
-                if queue.current_experiment.queue_item.status == Status.DONE:
-                    experiment_id = queue.current_experiment.queue_item.job['timestamp']['stamp']
+            if current_queue_item.status in [Status.DONE, Status.ABORTED]:
+                if current_queue_item.status == Status.DONE:
+                    experiment_id = current_queue_item.job['timestamp']['stamp']
                     response['experimentID'] = experiment_id
                 queue.current_experiment = None
                 queue.run_first()
@@ -99,7 +101,7 @@ def abort():
         filter(
             lambda item:
             item.queue_item.job['timestamp']['stamp'] == item_id,
-            queue),
+            queue.queue),
         None)
     # print(experiment)
     # Cancel queued experiment
@@ -109,7 +111,7 @@ def abort():
         experiment.queue_item.status = Status.CANCELLED
     # Abort active experiment
     if status == Status.ACTIVE:
-        recommender_system.abort_computation(experiment.name)
+        recommender_system.abort_computation(experiment.queue_item.name)
         experiment.queue_item.status = Status.ABORTED
     return "Removed index"
     # TODO handle item not in queue

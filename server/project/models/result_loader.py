@@ -62,6 +62,7 @@ def result_by_id(result_id, result_storage):
     # print('current result', json.dumps(current_result, indent=4))
 
 
+# TODO: refactor: use in result_by_id?
 def get_overview(evaluation_id, runid):
     """Return a specific entry from a specific overview.json.
 
