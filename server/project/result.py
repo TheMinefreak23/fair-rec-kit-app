@@ -199,45 +199,7 @@ def add_spotify_columns(dataset_name, dataframe):
     print(dataframe.head())
     return dataframe
 
-
-@result_bp.route('/export', methods=['POST'])
-def export():
-    """Give the user the option to export the current shown results to a .tsv file.
-
-    Returns:
-        A message indicating if the export was succesful
-    """
-    #TODO rework this
-    # Load results from json
-    json = request.json
-    results = json.get('results', '{}')
-
-    # Load the file selector
-    import tkinter as tk
-    from tkinter.filedialog import asksaveasfilename
-    root = tk.Tk()
-
-    # Focus on the file selector and hide the overlay
-    root.overrideredirect(True)
-    root.geometry('0x0+0+0')
-    root.deiconify()
-    root.lift()
-    root.focus_force()
-    tk.Tk().withdraw()
-
-    data = [('tsv', '*.tsv')]
-    try:
-        fn = asksaveasfilename(initialdir='/', title='Export Table', filetypes=data, defaultextension='.tsv',
-                               initialfile="experiment", parent=root)
-        df = pd.DataFrame(results)
-        df.to_csv(fn, index=False)
-        return {'message': 'Exported succesfully'}
-    except:
-        return {'message': 'Export cancelled'}
-
-
 @result_bp.route('/validate', methods=['POST'])
-
 def validate():
     """Give the server the task of running a requested experiment again.
 
