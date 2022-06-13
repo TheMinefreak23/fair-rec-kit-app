@@ -105,9 +105,9 @@ class ExperimentQueue:
                                 Status.TODO,
                                 ProgressStatus.NA,
                                 config_id)
-        current_job = Experiment(queue_item, self.recommender_system)
+        experiment = Experiment(queue_item, self.recommender_system)
 
-        self.queue.append(current_job)
+        self.queue.append(experiment)
 
     def add_validation(self, file_path, amount):
         """Add a validation experiment to the queue.
@@ -117,12 +117,14 @@ class ExperimentQueue:
             amount(int): the amount of runs for validation
 
         """
-        experiment = QueueItem(job={'file_path': file_path, 'amount': amount},
+        # TODO refactor
+        queue_item = QueueItem(job={'file_path': file_path, 'amount': amount},
                                config={},
                                name='',
                                status=Status.TODO,
                                progress=ProgressStatus.NA,
                                validating=True)
+        experiment = Experiment(queue_item, self.recommender_system)
         self.queue.append(experiment)
         self.run_first()
 

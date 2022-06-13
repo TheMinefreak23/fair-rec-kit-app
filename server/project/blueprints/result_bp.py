@@ -12,7 +12,7 @@ import pandas as pd
 from fairreckitlib.data.set.dataset import add_dataset_columns as add_data_columns
 
 from project.models import result_loader, \
-    result_storage, options_formatter, \
+    result_store, options_formatter, \
     recommender_system, queue
 from project.models.result_loader import result_by_id
 
@@ -51,10 +51,10 @@ def set_recs():
     path = result_loader.get_overview(result_id, run_id)[
         pair_id]['ratings_path']
     # Declare current_recs as a dictionary in a dictionary
-    if not run_id in result_storage.current_recs:
-        result_storage.current_recs[run_id] = {}
+    if not run_id in result_store.current_recs:
+        result_store.current_recs[run_id] = {}
     # Load the correct ratings file
-    result_storage.current_recs[run_id][pair_id] = pd.read_csv(
+    result_store.current_recs[run_id][pair_id] = pd.read_csv(
         path, sep='\t', header=0)
     return {'status': 'success', 'availableFilters': options_formatter.options['filters']}
 
@@ -69,16 +69,16 @@ def set_result():
     if request.method == 'POST':
         data = request.get_json()
         print('result_by_id data', data)
-        result_by_id(int(data['id']), result_storage)
-        if result_storage.current_result:
+        result_by_id(int(data['id']), result_store)
+        if result_store.current_result:
             response = {'status': 'success'}
         else:
             response = {'status': 'result not found'}
 
     else:  # GET request
         print('current result', json.dumps(
-            result_storage.current_result, indent=4))
-        response = {'result': result_storage.current_result}
+            result_store.current_result, indent=4))
+        response = {'result': result_store.current_result}
 
     return response
 
@@ -102,7 +102,7 @@ def user_result():
     sort_index = json_data.get("sortindex", 0)
 
     # Get recs
-    recs = result_storage.current_recs[run_id][pair_id]
+    recs = result_store.current_recs[run_id][pair_id]
     # TODO refactor/do dynamically
     spotify_datasets = ['LFM-2B']
     if dataset_name in spotify_datasets:

@@ -11,8 +11,8 @@ url_prefix = '/api/all-results'
 
 
 # Test getting the results overview GET route
-@patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
-@patch('project.result_storage.RESULTS_ROOT_FOLDER', test_results_root)
+@patch('project.models.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
+@patch('project.models.result_storage.RESULTS_DIR', test_results_root)
 def test_results(client):
     """Test if the server-side result loading component is functional.
     
@@ -28,8 +28,8 @@ def test_results(client):
     delete_test_results()
 
 # Test editing a result POST route
-@patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
-@patch('project.result_storage.RESULTS_ROOT_FOLDER', test_results_root)
+@patch('project.models.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
+@patch('project.models.result_storage.RESULTS_DIR', test_results_root)
 def test_edit(client):
     """Test if the server-side result editing component is functional.
     
@@ -59,7 +59,7 @@ def test_edit(client):
     os.removedirs(test_results_root+'-1_bar')
 
 
-@patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
+@patch('project.models.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 def test_delete(client):
     """Test if the server-side result deletion component is functional.
     

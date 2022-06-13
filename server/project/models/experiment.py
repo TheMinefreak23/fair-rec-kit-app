@@ -64,6 +64,16 @@ class Experiment:
         self.queue_item = queue_item
         self.recommender_system = recommender_system
 
+        """
+        # TODO refactor job and config_dict overlap
+        self.job =
+        self.config =
+        self.status = Status.TODO
+        self.progress = ProgressStatus.NA
+        self.name =
+        self.validating =
+        """
+
     def to_dict(self):
         """Convert queue item to dictionary format
 
@@ -101,6 +111,7 @@ class Experiment:
 
         # TODO USE THIS FUNCTION INSTEAD OF PARSING
         # self.recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)
+        # TODO delete YML and/or use config
 
     def validate_experiment(self, events):
         """Validate an experiment by running it multiple times, using the experiment file path.

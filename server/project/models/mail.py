@@ -16,10 +16,10 @@ class MailSender:
     def send_mail(self, address, name, timestamp):
         """Sends an e-mail to notify the user their experiment is done.
 
-        Keyword arguments:
-        adress      -- the adress the e-mail will be sent to
-        name        -- the name of the experiment
-        timestamp   -- the timestamp of when the experiment was started
+        Args:
+            address     -- the address the e-mail will be sent to
+            name        -- the name of the experiment
+            timestamp   -- the timestamp of when the experiment was started
         """
         msg = Message(subject='Your calculation ' + name + ' is ready!',
                       body='Hello! \nYour calculation with name ' + name

@@ -21,67 +21,52 @@ class EventHandler:
         self.experiment = experiment
         self.result_storage = result_storage
         self.mail_sender = mail_sender
-        self.events = {
+        event_ids = [
             # ON_BEGIN_EXPERIMENT_PIPELINE: lambda x, **kwargs: print('uwu'),
             # ON_END_EXPERIMENT_PIPELINE: self.on_end_experiment,
-            ON_BEGIN_EXPERIMENT_THREAD: self.on_begin_experiment,
-            ON_END_EXPERIMENT_THREAD: self.on_end_experiment_thread,
-            ON_PARSE: self.on_parse,  # NOTE TODO doesn't work in backend
-            ON_BEGIN_DATA_PIPELINE: self.on_data,
-            ON_BEGIN_FILTER_DATASET: self.on_filter,
-            ON_BEGIN_SPLIT_DATASET: self.on_split,
-            ON_BEGIN_MODEL_PIPELINE: self.on_model,
-            ON_BEGIN_LOAD_TRAIN_SET: self.on_load,
-            ON_BEGIN_TRAIN_MODEL: self.on_train,
+            ON_BEGIN_EXPERIMENT_THREAD,
+            ON_END_EXPERIMENT_THREAD,
+            # ON_PARSE, TODO doesn't work in Lib?
+            ON_BEGIN_DATA_PIPELINE,
+            ON_BEGIN_FILTER_DATASET,
+            ON_BEGIN_SPLIT_DATASET,
+            ON_BEGIN_MODEL_PIPELINE,
+            ON_BEGIN_LOAD_TRAIN_SET,
+            ON_BEGIN_TRAIN_MODEL,
+        ]
+        self.events = {event_id : self.handle_event for event_id in event_ids}
+
+    def handle_event(self, event_listener, event_args, **kwargs):
+        do_nothing(event_listener, kwargs)
+
+        progress_dict = {
+            ON_PARSE: ProgressStatus.PARSING,
+            ON_BEGIN_DATA_PIPELINE: ProgressStatus.PROCESSING_DATA,
+            ON_BEGIN_FILTER_DATASET: ProgressStatus.FILTERING_DATA,
+            ON_BEGIN_SPLIT_DATASET: ProgressStatus.SPLITTING_DATA,
+            ON_BEGIN_MODEL_PIPELINE: ProgressStatus.MODEL,
+            ON_BEGIN_LOAD_TRAIN_SET: ProgressStatus.MODEL_LOAD,
+            ON_BEGIN_TRAIN_MODEL: ProgressStatus.TRAINING
         }
 
-    def on_parse(self, event_listener, event_args, **kwargs):
-        """Change progress status to parsing."""
-        do_nothing(event_listener, event_args, kwargs)
-        self.experiment.progress = ProgressStatus.PARSING
+        if event_args.event_id == ON_BEGIN_EXPERIMENT_THREAD:
+            self.on_begin_experiment_thread()
+        elif event_args.event_id == ON_END_EXPERIMENT_THREAD:
+            self.on_end_experiment_thread()
+        else:
+            """Change progress status."""
+            self.experiment.progress = progress_dict[event_args.event_id]
 
-    def on_data(self, event_listener, event_args, **kwargs):
-        """Change progress status to processing data."""
-        do_nothing(event_listener, event_args, kwargs)
-        self.experiment.progress = ProgressStatus.PROCESSING_DATA
-
-    def on_filter(self, event_listener, event_args, **kwargs):
-        """Change progress status to filtering data."""
-        do_nothing(event_listener, event_args, kwargs)
-        self.experiment.progress = ProgressStatus.FILTERING_DATA
-
-    def on_split(self, event_listener, event_args, **kwargs):
-        """Change progress status to splitting data."""
-        do_nothing(event_listener, event_args, kwargs)
-        self.experiment.progress = ProgressStatus.SPLITTING_DATA
-
-    def on_model(self, event_listener, event_args, **kwargs):
-        """Change progress status to model."""
-        do_nothing(event_listener, event_args, kwargs)
-        self.experiment.progress = ProgressStatus.MODEL
-
-    def on_load(self, event_listener, event_args, **kwargs):
-        """Change progress status to model load."""
-        do_nothing(event_listener, event_args, kwargs)
-        self.experiment.progress = ProgressStatus.MODEL_LOAD
-
-    def on_train(self, event_listener, event_args, **kwargs):
-        """Change progress status to training."""
-        do_nothing(event_listener, event_args, kwargs)
-        self.experiment.progress = ProgressStatus.TRAINING
-
-    def on_begin_experiment(self, event_listener, event_args, **kwargs):
+    def on_begin_experiment_thread(self):
         """Change progress status to started
         and update the experiment status to active."""
-        do_nothing(event_listener, event_args, kwargs)
         self.experiment.status = Status.ACTIVE
         self.experiment.progress = ProgressStatus.STARTED
 
-    def on_end_experiment_thread(self, event_listener, event_args, **kwargs):
+    def on_end_experiment_thread(self):
         """Change progress status to finished
         and experiment status to done.
         Also sends an email if possible."""
-        do_nothing(event_listener, event_args, kwargs)
         if self.experiment.status is not Status.ABORTED:
             if not self.experiment.validating:
                 # TODO Update experiment data: Save elapsed time
@@ -97,7 +82,8 @@ class EventHandler:
             self.experiment.progress = ProgressStatus.FINISHED
 
 
-def do_nothing(event_listener, event_args, kwargs):
+def do_nothing(event_listener, kwargs):
     """This function only exists so that pylint stops complaining."""
-    if event_listener or event_args or kwargs:
+    if event_listener or kwargs:
         print(kwargs)
+

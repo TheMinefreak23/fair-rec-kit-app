@@ -5,6 +5,7 @@ from unittest.mock import patch
 import pytest
 
 from project.models.result_storage import *
+from project.models import result_store
 
 
 test_id = -1
@@ -16,14 +17,14 @@ test_results_path = test_results_root + 'test_results.json'
 test_result_directory = test_results_root+str(test_id)+'_'+test_experiment['metadata']['name']
 
 
-@patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
+@patch('project.models.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 def save_mock_result():
     # Make directory.
     if not os.path.exists(test_result_directory):
         os.makedirs(test_result_directory)
 
     # Save a result with the id.
-    save_result(test_experiment, {'data': []})
+    result_store.save_result(test_experiment, {'data': []})
 
 
 def delete_test_results():
@@ -37,8 +38,7 @@ def test_save_result():
     save_mock_result()
     expected = test_experiment
     # The current result gets updated
-    from project.models.result_storage import CURRENT_RESULT
-    assert CURRENT_RESULT is expected
+    assert result_store.current_result is expected
 
     # TODO use mock result
     #result_by_id(test_id)
@@ -59,7 +59,7 @@ def test_no_path_json():
 
 
 # Test updating of results overview
-@patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
+@patch('project.models.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 def test_update_results():
     # print(load_results_overview())
     old_results_length = len(load_results_overview()['all_results'])

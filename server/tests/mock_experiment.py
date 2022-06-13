@@ -6,14 +6,14 @@ Utrecht University within the Software Project course.
 
 import time
 from project.models.experiment import current_experiment
-from project.models import result_storage
+from project.models import result_store
 
 
 def mock_experiment():
     """Mock running an experiment and save the mock result."""
     # Mock experiment duration.
     time.sleep(2.5)
-    result_storage.save_result(current_experiment.job, result_storage.format_result(current_experiment.config))
+    result_store.save_result(current_experiment.job, result_store.format_result(current_experiment.config))
 
 
 def mock_recommend(dataset, approach):
