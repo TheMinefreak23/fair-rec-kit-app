@@ -3,28 +3,30 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
+import json
 from unittest.mock import patch
 
 from fairreckitlib.recommender_system import RecommenderSystem
 
-from project.models.result_storage import *
-from project.models import result_store, ExperimentQueue, options_formatter, result_storage, queue
+from project.models import result_store, queue
 from tests.constants import MOCK_RESULTS_DIR
 
-url_prefix = '/api/result'
+URL_PREFIX = '/api/result'
 
 
 # Test setting of current shown recommendations POST route
 @patch('project.models.result_storage.RESULTS_DIR', MOCK_RESULTS_DIR)
-@patch('project.models.result_storage.RESULTS_OVERVIEW_PATH', MOCK_RESULTS_DIR + 'results_overview.json')
+@patch('project.models.result_storage.RESULTS_OVERVIEW_PATH',
+       MOCK_RESULTS_DIR +
+       'results_overview.json')
 @patch('project.models.result_loader.RESULTS_DIR', MOCK_RESULTS_DIR)
 def test_set_recs(client):
     """Test if the server-side loading of user recommendations is functional.
-    
+
     Args:
         client: The client component used to send requests to the server
     """
-    url = url_prefix + '/set-recs'
+    url = URL_PREFIX + '/set-recs'
     settings = {'id': 0, 'runid': 0, 'pairid': 0}
     response = client.post(url, json=settings)
     # Check succes response
@@ -35,15 +37,17 @@ def test_set_recs(client):
 
 # TODO refactor
 @patch('project.models.result_storage.RESULTS_DIR', MOCK_RESULTS_DIR)
-@patch('project.models.result_storage.RESULTS_OVERVIEW_PATH', MOCK_RESULTS_DIR + 'results_overview.json')
+@patch('project.models.result_storage.RESULTS_OVERVIEW_PATH',
+       MOCK_RESULTS_DIR +
+       'results_overview.json')
 @patch('project.models.result_loader.RESULTS_DIR', MOCK_RESULTS_DIR)
 def test_result_by_id(client):
     """Test if the server-side retrieval of a result by its ID is functional.
-    
+
     Args:
         client: The client component used to send requests to the server
     """
-    url = url_prefix + '/result-by-id'
+    url = URL_PREFIX + '/result-by-id'
     # Check the post response
     settings = {'id': 0}
     response1 = client.post(url, json=settings)
@@ -56,11 +60,11 @@ def test_result_by_id(client):
 
 def test_get_recs(client):
     """Test if the server-side retrieval of user recommendations is functional.
-    
+
     Args:
         client: The client component used to send requests to the server
     """
-    url = url_prefix + '/'
+    url = URL_PREFIX + '/'
     amount = 10
     settings = {
         'pairid': 0,
@@ -101,18 +105,18 @@ def test_get_recs(client):
 
 def test_headers(client):
     """Test if the server-side header retrieval component is functional.
-    
+
     Args:
         client: The client component used to send requests to the server
     """
-    url = url_prefix + '/headers'
+    url = URL_PREFIX + '/headers'
     response = client.post(url, json={'name': 'foo'})
     result1 = json.loads(response.data)
     # Check that an invalid name does not return anything
     assert result1 == {}
     response = client.post(url, json={'name': 'ML-100K'})
     result2 = json.loads(response.data)
-    # Check that a valid name does return something 
+    # Check that a valid name does return something
     assert result2
 
 
@@ -125,6 +129,6 @@ def test_validate(client):
         client: The client component used to send requests to the server
     """
     queue.recommender_system = RecommenderSystem('datasets', MOCK_RESULTS_DIR)
-    url = url_prefix + '/validate'
+    url = URL_PREFIX + '/validate'
     response = client.post(url, json={'filepath': '1654518468_Test938_perturbance', 'amount': 0})
     assert b'Validated' == response.data

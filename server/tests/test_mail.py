@@ -10,13 +10,17 @@ app = Flask(__name__)
 app.config['TESTING'] = True
 make_mail(app)
 
+
 def test_send_mail():
-    mail_sender = MAIL[MAIL_KEY]
     """Testing the send_mail function"""
+    mail_sender = MAIL[MAIL_KEY]
     with mail_sender.mail.record_messages() as mailbox:
         mail_sender.send_mail('fake@email.com', 'the final amogus', '2022-4-20 4:20:69')
         assert len(mailbox) == 1
-        assert mailbox[0].body == 'Hello! \nYour calculation with name the final amogus and timestamp 2022-4-20 4:20:69 is done! \n\nThis is an automated e-mail.'
+        assert mailbox[0].body == 'Hello! \n' \
+                                  'Your calculation with name ' \
+                                  'the final amogus and timestamp 2022-4-20 4:20:69 is done! \n\n' \
+                                  'This is an automated e-mail.'
         assert mailbox[0].subject == 'Your calculation the final amogus is ready!'
         assert mailbox[0].recipients == ['fake@email.com']
         
