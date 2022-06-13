@@ -13,14 +13,15 @@ from project.models.experiment import *
 from project.models import queue, options_formatter
 from project.models.experiment_queue import *
 
-MOCK_RESULTS_PATH = 'mock/'
+from tests.constants import MOCK_RESULTS_DIR
+# MOCK_RESULTS_PATH = 'mock/'
 
 # TODO add more edge cases
 
 url_prefix = '/api/experiment'
 mock_options = json.load(open('tests/options.json'))
-TEST_RESULTS_PATH = 'test_results' # TODO patch doesn't work
-recommender_system = RecommenderSystem('datasets', MOCK_RESULTS_PATH)
+TEST_RESULTS_PATH = 'test_results'
+# recommender_system = RecommenderSystem('datasets', MOCK_RESULTS_DIR)
 
 
 def get_mock_options():
@@ -33,7 +34,7 @@ def get_mock_options():
     name = mock_options['metadata']['name']
     mock_options['timestamp'] = {'stamp': str(time.time())}
     queue_item = QueueItem(mock_options, {}, Status.TODO, ProgressStatus.NA, name)
-    experiment = Experiment(queue_item, recommender_system)
+    experiment = Experiment(queue_item, RecommenderSystem('datasets', TEST_RESULTS_PATH))
     # Make new timestamp
     print(experiment)
     return experiment
@@ -241,7 +242,7 @@ def test_append():
 
 #@patch('project.experiment.RESULTS_DIR', MOCK_RESULTS_PATH)
 #@patch('project.experiment.recommender_system', RecommenderSystem('datasets', MOCK_RESULTS_PATH))
-@patch('project.models.recommender_system', recommender_system)
+@patch('project.models.recommender_system', RecommenderSystem('datasets', MOCK_RESULTS_DIR))
 def test_add_validation():
     """Test whether a valudation experiment gets appended to the queue correctly."""
 

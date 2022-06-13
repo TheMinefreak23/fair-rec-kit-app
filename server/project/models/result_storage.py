@@ -22,9 +22,7 @@ import os
 import shutil
 
 # Storage paths
-from project.models.constants import RESULTS_DIR
-
-RESULTS_OVERVIEW_PATH = RESULTS_DIR + 'results_overview.json'
+from project.models.constants import RESULTS_DIR, RESULTS_OVERVIEW_PATH
 
 
 class ResultStorage:
