@@ -36,25 +36,15 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: ${{ env.pythonLocation }}
-          key: ${{ env.pythonLocation }}-${{ hashFiles('setup.py') }}-${{ hashFiles('requirements.txt') }}
+          key: ${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
 
       - name: Install dependencies
         run: |
+          cd ./server
           python -m pip install --upgrade pip
+          pip install -r requirements.txt
           pip install pylint
           pip install pytest
-          pip install pandas
-          pip install PyYAML
-          pip install Flask
-          pip install Flask-Cors
-          pip install Flask-Mail
-          pip install requests
-          pip install pillow
-          pip install Cython
-          pip install fairreckitlib
-          pip install sewar
-          pip install imageio
-          pip install polling
 
       - name: Lint all changed files
         run: |
