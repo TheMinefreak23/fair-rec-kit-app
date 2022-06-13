@@ -1,26 +1,30 @@
-# This program has been developed by students from the bachelor Computer Science at
-# Utrecht University within the Software Project course.
-# © Copyright Utrecht University (Department of Information and Computing Sciences)
+"""
+This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)
+"""
+import json
+import os
 from unittest.mock import patch
 
-from project.models.result_storage import *
+from project.models.result_storage import load_results_overview
 from tests.test_result_storage import save_mock_result, delete_test_results, \
-    test_results_path, test_results_root, test_id
+    TEST_RESULTS_PATH, TEST_RESULTS_ROOT, TEST_ID
 
-url_prefix = '/api/all-results'
+URL_PREFIX = '/api/all-results'
 
 
 # Test getting the results overview GET route
-@patch('project.models.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
-@patch('project.models.result_storage.RESULTS_DIR', test_results_root)
+@patch('project.models.result_storage.RESULTS_OVERVIEW_PATH', TEST_RESULTS_PATH)
+@patch('project.models.result_storage.RESULTS_DIR', TEST_RESULTS_ROOT)
 def test_results(client):
     """Test if the server-side result loading component is functional.
-    
+
     Args:
         client: The client component used to send requests to the server
     """
     save_mock_result()
-    url = url_prefix + '/'
+    url = URL_PREFIX + '/'
     response = client.get(url)
     # Check if a result has been loaded
     assert len(json.loads(response.data)) == 1
@@ -28,11 +32,11 @@ def test_results(client):
     delete_test_results()
 
 # Test editing a result POST route
-@patch('project.models.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
-@patch('project.models.result_storage.RESULTS_DIR', test_results_root)
+@patch('project.models.result_storage.RESULTS_OVERVIEW_PATH', TEST_RESULTS_PATH)
+@patch('project.models.result_storage.RESULTS_DIR', TEST_RESULTS_ROOT)
 def test_edit(client):
     """Test if the server-side result editing component is functional.
-    
+
     Args:
         client: The client component used to send requests to the server
     """
@@ -41,10 +45,10 @@ def test_edit(client):
     metadata = {'name': 'bar', 'tags': 'bar', 'email': 'foo@bar.com'}
     # Use the metadata to create the edit settings
     edit_settings = \
-        {'id': test_id, 'new_name': metadata['name'],
+        {'id': TEST_ID, 'new_name': metadata['name'],
          'new_tags': metadata['tags'], 'new_email': metadata['email']}
     # POST edit request
-    response = client.post(url_prefix + '/edit', json=edit_settings)
+    response = client.post(URL_PREFIX + '/edit', json=edit_settings)
     edited_results = load_results_overview()
 
     # Check success response
@@ -56,13 +60,13 @@ def test_edit(client):
     delete_test_results()
 
     # Delete new test result directory
-    os.removedirs(test_results_root+'-1_bar')
+    os.removedirs(TEST_RESULTS_ROOT + '-1_bar')
 
 
-@patch('project.models.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
+@patch('project.models.result_storage.RESULTS_OVERVIEW_PATH', TEST_RESULTS_PATH)
 def test_delete(client):
     """Test if the server-side result deletion component is functional.
-    
+
     Args:
         client: The client component used to send requests to the server
     """
@@ -71,7 +75,7 @@ def test_delete(client):
     index = 0
     #Create the settings required to remove an entry
     delete_settings = { 'name': 'foo', 'id': index}
-    response = client.post(url_prefix + '/delete', json=delete_settings)
+    response = client.post(URL_PREFIX + '/delete', json=delete_settings)
     edited_results = load_results_overview()
 
      # Check success response
