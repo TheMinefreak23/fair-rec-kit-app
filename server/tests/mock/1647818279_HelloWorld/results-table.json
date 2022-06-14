@@ -1,0 +1,22 @@
+{
+  "computation_name": "computation1",
+  "computation_tags": ["tag1", "tag2", "tag3", "tag4"],
+  "headers": [
+    { "name": "Dataset" },
+    { "name": "Algorithm" },
+    { "name": "Average position", "subheaders": ["1st female", "1st male"] },
+    { "name": "Hellinger Distance" },
+    { "name": "Precision", "subheaders": ["P@1", "P@10"] }
+  ],
+  "body": [
+    {
+      "dataset": "LFM-360K",
+      "algorithm": "ALS",
+      "fst_female": "6.7717",
+      "fst_male": "0.6142",
+      "hellinger_distance": "0.0988",
+      "precision_p1": "0.4505",
+      "precision_p10": "0.2997"
+    }
+  ]
+}

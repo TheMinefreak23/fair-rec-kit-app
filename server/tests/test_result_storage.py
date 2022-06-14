@@ -1,37 +1,52 @@
-# This program has been developed by students from the bachelor Computer Science at
-# Utrecht University within the Software Project course.
-# © Copyright Utrecht University (Department of Information and Computing Sciences)
-import json
-import random
+"""
+This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course.
+© Copyright Utrecht University (Department of Information and Computing Sciences)
+"""
+import os
 from unittest.mock import patch
 import pytest
 
-from project.result_storage import *
+from project.models import result_store
+from project.models.constants import RESULTS_OVERVIEW_PATH
+from project.models.result_storage\
+    import load_json, load_results_overview,\
+    add_result, create_results_overview
+
+TEST_ID = -1
+TEST_EXPERIMENT = {'result': None, 'timestamp': {'stamp': TEST_ID}, 'metadata': {'name': 'foo'}}
+TEST_RESULTS_ROOT = 'tests/'
+TEST_RESULTS_PATH = TEST_RESULTS_ROOT + 'test_results.json'
+
+# TODO refactor get from result_storage?
+TEST_RESULT_DIRECTORY = TEST_RESULTS_ROOT + str(TEST_ID) + '_' + TEST_EXPERIMENT['metadata']['name']
 
 
-test_id = -1
-test_experiment = {'result': None, 'timestamp': {'stamp': test_id}, 'metadata': {'name': 'foo'}}
-test_results_path = 'tests/test_results.json'
-
-
-@patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
+@patch('project.models.result_storage.RESULTS_OVERVIEW_PATH', TEST_RESULTS_PATH)
 def save_mock_result():
-    save_result(test_experiment, {'data' : []})  # Save a result with the id
+    """Save a mock result."""
+
+    # Make directory.
+    if not os.path.exists(TEST_RESULT_DIRECTORY):
+        os.makedirs(TEST_RESULT_DIRECTORY)
+
+    # Save a result with the id.
+    result_store.save_result(TEST_EXPERIMENT, {'data': []})
 
 
-# Delete all results by emptying the file
 def delete_test_results():
-    open(test_results_path, 'w').close()
+    """Delete all results in overview by emptying the file"""
+    with open(TEST_RESULTS_PATH, 'w', encoding='utf-8') as test_results_file:
+        test_results_file.close()
 
 
-# Test saving a result to the result overview
 def test_save_result():
-    test_experiment['result'] = 'foo'
+    """Test saving a result to the result overview."""
+    TEST_EXPERIMENT['result'] = 'foo'
     save_mock_result()
-    expected = test_experiment
+    expected = TEST_EXPERIMENT
     # The current result gets updated
-    from project.result_storage import current_result
-    assert current_result is expected
+    assert result_store.current_result is expected
 
     # TODO use mock result
     #result_by_id(test_id)
@@ -45,20 +60,20 @@ def test_save_result():
 # TODO test result_by_id and make a fixture for reuse in previous results testing
 
 
-# Test that loading a JSON on an invalid path throws an exception
 def test_no_path_json():
+    """Test that loading a JSON on an invalid path throws an exception"""
     with pytest.raises(Exception):
         load_json('')
 
 
-# Test updating of results overview
-@patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
+@patch('project.models.result_storage.RESULTS_OVERVIEW_PATH', TEST_RESULTS_PATH)
 def test_update_results():
-    print(load_results_overview())
+    """Test updating of results overview"""
+    # print(load_results_overview())
     old_results_length = len(load_results_overview()['all_results'])
-    add_result(test_experiment)
+    add_result(TEST_EXPERIMENT)
     new_results_length = len(load_results_overview()['all_results'])
-    print(load_results_overview())
+    # print(load_results_overview())
     assert new_results_length == old_results_length+1
 
     delete_test_results()
@@ -66,12 +81,12 @@ def test_update_results():
 # TODO test edit_result and use fixture for reuse in previous_results
 
 
-# Test that the overview exists on the path after being created
 def test_overview_created():
+    """Test that the overview exists on the path after being created"""
     create_results_overview()
     assert os.path.exists(RESULTS_OVERVIEW_PATH)
 
 
-# Test that the overview gets created when it is loaded
 def test_load_overview_exists():
+    """Test that the overview gets created when it is loaded"""
     assert load_results_overview() is not None

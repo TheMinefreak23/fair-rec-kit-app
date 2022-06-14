@@ -1,9 +1,0 @@
-{
-    "factors": 100,
-    "iterations": 15,
-    "regularization": 0.01,
-    "random_seed": 1650539937,
-    "calculate_training_loss": false,
-    "use_cg": true,
-    "use_native": true
-}

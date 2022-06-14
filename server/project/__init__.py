@@ -6,12 +6,11 @@ Utrecht University within the Software Project course.
 from flask import Flask
 from flask_cors import CORS
 
-from .experiment import compute_bp
-from .music_detail import detail_bp
-from .result import result_bp
-from .previous_results import results_bp
-from .result_storage import create_results_overview
-from .mail import make_mail, mail_bp
+from project.models.result_storage import create_results_overview
+from project.models.mail import MailSender
+from .models import make_mail
+from .blueprints import experiment_bp, music_detail_bp, result_bp, results_bp
+
 
 def create_app():
     """Instantiate the app."""
@@ -28,7 +27,6 @@ def create_app():
     app.config['MAIL_USE_TLS'] = False
     app.config['MAIL_USE_SSL'] = True
     # app.config['MAIL_SUPRESS_SEND'] = False
-    make_mail(app)
 
     # Enable Cross-Origin Resource Sharing.
     CORS(app)
@@ -45,6 +43,7 @@ def create_app():
 
     register_blueprints(app)
     create_results_overview()
+    make_mail(app)
     return app
 
 
@@ -52,10 +51,11 @@ def register_blueprints(app):
     """
     Register Flask blueprints with routes.
 
-    :param app: the main app
+    Args:
+         app: the main app
     """
-    app.register_blueprint(compute_bp)
-    app.register_blueprint(result_bp)
-    app.register_blueprint(results_bp)
-    app.register_blueprint(detail_bp)
-    app.register_blueprint(mail_bp)
+    app.register_blueprint(experiment_bp.blueprint)
+    app.register_blueprint(result_bp.blueprint)
+    app.register_blueprint(results_bp.blueprint)
+    app.register_blueprint(music_detail_bp.blueprint)
+    # app.register_blueprint(mail_bp)

@@ -5,15 +5,19 @@ Utrecht University within the Software Project course.
 """
 
 import time
-from project.experiment import current_experiment
-from project import result_storage
+from project.models import queue
+from project.models import result_store
 
 
 def mock_experiment():
     """Mock running an experiment and save the mock result."""
     # Mock experiment duration.
     time.sleep(2.5)
-    result_storage.save_result(current_experiment.job, result_storage.format_result(current_experiment.config))
+
+    queue_item = queue.current_experiment.queue_item
+    result_store.save_result(queue_item.job,
+                             queue_item.config
+                             )
 
 
 def mock_recommend(dataset, approach):
@@ -78,4 +82,3 @@ def mock_evaluate(approach, metric):
             result *= len(name) * val
 
     return result / 100
-
