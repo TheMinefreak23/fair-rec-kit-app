@@ -1,0 +1,12 @@
+{
+    "overview": [
+        {
+            "name": "ML-100K_user-movie-rating_0 - LensKit_Random_0",
+            "dataset": "ML-100K_user-movie-rating_0",
+            "recommender_system": "LensKit_Random_0",
+            "evaluation_path": "test_results\\1654537796_Test487_unsourced\\run_0\\ML-100K_user-movie-rating_0\\LensKit_Random_0\\evaluations.json",
+            "ratings_path": "test_results\\1654537796_Test487_unsourced\\run_0\\ML-100K_user-movie-rating_0\\LensKit_Random_0\\ratings.tsv",
+            "ratings_settings_path": "test_results\\1654537796_Test487_unsourced\\run_0\\ML-100K_user-movie-rating_0\\LensKit_Random_0\\settings.json"
+        }
+    ]
+}

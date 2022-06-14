@@ -1,7 +1,7 @@
 /* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
-import { statusPrefix } from './queueFormatter'
+import { statusPrefix, status } from './queueFormatter'
 
 // Format data for a results overview
 // TODO refactor so headers are dynamic (no separate case for status header)
@@ -9,7 +9,6 @@ export function formatResults(allResults, showStatus) {
   const results = []
   for (const i in allResults) {
     const rawResult = allResults[i]
-    // console.log('rawResult', rawResult)
     results[i] = {
       id: rawResult.timestamp.stamp,
       datetime: rawResult.timestamp.datetime,
@@ -39,7 +38,6 @@ export function formatArray(array) {
 
 // Format an array of named objects into a comma separated string
 export function formatMultipleItems(items) {
-  // console.log('items before format', items)
   let string = ''
   if (items == null) {
     string = 'None'
@@ -50,7 +48,6 @@ export function formatMultipleItems(items) {
       .filter(() => true) // remove empty array slots
       .join(', ')
   }
-  // console.log(items)
   return string
 }
 
@@ -71,7 +68,11 @@ export function statusVariant(rawStatus) {
   }
 }
 
-// Format a result for the result tab
+/**
+ * Format a result for the result tab
+ * @param {Object} result - The unformatted result
+ * @return {Object} The formatted result
+ */
 export function formatResult(result) {
   console.log('before format', JSON.parse(JSON.stringify(result)))
   const formattedResult = {
@@ -80,22 +81,26 @@ export function formatResult(result) {
     result: result.result
       // Format result per dataset
       .map((datasetResult) => {
-        datasetResult.results = datasetResult.recs.map((result) => {
-          const headers = [{ name: 'Approach' }]
+        datasetResult.results = []
+        for (let runID = 0; runID < result.metadata.runs; runID++) {
+          // Format result per approach
+          datasetResult.results.push(
+            datasetResult.recs.map((result) => {
+              const headers = [{ name: 'Approach' }]
 
-          // Use metric names as headers
-          for (const [index, evaluation] of result.evals.entries()) {
-            headers.push(formatEvaluation(evaluation, index, result))
-            // console.log(result)
-          }
+              // Use metric names as headers
+              for (const [index, evaluation] of result.evals.entries()) {
+                headers.push(formatEvaluation(evaluation, index, result, runID))
+              }
 
-          // Omit recommendation and evals (old properties)
-          const { recommendation, evals, ...rest } = result
-          datasetResult.headers = headers // TODO headers can be computed in outer loop
-          return rest
-        })
-        // console.log(datasetResult.results[0])
-        // console.log(datasetResult.headers)
+              // Omit recommendation and evals (old properties)
+              const { recommendation, evals, ...rest } = result
+              datasetResult.headers = headers // TODO headers can be computed in outer loop
+              return rest
+            })
+          )
+        }
+
         // datasetResult.headers = makeHeaders(datasetResult.results[0])
         datasetResult.caption = showDatasetInfo(datasetResult.dataset)
         return datasetResult
@@ -107,22 +112,11 @@ export function formatResult(result) {
   return formattedResult
 }
 
-/*
-// Omit the recommendation key from the result metric table
-function omitRecommendation(arr) {
-  return arr.map(
-    // Omit recommendation
-    (r) => ({
-      ...r,
-      recs: r.recs.map((rec) => {
-        const { recommendation, ...rest } = rec
-        return rest
-      }),
-    })
-  )
-} */
-
-// Short result description, e.g. for a result tab
+/**
+ * Short result description, e.g. for a result tab
+ * @param {Object} result - The result
+ * @return {String} - The short description
+ */
 export function shortResultDescription(result) {
   //console.log(result)
   const datasets = []
@@ -136,7 +130,6 @@ export function shortResultDescription(result) {
   const datetime = result.metadata.datetime
 
   function formatNames(list) {
-    //console.log(Array.from(new Set(list)))
     const formattedList = []
     for (const name of Array.from(new Set(list))) {
       // Remove index (part after last underscore)
@@ -159,17 +152,19 @@ export function showDatasetInfo(dataset) {
 }
 
 // Format evaluations (including filtered ones)
-export function formatEvaluation(e, index, result) {
+export function formatEvaluation(e, index, result, runID) {
   // TODO refactor and/or give option to set decimal precision in UI
   // Add index for unique metric key
-  result[formatMetric(e) + '_' + index] = e.evaluation.global.toFixed(2)
+  result[formatMetric(e) + '_' + index] = parseFloat(
+    e.evaluations[runID].global
+  ).toFixed(2)
 
   // Flatten filters
   // console.log(e.evaluation, e.evaluation.filtered)
   // Add filter category (main name) to filter parameter name
   // TODO refactor
   const filtered = []
-  for (const filter of e.evaluation.filtered) {
+  for (const filter of e.evaluations[0].filtered) {
     // console.log('filter', filter)
     for (const [mainName, params] of Object.entries(filter)) {
       // console.log(mainName, params)
@@ -184,13 +179,6 @@ export function formatEvaluation(e, index, result) {
       }
     }
   }
-  /*
-  const filtered = e.evaluation.filtered
-    .map((filter) => Object.entries(filter))
-    .map(([mainName, param] => { mainName + } ))
-    .flat()
-    .flat() */
-  // console.log(filtered)
 
   // Get filtered values and make subheaders
   if (filtered.length === 0) {
@@ -216,9 +204,7 @@ export function formatEvaluation(e, index, result) {
 export function formatMetric(evaluation) {
   // If it is a K metric, replace K with the parameter
   const name = evaluation.name
-  if (name.toLowerCase()[name.length - 1] === 'k') {
-    // console.log(evaluation)
-    // TODO refactor K condition
+  if (name.slice(-1).toLowerCase() === 'k') {
     return name.slice(0, -1) + evaluation.params.K
   } else return name
 }

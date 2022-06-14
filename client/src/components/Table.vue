@@ -24,6 +24,7 @@ const emit = defineEmits([
   'updateHeaders',
 ])
 const props = defineProps({
+  viewItem: Boolean,
   recs: Boolean,
   overview: Boolean,
   results: Array,
@@ -56,8 +57,9 @@ const filtersModalShow = ref(false)
 const filters = ref(emptyFormGroup(false))
 
 // Sorting
-const sortindex = ref(0)
-const descending = ref(false)
+const sortindex = ref()
+const descending = ref()
+const sortIcon = ref({true: ' ▲', false: ' ▼'})
 
 // Item detail
 const infoHeaders = ref([])
@@ -85,9 +87,8 @@ const sorted = computed(() => {
 })
 
 onMounted(() => {
-  /* if (props.caption == 'Testcaption')
-    console.log('filterOptions', props.filterOptions) */
   // Sort on default column if it is given
+  // If no column is given, the table is not sortable
   if (props.defaultSort) {
     sortindex.value = props.defaultSort
     descending.value = true // For now sort by descending on default, TODO refactor
@@ -142,11 +143,16 @@ function setsorting(i) {
   if (i === sortindex.value) {
     descending.value = !descending.value
   }
-  sortindex.value = i
+  else {sortindex.value = i}
   emit('paginationSort', i)
 }
 // console.log('propsfilteroptions', props.filterOptions)
 
+/**
+ * Checks whether a given string is a key.
+ * @param {String}	key	- the string that needs to be checked
+ * @return	{Bool} boolean stating whether the string is a key.
+ */
 function isItemKey(key) {
   const lowerKey = key.toLowerCase()
   const itemKeys = ['item']
@@ -161,7 +167,7 @@ function toggleInfoColumns(addHeaders) {
   ]
   additionalInfoAmount.value = addHeaders.length // TODO refactor
   // console.log('additional info amount', additionalInfoAmount.value)
-  console.log('toggleInfo infoHeaders', infoHeaders.value)
+  // console.log('toggleInfo infoHeaders', infoHeaders.value)
   // emit('updateHeaders', newHeaders)
 }
 
@@ -182,6 +188,8 @@ function isRecsHeader(key) {
 
 // TODO computed ?
 const filteredHeaders = () => {
+  // console.log('INFO HEADERS', infoHeaders.value)
+  // console.log('recs', props.recs)
   return !props.recs || infoHeaders.value.length === 0
     ? props.headers
     : infoHeaders.value
@@ -225,7 +233,7 @@ const filteredHeaders = () => {
               :headerOptions="headerOptions"
               @updateHeaders="(e) => emit('updateHeaders', e)"
             />
-            <b-button @click="filtersModalShow = !filterModalShow" class="m-1">
+            <b-button @click="filtersModalShow = !filterModalShow" class="m-1" data-testid="filterButton">
               Filters
             </b-button>
           </div>
@@ -236,7 +244,6 @@ const filteredHeaders = () => {
       <b-thead head-variant="dark">
         <!-- Main headers -->
         <b-tr>
-          <b-th v-if="overview" :style="colItemStyle(colWidth)"></b-th>
           <template v-for="(header, index) in filteredHeaders()" :key="header">
             <b-th
               class="text-center"
@@ -244,18 +251,20 @@ const filteredHeaders = () => {
               :style="{ ...colItemStyle(colWidth), cursor: 'pointer' }"
               @click="setsorting(index)"
             >
-              {{ header.name }}
+              
+              {{ header.name + (index == sortindex ? sortIcon[descending] : '' ) }}
             </b-th>
           </template>
+          <b-th v-if="overview" :style="colItemStyle(colWidth)"></b-th>
         </b-tr>
         <!-- Subheaders -->
         <b-tr v-if="overview">
-          <b-th :style="colItemStyle(colWidth)"></b-th>
           <template v-for="subheader in subheaders" :key="subheader">
             <b-th class="text-center" :style="colItemStyle(colWidth)">
               {{ subheader }}
             </b-th>
           </template>
+          <b-th v-if="overview" :style="colItemStyle(colWidth)"></b-th>
         </b-tr>
       </b-thead>
 
@@ -312,6 +321,7 @@ const filteredHeaders = () => {
           </template>
           <!-- Additional item info -->
           <!-- TODO refactor -->
+          <template v-if="recs">
           <template v-for="i in additionalInfoAmount" :key="i">
             <b-td
               v-if="itemsInfo[index]"
@@ -330,6 +340,7 @@ const filteredHeaders = () => {
             </b-td>
             <b-td :style="colItemStyle(colWidth * 3)" v-else></b-td>
           </template>
+          </template>
           <b-td
             class="align-middle"
             v-if="overview || removable"
@@ -341,7 +352,8 @@ const filteredHeaders = () => {
                 @click="$emit('viewResult', item.id)"
                 class="m-1"
                 style="width: 142px"
-                >View result
+              >
+                {{ viewItem ? 'View result' : 'Open result' }}
               </b-button>
               <div class="p-0" style="width: 150px">
                 <b-col md="auto" class="mx-0 px-0 d-inline">

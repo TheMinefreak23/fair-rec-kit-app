@@ -8,7 +8,7 @@ import Results from './components/Results.vue'
 import PreviousResults from './components/PreviousResults.vue'
 import ExperimentQueue from './components/ExperimentQueue.vue'
 import NewExperiment from './components/NewExperiment.vue'
-import TestForm from './test/TestForm.vue'
+// import TestForm from './test/TestForm.vue'
 import { onMounted, ref, watch } from 'vue'
 import { API_URL } from './api'
 import MusicDetail from './components/MusicDetail.vue'
@@ -17,7 +17,7 @@ import { store } from './store'
 import { status } from './helpers/queueFormatter'
 import { viewResultTab } from './helpers/resultRequests'
 import VCheckmark from './components/VCheckmark.vue'
-import TestSelect from './test/TestSelect.vue'
+// import TestSelect from './test/TestSelect.vue'
 
 let toast = useToast()
 const done = ref(false) // TODO refactor
@@ -40,7 +40,7 @@ watch(
 
 // Change UI on new result
 function onNewResult() {
-  done.value = store.currentExperiment.status == status.done
+  done.value = store.currentExperiment.status === status.done
   if (done.value) {
     // Make result tab blink
     blink.value = true
@@ -159,7 +159,7 @@ function callToast() {
           <Results @toast="onNewResult"
         /></b-tab>
         <b-tab title="All results">
-          <PreviousResults />
+          <PreviousResults viewItem />
         </b-tab>
         <b-tab title="Music Detail">
           <MusicDetail />

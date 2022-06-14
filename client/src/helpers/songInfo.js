@@ -18,6 +18,12 @@ function authorisedGetRequestOptions(token) {
   }
 }
 
+/**
+ * Does magical things to foo.
+ * @param {String}    foo    - foo is a sentence in bla. 
+ * @param {Int}        fa    - How often each letter in foo occurs.
+ * @return    {[Int]} Array of counts of each letter.
+ */
 async function getInfoFromSpotifyID(token, id) {
   //console.log(requestOptions)
   const url = SPOTIFY_API + 'tracks/' + id
@@ -26,14 +32,16 @@ async function getInfoFromSpotifyID(token, id) {
   // console.log('Spotify track from id', id, ':', track)
   return track
 }
-
+/**
+ * Gets the LastFM and AcousticBrainz data from a song using their respecitve API's
+ * @param {String}    track   - Name of the song
+ * @param {String}    artist  - Name of the artist
+ * @param {String}    mbid    - Unique MBID hash, that can be used in place of track and artist
+ * @return {Object}   Object with AcousticBrainz and LastFM data
+ */
 async function getSongInfo(track, artist, mbid) {
   const lastFMData = await getLastFMinfo(artist, track, mbid)
-  // console.log('song info lastFM track', lastFMData.track)
 
-  // TODO use spotifyId here?
-
-  //console.log('mbid', musicbrainzId)
   if (mbid == undefined && lastFMData.track) {
     mbid = lastFMData.track.mbid
     // console.log('mbid', mbid)
@@ -49,7 +57,11 @@ async function getSongInfo(track, artist, mbid) {
   }
 }
 
-// Request an authentication token from the Spotify API
+/**
+ * Request an authentication token from the Spotify API
+ * @return    {Object} JSON-object containing Auth-token.
+ */
+
 async function getSpotifyToken() {
   const response = await fetch(API_URL + '/music/token')
   const data = await response.json()
@@ -57,7 +69,14 @@ async function getSpotifyToken() {
   return data
 }
 
-//Request Spotify data from artist and track name
+/**
+ * Request Spotify data by making a query with artist and track name
+ * @param {String} token - Spotify Authentication Token
+ * @param {String} track - Track name
+ * @param {String} artist - Artist name
+ * @return    {[Array]} List of Spotify tracks found by query, each track containing data
+ */
+
 async function getSpotifyInfo(token, track, artist) {
   //console.log(requestOptions)
   const url =
@@ -73,6 +92,13 @@ async function getSpotifyInfo(token, track, artist) {
 }
 
 // Request song-data from LastFM
+/**
+ * 
+ * @param {String} artist - Artist name
+ * @param {String} track - Track name
+ * @param {String} mbid - MBID unique hash-token, which can be used instead of artist and track name
+ * @returns {Object} - Object containing all LastFM data about a track
+ */
 async function getLastFMinfo(artist, track, mbid) {
   var url
 
@@ -97,11 +123,14 @@ async function getLastFMinfo(artist, track, mbid) {
   }
   const response = await fetch(url)
   const data = await response.json()
-  // console.log('LastFM', data)
   return data
 }
 
-// Request High-level audio features from AcousticBrainz using a musicbrainzID
+/**
+ * Request AcousticBrainz data
+ * @param {String} musicbrainzId - Unique MusicBrainz identifier, which can be retrieved from LastFM 
+ * @returns {Object} data containing AcousticBrainz data, including high/low-level audio features
+ */
 async function getAcousticBrainzInfo(musicbrainzId) {
   const requestOptions = {
     method: 'POST',
@@ -116,7 +145,6 @@ async function getAcousticBrainzInfo(musicbrainzId) {
   const url = API_URL + '/music/AcousticBrainz'
   const response = await fetch(url, requestOptions)
   const data = await response.json()
-  //console.log('AcousticBrainz:', data)
   return data[musicbrainzId]
 }
 

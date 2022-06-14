@@ -14,17 +14,23 @@ const emit = defineEmits(['toast'])
 const showResultModal = ref(false)
 const currentTab = ref(0)
 
+/**
+ * Show a toast and set the status when the experiment is finished
+ */
 watch(
   () => store.currentExperiment.status,
   // New result added
   (newStatus, oldStatus) => {
-    if (newStatus == status.done || newStatus == status.aborted) {
+    if (newStatus === status.done || newStatus === status.aborted) {
       emit('toast')
       store.currentExperiment.status = status.notAvailable
     }
   }
 )
 
+/**
+ * Switch to the new result tab when it's updated (added)
+ */
 watch(
   () => store.currentResultTab,
   // New result added
@@ -32,28 +38,6 @@ watch(
     currentTab.value = newTab
   }
 )
-
-//onMounted(() => (store.currentResults = [mockResult()]))
-
-// Mockdata result
-function mockResult() {
-  const testcaption = 'Dataset: LFM-1b, Algorithm: ALS'
-
-  // Add mockdata result to current results
-  const mock = {
-    caption: testcaption,
-    results: mockdata.body,
-    headers: mockdata.headers,
-  }
-  return {
-    id: 0,
-    metadata: {
-      name: 'computation1',
-      tags: ['tag1 ', 'tag2 ', 'tag3 ', 'tag4 '],
-    },
-    result: [mock, mock],
-  }
-}
 
 /**
  * Close an inner result tab by index

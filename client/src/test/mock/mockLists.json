@@ -1,0 +1,44 @@
+{
+  "datasets": [
+    {
+      "name": "LFM-2B",
+      "params": [
+        {
+          "name": "Train/testsplit",
+          "value": "80"
+        }
+      ],
+      "matrix": [
+        {
+          "name": "user-track-count",
+          "params": [],
+          "conversion": []
+        }
+      ],
+      "filters": [],
+      "splitting": [
+        {
+          "name": "random",
+          "params": [
+            {
+              "name": "seed",
+              "value": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metrics": [],
+  "approaches": [
+    {
+      "name": "Random",
+      "params": [
+        {
+          "name": "seed",
+          "value": null
+        }
+      ]
+    }
+  ]
+}

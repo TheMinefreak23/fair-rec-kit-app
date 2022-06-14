@@ -1,22 +1,18 @@
 <script setup>
-/*This program has been developed by students from the bachelor Computer Science at
+/* This program has been developed by students from the bachelor Computer Science at
     Utrecht University within the Software Project course.
-    © Copyright Utrecht University (Department of Information and Computing Sciences)*/
+    © Copyright Utrecht University (Department of Information and Computing Sciences) */
 import { API_URL } from '../api.js'
 import Table from './Table.vue'
 import { onMounted, ref, watch } from 'vue'
 import { formatResults } from '../helpers/resultFormatter.js'
 import { status, progress } from '../helpers/queueFormatter.js'
 import { store, getQueue, pollForResult } from '../store.js'
-import { viewResult } from '../helpers/resultRequests.js'
+import { addResultById } from '../helpers/resultRequests.js'
 
-//const emit = defineEmits(['computing', 'done', 'stop'])
-const props = defineProps({
-  names: [String],
-  experiments: [],
-})
-
-//Declare the info about the experiments that will be shown to the user
+/**
+ * Declare the info about the experiments that will be shown to the user
+ */
 const headers = ref([
   { name: 'ID' },
   { name: 'Date Time' },
@@ -29,30 +25,23 @@ const headers = ref([
   { name: '' },
 ])
 
-const progressMax = 100
-const previousNumber = ref(0)
+const progressMax = 100 // the maximal value of the progress bar
+const previousNumber = ref(0) // the previous progress number
 
-//Retrieve the queue when the page is loaded
+/**
+ * Retrieve the queue when the page is loaded
+ */
 onMounted(() => {
   getQueue()
-  if (store.currentExperiment.status == status.active) {
+  if (store.currentExperiment.status === status.active) {
     pollForResult()
   }
 })
 
-/*
-//Reload the queue when the experiment is done
-watch(
-  () => store.currentExperiment.status,
-  (newStatus, oldStatus) => {
-    console.log('queue watch experiment:', store.currentExperiment)
-    if (newStatus) {
-      getQueue()
-    }
-  }
-)*/
-
-// Return a progress number based on the progress status
+/**
+ * Return a progress number based on the progress status
+ * @param {String} progressStatus - the progress status
+ */
 function progressNumber(progressStatus) {
   // progress statuses in order
   // TODO refactor
@@ -66,16 +55,16 @@ function progressNumber(progressStatus) {
     progress.finished,
   ]
   const progressNumbers = {}
-  for (let progressIndex in progresses) {
-    //console.log(progresses[progressIndex])
+  for (const progressIndex in progresses) {
+    // console.log(progresses[progressIndex])
     progressNumbers[progresses[progressIndex]] = Math.floor(
       (progressIndex / progresses.length) * progressMax
     )
   }
-  //console.log('current exp', store.currentExperiment)
-  //console.log('progressStatus', progressStatus)
-  //console.log(progressNumbers[progressStatus])
-  progressNumber = progressNumbers[progressStatus]
+  // console.log('current exp', store.currentExperiment)
+  // console.log('progressStatus', progressStatus)
+  // console.log(progressNumbers[progressStatus])
+  progressNumber.value = progressNumbers[progressStatus]
   if (progressNumber) {
     previousNumber.value = progressNumber
   }
@@ -96,6 +85,7 @@ function progressNumber(progressStatus) {
         }}
         <!--{{ store.currentExperiment }}-->
       </h4>
+      <!--Show the experiment progress.-->
       <b-progress
         v-if="store.currentExperiment.status == status.active"
         :max="progressMax"
@@ -109,14 +99,15 @@ function progressNumber(progressStatus) {
           <span>
             Progress:
             {{ store.currentExperiment.progress }}
-            <strong>
+            <!--<strong>
               {{ progressNumber(store.currentExperiment.progress) }}
-            </strong>
+            </strong>-->
           </span>
         </b-progress-bar>
       </b-progress>
+      <!--Show the queue with this session's experiments.-->
       <Table
-        @viewResult="viewResult"
+        @viewResult="addResultById"
         :results="formatResults(store.queue, true)"
         :headers="headers"
         buttonText="Cancel"
