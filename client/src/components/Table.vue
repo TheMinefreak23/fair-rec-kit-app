@@ -41,6 +41,7 @@ const props = defineProps({
   filters: Object,
   filterOptions: Array,
   defaultSort: Number,
+  startIndex: Number
 })
 
 // Column width
@@ -399,16 +400,16 @@ const filteredHeaders = () => {
     </b-table-simple>
 
     <!-- Pagination -->
+    <div v-if="pagination">
     <b-button
-      v-if="pagination"
       @click="$emit('loadMore', false, entryAmount)"
       variant="outline-primary"
-      :disabled="entryAmount < 1"
+      :disabled="entryAmount < 1 || entryAmount > props.startIndex"
     >
       Show previous {{ entryAmount }} items
     </b-button>
+    Showing entries {{props.startIndex + 1}} - {{props.startIndex + parseInt(entryAmount)}}
     <b-button
-      v-if="pagination"
       @click="$emit('loadMore', true, entryAmount)"
       variant="outline-primary"
       :disabled="entryAmount < 1"
@@ -417,12 +418,12 @@ const filteredHeaders = () => {
     </b-button>
     <b-form-input
       v-model="entryAmount"
-      v-if="pagination"
       :state="entryAmount >= 1"
       type="number"
       v-on:keyup.enter="$emit('loadMore', null, entryAmount)"
       >20</b-form-input
     >
+    </div>
   </div>
 </template>
 

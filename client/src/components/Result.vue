@@ -210,10 +210,9 @@ function loadMore(increase, amount, pairid, runID) {
   // Determine the index for where the next page starts, based on how many entries were shown before.
   if (increase != null)
   {
-    if (!increase && startIndex.value > 0) startIndex.value -= entryAmount.value;
+    if (!increase) startIndex.value -= amount;
     if (startIndex.value < 0) startIndex.value = 0;
     else if (increase) startIndex.value += entryAmount.value;
-    else startIndex.value = 0;
   }
   
   // Update amount to new number of entries that are shown.
@@ -490,7 +489,7 @@ function contains(string, array) {
                 <Table v-if="selectedHeaders[run][index]" :key="props.result.id" :caption="entry"
                   :results="data.results[run][index]" :headers="selectedHeaders[run][index].map(makeHeader)"
                   :filters="filters" :filterOptions="availableFilters" :headerOptions="optionalHeaderOptions[index]" defaultSort="0"
-                  pagination expandable :recs="snippet" @paginationSort="(i) => paginationSort(i, index, run)" @loadMore="
+                  :startIndex = "startIndex" pagination expandable :recs="snippet" @paginationSort="(i) => paginationSort(i, index, run)" @loadMore="
                     (increase, amount) => loadMore(increase, amount, index, run)
                   " @changeFilters="
   (changedFilters) => changeFilters(changedFilters, index, run)
