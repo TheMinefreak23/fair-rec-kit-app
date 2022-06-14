@@ -20,7 +20,6 @@ from tests.constants import MOCK_RESULTS_DIR
 def test_result_by_id():
     """Test setting the full result by its ID"""
     result_by_id(0, result_store)
-    # assert result_store.current_result
     # TODO throws error during CI
     correct_result = load_json(MOCK_RESULTS_DIR + "UNITTEST_correct_result.json")
     assert correct_result == result_store.current_result
