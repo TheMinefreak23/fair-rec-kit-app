@@ -362,12 +362,20 @@ function contains(string, array) {
           <!--<h4> done in {{ result.metadata.elapsed_time }} seconds </h4>-->
         </b-col>
         <b-col>
-          <div class="float-end">
+          <div class="float-end d-inline">
             <SettingsModal :resultId="result.id" />
-            <b-form-input type="number" v-model="validationAmount" v-b-tooltip.hover title="Number of validation runs">
+            <b-form-input 
+              type="number" 
+              v-model="validationAmount" 
+              v-b-tooltip.hover 
+              title="Number of validation runs">
             </b-form-input>
-            <b-button @click="validate()" variant="outline-primary fw-bold" v-b-tooltip.hover
-              title="Validate this experiment">Validate run
+            <b-button 
+              @click="validate()" 
+              variant="outline-primary fw-bold" 
+              v-b-tooltip.hover
+              title="Validate this experiment">
+              Validate run
             </b-button>
           </div>
         </b-col>

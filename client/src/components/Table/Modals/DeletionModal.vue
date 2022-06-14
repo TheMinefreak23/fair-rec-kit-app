@@ -98,8 +98,9 @@ function getTooltipText(item) {
       v-model="deleteModalShow"
       :title="entry.title"
       ok-title="Yes"
-      ok-variant="danger"
+      ok-variant="primary"
       cancel-title="No"
+      cancel-variant="danger"
       @ok="removeEntry()"
     >
       <p>{{ entry.description }}</p>
