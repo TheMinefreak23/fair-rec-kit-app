@@ -250,9 +250,9 @@ code:before {
 <template>
 <div id="main" class="ps-0">
   <!-- Open-close button -->
-  <span class="position-fixed bg-dark text-white px-2 rounded-end" style="font-size:30px;cursor:pointer" v-on:click="openCloseNav()">&#9776;</span>
+  <span class="position-fixed bg-dark text-white px-2 rounded-end" style="font-size:30px; cursor:pointer" v-on:click="openCloseNav()">&#9776;</span>
   <!-- Navigation sidebar -->
-  <div id="docSidenav" class="sidenav bg-secondary">
+  <div id="customScrollbar" class="sidenav bg-secondary">
     <!--<a href="javascript:void(0)" class="closebtn float-end m-0" v-on:click="closeNav()">&times;</a>-->
     <b-link class="position-relative py-0" :href='"#"+header.name' v-for="header in structure1D" :key="header">
       <!-- Indentation to indicate items and subitems -->
