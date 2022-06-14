@@ -11,7 +11,7 @@ defineEmits(['updateHeaders'])
 const updateHeadersModalShow = ref(false)
 
 // Columns
-const checkedColumns = ref([])
+const checkedColumns = ref(["track_spotify-uri"])
 </script>
 
 <template>

@@ -43,15 +43,13 @@ onMounted(() => {
   fillShownMetrics()
   // Load in all the user recommendation/prediction tables
   // Also initialize the components for table storage
-  // console.log('run numbers array', runNumbers)
   for (const run in runNumbers) {
-    // console.log(run)
     data.value.results[run] = []
     selectedHeaders.value[run] = []
     for (const index in userTables) {
-      // console.log(index, run)
       selectedHeaders.value[run][index] = []
       data.value.results[run][index] = []
+      optionalHeaders.value[index] = ['track_spotify-uri']
       setRecs(parseInt(index), parseInt(run))
     }
   }

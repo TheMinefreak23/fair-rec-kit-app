@@ -192,7 +192,7 @@ const filteredHeaders = () => {
   // console.log('recs', props.recs)
   return !props.recs || infoHeaders.value.length === 0
     ? props.headers
-    : infoHeaders.value
+    : [...props.headers, ...[{name : 'Album'}, {name : 'Snippet'}]]
 }
 </script>
 

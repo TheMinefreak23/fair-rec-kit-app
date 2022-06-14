@@ -98,20 +98,20 @@ def user_result():
     dataset_name = json.get("dataset", "")
     sortIndex = json.get("sortindex", 0)
 
-    # read mock dataframe
-    recs = result_storage.current_recs[run_id][pair_id]
+    #Load the current recs from the storage (without changing the original)
+    import copy
+    recs = copy.deepcopy(result_storage.current_recs[run_id][pair_id])
+
     dataset = recommender_system.data_registry.get_set(dataset_name)
     #TODO refactor/do dynamically
     spotify_datasets = ['LFM-2B']
     if dataset_name in spotify_datasets:
         recs = add_spotify_columns(dataset_name, recs)
-
+    
     recs = filter_results(recs, filters)
-
     #Add optional columns to the dataframe (if any)
     if (len(chosen_headers) > 0):
       recs=add_dataset_columns(dataset_name, recs, chosen_headers, matrix_name)
-
     #Make sure not to sort on a column that does not exist anymore
     if (len(recs.columns) <= sortIndex):
         sortIndex = 0
@@ -194,7 +194,7 @@ def add_spotify_columns(dataset_name, dataframe):
     """
     dataset = recommender_system.data_registry.get_set(dataset_name)
     matrix_name = 'user-track-count'
-    columns = ['track_id', 'track_spotify-uri']
+    columns = []
     dataframe = add_data_columns(dataset, matrix_name, dataframe, columns)
     print(dataframe.head())
     return dataframe
