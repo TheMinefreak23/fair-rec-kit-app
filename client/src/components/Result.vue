@@ -208,10 +208,14 @@ function loadMore(increase, amount, pairid, runID) {
   amount = parseInt(amount);
 
   // Determine the index for where the next page starts, based on how many entries were shown before.
-  if (!increase && startIndex.value > 0) startIndex.value -= entryAmount.value;
-  if (startIndex.value < 0) startIndex.value = 0;
-  else if (increase) startIndex.value += entryAmount.value;
-  else startIndex.value = 0;
+  if (increase != null)
+  {
+    if (!increase && startIndex.value > 0) startIndex.value -= entryAmount.value;
+    if (startIndex.value < 0) startIndex.value = 0;
+    else if (increase) startIndex.value += entryAmount.value;
+    else startIndex.value = 0;
+  }
+  
   // Update amount to new number of entries that are shown.
   entryAmount.value = amount;
   getUserRecs(pairid, runID);
