@@ -10,6 +10,7 @@ import { ref } from 'vue'
 import { structure } from '../documentation/documentation_structure.vue'
 import { doctext } from '../documentation/documentation_items.vue'
 
+const collapse =ref([])
 let itemDicts = ref();
 let sidenavOpened = ref();
 let structure1D = ref();
@@ -288,8 +289,10 @@ code:before {
     <!-- Subitems have more margin than its parent. -->
     <b-card :id='itemDicts[header.name]["name"]' :style='"margin-left:"+10*header.depth+"px"' class="border-end-0 border-top-0 border-bottom-0 border-5 bg-secondary">
       <!-- Subitems are smaller as well. -->
-      <b-card-title :style='"font-size: "+(22-(5*(Math.floor(header.depth/3))))+"px"'>{{itemDicts[header.name]["name"]}}</b-card-title>
-      <!-- v-if because if there is no description -> undefined, which takes space. -->
+      
+      <b-card-title :style='"font-size: "+(22-(5*(Math.floor(header.depth/3))))+"px"'>{{itemDicts[header.name]["name"]}} <b-button @click="collapse=!collapse" variant="primary">Collapse</b-button> </b-card-title>
+      <!-- v-if because if there is no description -> undefined, which takes space. -->    
+     <b-collapse v-model="collapse">
       <b-card-text v-if='itemDicts[header.name]["description"]'>
         <span v-html='itemDicts[header.name]["description"]'></span>
       </b-card-text>
@@ -299,8 +302,10 @@ code:before {
         <b-button variant="primary" :href='itemDicts[header.name]["button"]' v-if='itemDicts[header.name]["button"]'>
           {{ itemDicts[header.name]["name"] }}
         </b-button>
-      </span>
+      </span> 
+      </b-collapse>     
     </b-card> 
+
   </div>
 </div>
 </template>
