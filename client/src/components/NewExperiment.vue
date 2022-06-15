@@ -149,7 +149,7 @@ function reformat(property) {
                 <b-col md="auto" class="text-center">
                   <p>Experiment type 
                     <i class="bi bi-info-circle"  
-                    v-b-tooltip.hover title = "Predictions are predicted ratings for single user-item pairs in the data , while recommendations are a list of recommended items for a user based on these predicted ratings.">
+                    v-b-tooltip.hover title = "Predictions are predicted ratings for known user-item pairs in the data , while recommendations are a list of recommended items for a user based on these predicted ratings.">
                     </i>
                   </p>
                 </b-col>
