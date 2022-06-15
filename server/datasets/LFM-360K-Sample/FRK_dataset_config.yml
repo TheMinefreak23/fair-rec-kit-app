@@ -1,4 +1,4 @@
-dataset: LFM-360K
+dataset: LFM-360K-Sample
 matrices:
   user-artist-count:
     idx_item:

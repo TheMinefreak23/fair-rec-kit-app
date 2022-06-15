@@ -1,4 +1,4 @@
-dataset: ML-25M
+dataset: ML-25M-Sample
 matrices:
   user-movie-rating:
     idx_item:
