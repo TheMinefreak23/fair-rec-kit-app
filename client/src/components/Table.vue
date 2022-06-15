@@ -320,6 +320,9 @@ const filteredHeaders = () => {
                   <template v-else></template>
                 </template>
                 <!-- Regular column -->
+                <template v-else-if="value && value.toString().startsWith('http')">
+                  <b-link :href="value" target="_blank">{{ value}}</b-link>
+                </template>
                 <template v-else>
                   {{ value }}
                 </template>
@@ -417,7 +420,7 @@ const filteredHeaders = () => {
         Show previous {{ entryAmount }} items
       </b-button>
       Showing entries {{ props.startIndex + 1 }} -
-      {{ props.startIndex + parseInt(entryAmount) }}
+      {{ props.startIndex + props.results.length }}
       <b-button
         @click="$emit('loadMore', true, entryAmount)"
         variant="outline-primary"

@@ -103,7 +103,7 @@ def user_result():
 
     #Load the current recs from the storage (without changing the original)
     import copy
-    recs = copy.deepcopy(result_storage.current_recs[run_id][pair_id])
+    recs = copy.deepcopy(result_store.current_recs[run_id][pair_id])
 
     dataset = recommender_system.data_registry.get_set(dataset_name)
     #TODO refactor/do dynamically
@@ -111,13 +111,13 @@ def user_result():
     if dataset_name in spotify_datasets:
         recs = add_spotify_columns(dataset_name, recs)
     
-    recs = filter_results(recs, filters)
+    #recs = filter_results(recs, filters)
     #Add optional columns to the dataframe (if any)
     if (len(chosen_headers) > 0):
       recs=add_dataset_columns(dataset_name, recs, chosen_headers, matrix_name)
     #Make sure not to sort on a column that does not exist anymore
-    if (len(recs.columns) <= sortIndex):
-        sortIndex = 0
+    if (len(recs.columns) <= sort_index):
+        sort_index = 0
     # sort dataframe based on index and ascending or not
     df_sorted = recs.sort_values(
         by=recs.columns[sort_index], ascending=json_data.get("ascending"))
@@ -228,7 +228,7 @@ def add_spotify_columns(dataset_name, dataframe):
     print(dataframe.head())
     return dataframe
 
-@result_bp.route('/validate', methods=['POST'])
+@blueprint.route('/validate', methods=['POST'])
 def validate():
     """Give the server the task of running a requested experiment again.
 
