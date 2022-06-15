@@ -4,8 +4,8 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 import json
-import tkinter as tk
-from tkinter.filedialog import asksaveasfilename
+#import tkinter as tk
+#from tkinter.filedialog import asksaveasfilename
 
 from flask import (Blueprint, request)
 import pandas as pd
@@ -228,14 +228,14 @@ def add_spotify_columns(dataset_name, dataframe):
     print(dataframe.head())
     return dataframe
 
+"""Give the user the option to export the current shown results to a .tsv file.
 
+Returns:
+    A message indicating if the export was succesful
+"""
+"""
 @blueprint.route('/export', methods=['POST'])
 def export():
-    """Give the user the option to export the current shown results to a .tsv file.
-
-    Returns:
-        A message indicating if the export was succesful
-    """
     # TODO rework this
     # Load results from json
     json_data = request.json
@@ -262,7 +262,7 @@ def export():
         return {'message': 'Exported succesfully'}
     except SystemError:
         return {'message': 'Export cancelled'}
-
+"""
 
 @blueprint.route('/validate', methods=['POST'])
 def validate():
