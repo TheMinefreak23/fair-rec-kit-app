@@ -33,6 +33,5 @@ jobs:
           pip install pytest-cov
 
       - name: Run tests and coverage
-        run: |
-          cd ./server
-          pytest --cov
+        working-directory: ./server
+        run: pytest --cov

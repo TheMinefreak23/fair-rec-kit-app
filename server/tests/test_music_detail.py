@@ -7,15 +7,14 @@ Utrecht University within the Software Project course.
 import numpy as np
 from sewar.full_ref import uqi
 from PIL import Image
-from project.music_detail import collage
-from project.music_detail import request_spotify_data
-import imageio
+from project.blueprints.music_detail_bp import collage
+from project.blueprints.music_detail_bp import request_spotify_data
 
 URL_PREFIX = '/api/music'
 
 
 def test_spotify_token(client):
-    """ Tests the generating of a Spotify Auth token
+    """ Test the generating of a Spotify Auth token
 
     Args:
         client (Client): The client
@@ -25,7 +24,7 @@ def test_spotify_token(client):
 
 
 def test_acousticbrainz_data(client):
-    """ Tests if acousticbrainz gets succesfully requested
+    """ Test if AcousticBrainz gets successfully requested
 
     Args:
         client (Client): The client
@@ -36,17 +35,18 @@ def test_acousticbrainz_data(client):
 
 
 def test_background(client):
-    """ Tests if a background is succesfully generated
+    """ Test if a background is successfully generated
 
     Args:
         client (Client): The client
     """
-    response = client.get(URL_PREFIX + '/background')
+    response = client.post(URL_PREFIX + '/background')
     assert response.status_code == 200
+    assert response.data == b'Background saved'
 
 
 def test_collage():
-    """Tests if the collage method works properly
+    """Test if the collage method works properly
     """
     input_img = "tests/thisisbingus.jpg"
     output_img = "tests/4bingus.jpg"
@@ -63,17 +63,18 @@ def test_collage():
 
 
 def test_unique_album_background(client):
-    """ Tests if a background is succesfully generated
+    """ Test if a background is successfully generated
 
     Args:
         client (Client): The client
     """
     response = client.get(URL_PREFIX + '/unique-album-background')
     assert response.status_code == 200
+    assert response.data == b'Background saved'
 
 
 def test_spotify_data():
-    """ Tests if spotify track data gets succesfully requested
+    """ Test if Spotify track data gets successfully requested
     """
     url = 'https://api.spotify.com/v1/search?q=scatman%20john&type=track'
     result = request_spotify_data(url)
