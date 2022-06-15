@@ -127,6 +127,14 @@ function reformat(property) {
   }
   return formattedChoices
 }
+
+function validName(inputName) {
+  if (inputName)
+    return !['/', '\\\\', '.'].some((badString) =>
+      inputName.includes(badString)
+    )
+  //inputName.match(/^([a-zA-Z\-0-9])$/) != null
+}
 </script>
 
 <template>
@@ -170,6 +178,7 @@ function reformat(property) {
                     <b-form-input
                       placeholder="New experiment"
                       v-model="metadata.name"
+                      :state="validName(metadata.name)"
                     ></b-form-input>
                   </b-form-group>
                 </b-col>
