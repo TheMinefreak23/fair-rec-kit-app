@@ -8,14 +8,14 @@ on:
 
 jobs:
   lintchanges:
-    runs-on: ubuntu-latest  # windows-latest | macos-latest
+    runs-on: ubuntu-latest # windows-latest | macos-latest
     name: Retrieve and lint changed files
-    outputs: 
+    outputs:
       files: steps.changedfiles.changed-files.outputs
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # OR "2" -> To retrieve the preceding commit.
+          fetch-depth: 0 # OR "2" -> To retrieve the preceding commit.
 
       - name: Get changed files
         id: changed-files
@@ -25,33 +25,27 @@ jobs:
             **/*.py
           files_ignore: |
             !**.py
-            
+
       - name: Any changes?
         run: |
           echo "${{ steps.changed-files.outputs.any_changed }}"
-      
+
       - name: Set up Python
         uses: actions/setup-python@v3
-      
+
       - uses: actions/cache@v2
         with:
           path: ${{ env.pythonLocation }}
-          key: ${{ env.pythonLocation }}-${{ hashFiles('setup.py') }}-${{ hashFiles('requirements.txt') }}
-      
+          key: ${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
+
       - name: Install dependencies
         run: |
+          cd ./server
           python -m pip install --upgrade pip
+          pip install -r requirements.txt
           pip install pylint
           pip install pytest
-          pip install pandas
-          pip install PyYAML
-          pip install Flask
-          pip install Flask-Cors
-          pip install requests
-          pip install pillow
-          pip install Cython
-          pip install fairreckitlib
-          
+
       - name: Lint all changed files
         run: |
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do

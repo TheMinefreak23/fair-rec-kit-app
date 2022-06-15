@@ -3,7 +3,11 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
-from project.options_formatter import *
+from project.models.options_formatter \
+    import create_model_api_dict, format_categorised,\
+    reformat_all, reformat, \
+    reformat_options, form_to_data, \
+    parse_if_number, reformat_list
 
 form_options = {}
 
@@ -15,7 +19,7 @@ def test_model_api_dict():
     """Test model-to-API dictionary generation"""
     # Empty case
     model_to_api = create_model_api_dict({}, {})
-    assert model_to_api == {}
+    assert not model_to_api
 
     # Simple case
     #model_to_api = create_model_api_dict({}, {})
@@ -26,7 +30,7 @@ def test_format_categorised():
     """Test data to form reformatting fpr categorised options"""
     # Empty case
     formatted = format_categorised({})
-    assert formatted == []
+    assert not formatted
 
 
 # def test_available_options():
@@ -36,7 +40,7 @@ def test_reformat_all():
     """Test data to form reformatting fpr multiple options"""
     # Empty case
     formatted = reformat_all({}, {})
-    assert formatted == {}
+    assert not formatted
 
 
 def test_reformat():
@@ -53,11 +57,9 @@ def test_reformat_options():
     assert reformat_options([]) == []
 
 
-"""
-def test_config_from_settings():
+#def test_config_from_settings():
     # TODO assumption: no Empty case
-    config_dict_from_settings()
-"""
+    #config_dict_from_settings()
 
 
 def test_form_to_data():
@@ -65,7 +67,7 @@ def test_form_to_data():
     # Empty case
     settings = {'lists': {}}
     form_to_data(settings)
-    assert settings == {}
+    assert not settings
 
     # Lists key deleted
     # assert 'lists' not in settings

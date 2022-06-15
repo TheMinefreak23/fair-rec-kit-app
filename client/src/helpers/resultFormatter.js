@@ -68,7 +68,11 @@ export function statusVariant(rawStatus) {
   }
 }
 
-// Format a result for the result tab
+/**
+ * Format a result for the result tab
+ * @param {Object} result - The unformatted result
+ * @return {Object} The formatted result
+ */
 export function formatResult(result) {
   console.log('before format', JSON.parse(JSON.stringify(result)))
   const formattedResult = {
@@ -108,22 +112,11 @@ export function formatResult(result) {
   return formattedResult
 }
 
-/*
-// Omit the recommendation key from the result metric table
-function omitRecommendation(arr) {
-  return arr.map(
-    // Omit recommendation
-    (r) => ({
-      ...r,
-      recs: r.recs.map((rec) => {
-        const { recommendation, ...rest } = rec
-        return rest
-      }),
-    })
-  )
-} */
-
-// Short result description, e.g. for a result tab
+/**
+ * Short result description, e.g. for a result tab
+ * @param {Object} result - The result
+ * @return {String} - The short description
+ */
 export function shortResultDescription(result) {
   //console.log(result)
   const datasets = []
@@ -137,7 +130,6 @@ export function shortResultDescription(result) {
   const datetime = result.metadata.datetime
 
   function formatNames(list) {
-    //console.log(Array.from(new Set(list)))
     const formattedList = []
     for (const name of Array.from(new Set(list))) {
       // Remove index (part after last underscore)
@@ -162,9 +154,10 @@ export function showDatasetInfo(dataset) {
 // Format evaluations (including filtered ones)
 export function formatEvaluation(e, index, result, runID) {
   // TODO refactor and/or give option to set decimal precision in UI
-  // TODO support several runs
   // Add index for unique metric key
-  result[formatMetric(e) + '_' + index] = e.evaluations[runID].global.toFixed(2)
+  result[formatMetric(e) + '_' + index] = parseFloat(
+    e.evaluations[runID].global
+  ).toFixed(2)
 
   // Flatten filters
   // console.log(e.evaluation, e.evaluation.filtered)
@@ -186,13 +179,6 @@ export function formatEvaluation(e, index, result, runID) {
       }
     }
   }
-  /*
-  const filtered = e.evaluation.filtered
-    .map((filter) => Object.entries(filter))
-    .map(([mainName, param] => { mainName + } ))
-    .flat()
-    .flat() */
-  // console.log(filtered)
 
   // Get filtered values and make subheaders
   if (filtered.length === 0) {

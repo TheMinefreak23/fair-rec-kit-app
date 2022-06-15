@@ -8,7 +8,7 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { capitalise } from '../../helpers/resultFormatter'
 
 import FormGroup from './FormGroup.vue'
-import { showToast } from '../../store'
+import { store } from '../../store'
 
 const emit = defineEmits(['update:modelValue'])
 const props = defineProps({
@@ -132,7 +132,7 @@ function showFormToast(object, actionMessage) {
       '!',
   }
   const otherOptions = { pos: 'top-right', delay: 800, variant: 'warning' }
-  showToast(mainOptions, otherOptions)
+  store.toast = { mainOptions, otherOptions }
 }
 
 /**

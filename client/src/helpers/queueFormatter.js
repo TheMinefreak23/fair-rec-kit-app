@@ -3,6 +3,9 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
 // TODO get from server
+/**
+ * Available types of experiment statuses
+ */
 export const status = {
   notAvailable: 'Not Available',
   toDo: 'To Do',
@@ -13,6 +16,9 @@ export const status = {
 }
 
 // TODO get from server
+/**
+ * Available types of experiment progress
+ */
 export const progress = {
   notAvailable: 'Not Available',
   started: 'Started',
@@ -27,8 +33,16 @@ export const progress = {
   finished: 'Finished',
 }
 
+/**
+ * The string that comes before each status (prefix)
+ */
 export const statusPrefix = 'status_' // TODO hacky
 
+/**
+ * Get the status display variant from the status name for the queue table
+ * @param {String} rawStatus - The status string
+ * @return {String} The status variant
+ */
 export function statusVariant(rawStatus) {
   const experimentStatus = rawStatus.slice(statusPrefix.length)
   //console.log('statusVariant experimentStatus', experimentStatus)
