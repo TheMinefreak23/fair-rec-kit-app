@@ -4,9 +4,6 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 import json
-import tkinter as tk
-from tkinter.filedialog import asksaveasfilename
-
 from flask import (Blueprint, request)
 import pandas as pd
 from fairreckitlib.data.set.dataset import add_dataset_columns as add_data_columns
