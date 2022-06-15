@@ -34,15 +34,16 @@ def result_by_id(result_id, result_storage):
 
     # loops through all the subdirectories, and thus - runs, of a certain calculation
 
-    # TODO REMOVE WHEN LIB IS UP TO DATE: TEMPORARY FIX
-    subdirs = [f.path.relative_path.replace('\\', '/') for f in os.scandir(relative_path) if f.is_dir()]
-
-    for subdir in subdirs:
+    for subdir in [f.path for f in os.scandir(relative_path) if f.is_dir()]:
         run_overview = load_json(subdir + "/overview.json")
         # loops through individual results by looping through each entry in the overview.json
         for pair_id, pair_data in enumerate(run_overview['overview']):
             evaluation_path_full = os.getcwd() + "/" + \
                                    pair_data['evaluation_path']
+
+            # TODO REMOVE WHEN LIB IS UP TO DATE: TEMPORARY FIX
+            evaluation_path_full = evaluation_path_full.replace('\\', '/')
+
             # ratings_settings_path_full = os.getcwd() + "/" + \
             #    pair_data['ratings_settings_path']
 
