@@ -3,6 +3,9 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
+import sys
+import logging
+
 from flask import Flask
 from flask_cors import CORS
 
@@ -30,6 +33,10 @@ def create_app():
 
     # Enable Cross-Origin Resource Sharing.
     CORS(app)
+
+    # Add console output to log
+    app.logger.addHandler(logging.StreamHandler(sys.stdout))
+    app.logger.setLevel(logging.DEBUG)
 
     # Route: Main.
     @app.route('/api', methods=['GET'])
