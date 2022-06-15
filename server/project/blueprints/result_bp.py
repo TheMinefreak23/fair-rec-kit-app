@@ -70,7 +70,7 @@ def set_result():
     """
     if request.method == 'POST':
         data = request.get_json()
-        print('result_by_id data', data)
+        #print('result_by_id data', data)
         result_by_id(int(data['id']), result_store)
         if result_store.current_result:
             response = {'status': 'success'}
@@ -78,8 +78,8 @@ def set_result():
             response = {'status': 'result not found'}
 
     else:  # GET request
-        print('current result', json.dumps(
-            result_store.current_result, indent=4))
+        #print('current result', json.dumps(
+            #result_store.current_result, indent=4))
         response = {'result': result_store.current_result}
 
     return response

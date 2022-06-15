@@ -155,13 +155,13 @@ class OptionsFormatter:
         """
         settings = experiment['settings']
 
-        print('experiment settings from client:', json.dumps(settings, indent=4))
+        #print('experiment settings from client:', json.dumps(settings, indent=4))
 
         name = experiment['metadata']['name']
         experiment_id = experiment['timestamp']['stamp'] + '_' + name
 
         form_to_data(settings)
-        print('formatted from form', json.dumps(settings, indent=4))
+        #print('formatted from form', json.dumps(settings, indent=4))
 
         # Format datasets
         # Add generic split to all dataset
