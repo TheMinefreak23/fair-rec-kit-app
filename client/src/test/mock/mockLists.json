@@ -1,7 +1,7 @@
 {
   "datasets": [
     {
-      "name": "LFM-2B",
+      "name": "LFM-2B-Sample",
       "params": [
         {
           "name": "Train/testsplit",
