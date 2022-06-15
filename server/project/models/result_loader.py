@@ -28,19 +28,21 @@ def result_by_id(result_id, result_storage):
     relative_path = RESULTS_DIR + str(result_id) + "_" + \
                     id_to_name(results_overview, result_id)
 
-    # TODO REMOVE WHEN LIB IS UP TO DATE: TEMPORARY FIX
-    relative_path = relative_path.replace('\\', '/')
-
     data = results_overview['all_results'][id_to_index(
         results_overview, result_id)]
     data['metadata']['runs'] = 0  # Store runs
     # loops through all the subdirectories, and thus - runs, of a certain calculation
+
     for subdir in [f.path for f in os.scandir(relative_path) if f.is_dir()]:
         run_overview = load_json(subdir + "/overview.json")
         # loops through individual results by looping through each entry in the overview.json
         for pair_id, pair_data in enumerate(run_overview['overview']):
             evaluation_path_full = os.getcwd() + "/" + \
                                    pair_data['evaluation_path']
+
+            # TODO REMOVE WHEN LIB IS UP TO DATE: TEMPORARY FIX
+            evaluation_path_full = evaluation_path_full.replace('\\', '/')
+
             # ratings_settings_path_full = os.getcwd() + "/" + \
             #    pair_data['ratings_settings_path']
 
