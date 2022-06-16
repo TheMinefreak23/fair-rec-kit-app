@@ -35,7 +35,7 @@ function format() {
       :header-bg-variant="alternateBg ? 'secondary' : 'dark'"
       :header-text-variant="alternateBg ? 'black' : 'white'"
       :header="key"
-      class="text-center pt-1 mt-1"
+      class="text-center pt-0 mt-1"
     >
       <b-col>
         <!-- Loop if the value is an array -->
@@ -44,7 +44,7 @@ function format() {
             :header-bg-variant="!alternateBg ? 'secondary' : 'dark'"
             :header-text-variant="!alternateBg ? 'black' : 'white'"
             :header="'#' + (parseInt(index) + 1)"
-            class="text-center pt-1 mt-1"
+            class="text-center pt-0 mt-1" pt-0
           >
             <DictionaryDisplay
               :dict="val"
