@@ -32,8 +32,8 @@ function format() {
     <!-- Don't show empty option lists -->
     <b-card
       v-if="!Array.isArray(value) || value.length > 0"
-      header-bg-variant="dark"
-      header-text-variant="light"
+      :header-bg-variant="alternateBg ? 'secondary' : 'dark'"
+      :header-text-variant="alternateBg ? 'black' : 'white'"
       :header="key"
       class="text-center pt-1 mt-1"
     >
@@ -52,9 +52,17 @@ function format() {
             :dict="value"
             :alternateBg="!alternateBg"
           />
-          <template v-else
-            ><b-button>{{ value ? value : 'None' }}</b-button></template
-          >
+          <!-- TODO Decide between these two implementations-->
+          <template v-else-if="key == 'test_ratio'">
+            {{ (1 - value) * 100 }}/{{ value * 100 }}
+          </template>
+          <template v-else-if="key == 'Train/testsplit'">
+            {{ value }}/{{ 100 - value }}
+          </template>
+          <template v-else>
+            <!-- <b-button disabled>{{ value ? value : 'None' }}</b-button> -->
+            {{ value ? value : 'None' }}
+          </template>
         </template>
       </b-col>
     </b-card>

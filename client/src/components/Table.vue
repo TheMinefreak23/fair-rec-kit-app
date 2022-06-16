@@ -433,6 +433,7 @@ const filteredHeaders = () => {
         :state="entryAmount >= 1"
         type="number"
         v-on:keyup.enter="$emit('loadMore', null, entryAmount)"
+        v-on:focusout="$emit('loadMore', null, entryAmount)"
         >20</b-form-input
       >
     </div>
