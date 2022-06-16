@@ -7,7 +7,7 @@ import enum
 import os
 from dataclasses import dataclass
 import yaml
-from fairreckitlib.experiment.experiment_config_parsing import Parser
+from fairreckitlib.experiment.experiment_config_parser import ExperimentConfigParser
 
 # Constants
 CONFIG_DIR = 'config_files'
@@ -96,22 +96,23 @@ class Experiment:
         if not os.path.isdir(CONFIG_DIR):
             os.mkdir(CONFIG_DIR)
 
+        # TODO DON'T USE YML?
         # Save configuration to yaml file.
         config_file_path = CONFIG_DIR + '/' + self.queue_item.name
 
         with open(config_file_path + '.yml', 'w+', encoding='utf-8') as config_file:
             yaml.dump(self.queue_item.config, config_file)
 
-        parser = Parser(True)
+        parser = ExperimentConfigParser(True)
         config = parser.parse_experiment_config_from_yml(config_file_path,
                                                          self.recommender_system.data_registry,
                                                          self.recommender_system.experiment_factory)
 
         self.recommender_system.run_experiment(config, events=events)
 
-        # TODO USE THIS FUNCTION INSTEAD OF PARSING
-        # self.recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)
-        # TODO delete YML and/or use config
+        # Delete temporary YML config
+        os.remove(config_file_path + '.yml')
+        
 
     def validate_experiment(self, events):
         """Validate an experiment by running it multiple times, using the experiment file path.
