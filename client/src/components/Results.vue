@@ -2,7 +2,7 @@
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
-import { onMounted, onUpdated, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import Result from './Result.vue'
 import VDismissButton from './VDismissButton.vue'
 import PreviousResults from './PreviousResults.vue'
@@ -47,7 +47,7 @@ watch(
  */
 watch(
   () => store.currentTab,
-  // This activated upon opening the results tab
+  // This activates upon opening the results tab
   (index) => {
     if (index == 3) {
       if (blink.value >= 0) {
