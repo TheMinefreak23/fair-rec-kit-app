@@ -40,11 +40,17 @@ function format() {
       <b-col>
         <!-- Loop if the value is an array -->
         <template v-if="value && Array.isArray(value)">
-          <DictionaryDisplay
-            v-for="val in value"
-            :dict="val"
-            :alternateBg="!alternateBg"
-        /></template>
+          <b-card v-for="(val, index) in value" 
+            :header-bg-variant="!alternateBg ? 'secondary' : 'dark'"
+            :header-text-variant="!alternateBg ? 'black' : 'white'"
+            :header="'#' + (parseInt(index) + 1)"
+            class="text-center pt-1 mt-1"
+          >
+            <DictionaryDisplay
+              :dict="val"
+              :alternateBg="alternateBg"
+          /></b-card>
+        </template>
         <!-- Display the value using a display if it's an object -->
         <template v-else>
           <DictionaryDisplay
