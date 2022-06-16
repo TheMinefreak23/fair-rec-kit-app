@@ -4,7 +4,6 @@
 Cypress.config('viewportWidth', 1920)
 Cypress.config('viewportHeight', 1080)
 
-
 describe('Visit', () => {
     it('Visits the local app', () => {
         cy.visit('localhost:3000')
@@ -28,13 +27,13 @@ describe('New Experiment', () => {
         cy.get('#datasets').within(($datasets) => {
             cy.get('button').contains('Add dataset...').click()
 
-            cy.get('select').each($el => {
+            cy.get('select').each(($el) => {
                 cy.wrap($el).select(1)
             })
-            cy.get('select').each($el => {
+            cy.get('select').each(($el) => {
                 cy.wrap($el).select(1)
             })
-            cy.get('select').each($el => {
+            cy.get('select').each(($el) => {
                 cy.wrap($el).select(1)
             })
         })
@@ -43,39 +42,61 @@ describe('New Experiment', () => {
         cy.get('div[id*=recommender]').within(($approaches) => {
             cy.get('button').contains('Add approach...').click()
 
-            cy.get('select').each($el => {
-                cy.wrap($el).select(1)
+            cy.get('select').each(($el) => {
+                cy.wrap($el).select('Random', { force: true })
             })
 
+            cy.get('#group-approach-1')
+                .get('select')
+                .each(($el, index, $list) => {
+                    if (index > 0) {
+                        cy.wrap($el).select('PopScore', { force: true })
+                    }
+                })
         })
+    })
+    it('Select Metrics', () => {
+        cy.get('div[id*=metrics]').within(($metrics) => {
+            cy.get('button').contains('Add metric...').click()
+            cy.get('button').contains('Add metric...').click()
+
+            cy.get('#group-metric-1')
+                .get('select')
+                .each(($el, index, $list) => {
+                    if (index == 0) {
+                        cy.wrap($el).select('P@K', { force: true })
+                    }
+                    if (index > 0) {
+                        cy.wrap($el).select('MAE', { force: true })
+                    }
+                })
+        })
+    })
+    it('Send Computation', () => {
+        cy.get('button').contains('Send').click()
     })
 })
 
 describe('Experiment Queue', () => {
     it('Check for item in queue', () => {
         //todo
-
     })
 })
 
 describe('Results', () => {
     it('Check if there are results for each dataset', () => {
         //todo
-
     })
     it('Check if there are results for each metric', () => {
         //todo
-
     })
 })
 
 describe('Result overview', () => {
     it('Check that result is in overview', () => {
         //todo
-
     })
     it('Check that metadata is correct', () => {
         //todo
-
     })
 })
