@@ -263,6 +263,34 @@ code:before {
   </div>
 
   <!-- B-card items -->
+<<<<<<< Updated upstream
+=======
+  	
+  <span class="text-right pb-2 mx-5" v-for="header in structure1D" :key="header">
+    <b-collapse id="collapse-1" class="mt-2">
+      <b-card>
+        <p class="card-text">Collapse contents Here</p>
+        <b-button v-b-toggle.collapse-1-inner size="sm">Toggle Inner Collapse</b-button>
+        <b-collapse id="collapse-1-inner" class="mt-2">
+          <b-card>Hello!</b-card>
+        </b-collapse>
+      </b-card>
+    </b-collapse>
+
+
+
+
+
+
+    <!-- <span v-for="subheader in header" :key="subheader"> -->
+    <!-- <h2 v-if="header.depth==1">{{header.name}}</h2>
+    <h3 v-if="header.depth==2">{{header.name}}</h3>
+    <h4 v-if="header.depth==3">{{header.name}}</h4>
+    <h5 v-if="header.depth==4">{{header.name}}</h5> -->
+    <!-- </span> -->
+  </span>
+
+>>>>>>> Stashed changes
 
 </div>
 </template>
