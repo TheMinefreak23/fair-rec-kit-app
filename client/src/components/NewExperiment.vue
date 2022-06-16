@@ -53,7 +53,7 @@ async function sendToServer() {
   sendForm.lists.metrics = reformat(sendForm.lists.metrics)
   sendForm.lists.datasets = reformat(sendForm.lists.datasets)
   console.log('sendForm', sendForm)
-
+  /*
   // TODO get from server?
   store.currentExperiment = {
     metadata: metadata.value,
@@ -73,7 +73,7 @@ async function sendToServer() {
   console.log('sendToServer() queue', store.queue)
   // Switch to queue
   store.currentTab = 1
-  pollForResult()
+  pollForResult()*/
 }
 
 // Declare default values of the form
@@ -147,16 +147,20 @@ function reformat(property) {
             <b-col>
               <b-row>
                 <b-col md="auto" class="text-center">
-                  <p>Experiment type 
-                    <i class="bi bi-info-circle"  
-                    v-b-tooltip.hover title = "Predictions are predicted ratings for known user-item pairs in the data , while recommendations are a list of recommended items for a user based on these predicted ratings.">
+                  <p>
+                    Experiment type
+                    <i
+                      class="bi bi-info-circle"
+                      v-b-tooltip.hover
+                      title="Predictions are predicted ratings for known user-item pairs in the data , while recommendations are a list of recommended items for a user based on these predicted ratings."
+                    >
                     </i>
                   </p>
                 </b-col>
                 <b-col md="auto">
                   <b-form-radio-group
                     v-model="form.experimentMethod"
-                    :options="experimentMethods"                    
+                    :options="experimentMethods"
                   >
                   </b-form-radio-group>
                 </b-col>

@@ -13,8 +13,6 @@ DEFAULTS = {  # 'split': 80,
 }  # default values
 DEFAULT_SPLIT = {'name': 'Train/testsplit',
                  'default': '80', 'min': 0, 'max': 100}
-with open('parameters/resultFilter.json', encoding='utf-8') as filter_file:
-    filters = json.load(filter_file)  # TODO LOAD from dataset
 
 
 class OptionsFormatter:
@@ -34,6 +32,10 @@ class OptionsFormatter:
         Returns:
             (dict) the formatted options
         """
+
+        # DEV
+        #print(recommender_system.get_available_datasets())
+        #print(recommender_system.get_available_data_filters())
 
         datasets = recommender_system.get_available_datasets()
         self.dataset_matrices = {dataset: list(matrices.keys()) for (
@@ -58,25 +60,7 @@ class OptionsFormatter:
         pred_metrics = format_categorised(pred_metrics)
         rec_metrics = format_categorised(rec_metrics)
 
-        # Add dynamic (nested settings) settings
-        formatted_filters = reformat(filters, False)
-        # print(formatted_splits)
-
-        # MOCK: for now use all filters/metrics per dataset
-        filter_option = {'name': 'filter',
-                         'title': 'filters',
-                         # 'article': 'a',
-                         'options': formatted_filters}
-
-        for dataset in datasets:
-            # TODO this is stupid because we just created the options key
-            dataset['params'] = dataset['options']
-            del dataset['options']
-            self.set_dataset_params(dataset, filter_option, recommender_system)
-
-        for metric in rec_metrics + pred_metrics:
-            for option in metric['options']:
-                option['params']['dynamic'] = [filter_option]
+        self.set_dynamic_options(datasets, rec_metrics + pred_metrics, recommender_system)
 
         # TODO refactor
         uncategorised = [
@@ -90,7 +74,6 @@ class OptionsFormatter:
         ]
         options = reformat_all(uncategorised, categorised)
         options['defaults'] = DEFAULTS
-        options['filters'] = formatted_filters
 
         # print('datasets tests', json.dumps(datasets[0], indent=4))
         # print('recommender tests', json.dumps(recommenders[0], indent=4))
@@ -98,12 +81,43 @@ class OptionsFormatter:
 
         return options
 
-    def set_dataset_params(self, dataset, filter_option, recommender_system):
+    def set_dynamic_options(self, datasets, metrics, recommender_system):
+        """Set the nested (dynamic) list options
+
+        Args:
+            datasets: the available datasets
+            metrics: the available metrics
+            recommender_system: the recommender system for the experiment
+
+        """
+        filters = recommender_system.get_available_data_filters()
+
+        # Filters for datasets
+        for dataset in datasets:
+            # TODO this is stupid because we just created the options key
+            dataset['params'] = dataset['options']
+            del dataset['options']
+            self.set_dataset_params(dataset, filters, recommender_system)
+
+        # Filters for metrics
+        for metric in metrics:
+            for option in metric['options']:
+                metric_datasets = []
+                for dataset in datasets:
+                    metric_dataset_options = [
+                        self.make_matrix_option(dataset, filters)
+                    ]
+                    metric_datasets.append({'name': dataset['name'], 'params': {
+                        'dynamic': metric_dataset_options}})
+                # Make dataset option
+                option['params']['dynamic'] = [self.make_single_dynamic_option('dataset', metric_datasets)]
+
+    def set_dataset_params(self, dataset, filters, recommender_system):
         """Set the dataset option parameters
 
         Args:
             dataset: the dataset to set the parameters for
-            filter_option: the filter option available for the dataset
+            filter_option(dict): the filters available for the datasets
             recommender_system: the recommender system for the experiments
 
         """
@@ -111,6 +125,7 @@ class OptionsFormatter:
         splits = recommender_system.get_available_splitters()
 
         formatted_splits = reformat(splits, False)
+        # Same split option for all datasets
         split_type_option = {'name': 'type of split',
                              'single': True,
                              'required': True,
@@ -122,28 +137,67 @@ class OptionsFormatter:
         dataset['params']['values'] = [DEFAULT_SPLIT]
         # print('dataset', dataset)
         # TODO refactor
+        dataset['params']['dynamic'] = [
+            self.make_matrix_option(dataset, filters, converters), split_type_option]
+            #print('==FILTERS==', formatted_filters)
+        # print(dataset['params']['options'])
+
+    def make_filter_option(self, matrix_filters):
+        """Make a filter list option
+
+        Args:
+            matrix_filters: the filters available for the matrix
+
+        Returns:
+            the filter option for the form
+        """
+        formatted_filters = reformat(matrix_filters, False)
+
+        return {'name': 'filter',
+                 'title': 'filters',
+                 'options': formatted_filters}
+
+    def make_matrix_option(self, dataset, filters, converters=None):
         matrices = []
-        for matrix_name in self.dataset_matrices[dataset['name']]:
-            dataset_matrix_converters = converters[dataset['name']][matrix_name]
-            converter_option = {'name': 'rating converter',
-                                'single': True,
-                                'title': 'conversion',
-                                # 'article': 'a',
-                                'options': reformat(dataset_matrix_converters, False)}
+        dataset_name = dataset['name']
+
+        for matrix_name in self.dataset_matrices[dataset_name]:
+            dynamic_options = []
+            if converters: # TODO refactor
+                dataset_matrix_converters = converters[dataset_name][matrix_name]
+                # Converter per matrix
+                converter_option = {'name': 'rating converter',
+                                    'single': True,
+                                    'title': 'conversion',
+                                    # 'article': 'a',
+                                    'options': reformat(dataset_matrix_converters, False)}
+                dynamic_options.append(converter_option)
+            # Filter per matrix
+            matrix_filters = filters[dataset_name][matrix_name]
+            dynamic_options.append(self.make_filter_option(matrix_filters))
+
             matrices.append({'name': matrix_name, 'params': {
-                'dynamic': [converter_option]}})
-        matrix_option = {
-            'name': 'matrix',
+                'dynamic': dynamic_options}})
+        return self.make_single_dynamic_option('matrix', matrices)
+
+    def make_single_dynamic_option(self, name, list):
+        """Make option for a single form group list
+
+        Args:
+            option_name(str): the name of the option
+            option_list(list): the list of options available for the option
+
+        Returns:
+            the option for the form
+        """
+        return {
+            'name': name,
             'single': True,
             'required': True,
-            'title': 'matrix',
-            # 'article': 'a',
-            'options': reformat(matrices, False),
+            'title': name,
+            'options': reformat(list, False),
         }
-        # converter_option
-        dataset['params']['dynamic'] = [
-            matrix_option, filter_option, split_type_option]
-        # print(dataset['params']['options'])
+
 
     def config_dict_from_settings(self, experiment):
         """Create a configuration dictionary from client settings.
