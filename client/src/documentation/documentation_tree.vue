@@ -1,5 +1,5 @@
 <script>
-let tree = {
+export const tree = {
     label: 'Root',
     nodes: [
         {
