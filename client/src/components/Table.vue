@@ -364,6 +364,8 @@ const filteredHeaders = () => {
                 @click="$emit('viewResult', item.id)"
                 class="m-1"
                 style="width: 142px"
+                v-if="!item.status || 
+                  item.status.slice(statusPrefix.length) == status.done" :id="item.id"
               >
                 {{ viewItem ? 'View result' : 'Open result' }}
               </b-button>
@@ -378,7 +380,8 @@ const filteredHeaders = () => {
                   />
                 </b-col>
                 <b-col md="auto" class="mx-0 px-0 d-inline">
-                  <InfoModal :id="item.id" />
+                  <InfoModal v-if="!item.status || 
+                    item.status.slice(statusPrefix.length) == status.done" :id="item.id" />
                 </b-col>
 
                 <b-col md="auto" class="mx-0 px-0 d-inline">
