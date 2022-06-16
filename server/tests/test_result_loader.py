@@ -22,4 +22,6 @@ def test_result_by_id():
     result_by_id(0, result_store)
     # TODO throws error during CI
     correct_result = load_json(MOCK_RESULTS_DIR + "UNITTEST_correct_result.json")
-    assert correct_result == result_store.current_result
+    sorted_correct_result = sorted(sorted(i.items()) for i in correct_result)
+    sorted_current_result = sorted(sorted(i.items()) for i in result_store.current_result)
+    assert sorted_correct_result == sorted_current_result
