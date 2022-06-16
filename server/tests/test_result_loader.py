@@ -22,6 +22,13 @@ def test_result_by_id():
     result_by_id(0, result_store)
     # TODO throws error during CI
     correct_result = load_json(MOCK_RESULTS_DIR + "UNITTEST_correct_result.json")
-    sorted_correct_result = sorted(sorted(i.items()) for i in correct_result)
-    sorted_current_result = sorted(sorted(i.items()) for i in result_store.current_result)
-    assert sorted_correct_result == sorted_current_result
+    assert ordered(correct_result) == ordered(result_store.current_result)
+
+def ordered(obj):
+    """nested sorting of dictionary and all its elements"""
+    if isinstance(obj, dict):
+        return sorted((k, ordered(v)) for k, v in obj.items())
+    if isinstance(obj, list):
+        return sorted(ordered(x) for x in obj)
+    else:
+        return obj
