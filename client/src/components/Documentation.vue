@@ -8,6 +8,7 @@ Documentation tab which shows all algorithms, metrics, datasets, etc. and their 
 
 import { ref } from 'vue'
 import { structure } from '../documentation/documentation_structure.vue'
+import { tree } from '../documentation/documentation_tree.vue'
 import { doctext } from '../documentation/documentation_items.vue'
 
 const collapse =ref([])
@@ -262,32 +263,6 @@ code:before {
   </div>
 
   <!-- B-card items -->
-  <div class="text-right pb-2 mx-5" v-for="(header, index) in structure1D" :key="header">
-    <!-- Subitems have more margin than its parent. -->
-    <b-card :id='itemDicts[header.name]["name"]' :style='"margin-left:"+10*header.depth+"px"' class="border-end-0 border-top-0 border-bottom-0 border-5 bg-secondary">
-      <!-- Subitems are smaller as well. -->
-      <div>{{index}}</div>
-      <b-card-title :style='"font-size: "+(22-(5*(Math.floor(header.depth/3))))+"px"'>{{itemDicts[header.name]["name"]}} 
-        <b-button @click="collapse[index]=!collapse[index]" > 
-        <template v-if="collapse[index]"> <i class="bi bi-caret-down" /> </template>
-        <template v-else> <i class="bi bi-caret-right"/></template>
-        </b-button>
-      </b-card-title>
-      <!-- v-if because if there is no description -> undefined, which takes space. -->    
-     <b-collapse v-model="collapse[index]">
-      <b-card-text v-if='itemDicts[header.name]["description"]'>
-        <span v-html='itemDicts[header.name]["description"]'></span>
-      </b-card-text>
-      <b-link :href='itemDicts[header.name]["link"]' v-if='itemDicts[header.name]["link"]'>{{ itemDicts[header.name]["link"] }}</b-link>
-      <span v-if='itemDicts[header.name]["button"]'>
-        <br>
-        <b-button variant="primary" :href='itemDicts[header.name]["button"]' v-if='itemDicts[header.name]["button"]'>
-          {{ itemDicts[header.name]["name"] }}
-        </b-button>
-      </span> 
-      </b-collapse>     
-    </b-card> 
 
-  </div>
 </div>
 </template>
