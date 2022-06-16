@@ -326,6 +326,9 @@ function scrollToGroup(index) {
                   <!--Collapsable group-->
                   <!--<b-collapse :visible="visibleGroup == i" role="tabpanel">-->
                   <b-collapse :visible="groupVisible[i - 1]" role="tabpanel">
+                    <!-- Special form group for filters (subsets)-->
+                    <!--<p v-if="name.includes('subset')">SUBSET</p>-->
+                    <!-- Regular form group -->
                     <FormGroup
                       v-model="form.choices[i - 1]"
                       :index="i - 1"

@@ -110,7 +110,12 @@ class OptionsFormatter:
                     metric_datasets.append({'name': dataset['name'], 'params': {
                         'dynamic': metric_dataset_options}})
                 # Make dataset option
-                option['params']['dynamic'] = [self.make_single_dynamic_option('dataset', metric_datasets)]
+                # TOOD refactor
+                dataset_option = {'name': 'dataset',
+                                 'title': 'subgroups',
+                                 'options': reformat(metric_datasets, False)
+                                  }
+                option['params']['dynamic'] = [dataset_option]
 
     def set_dataset_params(self, dataset, filters, recommender_system):
         """Set the dataset option parameters
@@ -151,16 +156,22 @@ class OptionsFormatter:
         Returns:
             the filter option for the form
         """
-        formatted_filters = reformat(matrix_filters, False)
+        # TODO refactor
 
-        return {'name': 'filter',
-                 'title': 'filters',
-                 'options': formatted_filters}
+        filter_pass_option = {'name': 'filter',
+                              'title': 'filter',
+                              'options': reformat(matrix_filters, False)
+                              }
+        filter_pass_list = [{'name': 'filter pass', 'params': {'dynamic': [filter_pass_option]}}]
+
+
+        return {'name': 'filter pass',# TODO rename to filter groups?
+                 'title': 'subset',
+                 'options': reformat(filter_pass_list, False)}
 
     def make_matrix_option(self, dataset, filters, converters=None):
         matrices = []
         dataset_name = dataset['name']
-
         for matrix_name in self.dataset_matrices[dataset_name]:
             dynamic_options = []
             if converters: # TODO refactor
@@ -169,7 +180,6 @@ class OptionsFormatter:
                 converter_option = {'name': 'rating converter',
                                     'single': True,
                                     'title': 'conversion',
-                                    # 'article': 'a',
                                     'options': reformat(dataset_matrix_converters, False)}
                 dynamic_options.append(converter_option)
             # Filter per matrix

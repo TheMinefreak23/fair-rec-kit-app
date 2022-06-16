@@ -50,8 +50,9 @@ onMounted(() => {
   if (props.defaultOption) {
     form.value.main = props.defaultOption.value
   }
+  // If there is only one option (no main selection), use it as the default
+  if (props.options.length === 1) form.value.main = props.options[0].value
   // console.log('form', form.value)
-  // scroll to new group
 })
 
 /**
@@ -152,7 +153,9 @@ function hasParams() {
                 <b-form-group
                   :label="'Select ' + article(name) + ' ' + name + ' *'"
                 >
+                  <!-- If there is only one main option available, don't use a main selection-->
                   <b-form-select
+                    v-if="props.options.length > 1"
                     :class="blink ? 'subtle-blink' : ''"
                     v-model="form.main"
                     data-testid="main-select"
@@ -174,11 +177,11 @@ function hasParams() {
                     variant="primary"
                     >Copy {{ name }}...</b-button
                   >
-                  <template #first>
+                  <!--<template #first>
                     <b-form-select-option value="" disabled
                       >Choose..</b-form-select-option
                     >
-                  </template>
+                  </template>-->
                 </b-form-group>
               </b-col>
               <!--Show settings for selected option.-->
