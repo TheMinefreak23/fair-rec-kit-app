@@ -1,6 +1,6 @@
 <script>
 export const tree = {
-    label: 'Root',
+    label: 'Documentation',
     nodes: [
         {
             label: 'FairRecKit'
