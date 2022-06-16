@@ -138,6 +138,7 @@ function reformat(property) {
       <!--This form contains all the necessary parameters for a user to submit a request for a experiment-->
       <b-form
         v-if="options"
+        id= "new-experiment"
         @submit="$event.preventDefault(), sendToServer()"
         @keydown.enter.prevent
         @reset="$event.preventDefault(), initSettings()"
