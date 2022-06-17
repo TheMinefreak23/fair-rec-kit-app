@@ -81,39 +81,47 @@ describe('New Experiment', () => {
 })
 
 describe('Experiment Queue', () => {
+    var queue
     it('Check for approaches in queue', () => {
+        queue = cy.get('div[data-testid*="Queue"]')
         cy.wait(1000)
-        cy.get('td').contains('Random, PopScore').should('be.visible')
+        queue.get('td').contains('Random, PopScore').should('be.visible')
     })
     it('Check for correct metrics in queue', () => {
-        cy.get('td').contains('P@K, MAE').should('be.visible')
+        queue.get('td').contains('P@K, MAE').should('be.visible')
     })
     it('Computing result', () => {
-        cy.get('table', { "timeout": 12000 }).contains('Active').should('not.be.visible')
+        cy.wait(10000)
     })
-    it('Opening result', () => {
-        cy.get('button').contains('Open result').click({ force: true })
+})
+
+describe('Result overview', () => {
+    var overview
+    it('Visit results overview tab', () => {
+        cy.get('button').contains('All results').click({ force: true })
+        overview = cy.get('div[data-testid*="AllResults"]')
     })
+    it('Check that result is in overview', () => {
+        overview.get('td').contains('Cypress Test').should('be.visible')
+    })
+    it('Check that metadata is correct', () => {
+        overview.get('td').contains('Random, PopScore').should('be.visible')
+        overview.get('td').contains('P@K, MAE').should('be.visible')
+    })
+
 })
 
 describe('Results', () => {
     it('Visit results tab', () => {
         cy.get('button').contains('Results').click({ force: true })
     })
+
     it('Check if there are results for each dataset', () => {
         cy.get('div').contains('Result Cypress Test').should('be.visible')
-
+        cy.get('caption').contains('LFM-1B').should('be.visible')
     })
     it('Check if there are results for each metric', () => {
-        //todo
-    })
-})
-
-describe('Result overview', () => {
-    it('Check that result is in overview', () => {
-        //todo
-    })
-    it('Check that metadata is correct', () => {
-        //todo
+        cy.get('th').contains('P@10').should('be.visible')
+        cy.get('th').contains('MAE').should('be.visible')
     })
 })
