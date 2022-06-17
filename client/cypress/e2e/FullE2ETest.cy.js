@@ -1,5 +1,6 @@
 /**
- * Performs a full e2e test of the application.
+ * Performs a full End to end test of the application.
+ * 
  */
 Cypress.config('viewportWidth', 1920)
 Cypress.config('viewportHeight', 1080)
@@ -110,7 +111,8 @@ describe('Result overview', () => {
     })
 
 })
-
+// Sometimes, Results test fails because the experiment is not done yet
+// Could be fixed by using mock as it is faster.
 describe('Results', () => {
     it('Visit results tab', () => {
         cy.get('button').contains('Results').click({ force: true })
