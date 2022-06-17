@@ -76,8 +76,8 @@ def set_result():
             response = {'status': 'result not found'}
 
     else:  # GET request
-        print('current result', json.dumps(
-            result_store.current_result, indent=4))
+        #print('current result', json.dumps(
+        #    result_store.current_result, indent=4))
         response = {'result': result_store.current_result}
 
     return response

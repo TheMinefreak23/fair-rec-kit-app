@@ -6,7 +6,7 @@ Utrecht University within the Software Project course.
 import FormGroupList from './FormGroupList.vue'
 import { computed, onMounted, watch } from 'vue'
 import { article } from '../../helpers/resultFormatter'
-import { emptyFormGroup } from '../../helpers/optionsFormatter'
+import { emptyFormGroup, formatDefault } from '../../helpers/optionsFormatter'
 import '../../../node_modules/multi-range-slider-vue/MultiRangeSliderBlack.css'
 import FormInput from './FormInput.vue'
 import FormSelect from './FormSelect.vue'
@@ -119,7 +119,7 @@ function setParameterDefaults() {
       choices = option.params.options
       form.value.selects = choices.map((param) => ({
         name: param.name,
-        value: param.default,
+        value: formatDefault(param.default),
       }))
     }
     // console.log('selects', form.value.selects)

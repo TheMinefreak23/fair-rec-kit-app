@@ -7,7 +7,7 @@ function selectionOptions(options) {
 
 /**
  * Returns an empty formgroup
- * @return {object} A javascript object with the required fields 
+ * @return {object} A javascript object with the required fields
  */
 function emptyFormGroup(required) {
   return {
@@ -33,4 +33,23 @@ function validateEmail(email) {
   }
 }
 
-export { emptyOption, selectionOptions, validateEmail, emptyFormGroup }
+/**
+ * Format null values if the parameter value is a list
+ * @param {Object} paramValue - the default parameter value
+ * @returns the values with a null string instead of undefined value
+ */
+function formatDefault(paramValue) {
+  if (paramValue.length > 1) {
+    const nullIndex = paramValue.indexOf(null)
+    if (nullIndex) paramValue[nullIndex] = 'null'
+  }
+  return paramValue
+}
+
+export {
+  emptyOption,
+  selectionOptions,
+  validateEmail,
+  emptyFormGroup,
+  formatDefault,
+}

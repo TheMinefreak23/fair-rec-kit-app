@@ -17,6 +17,7 @@ DEFAULT_SPLIT = {'name': 'Train/testsplit',
 
 class OptionsFormatter:
     """Formatter for the experiment options"""
+
     def __init__(self, recommender_system):
         self.model_api_dict = {}
         # TODO for now use this to get the dataset matrix
@@ -34,8 +35,8 @@ class OptionsFormatter:
         """
 
         # DEV
-        #print(recommender_system.get_available_datasets())
-        #print(recommender_system.get_available_data_filters())
+        # print(recommender_system.get_available_datasets())
+        # print(recommender_system.get_available_data_filters())
 
         datasets = recommender_system.get_available_datasets()
         self.dataset_matrices = {dataset: list(matrices.keys()) for (
@@ -112,8 +113,8 @@ class OptionsFormatter:
                 # Make dataset option
                 # TOOD refactor
                 dataset_option = {'name': 'dataset',
-                                 'title': 'subgroups',
-                                 'options': reformat(metric_datasets, False)
+                                  'title': 'subgroups',
+                                  'options': reformat(metric_datasets, False)
                                   }
                 option['params']['dynamic'] = [dataset_option]
 
@@ -144,7 +145,7 @@ class OptionsFormatter:
         # TODO refactor
         dataset['params']['dynamic'] = [
             self.make_matrix_option(dataset, filters, converters), split_type_option]
-            #print('==FILTERS==', formatted_filters)
+        # print('==FILTERS==', formatted_filters)
         # print(dataset['params']['options'])
 
     def make_filter_option(self, matrix_filters):
@@ -164,17 +165,16 @@ class OptionsFormatter:
                               }
         filter_pass_list = [{'name': 'filter pass', 'params': {'dynamic': [filter_pass_option]}}]
 
-
-        return {'name': 'filter pass',# TODO rename to filter groups?
-                 'title': 'subset',
-                 'options': reformat(filter_pass_list, False)}
+        return {'name': 'filter pass',  # TODO rename to filter groups?
+                'title': 'subset',
+                'options': reformat(filter_pass_list, False)}
 
     def make_matrix_option(self, dataset, filters, converters=None):
         matrices = []
         dataset_name = dataset['name']
         for matrix_name in self.dataset_matrices[dataset_name]:
             dynamic_options = []
-            if converters: # TODO refactor
+            if converters:  # TODO refactor
                 dataset_matrix_converters = converters[dataset_name][matrix_name]
                 # Converter per matrix
                 converter_option = {'name': 'rating converter',
@@ -208,7 +208,6 @@ class OptionsFormatter:
             'options': reformat(list, False),
         }
 
-
     def config_dict_from_settings(self, experiment):
         """Create a configuration dictionary from client settings.
 
@@ -219,35 +218,41 @@ class OptionsFormatter:
         """
         settings = experiment['settings']
 
-        print('experiment settings from client:', json.dumps(settings, indent=4))
+        settings_without_raw = {key: settings[key] for key in settings if key != 'rawSettings'}
+        # print('experiment settings from client:', json.dumps(settings_without_raw, indent=4))
 
         name = experiment['metadata']['name']
         experiment_id = experiment['timestamp']['stamp'] + '_' + name
 
         form_to_data(settings)
-        print('formatted from form', json.dumps(settings, indent=4))
+        settings_without_raw = {key: settings[key] for key in settings if key != 'rawSettings'}
+        # ('formatted from form', json.dumps(settings_without_raw, indent=4))
+
+        def format_data_matrix(data):
+            # TODO refactor
+            data['dataset'] = data['name']
+            del data['name']
+            data_matrix = data['matrix']
+            data['matrix'] = data_matrix['name']
+            # print(data)
+            subset = data_matrix['subset']
+            # print(data)
+            data['subset'] = []
+            for filter_pass in subset:
+                data['subset'].append({'filter_pass' : filter_pass['filter']})
+            # print(data)
 
         # Format datasets
-        # Add generic split to all dataset
         for dataset in settings['datasets']:
             # print(dataset)
-            # TODO refactor
-            dataset['dataset'] = dataset['name']
-            matrix = dataset['matrix'][0]
-            dataset['matrix'] = matrix['name']
-            # TODO refactor = dataset['name'] = reformat_list(dataset['matrix'])
-            # TODO for now pick item matrix if available, else first matrix
-            # print(DATASET_MATRICES)
-            # print(dataset['dataset'])
-            # available_matrices = DATASET_MATRICES[dataset['dataset']]
-            # dataset['matrix'] = 'user-track-count'
-            # if 'user-track-count' in available_matrices else available_matrices[0]
-            if 'conversion' in matrix and matrix['conversion'] != []:
-                dataset['rating_converter'] = matrix['conversion'][0]
-            dataset['splitting'] = dataset['splitting'][0]
+            matrix = dataset['matrix']
+            format_data_matrix(dataset)
+            if 'conversion' in matrix:
+                dataset['rating_converter'] = matrix['conversion']
             # TODO rename split param
-            dataset['splitting']['test_ratio'] = (
-                100 - int(dataset['params']['Train/testsplit'])) / 100
+            dataset['splitting']['test_ratio'] = (100 -
+                                                  int(dataset['params']['Train/testsplit'])
+                                                  ) / 100
 
         # Format models
         models = {}
@@ -260,18 +265,31 @@ class OptionsFormatter:
                 model_setting = approach
             models.setdefault(self.model_api_dict[model_name], []).append(model_setting)
         # print(name)
+
+        # Format metrics (filters)
+        metrics = []
+        for metric in settings['metrics']:
+            for subgroup in metric['subgroups']:
+                format_data_matrix(subgroup)
+                # TODO clone?
+                subgroup_metric = {'name': metric['name'],
+                                   'params': metric['params'],
+                                   'subgroup': subgroup}
+                metrics.append(subgroup_metric)
+            del metric['subgroups']
+
         config_dict = {
             'data': settings['datasets'],
             'models': models,
-            'evaluation': settings['metrics'],
+            'evaluation': metrics,
             'name': experiment_id,
             'top_K': int(settings['recommendations']),
             'rated_items_filter': not settings['includeRatedItems']
             if 'includeRatedItems' in settings else False,
             'type': settings['experimentMethod']}
 
-        # print(config_dict)
-        # return config_dict, experiment_id
+        print('config dict from settings:', json.dumps(config_dict, indent=4))
+        return config_dict, experiment_id
 
 
 # TODO do this in another way
@@ -348,10 +366,10 @@ def reformat(options, nested):
             # Disable Elliot options
             # if option['name'] == ELLIOT_API:
             # for disable_option in option['options']:
-            #disable_option['disabled'] = True
+            # disable_option['disabled'] = True
             # print(disable_option)
 
-            #option['name'] = option['name'] + ' (unavailable)'
+            # option['name'] = option['name'] + ' (unavailable)'
     else:
         options = reformat_options(options)
 
@@ -393,10 +411,15 @@ def parse_if_number(string):
     Returns:
         the parsed string
     """
+    # TODO refactor
     if string:
+        if string == 'null':
+            return None
+        if isinstance(string, dict):
+            return {k: parse_if_number(v) for k, v in string.items()}
         if isinstance(string, list):
             return [parse_if_number(s) for s in string]
-        if isinstance(string, (float,int)):
+        if isinstance(string, (float, int)):
             return string
         if string.isnumeric():
             return int(string)
@@ -408,16 +431,17 @@ def parse_if_number(string):
     return string
 
 
-def reformat_list(settings, option_name, option_list):
-    """Reformat option list in settings from form to data.
+def reformat_list(settings, option_name, option_group):
+    """Reformat option form group list in settings from form to data.
 
     Args:
         settings(dict): the settings in which to store the option
         option_name(str): the name of the option list to format
-        option_list(list): the option list
+        option_group(list|dict): the option list or single option
 
     """
-    for option in option_list:
+
+    def reformat_option(option):
         # print(option)
         option['params'] = {param['name']: parse_if_number(
             param['value']) for param in option['params']}
@@ -427,4 +451,12 @@ def reformat_list(settings, option_name, option_list):
             if inner_option_name not in ['name', 'params']:
                 # print(json.dumps(option, indent=4))
                 reformat_list(option, inner_option_name, inner_option_list)
-    settings[option_name] = option_list
+
+    # TODO refactor
+    if isinstance(option_group, list):
+        for option_item in option_group:
+            reformat_option(option_item)
+    else:  # Single option group
+        reformat_option(option_group)
+
+    settings[option_name] = option_group

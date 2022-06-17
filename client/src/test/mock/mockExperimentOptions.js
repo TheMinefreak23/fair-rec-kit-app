@@ -17,8 +17,6 @@ async function sendMockData(options, simple = false, metrics = false) {
   console.log('options', options)
   form = {
     recommendations: rand(100),
-    //split: rand(100),
-    //splitMethod: 'timesplit',
     experimentMethod: 'recommendation', // todo random
   }
   if (simple) {
@@ -27,9 +25,7 @@ async function sendMockData(options, simple = false, metrics = false) {
     form.lists = {
       approaches: generateRandomApproach(options),
       metrics: [], // TODO
-      //metrics: generateRandomMetrics(options),
       datasets: generateRandomDatasets(options),
-      //filters: toFormObject(randomWords()),
     }
   }
   if (metrics) {
@@ -46,7 +42,7 @@ async function sendMockData(options, simple = false, metrics = false) {
 
   // TODO get from server?
   store.currentExperiment = {
-    metadata: metadata,
+    metadata,
     settings: form,
     progress: progress.notAvailable,
   }

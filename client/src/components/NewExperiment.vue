@@ -11,6 +11,7 @@ import { emptyFormGroup, validateEmail } from '../helpers/optionsFormatter'
 import { progress } from '../helpers/queueFormatter'
 import Tags from './Tags.vue'
 
+import filterForm from '../test/mock/filterMock.json'
 const options = ref()
 
 // Store the settings of the form in a reference
@@ -49,6 +50,7 @@ async function sendToServer() {
   const sendForm = JSON.parse(JSON.stringify(form.value)) // clone
 
   sendForm.rawSettings = JSON.parse(JSON.stringify(form.value)) // send raw settings for copying later TODO refactor
+  console.log('raw settings', sendForm.rawSettings)
   sendForm.lists.approaches = reformat(sendForm.lists.approaches)
   sendForm.lists.metrics = reformat(sendForm.lists.metrics)
   sendForm.lists.datasets = reformat(sendForm.lists.datasets)
@@ -118,7 +120,13 @@ function reformat(property) {
           if (list.choices[0].single) {
             // formgroup not list
             // TODO refactor
-            formattedChoices[i][list.choices[0].name] = reformat(list)
+            // If it is a single form group, take the first (and thus last) single option in the list
+            formattedChoices[i][list.choices[0].name] = reformat(list)[0]
+            /* console.log(
+              i,
+              list.choices[0].name,
+              formattedChoices[i][list.choices[0].name]
+            ) */
           } else formattedChoices[i][list.name] = reformat(list)
           // console.log('list', formattedChoices[i][list.name])
         }
@@ -317,6 +325,10 @@ function reformat(property) {
         variant="primary"
         @click="sendMockData(options, true, true)"
         >Metric Mock</b-button
+      >
+      <!--Fill the form with mock filter options-->
+      <b-button type="test" variant="primary" @click="form = filterForm"
+        >Filter Mock</b-button
       >
     </b-card>
   </div>
