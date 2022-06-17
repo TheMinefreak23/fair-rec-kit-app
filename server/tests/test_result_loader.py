@@ -1,4 +1,6 @@
-"""
+"""This module tests result loader functionality.
+test_result_by_id(): test setting the full result by its ID.
+
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
@@ -17,7 +19,7 @@ from tests.constants import MOCK_RESULTS_DIR
        'results_overview.json')
 @patch('project.models.result_loader.RESULTS_DIR', MOCK_RESULTS_DIR)
 def test_result_by_id():
-    """Test setting the full result by its ID"""
+    """Test setting the full result by its ID."""
     result_by_id(0, result_store)
     assert result_store.current_result
     # TODO throws error during CI

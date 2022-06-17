@@ -1,4 +1,11 @@
-"""
+"""This module tests the music detail functionality and the spotify api.
+test_spotify_token(client): test the generating of a Spotify Auth token.
+test_acousticbrainz_data(client): test if AcousticBrainz successfully gets requested.
+test_background(client): test if a background is successfully generated.
+test_collage(): test if the collage method works properly.
+test_unique_album_background(client): test if a background is successfully generated.
+test_spotify_data(): test if Spotify track data gets successfully requested.
+
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
@@ -14,20 +21,20 @@ URL_PREFIX = '/api/music'
 
 
 def test_spotify_token(client):
-    """ Test the generating of a Spotify Auth token
+    """Test the generating of a Spotify Auth token.
 
     Args:
-        client (Client): The client
+        client: The client component used to send requests to the server
     """
     response = client.get(URL_PREFIX + '/token')
     assert response.status_code == 200
 
 
 def test_acousticbrainz_data(client):
-    """ Test if AcousticBrainz gets successfully requested
+    """Test if AcousticBrainz successfully gets requested.
 
     Args:
-        client (Client): The client
+        client: The client component used to send requests to the server
     """
     params = {'mbid': 'bab7f3de-56e3-42fd-be0d-f122960e6a13'}
     response = client.post(URL_PREFIX + '/AcousticBrainz', json=params)
@@ -35,10 +42,10 @@ def test_acousticbrainz_data(client):
 
 
 def test_background(client):
-    """ Test if a background is successfully generated
+    """Test if a background is successfully generated.
 
     Args:
-        client (Client): The client
+        client: The client component used to send requests to the server
     """
     response = client.post(URL_PREFIX + '/background')
     assert response.status_code == 200
@@ -46,8 +53,7 @@ def test_background(client):
 
 
 def test_collage():
-    """Test if the collage method works properly
-    """
+    """Test if the collage method works properly."""
     input_img = "tests/thisisbingus.jpg"
     output_img = "tests/4bingus.jpg"
 
@@ -63,10 +69,10 @@ def test_collage():
 
 
 def test_unique_album_background(client):
-    """ Test if a background is successfully generated
+    """Test if a background is successfully generated.
 
     Args:
-        client (Client): The client
+        client: The client component used to send requests to the server
     """
     response = client.get(URL_PREFIX + '/unique-album-background')
     assert response.status_code == 200
@@ -74,8 +80,7 @@ def test_unique_album_background(client):
 
 
 def test_spotify_data():
-    """ Test if Spotify track data gets successfully requested
-    """
+    """Test if Spotify track data gets successfully requested."""
     url = 'https://api.spotify.com/v1/search?q=scatman%20john&type=track'
     result = request_spotify_data(url)
     assert "Scatman" in result['tracks']['items'][0]['album']['name']

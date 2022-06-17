@@ -1,4 +1,8 @@
-"""
+"""This module tests the functionality of various server-side functions that manipulate the previous results.
+test_results(client): test if the server-side result loading component is functional.
+test_edit(client): test if the server-side result editing component is functional.
+test_delete(client): test if the server-side result deletion component is functional.
+
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)

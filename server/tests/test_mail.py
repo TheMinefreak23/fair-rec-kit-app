@@ -1,4 +1,6 @@
-"""
+"""This module tests the email sending functionality.
+test_send_mail(): test the send_mail function.
+
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
@@ -12,7 +14,7 @@ make_mail(app)
 
 
 def test_send_mail():
-    """Testing the send_mail function"""
+    """Test the send_mail function."""
     mail_sender = MAIL[MAIL_KEY]
     with mail_sender.mail.record_messages() as mailbox:
         mail_sender.send_mail('fake@email.com', 'the final amogus', '2022-4-20 4:20:69')

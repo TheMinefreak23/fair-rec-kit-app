@@ -1,4 +1,16 @@
-"""
+"""This module tests various functionality related to the experiments.
+get_mock_options(): generate experiment from test options JSON.
+delete_test_results(): delete all results by deleting the test result directory.
+test_queue_format(): test whether the queue gets formatted correctly.
+test_experiment_format(): test whether an experiment gets formatted correctly.
+test_params(client): test params route.
+test_experiment_route_post(client): test POST request on experiment route.
+test_experiment_route_get(client): test GET request on experiment route.
+test_queue(client): test GET request on queue route.
+test_abort(client): test whether an experiment gets appended to the queue correctly.
+test_append(): test whether an experiment gets appended to the queue correctly.
+test_add_validation(): test whether a valudation experiment gets appended to the queue correctly.
+
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
@@ -34,7 +46,6 @@ def get_mock_options():
 
     Returns:
          (QueueItem) experiment
-
     """
     name = mock_options['metadata']['name']
     mock_options['timestamp'] = {'stamp': str(time.time())}
@@ -104,21 +115,33 @@ def test_experiment_format():
 
 
 def test_params(client):
-    """Test params route."""
+    """Test params route.
+    
+    Args:
+        client: The client component used to send requests to the server
+    """
     response = client.get(URL_PREFIX + '/options')
     assert response.status_code == 200
     assert json.loads(response.data)['options'] == options_formatter.options
 
 
 def test_experiment_route_post(client):
-    """Test POST request on experiment route."""
+    """Test POST request on experiment route.
+    
+    Args:
+        client: The client component used to send requests to the server
+    """
     post_response = client.post(URL_PREFIX + '/', json=mock_options)
     assert post_response.status_code == 200
     assert json.loads(post_response.data)['queue'] == queue.formatted_queue()
 
 
 def test_experiment_route_get(client):
-    """Test GET request on experiment route."""
+    """Test GET request on experiment route.
+    
+    Args:
+        client: The client component used to send requests to the server
+    """
     get_response = client.get(URL_PREFIX + '/')
     assert get_response.status_code == 200
 
@@ -174,7 +197,11 @@ def test_experiment_route_get(client):
 
 
 def test_queue(client):
-    """Test GET request on queue route."""
+    """Test GET request on queue route.
+    
+    Args:
+        client: The client component used to send requests to the server
+    """
     get_response = client.get(URL_PREFIX + '/queue', )
     # TODO fixture?
     assert get_response.status_code == 200
@@ -183,7 +210,11 @@ def test_queue(client):
 
 #@patch('project.experiment.experiment_queue', [])
 def test_abort(client):
-    """Test whether an experiment gets appended to the queue correctly."""
+    """Test whether an experiment gets appended to the queue correctly.
+    
+    Args:
+        client: The client component used to send requests to the server
+    """
     queue.queue = []
 
     url = URL_PREFIX + '/queue/abort'
