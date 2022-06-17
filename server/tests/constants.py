@@ -1,4 +1,5 @@
 """This module contains constants that are shared among some files in the test suite.
+
 MOCK_RESULTS_DIR: location of the mock folder.
 
 This program has been developed by students from the bachelor Computer Science at

@@ -1,4 +1,5 @@
 """This module tests various functionality related to the experiments.
+
 get_mock_options(): generate experiment from test options JSON.
 delete_test_results(): delete all results by deleting the test result directory.
 test_queue_format(): test whether the queue gets formatted correctly.
@@ -240,7 +241,6 @@ def test_abort(client):
 
 def test_append():
     """Test whether an experiment gets appended to the queue correctly."""
-
     # Use mock options from JSON
     # TODO refactor? global not working
     with open('tests/options.json', encoding='utf-8') as file:
@@ -277,7 +277,6 @@ def test_append():
 @patch('project.models.recommender_system', RecommenderSystem('datasets', MOCK_RESULTS_DIR))
 def test_add_validation():
     """Test whether a valudation experiment gets appended to the queue correctly."""
-
     # TODO Test invalid file path?
     # add_validation('',)
 

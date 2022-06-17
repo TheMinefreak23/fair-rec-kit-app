@@ -1,4 +1,5 @@
 """This module tests the functionality of various server-side retrival components.
+
 test_set_recs(client): test if the server-side loading of user recommendations is functional.
 test_result_by_id(client): test if the server-side retrieval of a result by its ID is functional.
 test_get_recs(client): test if the server-side retrieval of user recommendations is functional.

@@ -1,4 +1,5 @@
 """This module tests the event_handler events to see if the progress and status change.
+
 TestClassHelper: class with an status and progress attribute used for testing.
 TestClass: class with an experiment attribute used for testing.
 test_events(): tests the events to see if they correctly change the status and progress attributes.
@@ -26,12 +27,14 @@ from project.models.events import Status, ProgressStatus, EventHandler
 @dataclass
 class TestClassHelper:
     """Class with an status and progress attribute used for testing."""
+
     status = Any
     progress = Any
 
 @dataclass
 class TestClass:
     """Class with an experiment attribute used for testing."""
+
     experiment = TestClassHelper
 
 
@@ -43,7 +46,6 @@ eventListener = Any
 
 def test_events():
     """Tests the events to see if they correctly change the status and progress attributes."""
-
     event_handler = EventHandler(Self.experiment, None, None)
 
     event_handler.handle_event(eventListener, EventArgs(event_id=ON_PARSE))

@@ -1,4 +1,5 @@
 """This module tests the email sending functionality.
+
 test_send_mail(): test the send_mail function.
 
 This program has been developed by students from the bachelor Computer Science at

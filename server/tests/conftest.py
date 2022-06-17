@@ -1,4 +1,5 @@
 """This module contains constants and fixtures that are shared among all files in the test suite.
+
 fixture_test_app(): make the app for testing.
 client(test_app): get the app client for testing.
 runner(test_app): get the app CLI runner for testing.

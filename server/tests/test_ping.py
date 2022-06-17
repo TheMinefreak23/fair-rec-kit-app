@@ -1,4 +1,5 @@
 """This module tests to see if the server is online.
+
 test_greeting_example(client): test the server greeting.
 test_ping(client): test ping route.
 

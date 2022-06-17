@@ -1,4 +1,5 @@
 """This module tests the music detail functionality and the spotify api.
+
 test_spotify_token(client): test the generating of a Spotify Auth token.
 test_acousticbrainz_data(client): test if AcousticBrainz successfully gets requested.
 test_background(client): test if a background is successfully generated.

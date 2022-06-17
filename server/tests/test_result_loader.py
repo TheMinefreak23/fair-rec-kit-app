@@ -1,4 +1,5 @@
 """This module tests result loader functionality.
+
 test_result_by_id(): test setting the full result by its ID.
 
 This program has been developed by students from the bachelor Computer Science at

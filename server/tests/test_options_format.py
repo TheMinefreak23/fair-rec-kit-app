@@ -1,4 +1,5 @@
 """This module tests the functionality of the options_formatter module.
+
 test_model_api_dict(): test model-to-API dictionary generation.
 test_format_categorised(): test data to form reformatting fpr categorised options.
 test_reformat_all(): test data to form reformatting for multiple options.

@@ -1,4 +1,5 @@
 """This module tests result storage functionality.
+
 save_mock_result(): save a mock result.
 delete_test_results(): delete all results in overview by emptying the file.
 test_save_result(): test saving a result to the result overview.
@@ -33,7 +34,6 @@ TEST_RESULT_DIRECTORY = TEST_RESULTS_ROOT + str(TEST_ID) + '_' + TEST_EXPERIMENT
 @patch('project.models.result_storage.RESULTS_OVERVIEW_PATH', TEST_RESULTS_PATH)
 def save_mock_result():
     """Save a mock result."""
-
     # Make directory.
     if not os.path.exists(TEST_RESULT_DIRECTORY):
         os.makedirs(TEST_RESULT_DIRECTORY)

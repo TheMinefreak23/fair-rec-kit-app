@@ -1,4 +1,5 @@
 """This module mock runs an experiment, recommendation or evaluation.
+
 mock_experiment(): mock run an experiment and save the mock result.
 mock_recommend(dataset, approach): mock recommendation.
 mock_evaluate_all(approach, metric): mock evaluation for all filters.
