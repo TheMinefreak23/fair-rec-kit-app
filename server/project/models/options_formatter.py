@@ -271,7 +271,7 @@ class OptionsFormatter:
             'type': settings['experimentMethod']}
 
         # print(config_dict)
-        return config_dict, experiment_id
+        # return config_dict, experiment_id
 
 
 # TODO do this in another way

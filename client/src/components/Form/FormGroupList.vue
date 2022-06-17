@@ -15,6 +15,7 @@ const props = defineProps({
   name: String, // List name for display in the buttons
   groupId: String, // Group ID for autoscroll
   title: String, // List title for display in the header
+  description: String, // Option description for display in the header
   options: Array, // The available options to choose from
   required: Boolean, // Whether the list option is required
   maxK: Number, // The amount of  recommendations (caps K)
@@ -240,7 +241,9 @@ function scrollToGroup(index) {
       <h3 class="text-center text-white mb-0">
         <b-card no-body class="mb-0 bg-dark">
           <!--Capitalise the title.-->
-          {{ title && capitalise(title) }}
+          <!--TODO refactor-->
+          <!--{{ title && capitalise(title) }}-->
+          {{ description ? capitalise(description) : capitalise(title) }}
           <!--Collapsable group list toggle button-->
           <b-button
             class="text-start"
@@ -333,7 +336,7 @@ function scrollToGroup(index) {
                       v-model="form.choices[i - 1]"
                       :index="i - 1"
                       :name="name"
-                      :groupId="name"
+                      :groupId="scrollId"
                       :options="options"
                       :required="
                         // If the option is needed, at least one selection must've been made

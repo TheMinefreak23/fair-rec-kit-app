@@ -53,7 +53,7 @@ async function sendToServer() {
   sendForm.lists.metrics = reformat(sendForm.lists.metrics)
   sendForm.lists.datasets = reformat(sendForm.lists.datasets)
   console.log('sendForm', sendForm)
-  /*
+
   // TODO get from server?
   store.currentExperiment = {
     metadata: metadata.value,
@@ -73,7 +73,7 @@ async function sendToServer() {
   console.log('sendToServer() queue', store.queue)
   // Switch to queue
   store.currentTab = 1
-  pollForResult()*/
+  pollForResult()
 }
 
 // Declare default values of the form

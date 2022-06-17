@@ -227,7 +227,13 @@ function hasParams() {
               v-if="option.single"
               single
               v-model="form.lists[index].choices[0]"
-              :groupId="name + ' ' + props.index + ' ' + option.name"
+              :groupId="
+                (groupId ? groupId : name) +
+                ' ' +
+                props.index +
+                ' ' +
+                option.name
+              "
               :name="form.main.name + ' ' + option.name"
               :index="index"
               :title="option.title"
@@ -238,13 +244,17 @@ function hasParams() {
             <FormGroupList
               v-else
               v-model="form.lists[index]"
-              :groupId="name + ' ' + props.index + ' ' + option.name"
+              :groupId="
+                (groupId ? groupId : name) +
+                ' ' +
+                props.index +
+                ' ' +
+                option.name
+              "
               :name="form.main.name + ' ' + option.name"
               :index="index"
               :title="option.title"
-              :description="
-                option.title + ' for ' + name + ' ' + form.main.name
-              "
+              :description="name + ' ' + option.title"
               :options="option.options"
               :defaultOption="option.default"
               :required="false"
