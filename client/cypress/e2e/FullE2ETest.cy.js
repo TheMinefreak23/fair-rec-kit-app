@@ -3,10 +3,11 @@
  */
 Cypress.config('viewportWidth', 1920)
 Cypress.config('viewportHeight', 1080)
+Cypress.config('baseUrl', 'http://localhost:3000')
 
 describe('Visit', () => {
     it('Visits the local app', () => {
-        cy.visit('localhost:3000')
+        cy.visit('/')
     })
 })
 
@@ -27,8 +28,10 @@ describe('New Experiment', () => {
         cy.get('#datasets').within(($datasets) => {
             cy.get('button').contains('Add dataset...').click()
 
-            cy.get('select').each(($el) => {
-                cy.wrap($el).select(1)
+            cy.get('select').each(($el, index, $list) => {
+                if (index == 1) {
+                    cy.wrap($el).select(2)
+                }
             })
             cy.get('select').each(($el) => {
                 cy.wrap($el).select(1)
@@ -78,14 +81,28 @@ describe('New Experiment', () => {
 })
 
 describe('Experiment Queue', () => {
-    it('Check for item in queue', () => {
-        //todo
+    it('Check for approaches in queue', () => {
+        cy.wait(1000)
+        cy.get('td').contains('Random, PopScore').should('be.visible')
+    })
+    it('Check for correct metrics in queue', () => {
+        cy.get('td').contains('P@K, MAE').should('be.visible')
+    })
+    it('Computing result', () => {
+        cy.get('table', { "timeout": 12000 }).contains('Active').should('not.be.visible')
+    })
+    it('Opening result', () => {
+        cy.get('button').contains('Open result').click({ force: true })
     })
 })
 
 describe('Results', () => {
+    it('Visit results tab', () => {
+        cy.get('button').contains('Results').click({ force: true })
+    })
     it('Check if there are results for each dataset', () => {
-        //todo
+        cy.get('div').contains('Result Cypress Test').should('be.visible')
+
     })
     it('Check if there are results for each metric', () => {
         //todo
