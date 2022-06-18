@@ -113,4 +113,3 @@ def do_nothing(event_listener, kwargs):
     """do_nothing only exists so that pylint stops complaining."""
     if event_listener or kwargs:
         print(kwargs)
-
