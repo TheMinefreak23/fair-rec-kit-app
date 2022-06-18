@@ -26,11 +26,13 @@ def test_result_by_id():
     correct_result = load_json(MOCK_RESULTS_DIR + "UNITTEST_correct_result.json")
     assert ordered(correct_result) == ordered(result_store.current_result)
 
+
 def ordered(obj):
     """Nested sorting of dictionary and all its elements.
 
     args:
-        obj(dict): the dictionary to be sorted"""
+        obj(dict): the dictionary to be sorted
+    """
     if isinstance(obj, dict):
         return sorted((k, ordered(v)) for k, v in obj.items())
     if isinstance(obj, list):
