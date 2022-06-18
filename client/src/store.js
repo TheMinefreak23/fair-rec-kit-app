@@ -1,6 +1,5 @@
 import { reactive } from 'vue'
 import { API_URL } from './api'
-import { formatResult } from './helpers/resultFormatter'
 import { status } from './helpers/queueFormatter'
 import { addResultById } from './helpers/resultRequests'
 
@@ -28,7 +27,7 @@ function pollForResult() {
  * GET request: Ask server for latest calculation
  */
 function getCalculation() {
-  if (store.currentExperiment.status != status.notAvailable) {
+  if (store.currentExperiment.status !== status.notAvailable) {
     // console.log('fetching result')
     try {
       fetch(API_URL + '/experiment/')
@@ -61,15 +60,13 @@ function getCalculation() {
 async function getQueue() {
   const response = await fetch(API_URL + '/experiment/queue')
   const data = await response.json()
-  // store.queue = formatResults(data).map(x=>x.omit(x,'ID'))
-  // store.queue = formatResults(data)
   // console.log('queue latest', data.current)
+
   // Update latest experiment (queue item)
-  if (data.current && data.current.status != status.notAvailable) {
+  if (data.current && data.current.status !== status.notAvailable) {
     // console.log(data.current)
     store.currentExperiment = data.current
     console.log('progress:', data.current.progress)
-    // store.queue[store.queue.length - 1] = data.current
   }
   store.queue = data.queue
 }
@@ -100,6 +97,7 @@ function addResult(result) {
  */
 function removeResult(index) {
   store.currentResults.splice(index, 1)
+  // console.log(store.currentResultTab)
 }
 
 export {

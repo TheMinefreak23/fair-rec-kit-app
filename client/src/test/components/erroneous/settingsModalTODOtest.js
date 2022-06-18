@@ -4,7 +4,7 @@ Utrecht University (Department of Information and Computing Sciences) */
 
 import { render } from '@testing-library/vue'
 import { test } from 'vitest'
-import SettingsModal from '../../components/Table/Modals/SettingsModal.vue'
+import SettingsModal from '../../../components/Table/Modals/SettingsModal.vue'
 
 /**
  * Test settings modal

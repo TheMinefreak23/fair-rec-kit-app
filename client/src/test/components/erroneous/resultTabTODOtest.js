@@ -3,8 +3,8 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
 
 import { render, fireEvent } from '@testing-library/vue'
-import { test } from 'vitest'
-import Result from '../components/Result.vue'
+import { describe, test } from 'vitest'
+import Result from '../../../components/Result.vue'
 
 test('subResult', async () => {
   // get utilities to query component
@@ -19,6 +19,11 @@ test('subResult', async () => {
         },
         result: [
           {
+            dataset: {
+              dataset: 'dataset',
+              matrix: 'matrix',
+              name: 'dataset_matrix_0',
+            },
             caption: 'a test',
             results: [{ approach: 'number1' }, { approach: 'number2' }],
             headers: [{ name: 'foo' }, { name: 'bar' }],
@@ -38,12 +43,12 @@ test('subResult', async () => {
 describe('combine dataset-approach combinations', () => {
   test('starts with number', () => {
     const result = [
-        {
-          caption: 'test',
-          results: [{ approach: 'number1' }, { approach: 'number2' }],
-          headers: [{ name: 'foo' }, { name: 'bar' }],
-        },
-      ]
+      {
+        caption: 'test',
+        results: [{ approach: 'number1' }, { approach: 'number2' }],
+        headers: [{ name: 'foo' }, { name: 'bar' }],
+      },
+    ]
     //expect(Result.combineResults(result).length).toBe(2)
   })
 })
