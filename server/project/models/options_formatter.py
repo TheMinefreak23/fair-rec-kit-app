@@ -226,7 +226,7 @@ class OptionsFormatter:
 
         form_to_data(settings)
         settings_without_raw = {key: settings[key] for key in settings if key != 'rawSettings'}
-        # ('formatted from form', json.dumps(settings_without_raw, indent=4))
+        print('formatted from form', json.dumps(settings_without_raw, indent=4))
 
         def format_data_matrix(data):
             # TODO refactor
@@ -269,13 +269,17 @@ class OptionsFormatter:
         # Format metrics (filters)
         metrics = []
         for metric in settings['metrics']:
-            for subgroup in metric['subgroups']:
-                format_data_matrix(subgroup)
-                # TODO clone?
-                subgroup_metric = {'name': metric['name'],
-                                   'params': metric['params'],
-                                   'subgroup': subgroup}
-                metrics.append(subgroup_metric)
+            # Format subgroups
+            if metric['subgroups']:
+                for subgroup in metric['subgroups']:
+                    format_data_matrix(subgroup)
+                    # TODO clone?
+                    subgroup_metric = {'name': metric['name'],
+                                       'params': metric['params'],
+                                       'subgroup': subgroup}
+                    metrics.append(subgroup_metric)
+            else:
+                metrics.append(metric)
             del metric['subgroups']
 
         config_dict = {
