@@ -18,7 +18,7 @@ from project import create_app
 def fixture_test_app():
     """Make the app for testing.
 
-    Returns: 
+    Returns:
         yields the app
     """
     app = create_app()
