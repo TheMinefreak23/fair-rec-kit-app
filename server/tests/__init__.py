@@ -10,7 +10,8 @@ Modules:
     test_music_detail: test the music detail functionality and the spotify api.
     test_options_format: test the functionality of the options_formatter module.
     test_ping: test to see if the server is online.
-    test_previous_results: test the functionality of various server-side functions that manipulate the previous results.
+    test_previous_results: test the functionality of various server-side functions
+        that manipulate the previous results.
     test_result_loader: test result loader functionality.
     test_result_storage: test result storage functionality.
     test_result: test the functionality of various server-side retrival components.
