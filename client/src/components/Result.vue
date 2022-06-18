@@ -189,7 +189,7 @@ async function validate() {
     headers: { 'Content-type': 'application/json' },
     body: JSON.stringify({ filepath: file, amount: validationAmount.value }),
   }
-  const response = await fetch(
+  await fetch(
     API_URL + '/result/validate',
     requestOptions
   ).then(() => {
@@ -228,9 +228,9 @@ function loadMore(increase, amount, pairid, runID) {
  */
 function paginationSort(indexVar, pairid, runID) {
   // When sorting on the same column twice in a row, switch to descending.
-  //console.log(selectedHeaders.value[runID])
-  //selectedHeaders.value[runID][pairid][indexVar] += ' yeet'
-  //console.log(selectedHeaders[runID][pairid])
+  // console.log(selectedHeaders.value[runID])
+  // selectedHeaders.value[runID][pairid][indexVar] += ' yeet'
+  // console.log(selectedHeaders[runID][pairid])
   if (sortIndex.value === indexVar) {
     ascending.value = !ascending.value;
   }
@@ -345,10 +345,10 @@ function hideHeaders(headers) {
 function hideResults(results) {
   const result = []
   for (let i = 0; i < results.length; i++) {
-    const object_as_array = Object.entries(results[i]).filter(([property, value]) => {
+    const objectAsArray = Object.entries(results[i]).filter(([property, value]) => {
       return property.startsWith('approach') || contains(property, visibleMetrics.value)
     })
-    result.push(Object.fromEntries(object_as_array))
+    result.push(Object.fromEntries(objectAsArray))
   }
 
   return result

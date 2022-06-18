@@ -1,4 +1,11 @@
-"""
+"""This module tests the functionality of various server-side retrival components.
+
+test_set_recs(client): test if the server-side loading of user recommendations is functional.
+test_result_by_id(client): test if the server-side retrieval of a result by its ID is functional.
+test_get_recs(client): test if the server-side retrieval of user recommendations is functional.
+test_headers(client): test if the server-side header retrieval component is functional.
+test_validate(client): test if the server-side validation component is functional.
+
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
@@ -132,4 +139,4 @@ def test_validate(client):
     queue.recommender_system = RecommenderSystem('datasets', MOCK_RESULTS_DIR)
     url = URL_PREFIX + '/validate'
     response = client.post(url, json={'filepath': '1654518468_Test938_perturbance', 'amount': 0})
-    assert b'Validated' == response.data
+    assert response.data == b'Validated'

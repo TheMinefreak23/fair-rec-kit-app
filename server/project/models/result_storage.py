@@ -26,8 +26,16 @@ from project.models.constants import RESULTS_DIR, RESULTS_OVERVIEW_PATH
 
 
 class ResultStorage:
-    """Handle the storage of the results in the result overview and store the current result"""
+    """Handle the storage of the results in the result overview and store the current result.
+
+    methods:
+        __init__
+        save_result
+        do_nothing
+    """
+
     def __init__(self):
+        """Initialise ResultStorage."""
         # current result variables
         self.current_result = {}
         self.current_recs = {}
@@ -48,7 +56,7 @@ class ResultStorage:
     # TODO
     @staticmethod
     def do_nothing():
-        """This function exists to quit pylint from yappin"""
+        """do_nothing exists to stop pylint from yappin'."""
         return None
 
 
@@ -198,7 +206,7 @@ def edit_result(result_id, new_name, new_tags, new_email):
 
 
 def update_overviews(new_path, old_name, new_name):
-    """Update the name in all overview.json files
+    """Update the name in all overview.json files.
 
     Args:
         new_path: new result file path
@@ -219,7 +227,7 @@ def update_overviews(new_path, old_name, new_name):
 
 
 def makepath(result_id, result):
-    """Make result path from result ID and result
+    """Make result path from result ID and result.
 
     Args:
         result_id: the result ID

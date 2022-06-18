@@ -1,4 +1,20 @@
-"""
+"""This module has functions for retrieval of a specific result.
+
+Methods:
+    filter_results
+    get_chunk
+    rename_headers
+    add_dataset_columns
+    add_spotify_columns
+
+blueprint routes:
+    set_recs
+    set_result
+    user_result
+    headers
+    export
+    validate
+
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
@@ -82,7 +98,7 @@ def set_result():
 
 @blueprint.route('/', methods=['POST'])
 def user_result():
-    """"Get recommender results per user for the shown result.
+    """Get recommender results per user for the shown result.
 
     Returns:
         (JSON) user item data
@@ -129,7 +145,7 @@ def user_result():
 
 
 def get_chunk(start_rows, chunk_size, df_sorted):
-    """Get a chunk of a dataframe
+    """Get a chunk of a dataframe.
 
     Args:
         start_rows: rows to start at
@@ -152,7 +168,7 @@ def get_chunk(start_rows, chunk_size, df_sorted):
 
 
 def rename_headers(dataset_name, matrix_name, df_subset):
-    """Rename the user and item headers so they reflect their respective content
+    """Rename the user and item headers, so they reflect their respective content.
 
     Args:
         dataset_name: the name of the dataset of the matrix
