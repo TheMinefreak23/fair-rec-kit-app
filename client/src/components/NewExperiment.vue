@@ -7,7 +7,11 @@ import FormGroupList from './Form/FormGroupList.vue'
 import { sendMockData } from '../test/mock/mockExperimentOptions.js'
 import { store, pollForResult } from '../store.js'
 import { API_URL } from '../api'
-import { emptyFormGroup, validateEmail } from '../helpers/optionsFormatter'
+import {
+  emptyFormGroup,
+  validateEmail,
+  reformat,
+} from '../helpers/optionsFormatter'
 import { progress } from '../helpers/queueFormatter'
 import Tags from './Tags.vue'
 
@@ -96,44 +100,6 @@ function initForm() {
     experimentMethod: 'recommendation', // The default experiment type
     includeRatedItems: true,
   }
-}
-
-// Change the form format into a data format
-function reformat(property) {
-  const formattedChoices = []
-  for (const i in property.choices) {
-    const choices = property.choices[i]
-    // console.log('reformat', choices)
-    if (choices.main) {
-      // Direct settings (inputs/selects)
-      let params = []
-      if (choices.inputs) params = params.concat(choices.inputs)
-      if (choices.selects) params = params.concat(choices.selects)
-      formattedChoices[i] = {
-        name: choices.main.name,
-        params,
-      }
-      // Nested formgrouplists
-      if (choices.lists != null) {
-        for (const list of choices.lists) {
-          // console.log('list', list)
-          if (list.choices[0].single) {
-            // formgroup not list
-            // TODO refactor
-            // If it is a single form group, take the first (and thus last) single option in the list
-            formattedChoices[i][list.choices[0].name] = reformat(list)[0]
-            /* console.log(
-              i,
-              list.choices[0].name,
-              formattedChoices[i][list.choices[0].name]
-            ) */
-          } else formattedChoices[i][list.name] = reformat(list)
-          // console.log('list', formattedChoices[i][list.name])
-        }
-      }
-    }
-  }
-  return formattedChoices
 }
 </script>
 

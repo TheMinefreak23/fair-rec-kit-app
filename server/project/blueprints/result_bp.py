@@ -14,6 +14,7 @@ from fairreckitlib.data.set.dataset import add_dataset_columns as add_data_colum
 from project.models import result_loader, \
     result_store, options_formatter, \
     recommender_system, queue
+from project.models.options_formatter import reformat_list
 from project.models.result_loader import result_by_id
 
 blueprint = Blueprint('result', __name__, url_prefix='/api/result')
@@ -24,19 +25,38 @@ def filter_results(dataframe, filters):
 
     Args:
         dataframe: a dataframe containing results that need to be filtered
-        filters: an array that contains filters
+        filters(list): filter settings
 
     Returns:
         results after filtering
     """
-    # filter = fairreckitlib.data.filter
-    # filter(dataframe, filters)
-    # todo: filter
-    print('TODO do something with the filters: ', filters)
+    # print('raw filters from client: ', filters)
+
+    # Convert filters
+    settings = {} # TODO refactor?
+    reformat_list(settings, 'subset', filters) # TODO use reformat option instead?
+    # print('after reformat list', settings)
+
+    # TODO refactor (duplicate code in options formatter)
+    subset = []
+    for filter_pass in settings['subset']:
+        subset.append({'filter_pass': filter_pass['filter']})
+
+    print('filters data format', json.dumps(subset, indent=4))
+    print('TODO make a filter config and filter with it')
+
+    # TODO global import
+    #from fairreckitlib.data.pipeline.data_pipeline import DataPipeline
+    #from fairreckitlib.data.filter.filter_config_parsing import parse_data_subset_config
+    #from fairreckitlib.data.filter.filter_config import DataSubsetConfig
+
+    #parse_data_subset_config()
+    #DataSubsetConfig()
+    #DataPipeline().filter_rows(dataframe,)
+
     return dataframe
 
 
-# Set current shown recommendations
 @blueprint.route('/set-recs', methods=['POST'])
 def set_recs():
     """Set the recommendations for the current shown result.
@@ -56,7 +76,24 @@ def set_recs():
     # Load the correct ratings file
     result_store.current_recs[run_id][pair_id] = pd.read_csv(
         path, sep='\t', header=0)
-    return {'status': 'success', 'availableFilters': options_formatter.options['filters']}
+    return {'status': 'success'}
+
+
+@blueprint.route('/filters', methods=['POST'])
+def available_filters():
+    """Get the available filters based on the dataset and matrix.
+    (POST data: dataset name and matrix name)
+
+    Returns:
+        (dict) the available filters
+    """
+    json_data = request.json
+    dataset_name = json_data.get("dataset", "")
+    matrix_name = json_data.get("matrix", "")
+    filters = recommender_system.get_available_data_filters()[dataset_name][matrix_name]
+    formatted_filters = options_formatter.make_filter_option(filters)
+    # print('== FILTERS == ', dataset_name, matrix_name, ': ', formatted_filters['options'])
+    return {'filters': formatted_filters['options']}
 
 
 @blueprint.route('/result-by-id', methods=['POST', 'GET'])

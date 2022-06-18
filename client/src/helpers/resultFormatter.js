@@ -53,7 +53,7 @@ export function formatMultipleItems(items) {
 
 export function statusVariant(rawStatus) {
   const experimentStatus = rawStatus.slice(statusPrefix.length)
-  //console.log('statusVariant experimentStatus', experimentStatus)
+  // console.log('statusVariant experimentStatus', experimentStatus)
   switch (experimentStatus) {
     case status.toDo:
       return 'outline-warning'
@@ -110,7 +110,7 @@ export function formatResult(result) {
   }
   formattedResult.metadata.datetime = result.timestamp.datetime
 
-  console.log('formatted', formattedResult)
+  // console.log('formatted', formattedResult)
   return formattedResult
 }
 
@@ -120,7 +120,7 @@ export function formatResult(result) {
  * @return {String} - The short description
  */
 export function shortResultDescription(result) {
-  //console.log(result)
+  // console.log(result)
   const datasets = []
   const approaches = []
   for (const datasetResult of result.result) {
@@ -155,16 +155,16 @@ export function showDatasetInfo(dataset) {
 
 // Format evaluations (including filtered ones)
 export function formatEvaluation(e, index, result, runID) {
-  console.log('before evaluation format', JSON.parse(JSON.stringify(e)))
+  // console.log('before evaluation format', JSON.parse(JSON.stringify(e)))
 
   // Get filtered values and make subheaders
   let subgroupName = ''
 
   if (e.evaluations[0].subgroup.subset) {
-    console.log('subgroup subset', e.evaluations[0].subgroup.subset)
+    // console.log('subgroup subset', e.evaluations[0].subgroup.subset)
     for (const filter of e.evaluations[0].subgroup.subset) {
       // console.log('filter', filter)
-      for (const filterPass of filter['filter_pass']) {
+      for (const filterPass of filter.filter_pass) {
         for (const [paramName, paramValue] of Object.entries(
           filterPass.params
         )) {

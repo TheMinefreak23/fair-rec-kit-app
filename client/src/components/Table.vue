@@ -208,8 +208,8 @@ const filteredHeaders = () => {
     >
       <FormGroupList
         v-model="filters"
-        name="filter"
-        title="filters"
+        name="filter pass"
+        title="subset"
         :options="filterOptions"
       />
     </b-modal>

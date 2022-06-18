@@ -98,7 +98,7 @@ class Experiment:
 
         # TODO DON'T USE YML?
         # Save configuration to yaml file.
-        config_file_path = CONFIG_DIR + '/' + self.queue_item.name
+        config_file_path = os.path.join(CONFIG_DIR, self.queue_item.name)
 
         with open(config_file_path + '.yml', 'w+', encoding='utf-8') as config_file:
             yaml.dump(self.queue_item.config, config_file)
