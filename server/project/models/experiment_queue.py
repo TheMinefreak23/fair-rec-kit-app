@@ -1,4 +1,11 @@
-"""
+"""This module contains a class that handles the queueing of the experiments.
+
+classes:
+    ExperimentQueue
+
+methods:
+    formatted_experiments
+
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
@@ -13,8 +20,27 @@ from .experiment import Status, ProgressStatus, QueueItem, Experiment
 
 
 class ExperimentQueue:
-    """Queue for handling multiple experiments one by one"""
+    """Queue for handling multiple experiments one by one.
+
+    methods:
+        __init__
+        formatted_queue
+        run_first
+        set_up_experiment
+        append_queue
+        add_validation
+        formatted_experiment
+    """
+
     def __init__(self, recommender_system, options_formatter, result_storage, mail_sender):
+        """Initialize ExperimentQueue.
+
+        args:
+            recommender_system(obj): the recommender system
+            options_formatter(obj): options_formatter instance to be used
+            result_storage(obj): result_storage instance to be used
+            mail_sender(obj): mail_sender instance to be used
+        """
         self.options_formatter = options_formatter
         self.recommender_system = recommender_system
         self.result_storage = result_storage
@@ -35,7 +61,6 @@ class ExperimentQueue:
 
     def run_first(self):
         """Take the oldest settings in the queue and perform an experiment with them."""
-
         # Do one experiment at a time
         if self.current_experiment and self.current_experiment.queue_item.status == Status.ACTIVE:
             return
@@ -65,7 +90,6 @@ class ExperimentQueue:
         Returns:
             experiment(dict) the experiment events
         """
-
         # print('run experiment:', experiment)
 
         # Update current experiment

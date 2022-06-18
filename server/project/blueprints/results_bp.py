@@ -1,4 +1,10 @@
-"""
+"""The methods in this module call functions that are in the models folder to load and edit results.
+
+blueprint routes:
+    results
+    edit
+    delete
+
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)

@@ -86,9 +86,7 @@ def get_overview(evaluation_id, runid):
 
 
 def add_evaluation(data, evaluation):
-    """
-    Add an evaluation to the data.
-    """
+    """Add an evaluation to the data."""
     # todo: refactor docstring
     if not evaluation:
         return data
@@ -140,8 +138,7 @@ def id_to_index(json_data, result_id):
 
 
 def name_to_index(json_data, name, key, by_name=False):
-    """Returns the index of the entry in results_overview
-    of a specific dataset-recommender approach pair.
+    """Return the index of the entry in results_overview of a dataset-recommender approach pair.
 
     Args:
     json_data(list): the loaded json data from results_overview
