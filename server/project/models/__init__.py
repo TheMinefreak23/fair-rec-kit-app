@@ -1,4 +1,23 @@
-"""
+"""This package contains all the models used to manipulate server data.
+Modules:
+    constants.py: This file contains constants that are used by the other classes (such as file paths)
+
+    events.py: This file handles the events that are caused by the library, for example when an experiment is finished.
+
+    experiment.py: This file defines different classes required to handle the progress of experiments
+    and the experiment itself, which in turn has methods to run new experiments or validate them.
+
+    experiment_queue.py: This contains a class that handles the queueing of the experiments.
+
+    mail.py: This contains a class that is used to handle sending emails to the user whenever an experiment is finished.
+
+    options_formatter.py: This contains a class and modules that are used to convert user experiment options
+    to configuration dictionaries and vice-versa.
+
+    result_loader.py: This module contains functions to load and modify data from evaluation results.
+
+    result_storage.py: This module contains functions to load, save and modify data from the result overview.
+
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
