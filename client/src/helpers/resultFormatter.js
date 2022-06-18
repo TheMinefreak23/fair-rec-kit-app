@@ -74,7 +74,7 @@ export function statusVariant(rawStatus) {
  * @return {Object} The formatted result
  */
 export function formatResult(result) {
-  console.log('before format', JSON.parse(JSON.stringify(result)))
+  // console.log('before format', JSON.parse(JSON.stringify(result)))
   const formattedResult = {
     id: result.timestamp.stamp,
     metadata: result.metadata,
@@ -103,6 +103,8 @@ export function formatResult(result) {
 
         // datasetResult.headers = makeHeaders(datasetResult.results[0])
         datasetResult.caption = showDatasetInfo(datasetResult.dataset)
+        // Omit old properties TODO
+        // const { recs, ...rest } = datasetResult
         return datasetResult
       }),
   }
@@ -153,55 +155,43 @@ export function showDatasetInfo(dataset) {
 
 // Format evaluations (including filtered ones)
 export function formatEvaluation(e, index, result, runID) {
-  // TODO refactor and/or give option to set decimal precision in UI
-  // Add index for unique metric key
-  result[formatMetric(e) + '_' + index] = parseFloat(
-    e.evaluations[runID].global
-  ).toFixed(2)
+  console.log('before evaluation format', JSON.parse(JSON.stringify(e)))
 
-  // Flatten filters
-  // console.log(e.evaluation, e.evaluation.filtered)
-  // Add filter category (main name) to filter parameter name
-  // TODO refactor
-  const filtered = []
-  for (const filter of e.evaluations[0].filtered) {
-    // console.log('filter', filter)
-    for (const [mainName, params] of Object.entries(filter)) {
-      // console.log(mainName, params)
-      for (const param of params) {
-        for (const [paramName, paramValue] of Object.entries(param)) {
-          const filterItem = {}
-          // console.log('paramValue', paramValue.toFixed(2))
-          filterItem[mainName + ' ' + '(' + paramName + ')'] =
-            paramValue.toFixed(2)
-          filtered.push(filterItem)
+  // Get filtered values and make subheaders
+  let subgroupName = ''
+
+  if (e.evaluations[0].subgroup.subset) {
+    console.log('subgroup subset', e.evaluations[0].subgroup.subset)
+    for (const filter of e.evaluations[0].subgroup.subset) {
+      // console.log('filter', filter)
+      for (const filterPass of filter['filter_pass']) {
+        for (const [paramName, paramValue] of Object.entries(
+          filterPass.params
+        )) {
+          subgroupName += capitalise(
+            underscoreToSpace(filterPass.name) +
+              ' ' +
+              '(' +
+              paramName +
+              ' ' +
+              paramValue +
+              ')'
+          )
         }
       }
     }
-  }
+  } else subgroupName = 'Global'
 
-  // Get filtered values and make subheaders
-  if (filtered.length === 0) {
-    return { name: formatMetric(e) }
-  } else {
-    const subheaders = ['Global']
-    filtered.map((filter) => {
-      // Mock: get first entry for now
-      const [name, val] = Object.entries(filter)[0]
-      // const filterName = e.name + ' ' + name
-      const filterName = formatMetric(e) + name
-      result[filterName] = val
-      // console.log(result)
-      subheaders.push(capitalise(name))
-      // console.log(subheaders)
-    })
+  result[formatMetricName(e) + subgroupName + '_' + index] = parseFloat(
+    e.evaluations[runID].value
+  ).toFixed(2)
 
-    return { name: formatMetric(e), subheaders }
-  }
+  // TODO runID shit?
+  return { name: formatMetricName(e), subheaders: [subgroupName] }
 }
 
 // Format metric name
-export function formatMetric(evaluation) {
+export function formatMetricName(evaluation) {
   // If it is a K metric, replace K with the parameter
   const name = evaluation.name
   if (name.slice(-1).toLowerCase() === 'k') {
