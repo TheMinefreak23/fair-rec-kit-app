@@ -1,4 +1,9 @@
-"""
+"""This module tests the functionality of various server-side functions that manipulate the previous results.
+
+test_results(client): test if the server-side result loading component is functional.
+test_edit(client): test if the server-side result editing component is functional.
+test_delete(client): test if the server-side result deletion component is functional.
+
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
@@ -52,7 +57,7 @@ def test_edit(client):
     edited_results = load_results_overview()
 
     # Check success response
-    assert b'Edited index' == response.data
+    assert response.data == b'Edited index'
 
     # Check if the edited result in the stored results is as expected
     assert edited_results['all_results'][0]['metadata'] == metadata
@@ -79,7 +84,7 @@ def test_delete(client):
     edited_results = load_results_overview()
 
      # Check success response
-    assert b'Removed index' == response.data
+    assert response.data == b'Removed index'
 
      # Check if the removed result is no longer in the results overview
     assert len(edited_results) == len(initial_results)
