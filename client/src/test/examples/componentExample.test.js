@@ -4,7 +4,7 @@ Utrecht University within the Software Project course.
 
 import { render } from '@testing-library/vue'
 import { test } from 'vitest'
-import ExperimentQueue from '../components/ExperimentQueue.vue'
+import ExperimentQueue from '../../components/ExperimentQueue.vue'
 
 /**
  * Test queue tab content

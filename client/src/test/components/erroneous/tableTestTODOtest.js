@@ -4,19 +4,19 @@ Utrecht University within the Software Project course.
 
 import { render, fireEvent, getByTestId, getByText } from '@testing-library/vue'
 import { describe, expect, it, test } from 'vitest'
-import Table from '../components/Table.vue'
-import HeadersModal from '../components/Table/Modals/HeadersModal.vue'
-import DeletionModal from '../components/Table/Modals/DeletionModal.vue'
-import EditModal from '../components/Table/Modals/EditModal.vue'
-import InfoModal from '../components/Table/Modals/InfoModal.vue'
+import Table from '../../../components/Table.vue'
+import HeadersModal from '../../../components/Table/Modals/HeadersModal.vue'
+import DeletionModal from '../../../components/Table/Modals/DeletionModal.vue'
+import EditModal from '../../../components/Table/Modals/EditModal.vue'
+import InfoModal from '../../../components/Table/Modals/InfoModal.vue'
 
 test('Filter button', async () => {
-  const {getByText, getByTitle} = render(Table, {
+  const { getByText, getByTitle } = render(Table, {
     props: {
       expendable: true,
       results: [{ foo: 1, bar: 1 }],
       headers: [{ name: 'foo' }, { name: 'bar' }],
-    }
+    },
   })
 
   const button = getByText('Filters')
@@ -25,10 +25,10 @@ test('Filter button', async () => {
 })
 
 test('Header button', async () => {
-  const{getByText, getByTitle} = render(HeadersModal, {
+  const { getByText, getByTitle } = render(HeadersModal, {
     props: {
       headerOptions: true,
-    }
+    },
   })
 
   const button = getByText('Select Headers')
@@ -41,7 +41,7 @@ test('deleteTableItem', async () => {
   const { getByTestId, getByTitle } = render(DeletionModal, {
     props: {
       entry: true,
-    }
+    },
   })
 
   // get deletion button
@@ -98,4 +98,3 @@ test('viewMetadata', async () => {
   // check if the modal shows up
   getByTitle('Result information')
 })
-
