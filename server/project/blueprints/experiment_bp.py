@@ -1,4 +1,11 @@
-"""
+"""This module contains functions to manipulate the experiment calculation queue, or request experiment parameters.
+
+blueprint routes:
+    params
+    handle_experiment
+    get_queue
+    abort
+
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
@@ -34,7 +41,6 @@ def handle_experiment():
     Returns:
         (str) the queue for POST requests, or the current experiment ID (int) for GET requests
     """
-
     response = {}
     if request.method == 'POST':
         # Get settings and metadata from request
