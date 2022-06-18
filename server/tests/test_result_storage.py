@@ -56,7 +56,7 @@ def test_save_result():
     # The current result gets updated
     assert result_store.current_result is expected
 
-    # TODO use mock result
+    # use mock result
     #result_by_id(test_id)
     # The result is saved to a JSON on the path
     #from project.result_storage import current_result

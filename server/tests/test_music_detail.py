@@ -66,7 +66,7 @@ def test_collage():
 
     # print(test_output.size)
     # print(result.size)
-    assert (uqi(np.asanyarray(test_output), np.asanyarray(result)) > 0.8)
+    assert uqi(np.asanyarray(test_output), np.asanyarray(result)) > 0.8
 
 
 def test_unique_album_background(client):

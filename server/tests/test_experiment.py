@@ -101,7 +101,7 @@ def test_experiment_format():
     #delete_test_results()
 
 
-# TODO this test is kind of redundant, use fixtures?
+# this test is kind of redundant, use fixtures?
 #@patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 #def test_run_experiment():
 #    print(get_test_options())
@@ -117,7 +117,7 @@ def test_experiment_format():
 
 def test_params(client):
     """Test params route.
-    
+
     Args:
         client: The client component used to send requests to the server
     """
@@ -128,7 +128,7 @@ def test_params(client):
 
 def test_experiment_route_post(client):
     """Test POST request on experiment route.
-    
+
     Args:
         client: The client component used to send requests to the server
     """
@@ -139,7 +139,7 @@ def test_experiment_route_post(client):
 
 def test_experiment_route_get(client):
     """Test GET request on experiment route.
-    
+
     Args:
         client: The client component used to send requests to the server
     """
@@ -148,10 +148,9 @@ def test_experiment_route_get(client):
 
     data = json.loads(get_response.data)
     assert 'status' in data
-    # TODO Status is not available if there is no experiment
+    # Status is not available if there is no experiment
     #assert data['status'] == Status.NA.value
 
-#TODO
 #@patch('project.experiment.RESULTS_DIR', TEST_RESULTS_PATH)
 #@patch('project.models.recommender_system', RecommenderSystem('datasets', TEST_RESULTS_PATH))
 #def test_form(client):
@@ -199,7 +198,7 @@ def test_experiment_route_get(client):
 
 def test_queue(client):
     """Test GET request on queue route.
-    
+
     Args:
         client: The client component used to send requests to the server
     """
@@ -212,7 +211,7 @@ def test_queue(client):
 #@patch('project.experiment.experiment_queue', [])
 def test_abort(client):
     """Test whether an experiment gets appended to the queue correctly.
-    
+
     Args:
         client: The client component used to send requests to the server
     """
@@ -264,7 +263,7 @@ def test_append():
     #append_queue({}, {'lists': {'datasets': [], 'approaches': [], 'metrics': []}})
 
     # Test empty metadata
-    # TODO refactor? global not working
+    # refactor? global not working
     with open('tests/options.json', encoding='utf-8') as file:
         mock = json.load(file)
     queue.append_queue({}, mock['settings'])
@@ -277,7 +276,7 @@ def test_append():
 @patch('project.models.recommender_system', RecommenderSystem('datasets', MOCK_RESULTS_DIR))
 def test_add_validation():
     """Test whether a valudation experiment gets appended to the queue correctly."""
-    # TODO Test invalid file path?
+    # Test invalid file path?
     # add_validation('',)
 
     test_path = '1654518468_Test938_perturbance'
