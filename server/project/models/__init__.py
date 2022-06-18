@@ -1,4 +1,5 @@
 """This package contains all the models used to manipulate server data.
+
 Modules:
     constants.py: This file contains constants that are used by the other classes (such as file paths)
 
@@ -7,16 +8,22 @@ Modules:
     experiment.py: This file defines different classes required to handle the progress of experiments
     and the experiment itself, which in turn has methods to run new experiments or validate them.
 
-    experiment_queue.py: This contains a class that handles the queueing of the experiments.
+    experiment_queue.py: This module contains a class that handles the queueing of the experiments.
 
-    mail.py: This contains a class that is used to handle sending emails to the user whenever an experiment is finished.
+    mail.py: This module contains a class that is used to handle sending emails to the user whenever an experiment is finished.
 
-    options_formatter.py: This contains a class and modules that are used to convert user experiment options
+    options_formatter.py: This contains a class and methods that are used to convert user experiment options
     to configuration dictionaries and vice-versa.
 
     result_loader.py: This module contains functions to load and modify data from evaluation results.
 
     result_storage.py: This module contains functions to load, save and modify data from the result overview.
+
+classes:
+    Token
+
+methods:
+    make_mail
 
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
@@ -36,7 +43,8 @@ from .result_storage import ResultStorage
 
 @dataclass
 class Token:
-    """Contains the token for Spotify requests"""
+    """Contains the token for Spotify requests."""
+
     expiration_time: int
     token_type: str
     access_token: str
@@ -48,7 +56,7 @@ MAIL = {MAIL_KEY: None}
 
 
 def make_mail(app):
-    """Instantiate mail sender with app
+    """Instantiate mail sender with app.
 
     Args:
         app: the app to get the context from
