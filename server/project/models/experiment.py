@@ -1,4 +1,12 @@
-"""
+"""This file defines different classes required to handle the progress of experiments.
+
+It also handles the experiment itself, which in turn has methods to run new experiments or validate them.
+
+classes:
+    Enum
+    ProgressStatus
+    QueueItem
+    Experiment
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
@@ -22,7 +30,8 @@ CONFIG_DIR = 'config_files'
 
 
 class Status(enum.Enum):
-    """Experiment status in queue"""
+    """Experiment status in queue."""
+
     TODO = 'To Do'
     ACTIVE = 'Active'
     ABORTED = 'Aborted'
@@ -32,7 +41,8 @@ class Status(enum.Enum):
 
 
 class ProgressStatus(enum.Enum):
-    """Experiment progress status"""
+    """Experiment progress status."""
+
     STARTED = 'Started'
     PARSING = 'Parsing'
     PROCESSING_DATA = 'Processing Data'
@@ -49,7 +59,8 @@ class ProgressStatus(enum.Enum):
 # TODO refactor job and config_dict overlap
 @dataclass
 class QueueItem:
-    """Dataclass for experiment setting items in the queue"""
+    """Dataclass for experiment setting items in the queue."""
+
     job: dict
     config: dict
     status: Status
@@ -59,8 +70,22 @@ class QueueItem:
 
 
 class Experiment:
-    """For running a recommender system experiment"""
+    """For running a recommender system experiment.
+
+    methods:
+        __init__
+        to_dict
+        run_new_experiment
+        validate_experiment
+    """
+
     def __init__(self, queue_item, recommender_system):
+        """Initialize Experiment class.
+
+        args:
+            queue_item(obj): the queue item
+            recommender_system(obj): the recommender system (used for retrieving config settings)
+        """
         self.queue_item = queue_item
         self.recommender_system = recommender_system
 
@@ -75,7 +100,7 @@ class Experiment:
         """
 
     def to_dict(self):
-        """Convert queue item to dictionary format
+        """Convert queue item to dictionary format.
 
         Returns:
             The QueueItem as a dictionary
@@ -118,7 +143,6 @@ class Experiment:
 
         Args:
             experiment(QueueItem): the experiment to validate
-
         """
         self.recommender_system.validate_experiment(result_dir=self.queue_item.job['file_path'],
                                                num_runs=self.queue_item.job['amount'],
