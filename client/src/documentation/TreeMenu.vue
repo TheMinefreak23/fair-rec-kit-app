@@ -17,6 +17,9 @@
         >
         </tree-menu>
 
+        <b-card-text v-if='itemDicts[label]["description"]'>
+          <span v-html='itemDicts[label]["description"]'></span>
+        </b-card-text>
       </b-collapse>     
     </b-card> 
   </div>
@@ -26,7 +29,7 @@ export default {
   props: [ 'label', 'nodes' ],
   name: 'tree-menu'
 }
-import { doctext } from '../documentation/documentation_items.vue'
+import { doctext } from './documentation_items.vue'
 import { ref } from 'vue'
 
 const collapse =ref([])
