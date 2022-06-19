@@ -16,9 +16,7 @@
           :depth="depth+1"
         >
         </tree-menu>
-        <b-card-text v-if='itemDicts[label]["description"]'>
-          <span v-html='itemDicts[label]["description"]'></span>
-        </b-card-text>
+
       </b-collapse>     
     </b-card> 
   </div>

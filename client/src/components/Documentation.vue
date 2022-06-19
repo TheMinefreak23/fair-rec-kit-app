@@ -264,7 +264,7 @@ code:before {
   </div>
 
   <!-- B-card items -->
-<div id="app">
+<div id="app" class="text-right pb-2 mx-5">
   <tree-menu :label="tree.label" :nodes="tree.nodes"></tree-menu>
 </div>
 
