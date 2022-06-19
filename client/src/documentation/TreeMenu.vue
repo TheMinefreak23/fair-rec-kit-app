@@ -1,9 +1,9 @@
 <template>
   <div class="tree-menu">
     <b-card class="border-end-0 border-top-0 border-bottom-0 border-5 bg-secondary">
-      <b-button  v-b-toggle="label" variant="primary">{{label}}</b-button>
+      <b-button v-b-toggle='label.replace(" ", "_")' variant="primary">{{label}}</b-button>
       <!-- v-if because if there is no description -> undefined, which takes space. -->    
-      <b-collapse :id='label' class="collapse show">
+      <b-collapse :id='label.replace(" ", "_")' class="collapse show">
         <tree-menu 
           v-for="node in nodes" 
           :nodes="node.nodes" 
