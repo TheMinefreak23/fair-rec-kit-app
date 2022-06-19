@@ -1,7 +1,12 @@
 <template>
   <div class="tree-menu">
     <b-card class="border-end-0 border-top-0 border-bottom-0 border-5 bg-secondary">
-      <b-button v-b-toggle='label.replace(" ", "_")' variant="primary">{{label}}</b-button>
+      <b-card-title>{{label}} 
+        <b-button v-b-toggle='label.replace(" ", "_")' variant="secondary">
+          <span class="when-open"><i class="bi bi-caret-up" /></span>
+          <span class="when-closed"><i class="bi bi-caret-down" /></span>
+        </b-button>
+      </b-card-title>
       <!-- v-if because if there is no description -> undefined, which takes space. -->    
       <b-collapse :id='label.replace(" ", "_")' class="collapse show">
         <tree-menu 
@@ -11,7 +16,10 @@
           :depth="depth+1"
         >
         </tree-menu>
-      </b-collapse>
+        <b-card-text v-if='itemDicts[label]["description"]'>
+          <span v-html='itemDicts[label]["description"]'></span>
+        </b-card-text>
+      </b-collapse>     
     </b-card> 
   </div>
 </template>
@@ -120,3 +128,12 @@ function parseItem(item) {
 }
 
 </script>
+
+<style>
+  .collapsed > .when-open {
+    display: none;
+  }
+  :not(.collapsed) > .when-closed {
+    display: none;
+  }
+</style>
