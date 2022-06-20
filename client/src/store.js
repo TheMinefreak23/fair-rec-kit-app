@@ -38,8 +38,6 @@ function getCalculation() {
           if ([status.done, status.aborted].includes(data.status)) {
             clearInterval(store.resultPoll)
             if (data.status === status.done)
-              // addResult(formatResult(data.calculation))
-              // addResultById(data.calculation.timestamp.stamp, false)
               addResultById(data.experimentID, false)
             console.log('DONE or ABORTED!!')
           }
@@ -76,16 +74,7 @@ async function getQueue() {
  * @param {Object} result - The new result
  */
 function addResult(result) {
-  // store.currentResults = [result, ...store.currentResults]
-  /* console.log(
-    'currentResults before addResult',
-    JSON.parse(JSON.stringify(store.currentResults))
-  ) */
   store.currentResults.push(result)
-  /* console.log(
-    'currentResults after addResult',
-    JSON.parse(JSON.stringify(store.currentResults))
-  ) */
   store.currentResultTab = store.currentResults.length - 1
   // console.log('currentResultTab', store.currentResultTab)
   // console.log(store.currentResults)
