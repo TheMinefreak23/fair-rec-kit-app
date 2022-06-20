@@ -19,7 +19,7 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
-import json
+# import json
 import tkinter as tk
 from tkinter.filedialog import asksaveasfilename
 
@@ -30,7 +30,8 @@ from project.blueprints.constants import BAD_REQUEST_RESPONSE
 from project.models import result_loader, \
     result_store, options_formatter, \
     recommender_system, queue
-from project.models.result_loader import result_by_id, add_dataset_columns, get_chunk, rename_headers, \
+from project.models.result_loader import result_by_id, add_dataset_columns, \
+    get_chunk, rename_headers, \
     add_spotify_columns
 
 blueprint = Blueprint('result', __name__, url_prefix='/api/result')

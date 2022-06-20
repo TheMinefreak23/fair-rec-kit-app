@@ -1,4 +1,4 @@
-"""This module tests the functionality of various server-side functions that manipulate the previous results.
+"""This module tests various server-side functions that manipulate the previous results.
 
 test_results(client): test if the server-side result loading component is functional.
 test_edit(client): test if the server-side result editing component is functional.
