@@ -104,7 +104,8 @@ def test_get_recs(client):
         'runid': 0,
         'amount': amount,
         'dataset': 'LFM-2B',
-        'optionalHeaders': 'extraHeader'
+        'matrix': 'user-track-count',
+        'optionalHeaders': ['user_age']
     }
     response = client.post(url, json=settings)
     result3 = json.loads(response.data)
