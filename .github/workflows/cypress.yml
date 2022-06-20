@@ -23,7 +23,7 @@ jobs:
 
       - name: Boot up server
         working-directory: ./server
-        run: flask run
+        run: nohup flask run &
         
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
