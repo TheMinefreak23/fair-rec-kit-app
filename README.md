@@ -11,63 +11,39 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.  
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 
-## How to run client & server
+## Running the client & server
 
 ### NOTE: These instructions are for Windows command prompt
 
-(Install Node.js first and run npm install)
-Either click the run.bat file in the app directory, or run (in cmd):
+- Install Node.js first and run `npm install`
+- Either click the run.bat file in the app directory, or run `run` in cmd.
 
-### `run`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view the client in your browser.
+This runs the app in the development mode.  
+Open [http://localhost:3000](http://localhost:3000) to view the client in your browser.  
 Open [http://localhost:5000](http://localhost:5000) for the server.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+The page will reload when you make changes.  
+You can also see any lint errors in the console.
 
-## How to run client separately
+## Running the client separately
 
-In the client folder, run in the terminal:
+- Use `npm i` first to install the needed packages.
+- In the client folder, run `npm run dev` the terminal.  
 
-### `npm run dev`
+## Running the server separately
 
-(Use <npm i> first to install the needed packages.)
+- Install the prerequisite packages with pip (e.g. by running `pip install -r requirements.txt` in the server directory).  
+- In the server directory, either execute run.bat or enter `run` in the terminal.
 
-## How to run server separately
-
-The easiest way is to install the prequisite packages with pip. In the server directory, either click the run batch file or run in the terminal:
-
-## run
-
-If you're using Anaconda, you need to install the package python-dotenv. Then use the Anaconda prompt and run: (Note: make sure you're in the right environment, using activate <env-name>)
-
-### `flask run`
+If you're using Anaconda, you need to install the package python-dotenv. Then use the Anaconda prompt and run the `flask run` command.  
+(Note: make sure you're in the right environment, using `activate <env-name>`)
 
 In all cases, you might want to add a configuration (pointing to the .bat file) in PyCharm.
 
-###########
+## Testing the client
 
-## How to test client
+- Execute the run-test.bat file in the client folder, or run `npm run test` in the terminal.
 
-Execute the run-test batch file in the client folder, or run in the terminal:
+## Testing the server
 
-### npm run test
-
-## How to test server
-
-Execute the run-test batch file in the server directory, or run in the terminal:
-
-### python -m pytest
-
-###########
-
-### Server requirements
-
-flask
-flask-cors
-requests
-pandas
-pillow
-fairreckitlib
+- Execute the run-test batch file in the server directory, or run `python -m pytest` in the terminal.
