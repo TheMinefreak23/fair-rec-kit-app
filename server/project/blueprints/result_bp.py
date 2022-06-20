@@ -20,6 +20,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 import json
+import copy
 from flask import (Blueprint, request)
 import pandas as pd
 from fairreckitlib.data.set.dataset import add_dataset_columns as add_data_columns
@@ -115,21 +116,19 @@ def user_result():
     sort_index = json_data.get("sortindex", 0)
 
     #Load the current recs from the storage (without changing the original)
-    import copy
     recs = copy.deepcopy(result_store.current_recs[run_id][pair_id])
 
-    dataset = recommender_system.data_registry.get_set(dataset_name)
     #TODO refactor/do dynamically
     spotify_datasets = ['LFM-2B']
     if dataset_name in spotify_datasets:
-        recs = add_spotify_columns(dataset_name, recs)
+      recs = add_spotify_columns(dataset_name, recs)
     
     #recs = filter_results(recs, filters)
     #Add optional columns to the dataframe (if any)
-    if (len(chosen_headers) > 0):
+    if len(chosen_headers) > 0:
       recs=add_dataset_columns(dataset_name, recs, chosen_headers, matrix_name)
     #Make sure not to sort on a column that does not exist anymore
-    if (len(recs.columns) <= sort_index):
+    if len(recs.columns) <= sort_index:
         sort_index = 0
     # sort dataframe based on index and ascending or not
     df_sorted = recs.sort_values(

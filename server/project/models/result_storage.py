@@ -158,6 +158,12 @@ def delete_result(result_id, result_name):
     path = RESULTS_DIR + str(result_id) + '_' + result_name
     if os.path.isdir(path):
         shutil.rmtree(path)
+    # Remove the result from the experiment queue (if applicable)
+    from project.models import queue
+    queue.queue = [
+        result for result in queue.queue
+        if result.queue_item.job['timestamp']['stamp'] != result_id
+    ]
 
 
 def edit_result(result_id, new_name, new_tags, new_email):
