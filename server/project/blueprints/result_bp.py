@@ -20,9 +20,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 # import json
-import tkinter as tk
-from tkinter.filedialog import asksaveasfilename
-
+import copy
 from flask import (Blueprint, request)
 import pandas as pd
 
@@ -128,9 +126,10 @@ def user_result():
     matrix_name = json_data.get('matrix', '')
     dataset_name = json_data.get('dataset', '')
 
-    # Get recs
-    recs = result_store.current_recs[run_id][pair_id]
-    # TODO refactor/do dynamically
+    #Load the current recs from the storage (without changing the original)
+    recs = copy.deepcopy(result_store.current_recs[run_id][pair_id])
+
+    #TODO refactor/do dynamically
     spotify_datasets = ['LFM-2B']
     if dataset_name in spotify_datasets:
         recs = add_spotify_columns(dataset_name, recs)
@@ -179,41 +178,6 @@ def headers():
         for matrix_name in dataset.get_available_matrices():
             columns = dataset.get_available_columns(matrix_name)
     return columns
-
-
-@blueprint.route('/export', methods=['POST'])
-def export():
-    """Give the user the option to export the current shown results to a .tsv file.
-
-    Returns:
-        A message indicating if the export was succesful
-    """
-    # TODO rework this
-    # Load results from json
-    json_data = request.json
-    results = json_data.get('results', '{}')
-
-    # Load the file selector
-    root = tk.Tk()
-
-    # Focus on the file selector and hide the overlay
-    root.overrideredirect(True)
-    root.geometry('0x0+0+0')
-    root.deiconify()
-    root.lift()
-    root.focus_force()
-    tk.Tk().withdraw()
-
-    data = [('tsv', '*.tsv')]
-    try:
-        file_name = asksaveasfilename(initialdir='/', title='Export Table',
-                                      filetypes=data, defaultextension='.tsv',
-                                      initialfile="experiment", parent=root)
-        data_frame = pd.DataFrame(results)
-        data_frame.to_csv(file_name, index=False)
-        return {'message': 'Exported succesfully'}
-    except SystemError:
-        return {'message': 'Export cancelled'}
 
 
 @blueprint.route('/validate', methods=['POST'])

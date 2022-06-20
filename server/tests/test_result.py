@@ -105,12 +105,14 @@ def test_get_recs(client):
     result2 = json.loads(response.data)
     assert result[0] != result2[0]
 
-    # Check that spotify columns are added
+    # Check that optional columns are added
     settings = {
         'pairid': 0,
         'runid': 0,
         'amount': amount,
-        'dataset': 'LFM-2B'
+        'dataset': 'LFM-2B',
+        'matrix': 'user-track-count',
+        'optionalHeaders': ['user_age']
     }
     response = client.post(url, json=settings)
     result3 = json.loads(response.data)

@@ -6,7 +6,7 @@ Utrecht University within the Software Project course.
 import { ref } from 'vue'
 import { API_URL } from '../../../api'
 import { status, statusPrefix } from '../../../helpers/queueFormatter'
-import { store } from '../../../store'
+import { getQueue, store } from '../../../store'
 
 const props = defineProps({ item: Object, removalUrl: String })
 
@@ -37,6 +37,7 @@ async function removeEntry() {
   }
   fetch(API_URL + props.removalUrl, requestOptions).then(() => {
     console.log('Item', entry.value.id, 'removed succesfully')
+    getQueue()
   })
 }
 

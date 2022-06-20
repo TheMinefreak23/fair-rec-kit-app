@@ -13,6 +13,7 @@ from flask import (Blueprint, request)
 
 from project.blueprints.constants import BAD_REQUEST_RESPONSE
 from project.models.result_storage import edit_result, load_results_overview, delete_result
+from project.models import queue
 
 blueprint = Blueprint('results', __name__, url_prefix='/api/all-results')
 
@@ -62,4 +63,9 @@ def delete():
         return BAD_REQUEST_RESPONSE
 
     delete_result(result_id, name)
+     # Remove the result from the experiment queue (if applicable)
+    queue.queue = [
+        result for result in queue.queue
+        if result.queue_item.job['timestamp']['stamp'] != result_id
+    ]
     return "Removed index"
