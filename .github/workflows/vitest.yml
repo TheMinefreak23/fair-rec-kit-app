@@ -3,7 +3,7 @@ name: Client Vitest
 on:
   workflow_dispatch:
   pull_request:
-    branches: stable
+    branches: [stable,dev]
   schedule:
     - cron: '0 22 * * 5'
 
