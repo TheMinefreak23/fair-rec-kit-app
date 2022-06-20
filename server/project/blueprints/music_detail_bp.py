@@ -25,12 +25,16 @@ import numpy as np
 from PIL import Image
 
 from flask import Blueprint, request
+
+from project.blueprints.constants import BAD_REQUEST_RESPONSE
 from project.models import token as tok
 
 blueprint = Blueprint('music', __name__, url_prefix='/api/music')
 
 SPOTIFY_API = 'https://api.spotify.com/v1'
+AB_API = 'https://acousticbrainz.org/api/v1/'
 MAX_TRACK_LIMIT = 50
+
 
 def token_to_dict(token):
     """Convert a token to a dictionary format.
@@ -79,16 +83,18 @@ def get_acousticbrainz_data():
     Returns:
         Dict: Dictionary with all High-Level audiofeatures
     """
-    data = request.get_json()
-    print(data)
-    ab_api = 'https://acousticbrainz.org/api/v1/'
-    musicbrainz_id = data.get('mbid')
-    url = ab_api + 'high-level' + '?recording_ids=' + musicbrainz_id
+    json_data = request.json
+    try:
+        musicbrainz_id = json_data['mbid']
+    except KeyError:
+        return BAD_REQUEST_RESPONSE
+
+    url = AB_API + 'high-level' + '?recording_ids=' + musicbrainz_id
     res = requests.get(url)
     return json.loads(res.text)
 
 
-@blueprint.route('/background', methods=['POST'])
+@blueprint.route('/background', methods=['GET'])
 def get_background():
     """Generate a background from the album covers of a Spotify Playlist.
 

@@ -9,3 +9,5 @@ Utrecht University within the Software Project course.
 
 MOCK_RESULTS_DIR = 'tests/mock/'
 """Location of the mock folder."""
+
+BAD_JSON_REQUEST = {'bad': ''}

@@ -13,6 +13,9 @@ Utrecht University within the Software Project course.
 """
 import os
 # import pandas as pd
+from fairreckitlib.data.set.dataset import add_dataset_columns as add_data_columns
+
+from . import recommender_system
 from .constants import RESULTS_DIR
 from .result_storage import load_results_overview, load_json
 
@@ -152,3 +155,84 @@ def name_to_index(json_data, name, key, by_name=False):
         if by_name and result_value['name'] == name or result_value == name:
             current_index = i
     return current_index
+
+
+def get_chunk(start_rows, chunk_size, df_sorted):
+    """Get a chunk of a dataframe.
+
+    Args:
+        start_rows: rows to start at
+        chunk_size: size of the rows chunk
+        df_sorted: the sorted dataframe to get the chunk from
+
+    Returns:
+        The part of the dataframe
+    """
+    # getting only chunk of data
+    end_rows = start_rows + chunk_size
+    end_rows = int(end_rows)
+
+    # determine if at the end of the dataset
+    rows_number = len(df_sorted)
+    end_rows = min(end_rows, rows_number)
+
+    # return part of table that should be shown
+    return df_sorted[start_rows:end_rows]
+
+
+def rename_headers(dataset_name, matrix_name, df_subset):
+    """Rename the user and item headers, so they reflect their respective content.
+
+    Args:
+        dataset_name: the name of the dataset of the matrix
+        matrix_name: the matrix name of the matrix with the headers
+        df_subset: the dataframe with the headers
+
+    """
+    dataset = recommender_system.data_registry.get_set(dataset_name)
+    if not dataset is None and not dataset.get_matrix_config(matrix_name) is None:
+        item = dataset.get_matrix_config(matrix_name).item.key
+        user = dataset.get_matrix_config(matrix_name).user.key
+        df_subset.rename(columns={'user': user, 'item': item}, inplace=True)
+
+
+def add_dataset_columns(dataset_name, dataframe, columns, matrix_name):
+    """Add columns to the requested result based on its dataset.
+
+    Args:
+        dataset_name: the name of dataset belonging to the dataframe
+        dataframe: a pandas dataframe of the requested user results
+        columns: the current list of columns
+        matrix_name: the name of the matrix belonging to the dataframe
+
+    Returns:
+        The updated dataframe
+    """
+    dataset = recommender_system.data_registry.get_set(dataset_name)
+    if dataset is None:
+        return dataframe
+
+    result = list(map(lambda column: column.lower(), columns))
+    dataframe = add_data_columns(dataset, matrix_name, dataframe, result)
+    # dataframe = add_user_columns(dataset, dataframe, result)
+    # print(dataframe.head())
+    return dataframe
+
+
+def add_spotify_columns(dataset_name, dataframe):
+    """Add columns from the Spotify integration to the dataframe.
+
+    Args:
+        dataset_name: the name of dataset belonging to the dataframe
+        dataframe: a pandas dataframe of the requested user results
+
+
+    Returns:
+        The updated dataframe
+    """
+    dataset = recommender_system.data_registry.get_set(dataset_name)
+    matrix_name = 'user-track-count'
+    columns = ['track_id', 'track_spotify-uri']
+    dataframe = add_data_columns(dataset, matrix_name, dataframe, columns)
+    print(dataframe.head())
+    return dataframe

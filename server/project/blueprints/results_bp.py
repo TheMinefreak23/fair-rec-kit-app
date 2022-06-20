@@ -11,6 +11,7 @@ Utrecht University within the Software Project course.
 """
 from flask import (Blueprint, request)
 
+from project.blueprints.constants import BAD_REQUEST_RESPONSE
 from project.models.result_storage import edit_result, load_results_overview, delete_result
 
 blueprint = Blueprint('results', __name__, url_prefix='/api/all-results')
@@ -33,12 +34,16 @@ def edit():
     Returns:
         A message indicating the operation was succesful
     """
-    data = request.get_json()
-    data_id = data.get('id')
-    new_name = data.get('new_name')
-    new_tags = data.get('new_tags')
-    new_email = data.get('new_email')
-    edit_result(data_id, new_name, new_tags, new_email)
+    json_data = request.json
+    try:
+        result_id = json_data['id']
+        new_name = json_data['new_name']
+        new_tags = json_data['new_tags']
+        new_email = json_data['new_email']
+    except KeyError:
+        return BAD_REQUEST_RESPONSE
+
+    edit_result(result_id, new_name, new_tags, new_email)
     return "Edited index"
 
 
@@ -49,8 +54,12 @@ def delete():
     Returns:
         A message indicating the operation was succesful
     """
-    data = request.get_json()
-    result_id = data.get('id')
-    name = data.get('name')
+    json_data = request.json
+    try:
+        result_id = json_data['id']
+        name = json_data['name']
+    except KeyError:
+        return BAD_REQUEST_RESPONSE
+
     delete_result(result_id, name)
     return "Removed index"

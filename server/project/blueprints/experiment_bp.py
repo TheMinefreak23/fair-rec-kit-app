@@ -14,6 +14,7 @@ Utrecht University within the Software Project course.
 
 from flask import (Blueprint, request)
 
+from project.blueprints.constants import BAD_REQUEST_RESPONSE
 from project.models import options_formatter, queue, recommender_system
 from project.models.experiment_queue import formatted_experiment
 from project.models.experiment import Status
@@ -44,10 +45,15 @@ def handle_experiment():
     response = {}
     if request.method == 'POST':
         # Get settings and metadata from request
-        data = request.get_json()
-        settings = data.get('settings')
+        json_data = request.json
+        try:
+            settings = json_data['settings']
+            metadata = json_data['metadata']
+        except KeyError:
+            return BAD_REQUEST_RESPONSE
+
         # print('==/calculation POST==', json.dumps(data,indent=4))
-        queue.append_queue(data.get('metadata'), settings)
+        queue.append_queue(metadata, settings)
 
         # Run first experiment from the queue
         queue.run_first()
@@ -99,8 +105,12 @@ def abort():
     Returns:
          (string) a removal message
     """
-    data = request.get_json()
-    item_id = data.get('id')
+    json_data = request.json
+    try:
+        item_id = json_data['id']
+    except KeyError:
+        return BAD_REQUEST_RESPONSE
+
     print('trying to cancel', item_id)
     # Find the first experiment with the ID in the queue (should be unique)
     experiment = next(
