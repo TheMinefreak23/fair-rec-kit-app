@@ -76,7 +76,7 @@ describe('New Experiment', () => {
                 })
         })
     })
-    it('Send Computation', () => {
+    it('Send Experiment', () => {
         cy.get('button').contains('Send').click()
     })
 })
@@ -84,46 +84,68 @@ describe('New Experiment', () => {
 describe('Experiment Queue', () => {
     var queue
     it('Check for approaches in queue', () => {
+        cy.wait(2000)
         queue = cy.get('div[data-testid*="Queue"]')
-        cy.wait(1000)
         queue.get('td').contains('Random, PopScore').should('be.visible')
     })
     it('Check for correct metrics in queue', () => {
         queue.get('td').contains('P@K, MAE').should('be.visible')
     })
-    it('Computing result', () => {
-        cy.wait(10000)
+    it('Cancel result', () => {
+        queue.get('button[data-testid*="delete"]').click({ force: true })
+        queue.get('button').contains('yes').should('be.visible').click({ force: true })
+        queue.get('button').contains('Aborted').should('be.visible')
     })
 })
 
+describe('Simple mock for result', () =>{
+    it('Send Computation', () => {
+        cy.get('button').contains('New Experiment').click({ force: true })
+        cy.get('button').contains('Metric Mock').click()
+    })
+    it('Waiting for result', () => {
+        cy.scrollTo('top', {ensureScrollable: false})
+        cy.wait(12500)
+    })
+})
+
+describe('Results', () => {
+    it('Visit results tab', () => {
+        cy.get('button').contains('Results').click({ force: true })
+    })
+    it('Check if there are results', () => {
+        cy.get('p').contains('Results for').should('be.visible')
+    })
+    it('Check if there are results for each dataset', () => {
+        cy.get('caption').contains('LFM-1B').should('be.visible')
+    })
+    it('Check if there are results for metrics', () => {
+        cy.get('th').contains('P@10').should('be.visible')
+    })
+})
+
+
 describe('Result overview', () => {
     var overview
+    var results
     it('Visit results overview tab', () => {
         cy.get('button').contains('All results').click({ force: true })
         overview = cy.get('div[data-testid*="AllResults"]')
     })
     it('Check that result is in overview', () => {
-        overview.get('td').contains('Cypress Test').should('be.visible')
+        overview.get('td').contains('LFM-2B_user-track-count_0').should('be.visible')
+        results = overview.get('tbody').length
     })
-    it('Check that metadata is correct', () => {
-        overview.get('td').contains('Random, PopScore').should('be.visible')
-        overview.get('td').contains('P@K, MAE').should('be.visible')
+    it('Check that metrics is correct', () => {
+        overview.get('td').contains('Random').should('be.visible')
+        overview.get('td').contains('P@K, P@K').should('be.visible')
     })
+    it('Delete result', () => {
+        overview.get('button["data-testid="delete"]').click()
+        overview.get('button').contains('yes').should('be.visible').click()        
+    })
+    it('Check if result has been deleted', () =>
+        overview.get('tbody').should('have.length',(results-1))
+    )
 
-})
-// Sometimes, Results test fails because the experiment is not done yet
-// Could be fixed by using mock as it is faster.
-describe('Results', () => {
-    it('Visit results tab', () => {
-        cy.get('button').contains('Results').click({ force: true })
-    })
-
-    it('Check if there are results for each dataset', () => {
-        cy.get('div').contains('Result Cypress Test').should('be.visible')
-        cy.get('caption').contains('LFM-1B').should('be.visible')
-    })
-    it('Check if there are results for each metric', () => {
-        cy.get('th').contains('P@10').should('be.visible')
-        cy.get('th').contains('MAE').should('be.visible')
-    })
 })

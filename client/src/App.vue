@@ -138,9 +138,9 @@ function callToast() {
           nav-class="tab-active"
           active-nav-item-class="bg-secondary text-danger"
         >
-          <b-tab title="New Experiment"><NewExperiment /></b-tab>
+          <b-tab title="New Experiment" data-testid="NewExperiment"><NewExperiment /></b-tab>
 
-          <b-tab>
+          <b-tab data-testid="Queue">
             <ExperimentQueue />
             <template #title>
               <div>
@@ -159,7 +159,7 @@ function callToast() {
           <b-tab :title-item-class="blink ? 'blink' : ''" title="Results">
             <Results @toast="onNewResult"
           /></b-tab>
-          <b-tab title="All results">
+          <b-tab title="All results" data-testid="AllResults">
             <PreviousResults viewItem />
           </b-tab>
           <b-tab title="Music Detail">
