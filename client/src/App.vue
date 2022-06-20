@@ -17,19 +17,16 @@ import { store } from './store'
 import { status } from './helpers/queueFormatter'
 import { viewResultTab } from './helpers/resultRequests'
 import VCheckmark from './components/VCheckmark.vue'
+import { useFetch } from './composables/useFetch'
 // import TestSelect from './test/TestSelect.vue'
 
 let toast = useToast()
+
+// Ping server
+const { data, error, retry } = useFetch(API_URL)
+
 const done = ref(false) // TODO refactor
 const blink = ref(false)
-
-// Ping
-onMounted(async () => {
-  // console.log(API_URL)
-  const response = await fetch(API_URL)
-  const data = await response.json()
-  console.log(data)
-})
 
 watch(
   () => store.toast,
@@ -71,21 +68,18 @@ function callToast() {
 </script>
 
 <template>
-  <!--<TestSelect />-->
-  <b-container
-    :toast="{ root: true }"
-    fluid="sm"
-    position="position-fixed"
-    @click="done ? viewResultTab() : () => {}"
-  >
-  </b-container>
   <div class="d-flex flex-column min-vh-100">
+    <b-container
+      :toast="{ root: true }"
+      fluid="sm"
+      position="position-fixed"
+      @click="done ? viewResultTab() : () => {}"
+    >
+    </b-container>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
       rel="stylesheet"
     />
-    <!--<TestForm :useTestOptions="true" />-->
-
     <div class="bg-dark">
       <div class="wrap">
         <div class="content nav justify-content-center py-2">
@@ -129,43 +123,51 @@ function callToast() {
         </div>
       </div>
     </div>
-    <div class="nav-center">
-      <b-tabs
-        v-model="store.currentTab"
-        class="m-0 pt-2"
-        align="center"
-        nav-class="tab-active"
-        active-nav-item-class="bg-secondary text-danger"
-      >
-        <b-tab title="New Experiment"><NewExperiment /></b-tab>
-
-        <b-tab>
-          <ExperimentQueue />
-          <template #title>
-            <div>
-              <b-spinner
-                v-if="store.currentExperiment.status == status.active"
-                small
-              ></b-spinner>
-              <VCheckmark v-else />
-              Experiment Queue
-            </div>
-          </template>
-        </b-tab>
-        <b-tab title="Documentation" data-testid="DocTab">
-          <Documentation
-        /></b-tab>
-        <b-tab :title-item-class="blink ? 'blink' : ''" title="Results">
-          <Results @toast="onNewResult"
-        /></b-tab>
-        <b-tab title="All results">
-          <PreviousResults viewItem />
-        </b-tab>
-        <b-tab title="Music Detail">
-          <MusicDetail />
-        </b-tab>
-      </b-tabs>
+    <!-- Main content (tabs) -->
+    <div v-if="error">
+      <p>Oops! Error encountered: {{ error.message }}</p>
+      <button @click="retry">Retry</button>
     </div>
+    <!-- Show a loading screen unless data has been loaded -->
+    <b-overlay v-else :show="!data">
+      <div class="nav-center">
+        <b-tabs
+          v-model="store.currentTab"
+          class="m-0 pt-2"
+          align="center"
+          nav-class="tab-active"
+          active-nav-item-class="bg-secondary text-danger"
+        >
+          <b-tab title="New Experiment"><NewExperiment /></b-tab>
+
+          <b-tab>
+            <ExperimentQueue />
+            <template #title>
+              <div>
+                <b-spinner
+                  v-if="store.currentExperiment.status == status.active"
+                  small
+                ></b-spinner>
+                <VCheckmark v-else />
+                Experiment Queue
+              </div>
+            </template>
+          </b-tab>
+          <b-tab title="Documentation" data-testid="DocTab">
+            <Documentation
+          /></b-tab>
+          <b-tab :title-item-class="blink ? 'blink' : ''" title="Results">
+            <Results @toast="onNewResult"
+          /></b-tab>
+          <b-tab title="All results">
+            <PreviousResults viewItem />
+          </b-tab>
+          <b-tab title="Music Detail">
+            <MusicDetail />
+          </b-tab>
+        </b-tabs>
+      </div>
+    </b-overlay>
     <!-- Footer -->
     <div class="bg-dark py-1 mt-auto">
       <p class="text-white my-0 mt-2 pb-2 text-center">

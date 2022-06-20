@@ -33,7 +33,7 @@ export async function loadResult(resultId) {
 export async function getResult() {
   const response = await fetch(url)
   const data = await response.json()
-  return data
+  return data.result
 }
 
 /**
@@ -42,9 +42,9 @@ export async function getResult() {
  * @param {Boolean} view - Whether to view the result in the result tab
  */
 export async function addResultById(resultId, view = true) {
-  const data = await loadResult(resultId)
-  console.log('Result fetched', data.result)
-  addResult(formatResult(data.result))
+  const result = await loadResult(resultId)
+  console.log('Result fetched', result)
+  addResult(formatResult(result))
   if (view) viewResultTab()
 }
 

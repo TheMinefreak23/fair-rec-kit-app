@@ -102,34 +102,6 @@ async function setRecs(currentTable, runID) {
   }
 }
 
-/*
-//POST request: Ask server to load the evaluations of the current result
-//Currently not used, as evaluation tables are not finished
-// async function loadEvaluations() {
-//   const requestOptions = {
-//     method: 'POST',
-//     headers: { 'Content-type': 'application/json' },
-//     body: JSON.stringify({ id: props.result.id }),
-//   }
-//   const response = await fetch(
-//     API_URL + '/result/result-by-id',
-//     requestOptions
-//   ).then(() => {
-//     console.log('succesful POST request to API to retrieve evaluation data')
-//     const resultsData = await response.json()
-//     console.log('results data', resultsData)
-//     getEvaluations()
-//   })
-// }
-
-//GET request: Ask server for currently loaded evaluations
-async function getEvaluations() {
-  const response = await fetch(API_URL + '/result/result-by-id')
-  console.log('succesfully retrieved evaluation data.')
-  const resultsData = await response.json()
-  console.log('results data', resultsData)
-} */
-
 /**
  * POST request: Ask server for next part of user recommendation table.
  * @param {Int}   currentTable  - Index of which result file to load (from overview.json)
