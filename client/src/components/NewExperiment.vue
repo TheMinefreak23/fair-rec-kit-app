@@ -10,6 +10,7 @@ import { API_URL } from '../api'
 import { emptyFormGroup, validateEmail } from '../helpers/optionsFormatter'
 import { progress } from '../helpers/queueFormatter'
 import Tags from './Tags.vue'
+import endToEndMock from '../test/mock/endToEndMock.json'
 
 const options = ref()
 
@@ -49,6 +50,7 @@ async function sendToServer() {
   const sendForm = JSON.parse(JSON.stringify(form.value)) // clone
 
   sendForm.rawSettings = JSON.parse(JSON.stringify(form.value)) // send raw settings for copying later TODO refactor
+  // console.log('raw form settings', sendForm.rawSettings)
   sendForm.lists.approaches = reformat(sendForm.lists.approaches)
   sendForm.lists.metrics = reformat(sendForm.lists.metrics)
   sendForm.lists.datasets = reformat(sendForm.lists.datasets)
@@ -138,7 +140,7 @@ function reformat(property) {
       <!--This form contains all the necessary parameters for a user to submit a request for a experiment-->
       <b-form
         v-if="options"
-        id= "new-experiment"
+        id="new-experiment"
         @submit="$event.preventDefault(), sendToServer()"
         @keydown.enter.prevent
         @reset="$event.preventDefault(), initSettings()"
@@ -148,16 +150,20 @@ function reformat(property) {
             <b-col>
               <b-row>
                 <b-col md="auto" class="text-center">
-                  <p>Experiment type 
-                    <i class="bi bi-info-circle"  
-                    v-b-tooltip.hover title = "Predictions are predicted ratings for known user-item pairs in the data , while recommendations are a list of recommended items for a user based on these predicted ratings.">
+                  <p>
+                    Experiment type
+                    <i
+                      class="bi bi-info-circle"
+                      v-b-tooltip.hover
+                      title="Predictions are predicted ratings for known user-item pairs in the data , while recommendations are a list of recommended items for a user based on these predicted ratings."
+                    >
                     </i>
                   </p>
                 </b-col>
                 <b-col md="auto">
                   <b-form-radio-group
                     v-model="form.experimentMethod"
-                    :options="experimentMethods"                    
+                    :options="experimentMethods"
                   >
                   </b-form-radio-group>
                 </b-col>
@@ -299,22 +305,26 @@ function reformat(property) {
       </b-form>
       <!--Send a plethora of mock data to the queue-->
       <b-button type="test" variant="warning" @click="sendMockData(options)"
-        >Mock</b-button
-      >
+        >Mock
+      </b-button>
       <!--Simple version of the mock-->
       <b-button
         type="test"
         variant="primary"
         @click="sendMockData(options, true)"
-        >Simple Mock</b-button
-      >
+        >Simple Mock
+      </b-button>
       <!--Simple version of the mock with metrics-->
       <b-button
         type="test"
         variant="primary"
         @click="sendMockData(options, true, true)"
-        >Metric Mock</b-button
-      >
+        >Metric Mock
+      </b-button>
+      <!--Mock button for fast E2E Testing-->
+      <b-button type="test" variant="primary" @click="form = endToEndMock"
+        >E2E Mock
+      </b-button>
     </b-card>
   </div>
 </template>
