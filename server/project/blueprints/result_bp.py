@@ -121,12 +121,12 @@ def user_result():
     #TODO refactor/do dynamically
     spotify_datasets = ['LFM-2B']
     if dataset_name in spotify_datasets:
-      recs = add_spotify_columns(dataset_name, recs)
-    
+        recs = add_spotify_columns(dataset_name, recs)
+
     #recs = filter_results(recs, filters)
     #Add optional columns to the dataframe (if any)
     if len(chosen_headers) > 0:
-      recs=add_dataset_columns(dataset_name, recs, chosen_headers, matrix_name)
+        recs=add_dataset_columns(dataset_name, recs, chosen_headers, matrix_name)
     #Make sure not to sort on a column that does not exist anymore
     if len(recs.columns) <= sort_index:
         sort_index = 0
