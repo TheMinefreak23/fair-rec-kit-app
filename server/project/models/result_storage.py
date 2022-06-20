@@ -24,7 +24,6 @@ import shutil
 # Storage paths
 from project.models.constants import RESULTS_DIR, RESULTS_OVERVIEW_PATH
 
-
 class ResultStorage:
     """Handle the storage of the results in the result overview and store the current result.
 
@@ -158,12 +157,6 @@ def delete_result(result_id, result_name):
     path = RESULTS_DIR + str(result_id) + '_' + result_name
     if os.path.isdir(path):
         shutil.rmtree(path)
-    # Remove the result from the experiment queue (if applicable)
-    from project.models import queue
-    queue.queue = [
-        result for result in queue.queue
-        if result.queue_item.job['timestamp']['stamp'] != result_id
-    ]
 
 
 def edit_result(result_id, new_name, new_tags, new_email):
