@@ -1,5 +1,4 @@
-"""This module contains functions to manipulate the experiment queue.
-    (or get the experiment parameters)
+"""This module manipulates the experiment queue and gets the experiment parameters.
 
 blueprint routes:
     params
