@@ -16,6 +16,7 @@ from unittest.mock import patch
 from fairreckitlib.recommender_system import RecommenderSystem
 
 from project.models import result_store, queue
+from tests.common import check_bad_request
 from tests.constants import MOCK_RESULTS_DIR
 
 URL_PREFIX = '/api/result'
@@ -35,6 +36,7 @@ def test_set_recs(client):
     """
     url = URL_PREFIX + '/set-recs'
     settings = {'id': 0, 'runid': 0, 'pairid': 0}
+    check_bad_request(client, url)
     response = client.post(url, json=settings)
     # Check succes response
     assert json.loads(response.data)['status'] == 'success'
@@ -56,6 +58,8 @@ def test_result_by_id(client):
     """
     url = URL_PREFIX + '/result-by-id'
     # Check the post response
+    assert check_bad_request(client, url)
+
     settings = {'id': 0}
     response1 = client.post(url, json=settings)
     assert json.loads(response1.data)['status'] == 'success'
@@ -72,6 +76,9 @@ def test_get_recs(client):
         client: The client component used to send requests to the server
     """
     url = URL_PREFIX + '/'
+
+    assert check_bad_request(client, url)
+
     amount = 10
     settings = {
         'pairid': 0,
@@ -119,13 +126,18 @@ def test_headers(client):
         client: The client component used to send requests to the server
     """
     url = URL_PREFIX + '/headers'
+
+    assert check_bad_request(client, url)
+
+    # Check that an invalid name does not return anything
     response = client.post(url, json={'name': 'foo'})
     result1 = json.loads(response.data)
-    # Check that an invalid name does not return anything
     assert result1 == {}
+
+    # Check that a valid name does return something
     response = client.post(url, json={'name': 'ML-100K'})
     result2 = json.loads(response.data)
-    # Check that a valid name does return something
+
     assert result2
 
 
@@ -139,5 +151,6 @@ def test_validate(client):
     """
     queue.recommender_system = RecommenderSystem('datasets', MOCK_RESULTS_DIR)
     url = URL_PREFIX + '/validate'
+    assert check_bad_request(client, url)
     response = client.post(url, json={'filepath': '1654518468_Test938_perturbance', 'amount': 0})
     assert response.data == b'Validated'

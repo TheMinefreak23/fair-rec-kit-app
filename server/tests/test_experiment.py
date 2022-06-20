@@ -27,8 +27,10 @@ from fairreckitlib.recommender_system import RecommenderSystem
 from project.models.experiment import QueueItem, Status, ProgressStatus, Experiment
 from project.models import queue, options_formatter
 from project.models.experiment_queue import formatted_experiment
+from tests.common import check_bad_request
 
 from tests.constants import MOCK_RESULTS_DIR
+
 # MOCK_RESULTS_PATH = 'mock/'
 
 # TODO add more edge cases
@@ -132,7 +134,12 @@ def test_experiment_route_post(client):
     Args:
         client: The client component used to send requests to the server
     """
-    post_response = client.post(URL_PREFIX + '/', json=mock_options)
+    url = URL_PREFIX + '/'
+
+    assert check_bad_request(client, url)
+
+    # Test mock
+    post_response = client.post(url, json=mock_options)
     assert post_response.status_code == 200
     assert json.loads(post_response.data)['queue'] == queue.formatted_queue()
 

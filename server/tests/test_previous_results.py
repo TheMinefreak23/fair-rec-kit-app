@@ -1,4 +1,4 @@
-"""This module tests the functionality of various server-side functions that manipulate the previous results.
+"""This module tests various server-side functions that manipulate the previous results.
 
 test_results(client): test if the server-side result loading component is functional.
 test_edit(client): test if the server-side result editing component is functional.
@@ -13,6 +13,7 @@ import os
 from unittest.mock import patch
 
 from project.models.result_storage import load_results_overview
+from tests.common import check_bad_request
 from tests.test_result_storage import save_mock_result, delete_test_results, \
     TEST_RESULTS_PATH, TEST_RESULTS_ROOT, TEST_ID
 
@@ -45,6 +46,8 @@ def test_edit(client):
     Args:
         client: The client component used to send requests to the server
     """
+    url = URL_PREFIX + '/edit'
+
     save_mock_result()
     # New metadata (that we expect)
     metadata = {'name': 'bar', 'tags': 'bar', 'email': 'foo@bar.com'}
@@ -52,8 +55,11 @@ def test_edit(client):
     edit_settings = \
         {'id': TEST_ID, 'new_name': metadata['name'],
          'new_tags': metadata['tags'], 'new_email': metadata['email']}
+
     # POST edit request
-    response = client.post(URL_PREFIX + '/edit', json=edit_settings)
+    assert check_bad_request(client, url)
+
+    response = client.post(url, json=edit_settings)
     edited_results = load_results_overview()
 
     # Check success response
@@ -80,7 +86,12 @@ def test_delete(client):
     index = 0
     #Create the settings required to remove an entry
     delete_settings = { 'name': 'foo', 'id': index}
-    response = client.post(URL_PREFIX + '/delete', json=delete_settings)
+
+    url = URL_PREFIX + '/delete'
+
+    assert check_bad_request(client, url)
+
+    response = client.post(url, json=delete_settings)
     edited_results = load_results_overview()
 
      # Check success response
