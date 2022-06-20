@@ -1,4 +1,5 @@
-"""This module contains a class that is used to handle sending emails to the user whenever an experiment is finished.
+"""This module contains a class that is used to handle sending emails to the user
+whenever an experiment is finished.
 
 classes:
     MailSender

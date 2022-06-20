@@ -1,6 +1,7 @@
 """This file defines different classes required to handle the progress of experiments.
 
-It also handles the experiment itself, which in turn has methods to run new experiments or validate them.
+It also handles the experiment itself, which in turn has methods
+to run new experiments or validate them.
 
 classes:
     Enum
