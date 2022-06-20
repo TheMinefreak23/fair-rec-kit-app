@@ -1,0 +1,20 @@
+# Perform E2E testing using Cypress library
+name: End-to-End Testing
+
+on:
+  workflow_dispatch:
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Boot up server
+        run: run.bat
+      # Install NPM dependencies, cache them correctly
+      # and run all Cypress tests
+      - name: Cypress run
+        working-directory: ./client
+        uses: cypress-io/github-action@v4
