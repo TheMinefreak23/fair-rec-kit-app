@@ -2,7 +2,7 @@
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
 
-import { useCounter } from '../composables/counter.js'
+import { useCounter } from '../../composables/counter.js'
 
 test('useCounter', () => {
   const { count, increment } = useCounter()

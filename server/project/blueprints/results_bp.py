@@ -1,4 +1,10 @@
-"""
+"""The methods in this module call functions that are in the models folder to load and edit results.
+
+blueprint routes:
+    results
+    edit
+    delete
+
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
@@ -6,6 +12,7 @@ Utrecht University within the Software Project course.
 from flask import (Blueprint, request)
 
 from project.models.result_storage import edit_result, load_results_overview, delete_result
+from project.models import queue
 
 blueprint = Blueprint('results', __name__, url_prefix='/api/all-results')
 
@@ -47,4 +54,9 @@ def delete():
     result_id = data.get('id')
     name = data.get('name')
     delete_result(result_id, name)
+     # Remove the result from the experiment queue (if applicable)
+    queue.queue = [
+        result for result in queue.queue
+        if result.queue_item.job['timestamp']['stamp'] != result_id
+    ]
     return "Removed index"

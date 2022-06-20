@@ -1,4 +1,17 @@
-"""
+"""This module is used to convert user experiment options to configuration dictionaries and vice-versa.
+
+classes:
+    OptionsFormatter
+
+methods:
+    create_model_api_dict
+    format_categorised
+    reformat_all
+    reformat
+    reformat_options
+    form_to_data
+    parse_if_number
+    reformat_list
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
@@ -18,15 +31,28 @@ with open('parameters/resultFilter.json', encoding='utf-8') as filter_file:
 
 
 class OptionsFormatter:
-    """Formatter for the experiment options"""
+    """Formatter for the experiment options.
+
+    methods:
+        __init__
+        create_available_options
+        set_dataset_params
+        config_dict_from_settings
+    """
+
     def __init__(self, recommender_system):
+        """Initialize OptionsFormatter.
+
+        args:
+            recommender_system(obj): the recommender system to be used
+        """
         self.model_api_dict = {}
         # TODO for now use this to get the dataset matrix
         self.dataset_matrices = {}
         self.options = self.create_available_options(recommender_system)
 
     def create_available_options(self, recommender_system):
-        """Gets options from FairRecKitLib and formats them for usage on the client side
+        """Get options from FairRecKitLib and formats them for usage on the client side.
 
         Args:
             recommender_system(RecommenderSystem): the recommender system to get the options from
@@ -34,7 +60,6 @@ class OptionsFormatter:
         Returns:
             (dict) the formatted options
         """
-
         datasets = recommender_system.get_available_datasets()
         self.dataset_matrices = {dataset: list(matrices.keys()) for (
             dataset, matrices) in datasets.items()}
@@ -99,7 +124,7 @@ class OptionsFormatter:
         return options
 
     def set_dataset_params(self, dataset, filter_option, recommender_system):
-        """Set the dataset option parameters
+        """Set the dataset option parameters.
 
         Args:
             dataset: the dataset to set the parameters for

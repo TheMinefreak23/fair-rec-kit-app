@@ -1,4 +1,11 @@
-"""
+"""This file handles the events that are caused by the library, for example when an experiment is finished.
+
+classes:
+    EventHandler
+
+methods:
+    do_nothing
+
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
@@ -15,9 +22,23 @@ from .experiment import Status, ProgressStatus
 
 
 class EventHandler:
-    """Handles the events"""
+    """Handle the events.
+
+    methods:
+        __init__
+        handle_event
+        on_begin_experiment_thread
+        on_end_experiment_thread
+    """
 
     def __init__(self, experiment, result_storage, mail_sender):
+        """Initialize an instance of EventHandler.
+
+        args:
+            experiment(obj): the experiment that will have its events handled.
+            result_storage(obj): the current result_storage instance being used.
+            mail_sender(obj): the current mail sender instance being used.
+        """
         self.experiment = experiment
         self.result_storage = result_storage
         self.mail_sender = mail_sender
@@ -37,6 +58,12 @@ class EventHandler:
         self.events = {event_id : self.handle_event for event_id in event_ids}
 
     def handle_event(self, event_listener, event_args, **kwargs):
+        """Handle the event based on its ID.
+
+        args:
+            event_listener(obj): the event_listener to be used
+            event_args(dict): the event arguments
+        """
         do_nothing(event_listener, kwargs)
 
         progress_dict = {
@@ -58,15 +85,15 @@ class EventHandler:
             self.experiment.progress = progress_dict[event_args.event_id]
 
     def on_begin_experiment_thread(self):
-        """Change progress status to started
-        and update the experiment status to active."""
+        """Change progress status to started and update the experiment status to active."""
         self.experiment.status = Status.ACTIVE
         self.experiment.progress = ProgressStatus.STARTED
 
     def on_end_experiment_thread(self):
-        """Change progress status to finished
-        and experiment status to done.
-        Also sends an email if possible."""
+        """Change progress status to finished and experiment status to "done".
+
+        Also sends an email if possible.
+        """
         if self.experiment.status is not Status.ABORTED:
             if not self.experiment.validating:
                 # TODO Update experiment data: Save elapsed time
@@ -83,7 +110,6 @@ class EventHandler:
 
 
 def do_nothing(event_listener, kwargs):
-    """This function only exists so that pylint stops complaining."""
+    """do_nothing only exists so that pylint stops complaining."""
     if event_listener or kwargs:
         print(kwargs)
-

@@ -1,12 +1,26 @@
-"""
+"""This module has functions for retrieval of a specific result.
+
+Methods:
+    filter_results
+    get_chunk
+    rename_headers
+    add_dataset_columns
+    add_spotify_columns
+
+blueprint routes:
+    set_recs
+    set_result
+    user_result
+    headers
+    export
+    validate
+
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 import json
-import tkinter as tk
-from tkinter.filedialog import asksaveasfilename
-
+import copy
 from flask import (Blueprint, request)
 import pandas as pd
 from fairreckitlib.data.set.dataset import add_dataset_columns as add_data_columns
@@ -85,7 +99,7 @@ def set_result():
 
 @blueprint.route('/', methods=['POST'])
 def user_result():
-    """"Get recommender results per user for the shown result.
+    """Get recommender results per user for the shown result.
 
     Returns:
         (JSON) user item data
@@ -101,21 +115,19 @@ def user_result():
     dataset_name = json_data.get("dataset", "")
     sort_index = json_data.get("sortindex", 0)
 
-    # Get recs
-    recs = result_store.current_recs[run_id][pair_id]
-    # TODO refactor/do dynamically
+    #Load the current recs from the storage (without changing the original)
+    recs = copy.deepcopy(result_store.current_recs[run_id][pair_id])
+
+    #TODO refactor/do dynamically
     spotify_datasets = ['LFM-2B']
     if dataset_name in spotify_datasets:
         recs = add_spotify_columns(dataset_name, recs)
 
-    recs = filter_results(recs, json_data.get("filters", []))
-
-    # Add optional columns to the dataframe (if any)
+    #recs = filter_results(recs, filters)
+    #Add optional columns to the dataframe (if any)
     if len(chosen_headers) > 0:
-        recs = add_dataset_columns(
-            dataset_name, recs, chosen_headers, matrix_name)
-
-    # Make sure not to sort on a column that does not exist anymore
+        recs=add_dataset_columns(dataset_name, recs, chosen_headers, matrix_name)
+    #Make sure not to sort on a column that does not exist anymore
     if len(recs.columns) <= sort_index:
         sort_index = 0
     # sort dataframe based on index and ascending or not
@@ -132,7 +144,7 @@ def user_result():
 
 
 def get_chunk(start_rows, chunk_size, df_sorted):
-    """Get a chunk of a dataframe
+    """Get a chunk of a dataframe.
 
     Args:
         start_rows: rows to start at
@@ -155,7 +167,7 @@ def get_chunk(start_rows, chunk_size, df_sorted):
 
 
 def rename_headers(dataset_name, matrix_name, df_subset):
-    """Rename the user and item headers so they reflect their respective content
+    """Rename the user and item headers, so they reflect their respective content.
 
     Args:
         dataset_name: the name of the dataset of the matrix
@@ -223,46 +235,10 @@ def add_spotify_columns(dataset_name, dataframe):
     """
     dataset = recommender_system.data_registry.get_set(dataset_name)
     matrix_name = 'user-track-count'
-    columns = ['track_id', 'track_spotify-uri']
+    columns = []
     dataframe = add_data_columns(dataset, matrix_name, dataframe, columns)
     print(dataframe.head())
     return dataframe
-
-
-@blueprint.route('/export', methods=['POST'])
-def export():
-    """Give the user the option to export the current shown results to a .tsv file.
-
-    Returns:
-        A message indicating if the export was succesful
-    """
-    # TODO rework this
-    # Load results from json
-    json_data = request.json
-    results = json_data.get('results', '{}')
-
-    # Load the file selector
-    root = tk.Tk()
-
-    # Focus on the file selector and hide the overlay
-    root.overrideredirect(True)
-    root.geometry('0x0+0+0')
-    root.deiconify()
-    root.lift()
-    root.focus_force()
-    tk.Tk().withdraw()
-
-    data = [('tsv', '*.tsv')]
-    try:
-        file_name = asksaveasfilename(initialdir='/', title='Export Table',
-                                      filetypes=data, defaultextension='.tsv',
-                                      initialfile="experiment", parent=root)
-        data_frame = pd.DataFrame(results)
-        data_frame.to_csv(file_name, index=False)
-        return {'message': 'Exported succesfully'}
-    except SystemError:
-        return {'message': 'Export cancelled'}
-
 
 @blueprint.route('/validate', methods=['POST'])
 def validate():
