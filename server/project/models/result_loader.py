@@ -232,7 +232,7 @@ def add_spotify_columns(dataset_name, dataframe):
     """
     dataset = recommender_system.data_registry.get_set(dataset_name)
     matrix_name = 'user-track-count'
-    columns = ['track_id', 'track_spotify-uri']
+    columns = []
     dataframe = add_data_columns(dataset, matrix_name, dataframe, columns)
     print(dataframe.head())
     return dataframe

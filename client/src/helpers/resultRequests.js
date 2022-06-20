@@ -47,9 +47,9 @@ export async function addResultById(resultId, view = true) {
     .map((result) => result.id)
     .indexOf(resultId)
   if (index === -1) {
-    const data = await loadResult(resultId)
-    console.log('Result fetched', data.result)
-    addResult(formatResult(data.result))
+    const dataResult = await loadResult(resultId)
+    console.log('Result fetched', dataResult)
+    addResult(formatResult(dataResult))
   } else store.currentResultTab = index
   if (view) viewResultTab()
 }
