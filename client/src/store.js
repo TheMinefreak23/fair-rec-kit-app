@@ -28,7 +28,6 @@ function pollForResult() {
  */
 function getCalculation() {
   if (store.currentExperiment.status !== status.notAvailable) {
-    // console.log('fetching result')
     try {
       fetch(API_URL + '/experiment/')
         .then((response) => response.json())
@@ -46,7 +45,7 @@ function getCalculation() {
           getQueue()
         })
     } catch (e) {
-      console.log(e) // TODO better error handling, composable
+      console.log(e)
       store.currentExperiment = null
     }
   }
@@ -58,11 +57,9 @@ function getCalculation() {
 async function getQueue() {
   const response = await fetch(API_URL + '/experiment/queue')
   const data = await response.json()
-  // console.log('queue latest', data.current)
 
   // Update latest experiment (queue item)
   if (data.current && data.current.status !== status.notAvailable) {
-    // console.log(data.current)
     store.currentExperiment = data.current
     console.log('progress:', data.current.progress)
   }
@@ -76,8 +73,6 @@ async function getQueue() {
 function addResult(result) {
   store.currentResults.push(result)
   store.currentResultTab = store.currentResults.length - 1
-  // console.log('currentResultTab', store.currentResultTab)
-  // console.log(store.currentResults)
 }
 
 /**
@@ -86,7 +81,6 @@ function addResult(result) {
  */
 function removeResult(index) {
   store.currentResults.splice(index, 1)
-  // console.log(store.currentResultTab)
 }
 
 export {

@@ -80,7 +80,7 @@ function closeResult(index) {
     ok-variant="danger"
     cancel-title="Cancel"
     @ok="
-      store.currentTab = 3 //$emit('goToResult')
+      store.currentTab = 3
     "
   >
     <p>An experiment has finished.</p>
@@ -91,9 +91,6 @@ function closeResult(index) {
       <div class="border-top-0 p-0">
         <!--Open previous results sidebar on button press-->
         <div class="p-3 m-0 container-fluid">
-          <!--<div class="text-center">
-            <h3 class="d-inline">Results</h3>
-          </div>-->
           <h3 class="d-inline">Current results</h3>
           <button
             class="d-inline btn btn-primary float-end"

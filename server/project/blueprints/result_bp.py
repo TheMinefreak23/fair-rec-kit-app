@@ -19,7 +19,6 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
-# import json
 import copy
 from flask import (Blueprint, request)
 import pandas as pd
@@ -47,8 +46,7 @@ def filter_results(dataframe, filters):
     """
     # filter = fairreckitlib.data.filter
     # filter(dataframe, filters)
-    # todo: filter
-    print('TODO do something with the filters: ', filters)
+    # TODO: do something with the filters
     return dataframe
 
 
@@ -92,7 +90,6 @@ def set_result():
         except KeyError:
             return BAD_REQUEST_RESPONSE
 
-        # print('result_by_id data', data)
         result_by_id(int(result_id), result_store)
         if result_store.current_result:
             response = {'status': 'success'}
@@ -100,8 +97,6 @@ def set_result():
             response = {'status': 'result not found'}
 
     else:  # GET request
-        #print('current result', json.dumps(
-        #    result_store.current_result, indent=4))
         response = {'result': result_store.current_result}
 
     return response
@@ -129,7 +124,6 @@ def user_result():
     #Load the current recs from the storage (without changing the original)
     recs = copy.deepcopy(result_store.current_recs[run_id][pair_id])
 
-    #TODO refactor/do dynamically
     spotify_datasets = ['LFM-2B']
     if dataset_name in spotify_datasets:
         recs = add_spotify_columns(dataset_name, recs)

@@ -20,14 +20,6 @@ from fairreckitlib.experiment.experiment_config_parsing import Parser
 # Constants
 CONFIG_DIR = 'config_files'
 
-# TODO send enums to client?
-# def enum_to_dict(enum):
-#     return {i.name: i.value for i in enum}
-
-# @compute_bp.route('/statuses', methods=['GET'])
-# def get_statuses():
-#     return
-
 
 class Status(enum.Enum):
     """Experiment status in queue."""
@@ -89,23 +81,12 @@ class Experiment:
         self.queue_item = queue_item
         self.recommender_system = recommender_system
 
-        """
-        # TODO refactor job and config_dict overlap
-        self.job =
-        self.config =
-        self.status = Status.TODO
-        self.progress = ProgressStatus.NA
-        self.name =
-        self.validating =
-        """
-
     def to_dict(self):
         """Convert queue item to dictionary format.
 
         Returns:
             The QueueItem as a dictionary
         """
-        # TODO refactor
         self.queue_item.job['status'] = self.queue_item.status.value
         self.queue_item.job['progress'] = self.queue_item.progress.value
         return self.queue_item.job
@@ -133,10 +114,6 @@ class Experiment:
                                                          self.recommender_system.experiment_factory)
 
         self.recommender_system.run_experiment(config, events=events)
-
-        # TODO USE THIS FUNCTION INSTEAD OF PARSING
-        # self.recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)
-        # TODO delete YML and/or use config
 
     def validate_experiment(self, events):
         """Validate an experiment by running it multiple times, using the experiment file path.

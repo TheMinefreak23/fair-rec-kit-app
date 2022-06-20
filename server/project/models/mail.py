@@ -44,9 +44,3 @@ class MailSender:
                       recipients=[address])
         with self.app.app_context():
             self.mail.send(msg)
-
-    # TODO
-    @staticmethod
-    def do_nothing():
-        """do_nothing exists to stop pylint from yappin'."""
-        return None

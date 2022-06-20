@@ -44,7 +44,6 @@ def test_set_recs(client):
     assert result_store.current_recs[0]
 
 
-# TODO refactor
 @patch('project.models.result_storage.RESULTS_DIR', MOCK_RESULTS_DIR)
 @patch('project.models.result_storage.RESULTS_OVERVIEW_PATH',
        MOCK_RESULTS_DIR +
@@ -141,7 +140,6 @@ def test_headers(client):
     assert result2
 
 
-# @patch("project.experiment.recommender_system", RecommenderSystem('datasets', MOCK_RESULTS_DIR))
 @patch('project.models.recommender_system', RecommenderSystem('datasets', MOCK_RESULTS_DIR))
 def test_validate(client):
     """Test if the server-side validation component is functional.
