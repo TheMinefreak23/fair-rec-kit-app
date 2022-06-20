@@ -10,9 +10,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        
+      - name: Install Python
+        uses: actions/setup-python@v3
+        
+      - name: Install server dependencies
+        working-directory: ./server
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r ./server/requirements.txt
+          pip install python-dotenv
 
       - name: Boot up server
-        run: run.bat
+        working-directory: ./server
+        run: flask run
+        
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
       - name: Cypress run
