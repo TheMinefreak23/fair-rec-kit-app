@@ -20,14 +20,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install python-dotenv
-
-      - name: Boot up server
-        working-directory: ./server
-        run: nohup flask run &
         
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
       - name: Cypress run
         uses: cypress-io/github-action@v4
-        env:
-          working-directory: ./client
+        with:
+          start: start ./server/run.sh
+          project: ./client
