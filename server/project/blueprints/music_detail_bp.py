@@ -1,4 +1,17 @@
-"""
+"""This module handles the retrieval of the music details that are displayed in the result tables.
+
+methods:
+    token_to_dict
+    collage
+    get_unique_n
+    request_spotify_data
+
+blueprint routes:
+    get_spotify_token
+    get_acousticbrainz_data
+    get_background
+    first_100_album_collage
+
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
@@ -12,15 +25,19 @@ import numpy as np
 from PIL import Image
 
 from flask import Blueprint, request
+
+from project.blueprints.constants import BAD_REQUEST_RESPONSE
 from project.models import token as tok
 
 blueprint = Blueprint('music', __name__, url_prefix='/api/music')
 
 SPOTIFY_API = 'https://api.spotify.com/v1'
+AB_API = 'https://acousticbrainz.org/api/v1/'
 MAX_TRACK_LIMIT = 50
 
+
 def token_to_dict(token):
-    """Convert a token to a dictionary format
+    """Convert a token to a dictionary format.
 
     Args:
         token: the token to convert
@@ -35,7 +52,7 @@ def token_to_dict(token):
 
 @blueprint.route('/token', methods=['GET'])
 def get_spotify_token():
-    """Route: Get Spotify auth TOKEN using id and secret
+    """Route: Get Spotify auth TOKEN using id and secret.
 
     Returns: the spotify TOKEN
     """
@@ -61,23 +78,25 @@ def get_spotify_token():
 
 @blueprint.route('/AcousticBrainz', methods=['POST'])
 def get_acousticbrainz_data():
-    """Requests High-Level audio features from the AcousticBrainz API using a MusicBrainzID
+    """Request High-Level audio features from the AcousticBrainz API using a MusicBrainzID.
 
     Returns:
         Dict: Dictionary with all High-Level audiofeatures
     """
-    data = request.get_json()
-    print(data)
-    ab_api = 'https://acousticbrainz.org/api/v1/'
-    musicbrainz_id = data.get('mbid')
-    url = ab_api + 'high-level' + '?recording_ids=' + musicbrainz_id
+    json_data = request.json
+    try:
+        musicbrainz_id = json_data['mbid']
+    except KeyError:
+        return BAD_REQUEST_RESPONSE
+
+    url = AB_API + 'high-level' + '?recording_ids=' + musicbrainz_id
     res = requests.get(url)
     return json.loads(res.text)
 
 
-@blueprint.route('/background', methods=['POST'])
+@blueprint.route('/background', methods=['GET'])
 def get_background():
-    """Generates a background from the album covers of a Spotify Playlist
+    """Generate a background from the album covers of a Spotify Playlist.
 
     Returns:
         Image: Background-image
@@ -111,7 +130,7 @@ def get_background():
 
 
 def collage(images, size=10):
-    """Create collage from images
+    """Create collage from images.
 
     Args:
         urls: the image urls
@@ -119,7 +138,6 @@ def collage(images, size=10):
     Returns:
         the collage in PNG format
     """
-
     print('image size', images[0].size)
     image_width, image_height = images[0].size
     width = image_width * size
@@ -140,7 +158,7 @@ def collage(images, size=10):
 
 @blueprint.route('/unique-album-background', methods=['GET'])
 def first_100_album_collage():
-    """Route: Make a collage from the first 100 relevant albums from Spotify
+    """Route: Make a collage from the first 100 relevant albums from Spotify.
 
     Returns:
         an PNG image with the collage
@@ -193,7 +211,7 @@ def get_unique_n(query, amount, category, image):
 
 
 def request_spotify_data(url):
-    """Make an authorised Spotify JSON request from the url
+    """Make an authorised Spotify JSON request from the url.
 
     Args:
         url: the url at which to do the request

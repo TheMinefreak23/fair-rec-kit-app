@@ -1,4 +1,17 @@
-"""
+"""This module tests various functionality related to the experiments.
+
+get_mock_options(): generate experiment from test options JSON.
+delete_test_results(): delete all results by deleting the test result directory.
+test_queue_format(): test whether the queue gets formatted correctly.
+test_experiment_format(): test whether an experiment gets formatted correctly.
+test_params(client): test params route.
+test_experiment_route_post(client): test POST request on experiment route.
+test_experiment_route_get(client): test GET request on experiment route.
+test_queue(client): test GET request on queue route.
+test_abort(client): test whether an experiment gets appended to the queue correctly.
+test_append(): test whether an experiment gets appended to the queue correctly.
+test_add_validation(): test whether a valudation experiment gets appended to the queue correctly.
+
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
@@ -14,8 +27,10 @@ from fairreckitlib.recommender_system import RecommenderSystem
 from project.models.experiment import QueueItem, Status, ProgressStatus, Experiment
 from project.models import queue, options_formatter
 from project.models.experiment_queue import formatted_experiment
+from tests.common import check_bad_request
 
 from tests.constants import MOCK_RESULTS_DIR
+
 # MOCK_RESULTS_PATH = 'mock/'
 
 # TODO add more edge cases
@@ -34,7 +49,6 @@ def get_mock_options():
 
     Returns:
          (QueueItem) experiment
-
     """
     name = mock_options['metadata']['name']
     mock_options['timestamp'] = {'stamp': str(time.time())}
@@ -89,7 +103,7 @@ def test_experiment_format():
     #delete_test_results()
 
 
-# TODO this test is kind of redundant, use fixtures?
+# this test is kind of redundant, use fixtures?
 #@patch('project.result_storage.RESULTS_OVERVIEW_PATH', test_results_path)
 #def test_run_experiment():
 #    print(get_test_options())
@@ -104,30 +118,46 @@ def test_experiment_format():
 
 
 def test_params(client):
-    """Test params route."""
+    """Test params route.
+
+    Args:
+        client: The client component used to send requests to the server
+    """
     response = client.get(URL_PREFIX + '/options')
     assert response.status_code == 200
     assert json.loads(response.data)['options'] == options_formatter.options
 
 
 def test_experiment_route_post(client):
-    """Test POST request on experiment route."""
-    post_response = client.post(URL_PREFIX + '/', json=mock_options)
+    """Test POST request on experiment route.
+
+    Args:
+        client: The client component used to send requests to the server
+    """
+    url = URL_PREFIX + '/'
+
+    assert check_bad_request(client, url)
+
+    # Test mock
+    post_response = client.post(url, json=mock_options)
     assert post_response.status_code == 200
     assert json.loads(post_response.data)['queue'] == queue.formatted_queue()
 
 
 def test_experiment_route_get(client):
-    """Test GET request on experiment route."""
+    """Test GET request on experiment route.
+
+    Args:
+        client: The client component used to send requests to the server
+    """
     get_response = client.get(URL_PREFIX + '/')
     assert get_response.status_code == 200
 
     data = json.loads(get_response.data)
     assert 'status' in data
-    # TODO Status is not available if there is no experiment
+    # Status is not available if there is no experiment
     #assert data['status'] == Status.NA.value
 
-#TODO
 #@patch('project.experiment.RESULTS_DIR', TEST_RESULTS_PATH)
 #@patch('project.models.recommender_system', RecommenderSystem('datasets', TEST_RESULTS_PATH))
 #def test_form(client):
@@ -174,7 +204,11 @@ def test_experiment_route_get(client):
 
 
 def test_queue(client):
-    """Test GET request on queue route."""
+    """Test GET request on queue route.
+
+    Args:
+        client: The client component used to send requests to the server
+    """
     get_response = client.get(URL_PREFIX + '/queue', )
     # TODO fixture?
     assert get_response.status_code == 200
@@ -183,7 +217,11 @@ def test_queue(client):
 
 #@patch('project.experiment.experiment_queue', [])
 def test_abort(client):
-    """Test whether an experiment gets appended to the queue correctly."""
+    """Test whether an experiment gets appended to the queue correctly.
+
+    Args:
+        client: The client component used to send requests to the server
+    """
     queue.queue = []
 
     url = URL_PREFIX + '/queue/abort'
@@ -209,7 +247,6 @@ def test_abort(client):
 
 def test_append():
     """Test whether an experiment gets appended to the queue correctly."""
-
     # Use mock options from JSON
     # TODO refactor? global not working
     with open('tests/options.json', encoding='utf-8') as file:
@@ -233,7 +270,7 @@ def test_append():
     #append_queue({}, {'lists': {'datasets': [], 'approaches': [], 'metrics': []}})
 
     # Test empty metadata
-    # TODO refactor? global not working
+    # refactor? global not working
     with open('tests/options.json', encoding='utf-8') as file:
         mock = json.load(file)
     queue.append_queue({}, mock['settings'])
@@ -246,8 +283,7 @@ def test_append():
 @patch('project.models.recommender_system', RecommenderSystem('datasets', MOCK_RESULTS_DIR))
 def test_add_validation():
     """Test whether a valudation experiment gets appended to the queue correctly."""
-
-    # TODO Test invalid file path?
+    # Test invalid file path?
     # add_validation('',)
 
     test_path = '1654518468_Test938_perturbance'

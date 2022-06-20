@@ -41,6 +41,7 @@ const props = defineProps({
   filters: Object,
   filterOptions: Array,
   defaultSort: Number,
+  startIndex: Number,
 })
 
 // Column width
@@ -193,7 +194,7 @@ const filteredHeaders = () => {
   // console.log('recs', props.recs)
   return !props.recs || infoHeaders.value.length === 0
     ? props.headers
-    : infoHeaders.value
+    : [...props.headers, ...[{ name: 'Album' }, { name: 'Snippet' }]]
 }
 </script>
 
@@ -319,6 +320,9 @@ const filteredHeaders = () => {
                   <template v-else></template>
                 </template>
                 <!-- Regular column -->
+                <template v-else-if="value && value.toString().startsWith('http')">
+                  <b-link :href="value" target="_blank">{{ value}}</b-link>
+                </template>
                 <template v-else>
                   {{ value }}
                 </template>
@@ -360,6 +364,8 @@ const filteredHeaders = () => {
                 @click="$emit('viewResult', item.id)"
                 class="m-1"
                 style="width: 142px"
+                v-if="!item.status || 
+                  item.status.slice(statusPrefix.length) == status.done" :id="item.id"
               >
                 {{ viewItem ? 'View result' : 'Open result' }}
               </b-button>
@@ -374,7 +380,8 @@ const filteredHeaders = () => {
                   />
                 </b-col>
                 <b-col md="auto" class="mx-0 px-0 d-inline">
-                  <InfoModal :id="item.id" />
+                  <InfoModal v-if="!item.status || 
+                    item.status.slice(statusPrefix.length) == status.done" :id="item.id" />
                 </b-col>
 
                 <b-col md="auto" class="mx-0 px-0 d-inline">
@@ -407,29 +414,32 @@ const filteredHeaders = () => {
     </b-table-simple>
 
     <!-- Pagination -->
-    <b-button
-      v-if="pagination"
-      @click="$emit('loadMore', false, entryAmount)"
-      variant="outline-primary"
-      :disabled="entryAmount < 1"
-    >
-      Show previous {{ entryAmount }} items
-    </b-button>
-    <b-button
-      v-if="pagination"
-      @click="$emit('loadMore', true, entryAmount)"
-      variant="outline-primary"
-      :disabled="entryAmount < 1"
-    >
-      Show next {{ entryAmount }} items
-    </b-button>
-    <b-form-input
-      v-model="entryAmount"
-      v-if="pagination"
-      :state="entryAmount >= 1"
-      type="number"
-      >20</b-form-input
-    >
+    <div v-if="pagination">
+      <b-button
+        @click="$emit('loadMore', false, entryAmount)"
+        variant="outline-primary"
+        :disabled="entryAmount < 1 || entryAmount > props.startIndex"
+      >
+        Show previous {{ entryAmount }} items
+      </b-button>
+      Showing entries {{ props.startIndex + 1 }} -
+      {{ props.startIndex + props.results.length }}
+      <b-button
+        @click="$emit('loadMore', true, entryAmount)"
+        variant="outline-primary"
+        :disabled="entryAmount < 1"
+      >
+        Show next {{ entryAmount }} items
+      </b-button>
+      <b-form-input
+        v-model="entryAmount"
+        :state="entryAmount >= 1"
+        type="number"
+        v-on:keyup.enter="$emit('loadMore', null, entryAmount)"
+        v-on:focusout="$emit('loadMore', null, entryAmount)"
+        >20</b-form-input
+      >
+    </div>
   </div>
 </template>
 
