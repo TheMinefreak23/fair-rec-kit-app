@@ -1,4 +1,5 @@
-"""This file handles the events that are caused by the library, for example when an experiment is finished.
+"""This file handles the events that are caused by the library,
+for example when an experiment is finished.
 
 classes:
     EventHandler
@@ -79,7 +80,7 @@ class EventHandler:
         elif event_args.event_id == ON_END_EXPERIMENT_THREAD:
             self.on_end_experiment_thread()
         else:
-            """Change progress status."""
+            # Change progress status.
             self.experiment.progress = progress_dict[event_args.event_id]
 
     def on_begin_experiment_thread(self):
