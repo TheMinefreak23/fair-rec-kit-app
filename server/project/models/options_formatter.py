@@ -1,5 +1,4 @@
-"""This module is used to convert user experiment options to configuration
-dictionaries and vice-versa.
+"""This module is used to convert user experiment options to a configuration format and vice-versa.
 
 classes:
     OptionsFormatter

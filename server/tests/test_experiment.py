@@ -187,8 +187,7 @@ def test_append():
 
 @patch('project.models.recommender_system', RecommenderSystem('datasets', MOCK_RESULTS_DIR))
 def test_add_validation():
-    """Test whether a valudation experiment gets appended to the queue correctly."""
-
+    """Test whether a validation experiment gets appended to the queue correctly."""
     test_path = '1654518468_Test938_perturbance'
     test_amount = 0
     queue.add_validation(test_path, test_amount)

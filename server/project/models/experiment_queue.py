@@ -86,7 +86,6 @@ class ExperimentQueue:
         Returns:
             experiment(dict) the experiment events
         """
-
         # Update current experiment
         self.current_experiment = experiment
 

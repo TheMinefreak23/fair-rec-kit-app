@@ -1,5 +1,4 @@
-"""This file handles the events that are caused by the library,
-for example when an experiment is finished.
+"""This file handles events from the fairreckitlib library, e.g. an experiment finish.
 
 classes:
     EventHandler
@@ -97,9 +96,7 @@ class EventHandler:
             if not self.experiment.validating:
                 self.result_storage.save_result(self.experiment.job, self.experiment.config)
                 if 'email' in self.experiment.job['metadata']:
-                    self.mail_sender.send_mail(self.experiment.job['metadata']['email'],
-                              self.experiment.job['metadata']['name'],
-                              self.experiment.job['timestamp']['datetime'])
+                    self.mail_sender.send_mail(self.experiment.job)
 
             self.experiment.status = Status.DONE
             self.experiment.progress = ProgressStatus.FINISHED

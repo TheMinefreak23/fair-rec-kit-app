@@ -24,6 +24,7 @@ import shutil
 # Storage paths
 from project.models.constants import RESULTS_DIR, RESULTS_OVERVIEW_PATH
 
+
 class ResultStorage:
     """Handle the storage of the results in the result overview and store the current result.
 
@@ -46,41 +47,36 @@ class ResultStorage:
         experiment(dict): the experiment input settings
         config(dict): the final experiment configuration
         """
-        experiment['result'] = format_result(config)
+        experiment['result'] = self.format_result(config)
 
         self.current_result = experiment
         add_result(self.current_result)
+
     @staticmethod
-    def do_nothing():
-        """do_nothing exists to stop pylint from yappin'."""
-        return None
+    def format_result(settings):
+        """Mock result experiment.
 
+        Args:
+            settings(dict): the experiment settings
 
-
-def format_result(settings):
-    """Mock result experiment.
-
-    Args:
-        settings(dict): the experiment settings
-
-    Returns: (list) the mock result
-    """
-    result = []
-    datasets = settings['data']
-    for (dataset_index, dataset) in enumerate(datasets):
-        # Add dataset identifier to name
-        dataset['name'] = dataset['dataset'] + '_' + \
-                          dataset['matrix'] + '_' + str(dataset_index)
-        recs = []
-        for (api, approaches) in settings['models'].items():
-            for (approach_index, approach) in enumerate(approaches):
-                # Add approach, with index as identifier in the name
-                recommendation = {'approach': api + '_' + approach['name'] + '_'
-                                              + str(approach_index),
-                                  'evals': []}
-                recs.append(recommendation)
-        result.append({'dataset': dataset, 'recs': recs})
-    return result
+        Returns: (list) the mock result
+        """
+        result = []
+        datasets = settings['data']
+        for (dataset_index, dataset) in enumerate(datasets):
+            # Add dataset identifier to name
+            dataset['name'] = dataset['dataset'] + '_' + \
+                              dataset['matrix'] + '_' + str(dataset_index)
+            recs = []
+            for (api, approaches) in settings['models'].items():
+                for (approach_index, approach) in enumerate(approaches):
+                    # Add approach, with index as identifier in the name
+                    recommendation = {'approach': api + '_' + approach['name'] + '_'
+                                                  + str(approach_index),
+                                      'evals': []}
+                    recs.append(recommendation)
+            result.append({'dataset': dataset, 'recs': recs})
+        return result
 
 
 def load_json(path):
@@ -234,7 +230,6 @@ def create_results_overview():
         # Open the file in write mode.
         with open(RESULTS_OVERVIEW_PATH, 'w', encoding='utf-8') as file:
             json.dump({'all_results': []}, file, indent=4)
-
 
 
 def parse_tags(tags_string):
