@@ -4,8 +4,8 @@ Utrecht University within the Software Project course.
 
 import { render, fireEvent, within } from '@testing-library/vue'
 import { expect, test } from 'vitest'
-import FormGroupList from '../../components/Form/FormGroupList.vue'
-import { emptyFormGroup } from '../../helpers/optionsFormatter'
+import FormGroupList from '../../../components/Form/FormGroupList.vue'
+import { emptyFormGroup } from '../../../helpers/optionsFormatter'
 
 /**
  * Create mock props for a required Foo form group list

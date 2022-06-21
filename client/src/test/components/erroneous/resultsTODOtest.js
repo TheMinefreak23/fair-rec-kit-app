@@ -4,8 +4,8 @@ Utrecht University (Department of Information and Computing Sciences) */
 
 import { render, fireEvent } from '@testing-library/vue'
 import { test } from 'vitest'
-import Results from '../../components/Results.vue'
-import { store } from '../../store'
+import Results from '../../../components/Results.vue'
+import { store } from '../../../store'
 
 /**
  * Test results tab

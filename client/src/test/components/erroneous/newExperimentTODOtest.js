@@ -3,7 +3,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
 import { render, fireEvent, within } from '@testing-library/vue'
 import { expect, test } from 'vitest'
-import NewExperiment from '../../components/NewExperiment.vue'
+import NewExperiment from '../../../components/NewExperiment.vue'
 
 const property = {
   visible: true,
