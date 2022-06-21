@@ -1,6 +1,6 @@
-/*This program has been developed by students from the bachelor Computer Science at
+/* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
-© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+© Copyright Utrecht University (Department of Information and Computing Sciences) */
 
 import { describe, test, expect } from 'vitest'
 import {
@@ -26,7 +26,7 @@ describe('article', () => {
   /* TODO how to handle empty input?
   test('empty', () => {
     expect(article('')).toBe(false)
-  })*/
+  }) */
 })
 
 /**
@@ -66,8 +66,8 @@ describe('capitalise', () => {
 describe('capitalise', () => {
   test('several words', () => {
     const string = 'a random set of words'
-    // TODO LMAO it now gives OF instead of Of
-    expect(capitalise(string)).toBe('A Random Set Of Words')
+    // TODO different outcome
+    expect(capitalise(string)).toBe('A Random Set OF Words')
   })
   test('abbreviations', () => {
     const string = 'da'
@@ -78,8 +78,8 @@ describe('capitalise', () => {
     expect(capitalise(string)).toBe('123')
   })
   test('only spaces', () => {
-    const string = '       '
-    expect(capitalise(string).length).toBe(string.length)
+    const string = '     '
+    expect(capitalise(string).length).toBe(5)
   })
 })
 

@@ -1,4 +1,12 @@
-"""
+"""This package contains the fairreckit app server.
+
+Packages:
+    blueprints: contains the flask application objects (blueprints) used by fairreckit
+    models: contains the models used to manipulate the server data.
+
+methods:
+    create_app
+    register_blueprints
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
@@ -26,7 +34,6 @@ def create_app():
     app.config['MAIL_PASSWORD'] = 'shxvajwlrlszpnaa'
     app.config['MAIL_USE_TLS'] = False
     app.config['MAIL_USE_SSL'] = True
-    # app.config['MAIL_SUPRESS_SEND'] = False
 
     # Enable Cross-Origin Resource Sharing.
     CORS(app)
@@ -58,4 +65,3 @@ def register_blueprints(app):
     app.register_blueprint(result_bp.blueprint)
     app.register_blueprint(results_bp.blueprint)
     app.register_blueprint(music_detail_bp.blueprint)
-    # app.register_blueprint(mail_bp)

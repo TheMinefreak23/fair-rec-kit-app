@@ -1,4 +1,9 @@
-"""
+"""This module tests various server-side functions that manipulate the previous results.
+
+test_results(client): test if the server-side result loading component is functional.
+test_edit(client): test if the server-side result editing component is functional.
+test_delete(client): test if the server-side result deletion component is functional.
+
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
@@ -8,6 +13,7 @@ import os
 from unittest.mock import patch
 
 from project.models.result_storage import load_results_overview
+from tests.common import check_bad_request
 from tests.test_result_storage import save_mock_result, delete_test_results, \
     TEST_RESULTS_PATH, TEST_RESULTS_ROOT, TEST_ID
 
@@ -40,6 +46,8 @@ def test_edit(client):
     Args:
         client: The client component used to send requests to the server
     """
+    url = URL_PREFIX + '/edit'
+
     save_mock_result()
     # New metadata (that we expect)
     metadata = {'name': 'bar', 'tags': 'bar', 'email': 'foo@bar.com'}
@@ -47,12 +55,15 @@ def test_edit(client):
     edit_settings = \
         {'id': TEST_ID, 'new_name': metadata['name'],
          'new_tags': metadata['tags'], 'new_email': metadata['email']}
+
     # POST edit request
-    response = client.post(URL_PREFIX + '/edit', json=edit_settings)
+    assert check_bad_request(client, url)
+
+    response = client.post(url, json=edit_settings)
     edited_results = load_results_overview()
 
     # Check success response
-    assert b'Edited index' == response.data
+    assert response.data == b'Edited index'
 
     # Check if the edited result in the stored results is as expected
     assert edited_results['all_results'][0]['metadata'] == metadata
@@ -75,11 +86,16 @@ def test_delete(client):
     index = 0
     #Create the settings required to remove an entry
     delete_settings = { 'name': 'foo', 'id': index}
-    response = client.post(URL_PREFIX + '/delete', json=delete_settings)
+
+    url = URL_PREFIX + '/delete'
+
+    assert check_bad_request(client, url)
+
+    response = client.post(url, json=delete_settings)
     edited_results = load_results_overview()
 
      # Check success response
-    assert b'Removed index' == response.data
+    assert response.data == b'Removed index'
 
      # Check if the removed result is no longer in the results overview
     assert len(edited_results) == len(initial_results)

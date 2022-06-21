@@ -1,4 +1,13 @@
-"""
+"""This file defines different classes required to handle the progress of experiments.
+
+It also handles the experiment itself, which in turn has methods
+to run new experiments or validate them.
+
+classes:
+    Enum
+    ProgressStatus
+    QueueItem
+    Experiment
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
@@ -12,17 +21,10 @@ from fairreckitlib.experiment.experiment_config_parsing import Parser
 # Constants
 CONFIG_DIR = 'config_files'
 
-# TODO send enums to client?
-# def enum_to_dict(enum):
-#     return {i.name: i.value for i in enum}
-
-# @compute_bp.route('/statuses', methods=['GET'])
-# def get_statuses():
-#     return
-
 
 class Status(enum.Enum):
-    """Experiment status in queue"""
+    """Experiment status in queue."""
+
     TODO = 'To Do'
     ACTIVE = 'Active'
     ABORTED = 'Aborted'
@@ -32,7 +34,8 @@ class Status(enum.Enum):
 
 
 class ProgressStatus(enum.Enum):
-    """Experiment progress status"""
+    """Experiment progress status."""
+
     STARTED = 'Started'
     PARSING = 'Parsing'
     PROCESSING_DATA = 'Processing Data'
@@ -49,7 +52,8 @@ class ProgressStatus(enum.Enum):
 # TODO refactor job and config_dict overlap
 @dataclass
 class QueueItem:
-    """Dataclass for experiment setting items in the queue"""
+    """Dataclass for experiment setting items in the queue."""
+
     job: dict
     config: dict
     status: Status
@@ -59,28 +63,31 @@ class QueueItem:
 
 
 class Experiment:
-    """For running a recommender system experiment"""
+    """For running a recommender system experiment.
+
+    methods:
+        __init__
+        to_dict
+        run_new_experiment
+        validate_experiment
+    """
+
     def __init__(self, queue_item, recommender_system):
+        """Initialize Experiment class.
+
+        args:
+            queue_item(obj): the queue item
+            recommender_system(obj): the recommender system (used for retrieving config settings)
+        """
         self.queue_item = queue_item
         self.recommender_system = recommender_system
 
-        """
-        # TODO refactor job and config_dict overlap
-        self.job =
-        self.config =
-        self.status = Status.TODO
-        self.progress = ProgressStatus.NA
-        self.name =
-        self.validating =
-        """
-
     def to_dict(self):
-        """Convert queue item to dictionary format
+        """Convert queue item to dictionary format.
 
         Returns:
             The QueueItem as a dictionary
         """
-        # TODO refactor
         self.queue_item.job['status'] = self.queue_item.status.value
         self.queue_item.job['progress'] = self.queue_item.progress.value
         return self.queue_item.job
@@ -109,16 +116,11 @@ class Experiment:
 
         self.recommender_system.run_experiment(config, events=events)
 
-        # TODO USE THIS FUNCTION INSTEAD OF PARSING
-        # self.recommender_system.run_experiment_from_yml(config_file_path, num_threads=4)
-        # TODO delete YML and/or use config
-
     def validate_experiment(self, events):
         """Validate an experiment by running it multiple times, using the experiment file path.
 
         Args:
             experiment(QueueItem): the experiment to validate
-
         """
         self.recommender_system.validate_experiment(result_dir=self.queue_item.job['file_path'],
                                                num_runs=self.queue_item.job['amount'],
