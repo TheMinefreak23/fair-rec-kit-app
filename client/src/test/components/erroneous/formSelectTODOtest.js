@@ -4,7 +4,7 @@ Utrecht University within the Software Project course.
 
 import { render, fireEvent, getByTestId } from '@testing-library/vue'
 import { test } from 'vitest'
-import TestSelect from '../mock/TestSelect.vue'
+import TestSelect from '../../mock/TestSelect.vue'
 
 test('test selecting an option', async () => {
   const { getByText, getByDisplayValue } = render(TestSelect)
