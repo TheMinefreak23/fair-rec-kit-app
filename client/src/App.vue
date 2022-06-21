@@ -124,7 +124,7 @@ function callToast() {
     <!-- Main content (tabs) -->
     <div v-if="error">
       <p>Oops! Error encountered: {{ error.message }}</p>
-      <button @click="retry">Retry</button>
+      <b-button @click="retry">Retry</b-button>
     </div>
     <!-- Show a loading screen unless data has been loaded -->
     <b-overlay v-else :show="!data">

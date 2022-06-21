@@ -24,6 +24,7 @@ export function useFetch(url) {
       // otherwise the value will be returned as-is
       const res = await fetch(urlValue)
       data.value = await res.json()
+      // console.log('fetched', data.value)
     } catch (e) {
       error.value = e
     }
