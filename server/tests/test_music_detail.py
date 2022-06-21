@@ -17,6 +17,7 @@ from sewar.full_ref import uqi
 from PIL import Image
 from project.blueprints.music_detail_bp import collage
 from project.blueprints.music_detail_bp import request_spotify_data
+from tests.common import check_bad_request
 
 URL_PREFIX = '/api/music'
 
@@ -37,8 +38,12 @@ def test_acousticbrainz_data(client):
     Args:
         client: The client component used to send requests to the server
     """
+    url = URL_PREFIX + '/AcousticBrainz'
+
+    assert check_bad_request(client, url)
+
     params = {'mbid': 'bab7f3de-56e3-42fd-be0d-f122960e6a13'}
-    response = client.post(URL_PREFIX + '/AcousticBrainz', json=params)
+    response = client.post(url, json=params)
     assert response.status_code == 200
 
 
@@ -48,7 +53,7 @@ def test_background(client):
     Args:
         client: The client component used to send requests to the server
     """
-    response = client.post(URL_PREFIX + '/background')
+    response = client.get(URL_PREFIX + '/background')
     assert response.status_code == 200
     assert response.data == b'Background saved'
 
@@ -62,10 +67,6 @@ def test_collage():
     test_output = Image.open(output_img)
 
     result = collage([test_input, test_input, test_input, test_input], 2)
-    # result.save('../client/public/bingusresult.png')
-
-    # print(test_output.size)
-    # print(result.size)
     assert uqi(np.asanyarray(test_output), np.asanyarray(result)) > 0.8
 
 

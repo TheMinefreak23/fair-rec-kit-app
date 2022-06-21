@@ -65,9 +65,6 @@ class ExperimentQueue:
         if self.current_experiment and self.current_experiment.queue_item.status == Status.ACTIVE:
             return
 
-        # Get the oldest experiment from the queue.
-        # experiment = experiment_queue.pop()
-
         # Get the oldest experiment from the queue that is marked to do.
         first = next(filter(lambda item: item.queue_item.status == Status.TODO, self.queue), None)
 
@@ -79,7 +76,6 @@ class ExperimentQueue:
                 self.current_experiment.validate_experiment(events)
             else:
                 self.current_experiment.run_new_experiment(events)
-            # mock_experiment(experiment)
 
     def set_up_experiment(self, experiment):
         """Set up an experiment before running it.
@@ -90,8 +86,6 @@ class ExperimentQueue:
         Returns:
             experiment(dict) the experiment events
         """
-        # print('run experiment:', experiment)
-
         # Update current experiment
         self.current_experiment = experiment
 
@@ -114,7 +108,7 @@ class ExperimentQueue:
         # Set time
         timestamp = time.time()
         now = datetime.now()
-        current_dt = now.strftime('%Y-%m-%d %H:%M:%S')  # + ('-%02d' % (now.microsecond / 10000))
+        current_dt = now.strftime('%Y-%m-%d %H:%M:%S')
         job = {'timestamp': {'stamp': str(int(timestamp)),
                              'datetime': current_dt},
                'metadata': metadata,
@@ -141,7 +135,6 @@ class ExperimentQueue:
             amount(int): the amount of runs for validation
 
         """
-        # TODO refactor
         queue_item = QueueItem(job={'file_path': file_path, 'amount': amount},
                                config={},
                                name='',

@@ -44,7 +44,6 @@ onMounted(() => {
  */
 function progressNumber(progressStatus) {
   // progress statuses in order
-  // TODO refactor
   const progresses = [
     progress.started,
     progress.processingData,
@@ -56,14 +55,10 @@ function progressNumber(progressStatus) {
   ]
   const progressNumbers = {}
   for (const progressIndex in progresses) {
-    // console.log(progresses[progressIndex])
     progressNumbers[progresses[progressIndex]] = Math.floor(
       (progressIndex / progresses.length) * progressMax
     )
   }
-  // console.log('current exp', store.currentExperiment)
-  // console.log('progressStatus', progressStatus)
-  // console.log(progressNumbers[progressStatus])
   progressNumber.value = progressNumbers[progressStatus]
   if (progressNumber) {
     previousNumber.value = progressNumber
@@ -83,7 +78,6 @@ function progressNumber(progressStatus) {
             ? store.currentExperiment.metadata.name
             : 'None'
         }}
-        <!--{{ store.currentExperiment }}-->
       </h4>
       <!--Show the experiment progress.-->
       <b-progress
@@ -99,9 +93,6 @@ function progressNumber(progressStatus) {
           <span>
             Progress:
             {{ store.currentExperiment.progress }}
-            <!--<strong>
-              {{ progressNumber(store.currentExperiment.progress) }}
-            </strong>-->
           </span>
         </b-progress-bar>
       </b-progress>

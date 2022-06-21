@@ -43,15 +43,13 @@ onMounted(() => {
   fillShownMetrics()
   // Load in all the user recommendation/prediction tables
   // Also initialize the components for table storage
-  // console.log('run numbers array', runNumbers)
   for (const run in runNumbers) {
-    // console.log(run)
     data.value.results[run] = []
     selectedHeaders.value[run] = []
     for (const index in userTables) {
-      // console.log(index, run)
       selectedHeaders.value[run][index] = []
       data.value.results[run][index] = []
+      optionalHeaders.value[index] = ['track_spotify-uri']
       setRecs(parseInt(index), parseInt(run))
     }
   }
@@ -96,43 +94,15 @@ async function setRecs(currentTable, runID) {
   if (response.status === 200) {
     const data = await response.json()
     availableFilters.value = data.availableFilters
-    // console.log('set recs current table', currentTable)
     getUserRecs(currentTable, runID)
     getHeaderOptions(currentTable)
   }
 }
 
-/*
-//POST request: Ask server to load the evaluations of the current result
-//Currently not used, as evaluation tables are not finished
-// async function loadEvaluations() {
-//   const requestOptions = {
-//     method: 'POST',
-//     headers: { 'Content-type': 'application/json' },
-//     body: JSON.stringify({ id: props.result.id }),
-//   }
-//   const response = await fetch(
-//     API_URL + '/result/result-by-id',
-//     requestOptions
-//   ).then(() => {
-//     console.log('succesful POST request to API to retrieve evaluation data')
-//     const resultsData = await response.json()
-//     console.log('results data', resultsData)
-//     getEvaluations()
-//   })
-// }
-
-//GET request: Ask server for currently loaded evaluations
-async function getEvaluations() {
-  const response = await fetch(API_URL + '/result/result-by-id')
-  console.log('succesfully retrieved evaluation data.')
-  const resultsData = await response.json()
-  console.log('results data', resultsData)
-} */
-
 /**
  * POST request: Ask server for next part of user recommendation table.
  * @param {Int}   currentTable  - Index of which result file to load (from overview.json)
+ * @param {int}   runID         - Index of the run this result belongs to
  */
 async function getUserRecs(currentTable, runID) {
   const requestOptions = {
@@ -159,19 +129,29 @@ async function getUserRecs(currentTable, runID) {
   )
 }
 
-async function exportTable(currentTable) {
-  const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-type': 'application/json' },
-    body: JSON.stringify({ results: props.result.result[currentTable].results }),
-  }
-  const response = await fetch(
-    API_URL + '/result/export',
-    requestOptions
-  )
-  const confirmation = await response.json()
-  console.log(confirmation.message)
+/**
+ * Export a results objec to tsv and store in the user's download folder
+ * @param {int}   currentTable  - Index of which result file to load (from overview.json)
+ * @param {int}   runID         - Index of the run this result belongs to
+ */
+function exportTable(currentTable, runID) {
+  // Convert the result object into tsv format
+  let result = props.result.result[currentTable].results[runID]
+  let headers = props.result.result[currentTable].headers.map((header) => header.name)
+  let tsv = headers.join('  ') + '\n';
+    result.forEach((row) => {
+            tsv += Object.values(row).join('  ');
+            tsv += "\n";
+    });
+
+  // Create an element to download the file
+  const anchor = document.createElement('a')
+  anchor.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(tsv)
+  anchor.target = '_blank'
+  anchor.download = props.result.metadata.name + '.csv'
+  anchor.click();
 }
+
 
 async function validate() {
   const file = props.result.id + '_' + props.result.metadata.name
@@ -193,15 +173,19 @@ async function validate() {
  * @param {Bool}   increase  - Determines whether the next or previous data is required.
  * @param {Int}    amount    - Number of items that the user has requested.
  * @param {Int}    pairid    - Index of which result file to load (from overview.json)
+ * @param {int}    runID     - Index of the run this result belongs to
  */
 function loadMore(increase, amount, pairid, runID) {
   amount = parseInt(amount);
 
   // Determine the index for where the next page starts, based on how many entries were shown before.
-  if (!increase && startIndex.value > 0) startIndex.value -= entryAmount.value;
-  if (startIndex.value < 0) startIndex.value = 0;
-  else if (increase) startIndex.value += entryAmount.value;
-  else startIndex.value = 0;
+  if (increase != null)
+  {
+    if (!increase) startIndex.value -= amount;
+    if (startIndex.value < 0) startIndex.value = 0;
+    else if (increase) startIndex.value += entryAmount.value;
+  }
+  
   // Update amount to new number of entries that are shown.
   entryAmount.value = amount;
   getUserRecs(pairid, runID);
@@ -209,14 +193,12 @@ function loadMore(increase, amount, pairid, runID) {
 
 /**
  * Handles sorting for tables that have pagination.
- * @param {int}   indexVar  - Index of the column on which is sorted.
+ * @param {int}   indexVar   - Index of the column on which is sorted.
  * @param {Int}    pairid    - Index of which result file to load (from overview.json)
+ * @param {int}    runID     - Index of the run this result belongs to
  */
 function paginationSort(indexVar, pairid, runID) {
   // When sorting on the same column twice in a row, switch to descending.
-  // console.log(selectedHeaders.value[runID])
-  // selectedHeaders.value[runID][pairid][indexVar] += ' yeet'
-  // console.log(selectedHeaders[runID][pairid])
   if (sortIndex.value === indexVar) {
     ascending.value = !ascending.value;
   }
@@ -231,6 +213,7 @@ function paginationSort(indexVar, pairid, runID) {
  * Update headers shown in user recommendations
  * @param {Array}   headers  - A list of the headers that have been selected to be shown
  * @param {Int}    pairid    - Index of which result file to load (from overview.json)
+ * @param {int}    runID     - Index of the run this result belongs to
  */
 function updateHeaders(headers, pairid, runID) {
   optionalHeaders.value[pairid] = headers;
@@ -239,8 +222,9 @@ function updateHeaders(headers, pairid, runID) {
 
 /**
  * Update headers shown in user recommendations
- * @param {Array}   changedFilters  - A list of filters that are selected
- * @param {Int}    pairid    - Index of which result file to load (from overview.json)
+ * @param {Array}  changedFilters - A list of filters that are selected
+ * @param {Int}    pairid         - Index of which result file to load (from overview.json)
+ * @param {int}    runID          - Index of the run this result belongs to
  */
 function changeFilters(changedFilters, pairid, runID) {
   filters.value = changedFilters;
@@ -358,8 +342,6 @@ function contains(string, array) {
           <p class="lead"> Results for </p>
           <h1 class="display-3"> {{ result.metadata.name }} </h1>
           <h3 class="text-muted"> {{ result.metadata.datetime }} </h3>
-          <!--TODO elapsed time-->
-          <!--<h4> done in {{ result.metadata.elapsed_time }} seconds </h4>-->
         </b-col>
         <b-col>
           <div class="float-end">
@@ -429,7 +411,7 @@ function contains(string, array) {
                 <h4>Run {{ runID }}</h4>
                 <Table :caption="datasetResult.dataset.dataset" :results="hideResults(datasetResult.results[runID])"
                   :headers="hideHeaders(datasetResult.headers)" :removable="false" />
-                <b-button @click="exportTable(index)">Export table</b-button>
+                <b-button @click="exportTable(index, runID)">Export table</b-button>
               </template>
             </b-col>
           </template>
@@ -473,13 +455,12 @@ function contains(string, array) {
                 <Table v-if="selectedHeaders[run][index]" :key="props.result.id" :caption="entry"
                   :results="data.results[run][index]" :headers="selectedHeaders[run][index].map(makeHeader)"
                   :filters="filters" :filterOptions="availableFilters" :headerOptions="optionalHeaderOptions[index]" defaultSort="0"
-                  pagination expandable :recs="snippet" @paginationSort="(i) => paginationSort(i, index, run)" @loadMore="
+                  :startIndex = "startIndex" pagination expandable :recs="snippet" @paginationSort="(i) => paginationSort(i, index, run)" @loadMore="
                     (increase, amount) => loadMore(increase, amount, index, run)
                   " @changeFilters="
   (changedFilters) => changeFilters(changedFilters, index, run)
 " @updateHeaders="(headers) => updateHeaders(headers, index, run)" />
               </div>
-              <!-- </template> -->
             </template>
           </template>
         </template>

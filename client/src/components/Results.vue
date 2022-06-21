@@ -2,7 +2,7 @@
 /*This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)*/
-import { onMounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import Result from './Result.vue'
 import VDismissButton from './VDismissButton.vue'
 import PreviousResults from './PreviousResults.vue'
@@ -13,6 +13,7 @@ import { shortResultDescription } from '../helpers/resultFormatter'
 const emit = defineEmits(['toast'])
 const showResultModal = ref(false)
 const currentTab = ref(0)
+const blink = ref(-1)
 
 /**
  * Show a toast and set the status when the experiment is finished
@@ -24,6 +25,8 @@ watch(
     if (newStatus === status.done || newStatus === status.aborted) {
       emit('toast')
       store.currentExperiment.status = status.notAvailable
+      blink.value = store.currentResults.length
+      console.log(blink.value)
     }
   }
 )
@@ -36,6 +39,25 @@ watch(
   // New result added
   (newTab) => {
     currentTab.value = newTab
+  }
+)
+
+/**
+ * Apply a blink to a newly added result
+ */
+watch(
+  () => store.currentTab,
+  // This activates upon opening the results tab
+  (index) => {
+    if (index == 3) {
+      if (blink.value >= 0) {
+        // Blink fades after 5 seconds
+        const timeoutMs = 5000
+        setTimeout(() => {
+          blink.value = -1
+        }, timeoutMs)
+      }
+    }
   }
 )
 
@@ -58,7 +80,7 @@ function closeResult(index) {
     ok-variant="danger"
     cancel-title="Cancel"
     @ok="
-      store.currentTab = 3 //$emit('goToResult')
+      store.currentTab = 3
     "
   >
     <p>An experiment has finished.</p>
@@ -69,9 +91,6 @@ function closeResult(index) {
       <div class="border-top-0 p-0">
         <!--Open previous results sidebar on button press-->
         <div class="p-3 m-0 container-fluid">
-          <!--<div class="text-center">
-            <h3 class="d-inline">Results</h3>
-          </div>-->
           <h3 class="d-inline">Current results</h3>
           <button
             class="d-inline btn btn-primary float-end"
@@ -87,19 +106,16 @@ function closeResult(index) {
           <template v-if="store.currentResults.length > 0">
             <b-tabs v-model="currentTab" card content-class="mt-3">
               <!-- Show opened results in tabs.-->
-              <b-tab v-for="(result, index) in store.currentResults">
+              <b-tab
+                v-for="(result, index) in store.currentResults"
+                :title-item-class="blink == index ? 'blink' : ''"
+              >
                 <template #title
                   ><b-button
                     variant="light"
                     v-b-tooltip.hover
                     :title="shortResultDescription(result)"
                   >
-                    <b-spinner
-                      v-if="index == store.currentResults.length - 1"
-                      type="grow"
-                      variant="info"
-                      small
-                    ></b-spinner>
                     Result {{ result.metadata.name }}
                     <VDismissButton @click.stop="closeResult(index)" />
                   </b-button>

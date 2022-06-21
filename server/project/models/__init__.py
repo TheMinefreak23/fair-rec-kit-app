@@ -74,7 +74,6 @@ def make_mail(app):
 
 # Initialise
 recommender_system = RecommenderSystem('datasets', RESULTS_DIR)
-# TODO refactor
 options_formatter = OptionsFormatter(recommender_system)
 result_store = ResultStorage()
 queue = ExperimentQueue(recommender_system,

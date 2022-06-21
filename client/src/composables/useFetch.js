@@ -1,13 +1,8 @@
-// code adapted from https://vuejs.org/guide/reusability/composables.html
-
-/*This program has been developed by students from the bachelor Computer Science at
+/* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
-© Copyright Utrecht University (Department of Information and Computing Sciences)*/
-/*
-Playground component: Shows off a couple Vue 3 + Bootstrap 5 features.
-Check out https://vuejs.org/examples 
-and https://getbootstrap.com/docs/5.0/getting-started/introduction/ for more
-*/
+© Copyright Utrecht University (Department of Information and Computing Sciences) */
+
+// code adapted from https://vuejs.org/guide/reusability/composables.html
 
 import { ref, isRef, unref, watchEffect } from 'vue'
 

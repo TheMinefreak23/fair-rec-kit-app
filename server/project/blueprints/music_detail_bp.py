@@ -25,12 +25,16 @@ import numpy as np
 from PIL import Image
 
 from flask import Blueprint, request
+
+from project.blueprints.constants import BAD_REQUEST_RESPONSE
 from project.models import token as tok
 
 blueprint = Blueprint('music', __name__, url_prefix='/api/music')
 
 SPOTIFY_API = 'https://api.spotify.com/v1'
+AB_API = 'https://acousticbrainz.org/api/v1/'
 MAX_TRACK_LIMIT = 50
+
 
 def token_to_dict(token):
     """Convert a token to a dictionary format.
@@ -57,18 +61,15 @@ def get_spotify_token():
         spotify_secret = 'd5a9e8febef2468b94a5edabe2c5ddeb'
         message = (spotify_id + ':' + spotify_secret).encode()
         encoded = base64.b64encode(message)
-        # print('encoded',encoded)
         headers = {'Authorization': 'Basic ' + encoded.decode(),
                    'Content-Type': 'application/x-www-form-urlencoded'}
         data = 'grant_type=client_credentials'
         res = requests.post(
             'https://accounts.spotify.com/api/token', data=data, headers=headers)
-        # print('spotify response', res.text)
         token_data = json.loads(res.text)
         tok.expiration_time = time.time() + token_data['expires_in']
         tok.token_type = token_data['token_type']
         tok.access_token = token_data['access_token']
-    # print(time.time(), tok.expiration_time)
     return token_to_dict(tok)
 
 
@@ -79,16 +80,18 @@ def get_acousticbrainz_data():
     Returns:
         Dict: Dictionary with all High-Level audiofeatures
     """
-    data = request.get_json()
-    print(data)
-    ab_api = 'https://acousticbrainz.org/api/v1/'
-    musicbrainz_id = data.get('mbid')
-    url = ab_api + 'high-level' + '?recording_ids=' + musicbrainz_id
+    json_data = request.json
+    try:
+        musicbrainz_id = json_data['mbid']
+    except KeyError:
+        return BAD_REQUEST_RESPONSE
+
+    url = AB_API + 'high-level' + '?recording_ids=' + musicbrainz_id
     res = requests.get(url)
     return json.loads(res.text)
 
 
-@blueprint.route('/background', methods=['POST'])
+@blueprint.route('/background', methods=['GET'])
 def get_background():
     """Generate a background from the album covers of a Spotify Playlist.
 
@@ -96,7 +99,6 @@ def get_background():
         Image: Background-image
     """
     playlist1 = '6KnSfElksjrqygPIc4TDmf'  # Playlist with nice album art
-    # TOP_50 = '37i9dQZEVXbMDoHDwVN2tF' # Spotify top 50 chart
 
     playlist_id = playlist1
 
@@ -114,13 +116,11 @@ def get_background():
         items += playlist['items']
         if offset == 0:
             playlist_length = playlist['total']
-            print('playlist length', playlist_length)
         offset += MAX_TRACK_LIMIT
     urls = [item['track']['album']['images'][1]['url'] for item in items]
     images = [Image.open(BytesIO(requests.get(url).content)) for url in urls]
     collage(images)
     return 'Background saved'
-    # return send_file('../background.png', mimetype='image/png')
 
 
 def collage(images, size=10):
@@ -132,7 +132,6 @@ def collage(images, size=10):
     Returns:
         the collage in PNG format
     """
-    print('image size', images[0].size)
     image_width, image_height = images[0].size
     width = image_width * size
     height = image_width * size
@@ -164,7 +163,6 @@ def first_100_album_collage():
 
     collage(images)
     return 'Background saved'
-    # return send_file('../background.png', mimetype='image/png')
 
 
 def get_unique_n(query, amount, category, image):
@@ -189,7 +187,6 @@ def get_unique_n(query, amount, category, image):
     while len(items) < amount:
         query = request_spotify_data(url)
         category_data = query[category + 's']
-        print('total items', category_data['total'])
         if image:
             items = list(set(items + [item['images'][1]['url']
                                       for item in category_data['items']]))
@@ -199,7 +196,6 @@ def get_unique_n(query, amount, category, image):
         if len(items) < limit:
             break  # Stop if there are less items left than the limit
         url = category_data['next']
-    print('items length', len(items))
 
     return items
 
