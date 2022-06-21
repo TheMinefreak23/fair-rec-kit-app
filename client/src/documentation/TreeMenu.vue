@@ -1,16 +1,22 @@
 <script>
-export default { 
-  props: [ 'label', 'nodes' ],
-  name: 'tree-menu'
-}
 import { doctext } from './documentation_items.vue'
 import { ref } from 'vue'
 
-const collapse =ref([])
-let itemDicts = ref();
+let abc = "teststring";
 
-itemDicts = parse(doctext);
+export default { 
+  props: [ 'label', 'nodes', 'depth' ],
+  name: 'tree-menu',
+  data() {
+    return {
+      itemDicts: parse(doctext)
+    }
+  }
+}
 
+const collapse =ref([]);
+
+  
 /**
  * Parses the content of documentation_items.txt into items.
  * @param {String} text - documentation_items.txt as one string.
@@ -124,7 +130,12 @@ function parseItem(item) {
         </b-button>
       </b-card-title>
       <!-- v-if because if there is no description -> undefined, which takes space. -->    
-      <b-collapse :id='label.replace(" ", "_")' class="collapse show">
+      <b-collapse :id='label.replace(" ", "_")' class="collapse">
+
+        <b-collapse-text v-if='true'>
+          <h1>{{itemDicts[label]["description"]}}</h1>
+        </b-collapse-text>
+
         <tree-menu 
           v-for="node in nodes" 
           :nodes="node.nodes" 
@@ -132,10 +143,6 @@ function parseItem(item) {
           :depth="depth+1"
         >
         </tree-menu>
-
-        <b-collapse-text v-if='itemDicts[label]["description"]'>
-          <h1>test</h1>
-        </b-collapse-text>
 
       </b-collapse>     
     </b-card> 
