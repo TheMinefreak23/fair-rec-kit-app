@@ -1,29 +1,3 @@
-<template>
-  <div class="tree-menu">
-    <b-card class="border-end-0 border-top-0 border-bottom-0 border-5 bg-secondary">
-      <b-card-title>{{label}} 
-        <b-button v-b-toggle='label.replace(" ", "_")' variant="secondary">
-          <span class="when-open"><i class="bi bi-caret-up" /></span>
-          <span class="when-closed"><i class="bi bi-caret-down" /></span>
-        </b-button>
-      </b-card-title>
-      <!-- v-if because if there is no description -> undefined, which takes space. -->    
-      <b-collapse :id='label.replace(" ", "_")' class="collapse show">
-        <tree-menu 
-          v-for="node in nodes" 
-          :nodes="node.nodes" 
-          :label="node.label"
-          :depth="depth+1"
-        >
-        </tree-menu>
-      
-        <b-card-text v-if='itemDicts[label]["description"]'>
-          <span v-html='itemDicts[label]["description"]'></span>
-        </b-card-text>
-      </b-collapse>     
-    </b-card> 
-  </div>
-</template>
 <script>
 export default { 
   props: [ 'label', 'nodes' ],
@@ -138,3 +112,33 @@ function parseItem(item) {
     display: none;
   }
 </style>
+
+
+<template>
+  <div class="tree-menu">
+    <b-card class="border-end-0 border-top-0 border-bottom-0 border-5 bg-secondary">
+      <b-card-title>{{label}} 
+        <b-button v-b-toggle='label.replace(" ", "_")' variant="secondary">
+          <span class="when-open"><i class="bi bi-caret-up" /></span>
+          <span class="when-closed"><i class="bi bi-caret-down" /></span>
+        </b-button>
+      </b-card-title>
+      <!-- v-if because if there is no description -> undefined, which takes space. -->    
+      <b-collapse :id='label.replace(" ", "_")' class="collapse show">
+        <tree-menu 
+          v-for="node in nodes" 
+          :nodes="node.nodes" 
+          :label="node.label"
+          :depth="depth+1"
+        >
+        </tree-menu>
+
+        <b-collapse-text v-if='itemDicts[label]["description"]'>
+          <h1>test</h1>
+        </b-collapse-text>
+
+      </b-collapse>     
+    </b-card> 
+  </div>
+</template>
+
