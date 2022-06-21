@@ -1,5 +1,5 @@
 import { mount } from 'cypress/vue'
-import FormInput from '../../src/components/Form/FormInput.vue'
+import FormInput from '../../client/src/components/Form/FormInput.vue'
 
 describe('FormInput.cy.js', () => {
   it('input', () => {
