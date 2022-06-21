@@ -154,7 +154,7 @@ export function showDatasetInfo(dataset) {
 }
 
 // Format evaluations (including filtered ones)
-export function formatEvaluation(e, index, result, runID) {
+function formatEvaluation(e, index, result, runID) {
   // console.log('before evaluation format', JSON.parse(JSON.stringify(e)))
 
   // Get filtered values and make subheaders
@@ -168,15 +168,17 @@ export function formatEvaluation(e, index, result, runID) {
         for (const [paramName, paramValue] of Object.entries(
           filterPass.params
         )) {
-          subgroupName += capitalise(
-            underscoreToSpace(filterPass.name) +
-              ' ' +
-              '(' +
-              paramName +
-              ' ' +
-              paramValue +
-              ')'
-          )
+          subgroupName +=
+            ' ' +
+            capitalise(
+              underscoreToSpace(filterPass.name) +
+                ' ' +
+                '(' +
+                paramName +
+                ' ' +
+                paramValue +
+                ')'
+            )
         }
       }
     }
@@ -191,7 +193,7 @@ export function formatEvaluation(e, index, result, runID) {
 }
 
 // Format metric name
-export function formatMetricName(evaluation) {
+function formatMetricName(evaluation) {
   // If it is a K metric, replace K with the parameter
   const name = evaluation.name
   if (name.slice(-1).toLowerCase() === 'k') {

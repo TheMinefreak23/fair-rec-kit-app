@@ -57,7 +57,7 @@ def filter_results(dataframe, filters):
     for filter_pass in settings['subset']:
         subset.append({'filter_pass': filter_pass['filter']})
 
-    print('filters data format', json.dumps(subset, indent=4))
+    # print('filters data format', json.dumps(subset, indent=4))
     print('TODO make a filter config and filter with it')
 
     # TODO global import

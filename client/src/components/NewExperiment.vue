@@ -27,10 +27,13 @@ const experimentMethods = [
 ]
 
 onMounted(async () => {
-  await getOptions()
+  await setOptions()
   initSettings()
 })
 
+/**
+ * Watch for change of global form settings, copy them
+ */
 watch(
   () => store.settings,
   (newSettings) => {
@@ -41,11 +44,31 @@ watch(
   }
 )
 
-// GET request: Get available options for selection from server
-async function getOptions() {
-  const response = await fetch(API_URL + '/experiment/options')
+/**
+ * Update the options based on the chosen datasets
+ */
+watch(
+  () => reformat(form.value.lists.datasets),
+  (newDatasets) => {
+    // console.log(newDatasets)
+    setOptions(newDatasets)
+  },
+  {
+    immediate: false,
+  }
+)
+
+// POST request: Get available options for selection from server
+async function setOptions(chosenDatasets = []) {
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ datasets: chosenDatasets }),
+  }
+  const response = await fetch(API_URL + '/experiment/options', requestOptions)
   const data = await response.json()
   options.value = data.options
+  // console.log('new options', options.value)
 }
 
 // POST request: Send form to server.
@@ -57,7 +80,7 @@ async function sendToServer() {
   sendForm.lists.approaches = reformat(sendForm.lists.approaches)
   sendForm.lists.metrics = reformat(sendForm.lists.metrics)
   sendForm.lists.datasets = reformat(sendForm.lists.datasets)
-  // console.log('sendForm', sendForm)
+  console.log('sendForm', sendForm)
 
   store.currentExperiment = {
     metadata: metadata.value,
@@ -251,6 +274,7 @@ function initForm() {
                   name="metric"
                   title="metrics"
                   :maxK="form.recommendations"
+                  :datasets="reformat(form.lists.datasets)"
                   :options="
                     form.experimentMethod == 'recommendation'
                       ? options.recMetrics
@@ -279,7 +303,7 @@ function initForm() {
       <b-button
         type="test"
         variant="primary"
-        @click="sendMockData(options, true)"
+        @click="sendMockData(options, true, false)"
         >Simple Mock</b-button
       >
       <!--Simple version of the mock with metrics-->

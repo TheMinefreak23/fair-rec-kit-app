@@ -21,13 +21,21 @@ from project.models.experiment import Status
 blueprint = Blueprint('experiment', __name__, url_prefix='/api/experiment')
 
 
-@blueprint.route('/options', methods=['GET'])
+@blueprint.route('/options', methods=['POST'])
 def params():
     """Route: Provide selection options.
 
     Returns:
          (dict) the options response
     """
+    # Get optional datasets from request
+    json_data = request.json
+    chosen_datasets = json_data.get('datasets', [])
+    if chosen_datasets:
+        # Change subgroup options
+        options_formatter.create_available_options(chosen_datasets)
+
+    print(chosen_datasets)
     response = {'options': options_formatter.options}
     return response
 

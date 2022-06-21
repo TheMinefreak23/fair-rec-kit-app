@@ -18,7 +18,8 @@ const props = defineProps({
   description: String, // Option description for display in the header
   options: Array, // The available options to choose from
   required: Boolean, // Whether the list option is required
-  maxK: Number, // The amount of  recommendations (caps K)
+  maxK: Number, // The amount of recommendations (caps K)
+  //datasets: Object, // The chosen datasets (for filters)
   modelValue: { type: Object, required: true }, // The local form linked to the form component
 })
 
@@ -55,6 +56,8 @@ const groupVisible = ref([true]) // TODO refactor
 onMounted(() => {
   // TODO separate 1-sized formgrouplists
   form.value.name = props.title
+
+  if (props.title === 'subgroups') console.log(props.options)
 })
 
 /**
@@ -75,6 +78,22 @@ watch(
     deep: true,
   }
 )
+
+/*
+ * Watch for changing of datasets (for filters)
+ */
+/*
+watch(
+  () => {
+    return props.datasets
+  },
+  () => {
+    if (props.title === 'subgroups') {
+      console.log('chosen datasets', props.datasets)
+      console.log('options', props.options)
+    }
+  }
+)*/
 
 /**
  * Splice groups array to remove a group.
@@ -238,7 +257,13 @@ function scrollToGroup(index) {
 <template>
   <b-container>
     <b-row>
-      <h3 class="text-center text-white mb-0">
+      <template v-if="options && options.length === 0">
+        <h4>No options available!</h4>
+        <h4 v-if="title === 'subgroups'">
+          Please select a dataset and matrix.
+        </h4>
+      </template>
+      <h3 v-else class="text-center text-white mb-0">
         <b-card no-body class="mb-0 bg-dark">
           <!--Capitalise the title.-->
           <!--TODO refactor-->
@@ -286,13 +311,7 @@ function scrollToGroup(index) {
                           <b-button
                             class="text-start"
                             block
-                            @click="
-                              // TODO this is pretty hacky
-                              /*visibleGroup == i
-                              ? (visibleGroup = -1)
-                              : (visibleGroup = i)*/
-                              groupVisible[i - 1] = !groupVisible[i - 1]
-                            "
+                            @click="groupVisible[i - 1] = !groupVisible[i - 1]"
                             :variant="
                               //visibleGroup == i ? 'secondary' : 'dark'
                               groupVisible[i - 1] ? 'secondary' : 'dark'
@@ -329,9 +348,6 @@ function scrollToGroup(index) {
                   <!--Collapsable group-->
                   <!--<b-collapse :visible="visibleGroup == i" role="tabpanel">-->
                   <b-collapse :visible="groupVisible[i - 1]" role="tabpanel">
-                    <!-- Special form group for filters (subsets)-->
-                    <!--<p v-if="name.includes('subset')">SUBSET</p>-->
-                    <!-- Regular form group -->
                     <FormGroup
                       v-model="form.choices[i - 1]"
                       :index="i - 1"

@@ -21,6 +21,7 @@ const props = defineProps({
   required: Boolean, // WHether the group option is required
   defaultOption: String, // The default main option
   maxK: Number, // The amount of  recommendations (caps K)
+  datasets: Object, // The chosen datasets (for filters)
   modelValue: { type: Object, required: true }, // The local form linked to the form component
   single: { type: Boolean, default: false }, // single form group or multi (form group list)
 })
@@ -151,7 +152,11 @@ function hasParams() {
               <!--Main option selection-->
               <b-col cols="12">
                 <b-form-group
-                  :label="'Select ' + article(name) + ' ' + name + ' *'"
+                  :label="
+                    props.options.length > 1
+                      ? 'Select ' + article(name) + ' ' + name + ' *'
+                      : form.main && name + ': ' + form.main.name
+                  "
                 >
                   <!-- If there is only one main option available, don't use a main selection-->
                   <b-form-select
