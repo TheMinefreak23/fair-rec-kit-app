@@ -42,7 +42,6 @@ async function getOptions() {
   const response = await fetch(API_URL + '/experiment/options')
   const data = await response.json()
   options.value = data.options
-  // console.log('options', options.value)
 }
 
 // POST request: Send form to server.
@@ -56,7 +55,6 @@ async function sendToServer() {
   sendForm.lists.datasets = reformat(sendForm.lists.datasets)
   console.log('sendForm', sendForm)
 
-  // TODO get from server?
   store.currentExperiment = {
     metadata: metadata.value,
     settings: sendForm,
@@ -103,7 +101,6 @@ function reformat(property) {
   const formattedChoices = []
   for (const i in property.choices) {
     const choices = property.choices[i]
-    // console.log('reformat', choices)
     if (choices.main) {
       // Direct settings (inputs/selects)
       let params = []
@@ -116,13 +113,10 @@ function reformat(property) {
       // Nested formgrouplists
       if (choices.lists != null) {
         for (const list of choices.lists) {
-          // console.log('list', list)
           if (list.choices[0].single) {
             // formgroup not list
-            // TODO refactor
             formattedChoices[i][list.choices[0].name] = reformat(list)
           } else formattedChoices[i][list.name] = reformat(list)
-          // console.log('list', formattedChoices[i][list.name])
         }
       }
     }
@@ -174,7 +168,6 @@ function reformat(property) {
             Tags (optional)
             Email for notification (optional) -->
             <b-col md="auto" class="p-2 m-1 rounded-3 bg-secondary">
-              <!--<h3 class="text-center">Meta</h3>-->
               <b-row>
                 <b-col>
                   <b-form-group label-cols-md="4" label="Experiment name">

@@ -27,7 +27,6 @@ TEST_EXPERIMENT = {'result': None, 'timestamp': {'stamp': TEST_ID}, 'metadata': 
 TEST_RESULTS_ROOT = 'tests/'
 TEST_RESULTS_PATH = TEST_RESULTS_ROOT + 'test_results.json'
 
-# TODO refactor get from result_storage?
 TEST_RESULT_DIRECTORY = TEST_RESULTS_ROOT + str(TEST_ID) + '_' + TEST_EXPERIMENT['metadata']['name']
 
 
@@ -56,16 +55,8 @@ def test_save_result():
     # The current result gets updated
     assert result_store.current_result is expected
 
-    # use mock result
-    #result_by_id(test_id)
-    # The result is saved to a JSON on the path
-    #from project.result_storage import current_result
-    #assert current_result is expected
-
     delete_test_results()
 
-
-# TODO test result_by_id and make a fixture for reuse in previous results testing
 
 
 def test_no_path_json():
@@ -77,16 +68,13 @@ def test_no_path_json():
 @patch('project.models.result_storage.RESULTS_OVERVIEW_PATH', TEST_RESULTS_PATH)
 def test_update_results():
     """Test updating of results overview."""
-    # print(load_results_overview())
     old_results_length = len(load_results_overview()['all_results'])
     add_result(TEST_EXPERIMENT)
     new_results_length = len(load_results_overview()['all_results'])
-    # print(load_results_overview())
     assert new_results_length == old_results_length+1
 
     delete_test_results()
 
-# TODO test edit_result and use fixture for reuse in previous_results
 
 
 def test_overview_created():

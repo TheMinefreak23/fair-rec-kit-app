@@ -8,7 +8,6 @@ import Results from './components/Results.vue'
 import PreviousResults from './components/PreviousResults.vue'
 import ExperimentQueue from './components/ExperimentQueue.vue'
 import NewExperiment from './components/NewExperiment.vue'
-// import TestForm from './test/TestForm.vue'
 import { onMounted, ref, watch } from 'vue'
 import { API_URL } from './api'
 import MusicDetail from './components/MusicDetail.vue'
@@ -18,14 +17,13 @@ import { status } from './helpers/queueFormatter'
 import { viewResultTab } from './helpers/resultRequests'
 import VCheckmark from './components/VCheckmark.vue'
 import { useFetch } from './composables/useFetch'
-// import TestSelect from './test/TestSelect.vue'
 
 let toast = useToast()
 
 // Ping server
 const { data, error, retry } = useFetch(API_URL)
 
-const done = ref(false) // TODO refactor
+const done = ref(false)
 const blink = ref(false)
 
 watch(
