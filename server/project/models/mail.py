@@ -34,7 +34,7 @@ class MailSender:
         Args:
             experiment_job  -- the experiment settings
         """
-        msg = self.make_message(
+        msg = MailSender.make_message(
             experiment_job['metadata']['email'],
             experiment_job['metadata']['name'],
             experiment_job['timestamp']['datetime']
@@ -43,17 +43,17 @@ class MailSender:
             self.mail.send(msg)
 
     @staticmethod
-    def make_message(address, name, timestamp):
+    def make_message(address, name, date_time):
         """Create the e-mail message to send when the experiment is done.
 
         Args:
             address     -- the address the e-mail will be sent to
             name        -- the name of the experiment
-            timestamp   -- the timestamp of when the experiment was started
+            date_time   -- the date and time of when the experiment was started
         """
         return Message(subject='Your calculation ' + name + ' is ready!',
                        body='Hello! \nYour calculation with name ' + name
-                            + ' and timestamp ' + timestamp
+                            + ' and datetime ' + date_time
                             + ' is done! \n\nThis is an automated e-mail.',
                        sender='fairreckit@noreply.com',
                        recipients=[address])

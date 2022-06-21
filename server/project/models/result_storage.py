@@ -47,7 +47,7 @@ class ResultStorage:
         experiment(dict): the experiment input settings
         config(dict): the final experiment configuration
         """
-        experiment['result'] = self.format_result(config)
+        experiment['result'] = ResultStorage.format_result(config)
 
         self.current_result = experiment
         add_result(self.current_result)
