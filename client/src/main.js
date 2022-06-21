@@ -8,7 +8,6 @@ import { BToastPlugin } from 'bootstrap-vue-3'
 
 // import the root component App from a single-file component.
 import App from './App.vue'
-// import App from './test/TestApp.vue'
 import '../scss/custom.scss'
 
 const app = createApp(App)

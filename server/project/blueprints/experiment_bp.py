@@ -29,11 +29,9 @@ def params():
          (dict) the options response
     """
     response = {'options': options_formatter.options}
-    # print(response)
     return response
 
 
-# TODO rename route
 @blueprint.route('/', methods=['GET', 'POST'])
 def handle_experiment():
     """Route: Perform an experiment or give the current experiment.
@@ -51,34 +49,29 @@ def handle_experiment():
         except KeyError:
             return BAD_REQUEST_RESPONSE
 
-        # print('==/calculation POST==', json.dumps(data,indent=4))
         queue.append_queue(metadata, settings)
 
         # Run first experiment from the queue
         queue.run_first()
 
-        # print('queue', experiment_queue)
         response = {'queue': queue.formatted_queue()}
     else:
         # TODO catch error
-        # TODO refactor
         if not queue.current_experiment:
             print('Current experiment should have started but is None')
             response['status'] = Status.NA.value
 
         if queue.current_experiment:
-            # TODO refactor
             current_queue_item = queue.current_experiment.queue_item
             # Set status
             response['status'] = current_queue_item.status.value
-            # Exoeriment thread has finished: reset and possibly run the next one
+            # Experiment thread has finished: reset and possibly run the next one
             if current_queue_item.status in [Status.DONE, Status.ABORTED]:
                 if current_queue_item.status == Status.DONE:
                     experiment_id = current_queue_item.job['timestamp']['stamp']
                     response['experimentID'] = experiment_id
                 queue.current_experiment = None
                 queue.run_first()
-    # print('calculation response:', response)
     return response
 
 
@@ -90,7 +83,6 @@ def get_queue():
         (dict) the queue and experiment
 
     """
-    # print('queue', queue)
     return {'queue': queue.formatted_queue(),
             'current': formatted_experiment(queue.current_experiment)
             if queue.current_experiment
@@ -118,9 +110,7 @@ def abort():
             item.queue_item.job['timestamp']['stamp'] == item_id,
             queue.queue),
         None)
-    # print(experiment)
     # Cancel queued experiment
-    #TODO refactor
     status = experiment.queue_item.status
     if status == Status.TODO:
         experiment.queue_item.status = Status.CANCELLED

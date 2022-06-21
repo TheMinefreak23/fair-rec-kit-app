@@ -12,7 +12,6 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 import os
-# import pandas as pd
 from fairreckitlib.data.set.dataset import add_dataset_columns as add_data_columns
 
 from . import recommender_system
@@ -40,16 +39,9 @@ def result_by_id(result_id, result_storage):
         for pair_id, pair_data in enumerate(run_overview['overview']):
             evaluation_path_full = os.getcwd() + "/" + \
                                    pair_data['evaluation_path']
-            # ratings_settings_path_full = os.getcwd() + "/" + \
-            #    pair_data['ratings_settings_path']
 
             if os.path.exists(evaluation_path_full):
                 evaluation_data = load_json(evaluation_path_full)
-                # TODO ratings_settings still needs to go somewhere
-                # ratings_settings_data = pd.read_csv(
-                #    ratings_settings_path_full,
-                #    sep='\t',
-                #    header=None).to_dict(orient='records')
                 dataset_index = name_to_index(data['result'],
                                               run_overview['overview'][pair_id]['dataset'],
                                               'dataset', by_name=True)
@@ -62,10 +54,7 @@ def result_by_id(result_id, result_storage):
         data['metadata']['runs'] += 1
 
     result_storage.current_result = data
-    # print('current result', json.dumps(current_result, indent=4))
 
-
-# TODO: refactor: use in result_by_id?
 def get_overview(evaluation_id, runid):
     """Return a specific entry from a specific overview.json.
 
@@ -82,15 +71,10 @@ def get_overview(evaluation_id, runid):
     overview_path = relative_path + "/overview.json"
     run_overview = load_json(overview_path)
     return run_overview['overview']
-    # rec_paths = []
-    # for index in range(0, len(run_overview['overview'])):
-    #    rec_paths[index] = run_overview['overview'][pairid]['ratings_path']
-    # return rec_paths
 
 
 def add_evaluation(data, evaluation):
     """Add an evaluation to the data."""
-    # todo: refactor docstring
     if not evaluation:
         return data
     if not data:
@@ -102,7 +86,6 @@ def add_evaluation(data, evaluation):
 
 def format_evaluation(evaluation):
     """Format an evaluation to be used in the current_result."""
-    # todo: refactor docstring
     for eval_item in evaluation:
         evaluation_list = [eval_item['evaluation']]
         eval_item.pop('evaluation')
@@ -132,11 +115,6 @@ def id_to_index(json_data, result_id):
     for iteration_id, data in enumerate(json_data['all_results']):
         if int(data['timestamp']['stamp']) == int(result_id):
             current_result_overview_id = iteration_id
-            # print('==ID TO INDEX',
-            # 'ID',result_id,'INDEX',
-            # iteration_id,
-            # 'NAME',
-            # data['metadata']['name'])
     return current_result_overview_id
 
 
@@ -214,8 +192,6 @@ def add_dataset_columns(dataset_name, dataframe, columns, matrix_name):
 
     result = list(map(lambda column: column.lower(), columns))
     dataframe = add_data_columns(dataset, matrix_name, dataframe, result)
-    # dataframe = add_user_columns(dataset, dataframe, result)
-    # print(dataframe.head())
     return dataframe
 
 
