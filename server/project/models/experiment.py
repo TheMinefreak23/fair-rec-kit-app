@@ -1,6 +1,7 @@
 """This file defines different classes required to handle the progress of experiments.
 
-It also handles the experiment itself, which in turn has methods to run new experiments or validate them.
+It also handles the experiment itself, which in turn has methods
+to run new experiments or validate them.
 
 classes:
     Enum
@@ -19,14 +20,6 @@ from fairreckitlib.experiment.experiment_config_parser import ExperimentConfigPa
 
 # Constants
 CONFIG_DIR = 'config_files'
-
-# TODO send enums to client?
-# def enum_to_dict(enum):
-#     return {i.name: i.value for i in enum}
-
-# @compute_bp.route('/statuses', methods=['GET'])
-# def get_statuses():
-#     return
 
 
 class Status(enum.Enum):
@@ -89,23 +82,12 @@ class Experiment:
         self.queue_item = queue_item
         self.recommender_system = recommender_system
 
-        """
-        # TODO refactor job and config_dict overlap
-        self.job =
-        self.config =
-        self.status = Status.TODO
-        self.progress = ProgressStatus.NA
-        self.name =
-        self.validating =
-        """
-
     def to_dict(self):
         """Convert queue item to dictionary format.
 
         Returns:
             The QueueItem as a dictionary
         """
-        # TODO refactor
         self.queue_item.job['status'] = self.queue_item.status.value
         self.queue_item.job['progress'] = self.queue_item.progress.value
         return self.queue_item.job

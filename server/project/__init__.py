@@ -34,7 +34,6 @@ def create_app():
     app.config['MAIL_PASSWORD'] = 'shxvajwlrlszpnaa'
     app.config['MAIL_USE_TLS'] = False
     app.config['MAIL_USE_SSL'] = True
-    # app.config['MAIL_SUPRESS_SEND'] = False
 
     # Enable Cross-Origin Resource Sharing.
     CORS(app)
@@ -66,4 +65,3 @@ def register_blueprints(app):
     app.register_blueprint(result_bp.blueprint)
     app.register_blueprint(results_bp.blueprint)
     app.register_blueprint(music_detail_bp.blueprint)
-    # app.register_blueprint(mail_bp)

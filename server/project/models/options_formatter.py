@@ -1,4 +1,4 @@
-"""This module is used to convert user experiment options to configuration dictionaries and vice-versa.
+"""This module is used to convert user experiment options to a configuration format and vice-versa.
 
 classes:
     OptionsFormatter
@@ -17,11 +17,10 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 import json
-# from fairreckitlib.core.core_constants import ELLIOT_API
 from fairreckitlib.core.core_constants import TYPE_PREDICTION, TYPE_RECOMMENDATION
 
 # constants
-DEFAULTS = {  # 'split': 80,
+DEFAULTS = {
     'recCount': {'min': 1, 'max': 100, 'default': 10},
 }  # default values
 DEFAULT_SPLIT = {'name': 'Train/testsplit',
@@ -45,7 +44,6 @@ class OptionsFormatter:
             recommender_system(obj): the recommender system to be used
         """
         self.model_api_dict = {}
-        # TODO for now use this to get the dataset matrix
         self.dataset_matrices = {}
         self.options = self.create_available_options(recommender_system)
 
@@ -61,21 +59,16 @@ class OptionsFormatter:
         datasets = recommender_system.get_available_datasets()
         self.dataset_matrices = {dataset: list(matrices.keys()) for (
             dataset, matrices) in datasets.items()}
-        # print(DATASET_MATRICES)
         predictors = recommender_system.get_available_algorithms(TYPE_PREDICTION)
         recommenders = recommender_system.get_available_algorithms(
             TYPE_RECOMMENDATION)
-        # TODO different metrics for diff types
         pred_metrics = recommender_system.get_available_metrics(TYPE_PREDICTION)
         rec_metrics = recommender_system.get_available_metrics(TYPE_RECOMMENDATION)
 
         self.model_api_dict = create_model_api_dict(predictors, recommenders)
 
         # Format categorised settings (most settings are categorised once)
-        # TODO refactor
-        # print('before format categ.', json.dumps(list(datasets.items())[0], indent=4))
         datasets = format_categorised(datasets)
-        # print('after format categ.', json.dumps(datasets[0], indent=4))
         recommenders = format_categorised(recommenders)
         predictors = format_categorised(predictors)
         pred_metrics = format_categorised(pred_metrics)
@@ -83,7 +76,6 @@ class OptionsFormatter:
 
         self.set_dynamic_options(datasets, rec_metrics + pred_metrics, recommender_system)
 
-        # TODO refactor
         uncategorised = [
             ('datasets', datasets),
         ]
@@ -95,10 +87,6 @@ class OptionsFormatter:
         ]
         options = reformat_all(uncategorised, categorised)
         options['defaults'] = DEFAULTS
-
-        # print('datasets tests', json.dumps(datasets[0], indent=4))
-        # print('recommender tests', json.dumps(recommenders[0], indent=4))
-        # print(options)
 
         return options
 
@@ -156,7 +144,6 @@ class OptionsFormatter:
                              'single': True,
                              'required': True,
                              'title': 'splitting',
-                             # 'article': 'a',
                              'default': formatted_splits[0],
                              'options': formatted_splits}
 
@@ -279,7 +266,6 @@ class OptionsFormatter:
         for approach in settings['approaches']:
             model_name = approach['name']
             if approach['params'] is None:  # handle params null
-                # TODO handle params null in frontend?
                 model_setting = {'name': model_name}
             else:
                 model_setting = approach
@@ -312,11 +298,10 @@ class OptionsFormatter:
             if 'includeRatedItems' in settings else False,
             'type': settings['experimentMethod']}
 
-        print('config dict from settings:', json.dumps(config_dict, indent=4))
+        # print('config dict from settings:', json.dumps(config_dict, indent=4))
         return config_dict, experiment_id
 
 
-# TODO do this in another way
 def create_model_api_dict(predictors, recommenders):
     """Generate a dictionary that maps approaches (models) to an API.
 
@@ -332,7 +317,6 @@ def create_model_api_dict(predictors, recommenders):
     for (header, options) in approaches:
         for option in options:
             model_to_api[option['name']] = header
-    # print(dict)
     return model_to_api
 
 
@@ -348,10 +332,7 @@ def format_categorised(settings):
     """
     formatted_settings = []
     for (header, options) in settings.items():
-        # print(settings[header])
-        # options['header'] = header TODO handle categories/APIs differently
         formatted_settings.append({'name': header, 'options': options})
-    # print(formatted_settings)
     return formatted_settings
 
 
@@ -386,14 +367,6 @@ def reformat(options, nested):
     if nested:
         for option in options:
             option['options'] = reformat_options(option['options'])
-
-            # Disable Elliot options
-            # if option['name'] == ELLIOT_API:
-            # for disable_option in option['options']:
-            # disable_option['disabled'] = True
-            # print(disable_option)
-
-            # option['name'] = option['name'] + ' (unavailable)'
     else:
         options = reformat_options(options)
 
@@ -421,7 +394,6 @@ def form_to_data(settings):
 
     """
     for option_name, option_list in settings['lists'].items():
-        # print(option_list)
         reformat_list(settings, option_name, option_list)
     del settings['lists']
 
@@ -466,14 +438,11 @@ def reformat_list(settings, option_name, option_group):
     """
 
     def reformat_option(option):
-        # print(option)
         option['params'] = {param['name']: parse_if_number(
             param['value']) for param in option['params']}
         # Format inner formgrouplists
         for inner_option_name, inner_option_list in option.items():
-            # TODO use settings/lists key after all?
             if inner_option_name not in ['name', 'params']:
-                # print(json.dumps(option, indent=4))
                 reformat_list(option, inner_option_name, inner_option_list)
 
     # TODO refactor

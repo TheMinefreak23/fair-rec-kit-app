@@ -31,9 +31,6 @@ def test_model_api_dict():
     model_to_api = create_model_api_dict({}, {})
     assert not model_to_api
 
-    # Simple case
-    #model_to_api = create_model_api_dict({}, {})
-    #assert model_to_api == {}
 
 
 def test_format_categorised():
@@ -42,8 +39,6 @@ def test_format_categorised():
     formatted = format_categorised({})
     assert not formatted
 
-
-# def test_available_options():
 
 
 def test_reformat_all():
@@ -57,7 +52,6 @@ def test_reformat():
     """Test data to form reformatting."""
     # Empty case
     assert reformat([], False) == []
-    # TODO same as test_reformat_options:
     assert reformat([], True) == []
 
 
@@ -66,10 +60,6 @@ def test_reformat_options():
     # Empty case
     assert reformat_options([]) == []
 
-
-#def test_config_from_settings():
-    # TODO assumption: no Empty case
-    #config_dict_from_settings()
 
 
 def test_form_to_data():
@@ -91,7 +81,6 @@ def test_parse_if_number():
 
     # Already int (and thus float) case
     number = 0
-    #assert isinstance(parse_if_number(number), float)
     assert isinstance(parse_if_number(number), int)
 
     # Parseable to int (numeric) case
@@ -120,8 +109,6 @@ def test_reformat_list():
 
     # List value case
     settings = {}
-    # TODO refactor?
     option = {'params': [{'name': 'the beast', 'value': ['1', '2']}]}
     reformat_list(settings, 'foo', [option])
     assert settings['foo'] == [{'params': {'the beast': [1, 2]}}]
-    # TODO test nested inner recursive formatting

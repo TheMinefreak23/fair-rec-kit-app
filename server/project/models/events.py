@@ -1,4 +1,4 @@
-"""This file handles the events that are caused by the library, for example when an experiment is finished.
+"""This file handles events from the fairreckitlib library, e.g. an experiment finish.
 
 classes:
     EventHandler
@@ -43,8 +43,6 @@ class EventHandler:
         self.result_storage = result_storage
         self.mail_sender = mail_sender
         event_ids = [
-            # ON_BEGIN_EXPERIMENT_PIPELINE: lambda x, **kwargs: print('uwu'),
-            # ON_END_EXPERIMENT_PIPELINE: self.on_end_experiment,
             ON_BEGIN_EXPERIMENT_THREAD,
             ON_END_EXPERIMENT_THREAD,
             # ON_PARSE, TODO doesn't work in Lib?
@@ -81,7 +79,7 @@ class EventHandler:
         elif event_args.event_id == ON_END_EXPERIMENT_THREAD:
             self.on_end_experiment_thread()
         else:
-            """Change progress status."""
+            # Change progress status.
             self.experiment.progress = progress_dict[event_args.event_id]
 
     def on_begin_experiment_thread(self):
@@ -96,14 +94,9 @@ class EventHandler:
         """
         if self.experiment.status is not Status.ABORTED:
             if not self.experiment.validating:
-                # TODO Update experiment data: Save elapsed time
-                #self.experiment.job['metadata']['duration'] = kwargs['elapsed_time']
                 self.result_storage.save_result(self.experiment.job, self.experiment.config)
                 if 'email' in self.experiment.job['metadata']:
-                    self.mail_sender.send_mail(self.experiment.job['metadata']['email'],
-                              self.experiment.job['metadata']['name'],
-                              self.experiment.job['timestamp']['datetime'])
-            # else: self.experiment.job['runs'] = kwargs['num_runs']
+                    self.mail_sender.send_mail(self.experiment.job)
 
             self.experiment.status = Status.DONE
             self.experiment.progress = ProgressStatus.FINISHED
