@@ -153,6 +153,7 @@ function hasParams() {
                   :label="'Select ' + article(name) + ' ' + name + ' *'"
                 >
                   <b-form-select
+                    :id="name"
                     :class="blink ? 'subtle-blink' : ''"
                     v-model="form.main"
                     data-testid="main-select"

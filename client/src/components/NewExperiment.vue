@@ -11,6 +11,7 @@ import { emptyFormGroup, validateEmail } from '../helpers/optionsFormatter'
 import { progress } from '../helpers/queueFormatter'
 import Tags from './Tags.vue'
 import { useFetch } from '../composables/useFetch'
+import endToEndMock from '../test/mock/endToEndMock.json'
 
 // GET request: Get available options for selection from server
 const { data, error, retry } = useFetch(API_URL + '/experiment/options')
@@ -51,7 +52,8 @@ watch(
 async function sendToServer() {
   const sendForm = JSON.parse(JSON.stringify(form.value)) // clone
 
-  sendForm.rawSettings = JSON.parse(JSON.stringify(form.value)) // send raw settings for copying later
+  sendForm.rawSettings = JSON.parse(JSON.stringify(form.value)) // send raw settings for copying later TODO refactor
+  // console.log('raw form settings', sendForm.rawSettings)
   sendForm.lists.approaches = reformat(sendForm.lists.approaches)
   sendForm.lists.metrics = reformat(sendForm.lists.metrics)
   sendForm.lists.datasets = reformat(sendForm.lists.datasets)
@@ -334,6 +336,10 @@ function validName(inputName) {
             @click="sendMockData(options, true, true)"
             >Metric Mock</b-button
           >
+          <!--Mock button for fast E2E Testing-->
+          <b-button type="test" variant="primary" @click="form = endToEndMock"
+            >E2E Mock
+          </b-button>
         </template>
       </b-card>
     </div>

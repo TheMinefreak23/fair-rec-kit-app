@@ -235,7 +235,7 @@ function scrollToGroup(index) {
 </script>
 
 <template>
-  <b-container>
+  <b-container :id= title>
     <b-row>
       <h3 class="text-center text-white mb-0">
         <b-card no-body class="mb-0 bg-dark">

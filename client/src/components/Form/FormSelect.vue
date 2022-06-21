@@ -81,6 +81,7 @@ function formatOptions(options) {
     >
       <!--TODO: ADD MULTIPLE SELECT FOR FILTERS (MODAL?)-->
       <b-form-select
+        :id="option.name"
         v-model="form.value"
         :options="formatOptions(option.options)"
         text-field="name"
