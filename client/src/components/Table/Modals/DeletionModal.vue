@@ -20,11 +20,18 @@ async function removeEntry() {
     // Remove first matching item from store
     const list = entry.value.fromQueue ? store.queue : store.allResults
     for (const i in list) {
-      console.log(list[i])
       if (list[i].id === entry.value.id) {
         list.splice(i, 1)
         console.log(entry.value.id, 'removed from store')
         break
+      }
+    }
+    if (!entry.value.fromQueue) {
+      for (const i in store.currentResults) {
+        // A deleted entry cannot be open on the results tab
+        if (store.currentResults[i].id === entry.value.id) {
+          store.currentResults.splice(i, 1)
+        }
       }
     }
   }
