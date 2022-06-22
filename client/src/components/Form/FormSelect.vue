@@ -45,7 +45,6 @@ function checkboxLabel() {
 }
 
 function formatOptions(options) {
-  console.log(options)
   return options.map((option) => ({
     name: capitalise(String(option)),
     value: option,

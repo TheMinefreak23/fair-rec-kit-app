@@ -56,8 +56,6 @@ const groupVisible = ref([true]) // TODO refactor
 onMounted(() => {
   // TODO separate 1-sized formgrouplists
   form.value.name = props.title
-
-  if (props.title === 'subgroups') console.log(props.options)
 })
 
 /**
@@ -70,7 +68,10 @@ watch(
   () => {
     // Update form if this changes
     // TODO refactor
-    if (props.name === 'approach' || props.name === 'metric') update()
+    if (props.name === 'approach' || props.name === 'metric') update(true)
+
+    //console.log(props.name)
+    // if (props.name === 'dataset') update(false)
   },
   {
     // Make sure this does not trigger on initialization.
@@ -78,22 +79,6 @@ watch(
     deep: true,
   }
 )
-
-/*
- * Watch for changing of datasets (for filters)
- */
-/*
-watch(
-  () => {
-    return props.datasets
-  },
-  () => {
-    if (props.title === 'subgroups') {
-      console.log('chosen datasets', props.datasets)
-      console.log('options', props.options)
-    }
-  }
-)*/
 
 /**
  * Splice groups array to remove a group.
@@ -158,12 +143,15 @@ function showFormToast(object, actionMessage) {
 /**
  * Update the options that cannot be be submitted due to changing experiment type.
  */
-function update() {
-  const entries = props.options
-    .map((category) => category.options)
-    .concat()
-    .flat()
-    .map((entry) => entry.name)
+function update(nested) {
+  const flattened = nested
+    ? props.options
+        .map((category) => category.options)
+        .concat()
+        .flat()
+    : props.options
+  const entries = flattened.map((entry) => entry.name)
+  // console.log(props.name, 'entries', entries)
 
   const deleteEntry = 'NULL'
   for (let i = 0; i < form.value.choices.length; i++) {

@@ -39,7 +39,7 @@ function validateEmail(email) {
  * @returns the values with a null string instead of undefined value
  */
 function formatDefault(paramValue) {
-  if (paramValue.length > 1) {
+  if (paramValue.isArray && paramValue.length > 1) {
     const nullIndex = paramValue.indexOf(null)
     if (nullIndex) paramValue[nullIndex] = 'null'
   }

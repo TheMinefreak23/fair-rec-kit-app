@@ -60,7 +60,6 @@ class OptionsFormatter:
         Returns:
             (dict) the formatted options
         """
-
         filters = self.recommender_system.get_available_data_filters()
 
         if not chosen_datasets:
@@ -84,7 +83,7 @@ class OptionsFormatter:
 
             # Filters for datasets
             for dataset in datasets:
-                # TODO this is stupid because we just created the options key
+                # TODO refactor (double reformat; we just created the options key)
                 dataset['params'] = dataset['options']
                 del dataset['options']
                 self.set_dataset_params(dataset, filters)
@@ -104,7 +103,8 @@ class OptionsFormatter:
                                             'categorised': copy.deepcopy(categorised)}
 
             # Use stored dictionary for dataset-matrix pairs (all available options)
-            self.set_metric_filters(rec_metrics + pred_metrics, self.dataset_matrices, filters)
+            datasets_matrices = self.dataset_matrices
+
         else:
             # Get the stored options without filters
             options = copy.deepcopy(self.options_without_filters)
@@ -113,16 +113,16 @@ class OptionsFormatter:
 
             # Get dataset options from chosen datasets
             datasets_matrices = {}
+
             for dataset in chosen_datasets:
                 if 'matrix' in dataset:
-                    print('CHOSEN DATASETS MATRIX', dataset['matrix'])
                     matrix_name = dataset['matrix']['name']
                     datasets_matrices.setdefault(dataset['name'], []).append(matrix_name)
 
-            self.set_metric_filters(categorised['recMetrics'] +
-                                    categorised['predMetrics'],
-                                    datasets_matrices,
-                                    filters)
+            rec_metrics = categorised['recMetrics']
+            pred_metrics = categorised['predMetrics']
+
+        self.set_metric_filters(rec_metrics + pred_metrics, datasets_matrices, filters)
 
         options = reformat_all(uncategorised, categorised)
         options['defaults'] = DEFAULTS
@@ -153,7 +153,6 @@ class OptionsFormatter:
                                   'options': reformat(metric_datasets, False)
                                   }
                 option['params']['dynamic'] = [dataset_option]
-                print('DATASET OPTION', dataset_option)
 
     def set_dataset_params(self, dataset, filters):
         """Set the dataset option parameters.
@@ -209,7 +208,7 @@ class OptionsFormatter:
         matrices = []
         for matrix_name in matrix_names:
             dynamic_options = []
-            if converters:  # TODO refactor
+            if converters:
                 dataset_matrix_converters = converters[dataset_name][matrix_name]
                 # Converter per matrix
                 converter_option = {'name': 'rating converter',
@@ -218,11 +217,14 @@ class OptionsFormatter:
                                     'options': reformat(dataset_matrix_converters, False)}
                 dynamic_options.append(converter_option)
             # Filter per matrix
-            matrix_filters = filters[dataset_name][matrix_name]
-            dynamic_options.append(self.make_filter_option(matrix_filters))
+            if matrix_name in filters[dataset_name]: # TODO only not true for first POST request, debounce?
+                matrix_filters = filters[dataset_name][matrix_name]
+                dynamic_options.append(self.make_filter_option(matrix_filters))
 
-            matrices.append({'name': matrix_name, 'params': {
-                'dynamic': dynamic_options}})
+                matrices.append({'name': matrix_name, 'params': {
+                    'dynamic': dynamic_options}})
+            else:
+                print('DATASET NAME', dataset_name, 'FILTERS', filters[dataset_name], 'MATRIX NAMES', matrix_names)
         return self.make_single_dynamic_option('matrix', matrices)
 
     def make_single_dynamic_option(self, name, list):

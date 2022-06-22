@@ -46,6 +46,11 @@ const form = computed({
  * Initialise form values: single, name and default option.
  */
 onMounted(() => {
+  // Reset main option (TODO temporary measure for changing options prop)
+  if (form.value.main) {
+    console.log(props.title, form.value.main)
+    form.value.main = ''
+  }
   form.value.single = props.single
   form.value.name = props.title
   if (props.defaultOption) {
@@ -62,8 +67,24 @@ onMounted(() => {
 watch(
   () => form.value.main,
   () => {
-    // console.log('form', form.value)
-    setParameterDefaults()
+    // Whether the form options have already been set.
+    if (!(form.value.values || form.value.options || form.value.lists)) {
+      if (form.value.main) setParameterDefaults()
+    }
+  }
+)
+
+/**
+ * Set the parameter defaults when the main option changes.
+ */
+watch(
+  () => props.options,
+  () => {
+    // Reset main option (TODO temporary measure for changing options prop)
+    if (props.name === 'metric' && form.value.main) {
+      // console.log(props.name, form.value.main)
+      form.value.main = ''
+    }
   }
 )
 
@@ -91,22 +112,10 @@ watch(
  * Set default values for the group parameters.
  */
 function setParameterDefaults() {
-  /**
-   * Whether the form options have already been set.
-   */
-  function formSet() {
-    return form.value.values || form.value.options || form.value.lists
-  }
-
   const option = form.value.main
-  // console.log('setting parameter', props.name, props.options, form.value.main)
   let choices
-  // console.log(option)
-  /* if (formSet()) {
-    console.log('BINGO')
-  } */
   // Only set defaults if the form hasn't been set (when copying)
-  if (option.params && !formSet()) {
+  if (option.params) {
     // console.log('option', props.name, option.name, 'params', option.params)
     if (option.params.values && option.params.values.length > 0) {
       choices = option.params.values
@@ -143,7 +152,11 @@ function hasParams() {
 </script>
 
 <template>
-  <b-row class="align-items-end">
+  <template v-if="options && options.length === 0">
+    <h4>No options available!</h4>
+    <h4 v-if="title === 'matrix'">Please select a dataset and matrix.</h4>
+  </template>
+  <b-row v-else class="align-items-end">
     <b-col>
       <b-col>
         <b-row>
@@ -151,6 +164,9 @@ function hasParams() {
             <b-row>
               <!--Main option selection-->
               <b-col cols="12">
+                <h4 v-if="props.name === 'metric'">
+                  NOTE: resets when changing dataset
+                </h4>
                 <b-form-group
                   :label="
                     props.options.length > 1
@@ -160,7 +176,7 @@ function hasParams() {
                 >
                   <!-- If there is only one main option available, don't use a main selection-->
                   <b-form-select
-                    v-if="props.options.length > 1"
+                    v-if="options.length > 1"
                     :class="blink ? 'subtle-blink' : ''"
                     v-model="form.main"
                     data-testid="main-select"

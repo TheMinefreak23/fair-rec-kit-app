@@ -35,7 +35,6 @@ def params():
         # Change subgroup options
         options_formatter.create_available_options(chosen_datasets)
 
-    print(chosen_datasets)
     response = {'options': options_formatter.options}
     return response
 
