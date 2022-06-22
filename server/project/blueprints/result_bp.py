@@ -185,12 +185,12 @@ def validate():
     json_data = request.json
     try:
         file_path = request.json['filepath']
-        ID = request.json['ID']
+        id = request.json['ID']
     except KeyError:
         return BAD_REQUEST_RESPONSE
-    
+
     overview = load_results_overview()
-    result = overview['all_results'][id_to_index(overview, ID)]
+    result = overview['all_results'][id_to_index(overview, id)]
     amount = int(json_data.get('amount', 1))
     queue.add_validation(file_path, amount, result)
     queue.run_first()
