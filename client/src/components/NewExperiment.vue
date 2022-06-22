@@ -23,6 +23,7 @@ const { data, error, retry } = useFetch(API_URL + '/experiment/options')
 const options = ref()
 // Store the settings of the form in a reference
 const form = ref(initForm())
+const metadata = ref({})
 const experimentMethods = [
   { text: 'Recommendation (default)', value: 'recommendation' },
   { text: 'Prediction', value: 'prediction' },
@@ -59,9 +60,13 @@ watch(
  */
 watch(
   () => reformat(form.value.lists.datasets),
-  (newDatasets) => {
-    // console.log(newDatasets)
-    setOptions(newDatasets)
+  (newDatasets, oldDatasets) => {
+    console.log('new datasets', newDatasets)
+    if (
+      newDatasets.name !== oldDatasets.name ||
+      newDatasets.matrix !== oldDatasets.matrix
+    )
+      setOptions(newDatasets)
   },
   {
     immediate: false,
@@ -77,7 +82,7 @@ async function setOptions(chosenDatasets = []) {
   }
   const response = await fetch(API_URL + '/experiment/options', requestOptions)
   const data = await response.json()
-  options.value = data.options
+  options.value = JSON.parse(JSON.stringify(data.options))
   // console.log('new options', options.value)
 }
 

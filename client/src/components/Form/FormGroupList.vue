@@ -19,7 +19,6 @@ const props = defineProps({
   options: Array, // The available options to choose from
   required: Boolean, // Whether the list option is required
   maxK: Number, // The amount of recommendations (caps K)
-  //datasets: Object, // The chosen datasets (for filters)
   modelValue: { type: Object, required: true }, // The local form linked to the form component
 })
 
@@ -243,7 +242,7 @@ function scrollToGroup(index) {
 </script>
 
 <template>
-  <b-container :id= title>
+  <b-container :id="title">
     <b-row>
       <template v-if="options && options.length === 0">
         <h4>No options available!</h4>
