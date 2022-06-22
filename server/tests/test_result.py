@@ -150,5 +150,6 @@ def test_validate(client):
     queue.recommender_system = RecommenderSystem('datasets', MOCK_RESULTS_DIR)
     url = URL_PREFIX + '/validate'
     assert check_bad_request(client, url)
-    response = client.post(url, json={'filepath': '1654518468_Test938_perturbance', 'amount': 0})
+    response = client.post(url, json={'filepath': '1654518468_Test938_perturbance', \
+        'amount': 0, 'ID': 0})
     assert response.data == b'Validated'

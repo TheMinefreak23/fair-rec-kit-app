@@ -44,8 +44,7 @@ const rightVal = computed({
 function correctValue() {
   return (
     value.value > props.min &&
-    value.value < props.max &&
-    value.value % props.step === 0
+    value.value < props.max 
   )
 }
 </script>

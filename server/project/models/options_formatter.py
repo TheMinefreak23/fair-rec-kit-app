@@ -176,8 +176,11 @@ class OptionsFormatter:
             if 'conversion' in matrix and matrix['conversion'] != []:
                 dataset['rating_converter'] = matrix['conversion'][0]
             dataset['splitting'] = dataset['splitting'][0]
-            dataset['splitting']['test_ratio'] = (
-                100 - int(dataset['params']['Train/testsplit'])) / 100
+            # TODO rename split param
+            dataset['splitting']['Train/testsplit'] = str(dataset['params']['Train/testsplit']) \
+            + '/' + str(100 - dataset['params']['Train/testsplit'])
+
+            del dataset['params']['Train/testsplit']
 
         # Format models
         models = {}

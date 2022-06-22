@@ -124,10 +124,10 @@ class ExperimentQueue:
                                 ProgressStatus.NA,
                                 config_id)
         experiment = Experiment(queue_item, self.recommender_system)
-
+        self.filter_queue()
         self.queue.append(experiment)
 
-    def add_validation(self, file_path, amount):
+    def add_validation(self, file_path, amount, result):
         """Add a validation experiment to the queue.
 
         Args:
@@ -135,16 +135,27 @@ class ExperimentQueue:
             amount(int): the amount of runs for validation
 
         """
-        queue_item = QueueItem(job={'file_path': file_path, 'amount': amount},
+        result['file_path'] = file_path
+        result['amount'] = amount
+        queue_item = QueueItem(job = result,
                                config={},
                                name='',
                                status=Status.TODO,
                                progress=ProgressStatus.NA,
                                validating=True)
         experiment = Experiment(queue_item, self.recommender_system)
+        self.filter_queue()
         self.queue.append(experiment)
-        self.run_first()
 
+    def filter_queue(self):
+        """Filter out finished experiments when the queue is too long."""
+        finished_experiments = len([
+        item for item in self.queue
+        if item.queue_item.status in (Status.DONE, Status.ABORTED)
+    ])
+        while finished_experiments > 5:
+            self.queue.pop(0)
+            finished_experiments -= 1
 
 def formatted_experiment(experiment):
     """Format the experiment to a dictionary.

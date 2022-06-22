@@ -58,13 +58,6 @@ function format() {
             :dict="value"
             :alternateBg="!alternateBg"
           />
-          <!-- TODO Decide between these two implementations-->
-          <template v-else-if="key == 'test_ratio'">
-            {{ (1 - value) * 100 }}/{{ value * 100 }}
-          </template>
-          <template v-else-if="key == 'Train/testsplit'">
-            {{ value }}/{{ 100 - value }}
-          </template>
           <template v-else>
             <!-- <b-button disabled>{{ value ? value : 'None' }}</b-button> -->
             {{ value ? value : 'None' }}
