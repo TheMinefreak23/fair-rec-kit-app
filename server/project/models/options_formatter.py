@@ -290,10 +290,14 @@ class OptionsFormatter:
             format_data_matrix(dataset)
             if 'conversion' in matrix:
                 dataset['rating_converter'] = matrix['conversion']
-            # TODO rename split param
             dataset['splitting']['test_ratio'] = (100 -
                                                   int(dataset['params']['Train/testsplit'])
                                                   ) / 100
+            
+            #dataset['splitting']['Train/testsplit'] = str(dataset['params']['Train/testsplit']) \
+            #+ '/' + str(100 - dataset['params']['Train/testsplit'])
+
+            del dataset['params']['Train/testsplit']
 
         # Format models
         models = {}

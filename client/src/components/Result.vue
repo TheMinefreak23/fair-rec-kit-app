@@ -6,6 +6,7 @@ Utrecht University within the Software Project course.
 import Table from './Table.vue'
 import { onMounted, ref } from 'vue'
 import { emptyFormGroup, reformat } from '../helpers/optionsFormatter'
+import { store, pollForResult, getQueue } from '../store.js'
 import { makeHeader } from '../helpers/resultFormatter'
 import { API_URL } from '../api'
 import SettingsModal from './Table/Modals/SettingsModal.vue'
@@ -178,13 +179,20 @@ async function validate() {
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-type': 'application/json' },
-    body: JSON.stringify({ filepath: file, amount: validationAmount.value }),
+    body: JSON.stringify({ 
+                           filepath: file, 
+                           amount: validationAmount.value, 
+                           ID: props.result.id 
+                         }),
   }
   await fetch(
     RESULT_URL + 'validate',
     requestOptions
   ).then(() => {
     console.log('Validation added to the queue')
+    getQueue()
+    store.currentTab = 1
+    pollForResult()
   })
 }
 
