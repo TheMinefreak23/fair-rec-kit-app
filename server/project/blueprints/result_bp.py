@@ -251,4 +251,5 @@ def validate():
     filepath = json_data.get('filepath')
     amount = int(json_data.get('amount', 1))
     queue.add_validation(filepath, amount)
+    queue.run_first()
     return "Validated"

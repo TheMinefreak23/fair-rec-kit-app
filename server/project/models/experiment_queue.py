@@ -14,6 +14,8 @@ Utrecht University within the Software Project course.
 import time
 from datetime import datetime
 
+from click import Abort
+
 from .constants import MAIL_KEY
 from .events import EventHandler
 from .experiment import Status, ProgressStatus, QueueItem, Experiment
@@ -130,7 +132,7 @@ class ExperimentQueue:
                                 ProgressStatus.NA,
                                 config_id)
         experiment = Experiment(queue_item, self.recommender_system)
-
+        self.filterQueue()
         self.queue.append(experiment)
 
     def add_validation(self, file_path, amount):
@@ -149,9 +151,18 @@ class ExperimentQueue:
                                progress=ProgressStatus.NA,
                                validating=True)
         experiment = Experiment(queue_item, self.recommender_system)
+        self.filterQueue()
         self.queue.append(experiment)
-        self.run_first()
 
+    def filterQueue(self):
+        """Filters out finished experiments when the queue is too long."""
+        finished_experiments = len([
+        item for item in self.queue
+        if item.queue_item.status == Status.DONE or item.queue_item.status == Status.Abort
+    ])
+        while(finished_experiments > 5):
+            self.queue.pop(0)
+            finished_experiments -= 1
 
 def formatted_experiment(experiment):
     """Format the experiment to a dictionary.
