@@ -9,7 +9,7 @@ import PreviousResults from './components/PreviousResults.vue'
 import ExperimentQueue from './components/ExperimentQueue.vue'
 import NewExperiment from './components/NewExperiment.vue'
 import { onMounted, ref, watch } from 'vue'
-import { API_URL } from './api'
+import { API_URL, DEV } from './api'
 import MusicDetail from './components/MusicDetail.vue'
 import { useToast } from 'bootstrap-vue-3'
 import { store } from './store'
@@ -124,7 +124,7 @@ function callToast() {
     <!-- Main content (tabs) -->
     <div v-if="error">
       <p>Oops! Error encountered: {{ error.message }}</p>
-      <button @click="retry">Retry</button>
+      <b-button @click="retry">Retry</b-button>
     </div>
     <!-- Show a loading screen unless data has been loaded -->
     <b-overlay v-else :show="!data">
@@ -136,7 +136,9 @@ function callToast() {
           nav-class="tab-active"
           active-nav-item-class="bg-secondary text-danger"
         >
-          <b-tab title="New Experiment" data-testid="NewExperiment"><NewExperiment /></b-tab>
+          <b-tab title="New Experiment" data-testid="NewExperiment"
+            ><NewExperiment
+          /></b-tab>
 
           <b-tab data-testid="Queue">
             <ExperimentQueue />
@@ -160,7 +162,7 @@ function callToast() {
           <b-tab title="All results" data-testid="AllResults">
             <PreviousResults viewItem />
           </b-tab>
-          <b-tab title="Music Detail">
+          <b-tab v-if="DEV" title="Music Detail">
             <MusicDetail />
           </b-tab>
         </b-tabs>
