@@ -25,9 +25,9 @@ import pandas as pd
 
 from project.blueprints.constants import BAD_REQUEST_RESPONSE
 from project.models import result_loader, \
-    result_store, options_formatter, \
+    result_store, \
     recommender_system, queue
-from project.models.options_formatter import reformat_list
+from project.models.options_formatter import reformat_list, make_filter_option
 from project.models.result_loader import result_by_id, add_dataset_columns, \
     get_chunk, rename_headers, \
     add_spotify_columns
@@ -109,7 +109,7 @@ def available_filters():
     dataset_name = json_data.get("dataset", "")
     matrix_name = json_data.get("matrix", "")
     filters = recommender_system.get_available_data_filters()[dataset_name][matrix_name]
-    formatted_filters = options_formatter.make_filter_option(filters)
+    formatted_filters = make_filter_option(filters)
     # print('== FILTERS == ', dataset_name, matrix_name, ': ', formatted_filters['options'])
     return {'filters': formatted_filters['options']}
 
