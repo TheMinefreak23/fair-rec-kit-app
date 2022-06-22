@@ -29,7 +29,8 @@ from project.models import result_loader, \
     recommender_system, queue
 from project.models.result_loader import result_by_id, add_dataset_columns, \
     get_chunk, rename_headers, \
-    add_spotify_columns
+    add_spotify_columns, id_to_index
+from project.models.result_storage import load_results_overview
 
 blueprint = Blueprint('result', __name__, url_prefix='/api/result')
 
@@ -184,10 +185,13 @@ def validate():
     json_data = request.json
     try:
         file_path = request.json['filepath']
+        ID = request.json['ID']
     except KeyError:
         return BAD_REQUEST_RESPONSE
-
+    
+    overview = load_results_overview()
+    result = overview['all_results'][id_to_index(overview, ID)]
     amount = int(json_data.get('amount', 1))
-    queue.add_validation(file_path, amount)
+    queue.add_validation(file_path, amount, result)
     queue.run_first()
     return "Validated"

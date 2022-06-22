@@ -129,7 +129,7 @@ class ExperimentQueue:
         self.filterQueue()
         self.queue.append(experiment)
 
-    def add_validation(self, file_path, amount):
+    def add_validation(self, file_path, amount, result):
         """Add a validation experiment to the queue.
 
         Args:
@@ -137,7 +137,9 @@ class ExperimentQueue:
             amount(int): the amount of runs for validation
 
         """
-        queue_item = QueueItem(job={'file_path': file_path, 'amount': amount},
+        result['file_path'] = file_path
+        result['amount'] = amount
+        queue_item = QueueItem(job = result,
                                config={},
                                name='',
                                status=Status.TODO,
