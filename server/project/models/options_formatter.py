@@ -177,9 +177,9 @@ class OptionsFormatter:
                 dataset['rating_converter'] = matrix['conversion'][0]
             dataset['splitting'] = dataset['splitting'][0]
             # TODO rename split param
-            dataset['splitting']['Train/testsplit'] = str(dataset['params']['Train/testsplit']) + '/' + str(100 - dataset['params']['Train/testsplit'])
-                # (str(100 - int(dataset['params']['Train/testsplit'])) 
-                # + '/' + dataset['params']['Train/testsplit'])
+            dataset['splitting']['Train/testsplit'] = str(dataset['params']['Train/testsplit']) 
+            + '/' + str(100 - dataset['params']['Train/testsplit'])
+
             del dataset['params']['Train/testsplit']
 
         # Format models
