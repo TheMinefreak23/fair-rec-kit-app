@@ -150,7 +150,7 @@ class ExperimentQueue:
         self.queue.append(experiment)
 
     def filterQueue(self):
-        """Filters out finished experiments when the queue is too long."""
+        """Filter out finished experiments when the queue is too long."""
         finished_experiments = len([
         item for item in self.queue
         if item.queue_item.status == Status.DONE or item.queue_item.status == Status.Abort
