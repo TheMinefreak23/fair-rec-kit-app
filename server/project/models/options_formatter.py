@@ -184,7 +184,7 @@ class OptionsFormatter:
             split_type_option]
 
     def make_filter_option(self, matrix_filters):
-        """Make a filter list option
+        """Make a filter list option.
 
         Args:
             matrix_filters: the filters available for the matrix
@@ -205,6 +205,17 @@ class OptionsFormatter:
                 'options': reformat(filter_pass_list, False)}
 
     def make_matrix_option(self, dataset_name, matrix_names, filters, converters=None):
+        """Make a matrix list option.
+
+        Args:
+            dataset_name: the name of the dataset of the matrix
+            matrix_names: the names of the matrices to choose from
+            filters: the available filters
+            converters: the available converters
+
+        Returns:
+            the matrix option for the form
+        """
         matrices = []
         for matrix_name in matrix_names:
             dynamic_options = []
@@ -228,7 +239,7 @@ class OptionsFormatter:
         return self.make_single_dynamic_option('matrix', matrices)
 
     def make_single_dynamic_option(self, name, list):
-        """Make option for a single form group list
+        """Make option for a single form group list.
 
         Args:
             option_name(str): the name of the option

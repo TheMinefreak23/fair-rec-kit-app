@@ -193,7 +193,7 @@ function formatEvaluation(e, index, result, runID) {
 }
 
 // Format metric name
-function formatMetricName(evaluation) {
+export function formatMetricName(evaluation) {
   // If it is a K metric, replace K with the parameter
   const name = evaluation.name
   if (name.slice(-1).toLowerCase() === 'k') {

@@ -101,7 +101,6 @@ def set_recs():
 @blueprint.route('/filters', methods=['POST'])
 def available_filters():
     """Get the available filters based on the dataset and matrix.
-    (POST data: dataset name and matrix name)
 
     Returns:
         (dict) the available filters

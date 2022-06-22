@@ -119,7 +119,7 @@ class Experiment:
 
         # Delete temporary YML config
         os.remove(config_file_path + '.yml')
-        
+
 
     def validate_experiment(self, events):
         """Validate an experiment by running it multiple times, using the experiment file path.
