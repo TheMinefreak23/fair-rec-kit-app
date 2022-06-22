@@ -48,7 +48,6 @@ const props = defineProps({
 const colWidth = 6
 
 // Pagination
-// const caption = ref('')
 const entryAmount = ref(10)
 
 // Modals
@@ -81,8 +80,6 @@ const subheaders = computed(() => {
 })
 
 const sorted = computed(() => {
-  // console.log(props.results)
-
   if (!props.pagination) return sort(sortindex.value)
   else return props.results
 })
@@ -94,11 +91,6 @@ onMounted(() => {
     sortindex.value = props.defaultSort
     descending.value = true // For now sort by descending on default, TODO refactor
   }
-  /* console.log(
-    'HEADERS',
-    props.headers.map((header) => header.name)
-  ) */
-  // TODO refactor includes
   if (
     props.headers
       .map((header) => header.name)
@@ -148,7 +140,6 @@ function setsorting(i) {
   }
   emit('paginationSort', i)
 }
-// console.log('propsfilteroptions', props.filterOptions)
 
 /**
  * Checks whether a given string is a key.
@@ -167,31 +158,19 @@ function toggleInfoColumns(addHeaders) {
     ...props.headers.filter((header) => !isItemKey(header.name)),
     ...addHeaders.map((header) => ({ name: header })),
   ]
-  additionalInfoAmount.value = addHeaders.length // TODO refactor
-  // console.log('additional info amount', additionalInfoAmount.value)
-  // console.log('toggleInfo infoHeaders', infoHeaders.value)
-  // emit('updateHeaders', newHeaders)
+  additionalInfoAmount.value = addHeaders.length
 }
 
 function isRecsHeader(key) {
-  // console.log('infoHeaders', infoHeaders.value)
-  /* console.log(
-    'filteredHeaders',
-    filteredHeaders().map((header) => header.name.toLowerCase())
-  )
-  console.log('filteredHeaders', key) */
   return (
     key &&
     filteredHeaders()
       .map((header) => header.name.toLowerCase())
-      .includes(key.split('_').join(' ')) // TODO refactor
+      .includes(key.split('_').join(' '))
   )
 }
 
-// TODO computed ?
 const filteredHeaders = () => {
-  // console.log('INFO HEADERS', infoHeaders.value)
-  // console.log('recs', props.recs)
   return !props.recs || infoHeaders.value.length === 0
     ? props.headers
     : [...props.headers, ...[{ name: 'Album' }, { name: 'Snippet' }]]
@@ -284,14 +263,12 @@ const filteredHeaders = () => {
             :key="`${descending}_${sortindex}_${index}-${key}`"
           >
             <!-- For recs tables, show filtered columns -->
-            <!-- TODO refactor -->
             <b-td
               v-if="!recs || isRecsHeader(key)"
               class="text-center"
               :style="colItemStyle"
             >
               <!--Special pill format for status-->
-              <!-- TODO refactor-->
               <template
                 v-if="
                   typeof value === 'string' && value.startsWith(statusPrefix)
@@ -330,7 +307,6 @@ const filteredHeaders = () => {
             </b-td>
           </template>
           <!-- Additional item info -->
-          <!-- TODO refactor -->
           <template v-if="recs">
             <template v-for="i in additionalInfoAmount" :key="i">
               <b-td
@@ -385,7 +361,6 @@ const filteredHeaders = () => {
                 </b-col>
 
                 <b-col md="auto" class="mx-0 px-0 d-inline">
-                  <!--REFACTOR status condition-->
                   <DeletionModal
                     v-if="
                       removable &&

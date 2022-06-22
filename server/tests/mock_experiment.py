@@ -77,10 +77,8 @@ def mock_evaluate(approach, metric):
     # Mock evaluation
 
     result = len(approach['name']) * len(metric['name'])
-    # print('metric:', metric)
     # Do something with the metrics parameters.
     if metric['params']:
-        # print(metric['name'], 'has params', metric['params'])
         for (name, value) in metric['params'].items():
             val = int(value) if value else 0
             result *= len(name) * val

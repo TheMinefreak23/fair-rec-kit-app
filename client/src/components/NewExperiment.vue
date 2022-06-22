@@ -10,6 +10,7 @@ import { API_URL } from '../api'
 import { emptyFormGroup, validateEmail } from '../helpers/optionsFormatter'
 import { progress } from '../helpers/queueFormatter'
 import Tags from './Tags.vue'
+import endToEndMock from '../test/mock/endToEndMock.json'
 
 const options = ref()
 
@@ -41,7 +42,6 @@ async function getOptions() {
   const response = await fetch(API_URL + '/experiment/options')
   const data = await response.json()
   options.value = data.options
-  // console.log('options', options.value)
 }
 
 // POST request: Send form to server.
@@ -49,12 +49,12 @@ async function sendToServer() {
   const sendForm = JSON.parse(JSON.stringify(form.value)) // clone
 
   sendForm.rawSettings = JSON.parse(JSON.stringify(form.value)) // send raw settings for copying later TODO refactor
+  // console.log('raw form settings', sendForm.rawSettings)
   sendForm.lists.approaches = reformat(sendForm.lists.approaches)
   sendForm.lists.metrics = reformat(sendForm.lists.metrics)
   sendForm.lists.datasets = reformat(sendForm.lists.datasets)
   console.log('sendForm', sendForm)
 
-  // TODO get from server?
   store.currentExperiment = {
     metadata: metadata.value,
     settings: sendForm,
@@ -101,7 +101,6 @@ function reformat(property) {
   const formattedChoices = []
   for (const i in property.choices) {
     const choices = property.choices[i]
-    // console.log('reformat', choices)
     if (choices.main) {
       // Direct settings (inputs/selects)
       let params = []
@@ -114,13 +113,10 @@ function reformat(property) {
       // Nested formgrouplists
       if (choices.lists != null) {
         for (const list of choices.lists) {
-          // console.log('list', list)
           if (list.choices[0].single) {
             // formgroup not list
-            // TODO refactor
             formattedChoices[i][list.choices[0].name] = reformat(list)
           } else formattedChoices[i][list.name] = reformat(list)
-          // console.log('list', formattedChoices[i][list.name])
         }
       }
     }
@@ -138,6 +134,7 @@ function reformat(property) {
       <!--This form contains all the necessary parameters for a user to submit a request for a experiment-->
       <b-form
         v-if="options"
+        id="new-experiment"
         @submit="$event.preventDefault(), sendToServer()"
         @keydown.enter.prevent
         @reset="$event.preventDefault(), initSettings()"
@@ -147,16 +144,20 @@ function reformat(property) {
             <b-col>
               <b-row>
                 <b-col md="auto" class="text-center">
-                  <p>Experiment type 
-                    <i class="bi bi-info-circle"  
-                    v-b-tooltip.hover title = "Predictions are predicted ratings for known user-item pairs in the data , while recommendations are a list of recommended items for a user based on these predicted ratings.">
+                  <p>
+                    Experiment type
+                    <i
+                      class="bi bi-info-circle"
+                      v-b-tooltip.hover
+                      title="Predictions are predicted ratings for known user-item pairs in the data , while recommendations are a list of recommended items for a user based on these predicted ratings."
+                    >
                     </i>
                   </p>
                 </b-col>
                 <b-col md="auto">
                   <b-form-radio-group
                     v-model="form.experimentMethod"
-                    :options="experimentMethods"                    
+                    :options="experimentMethods"
                   >
                   </b-form-radio-group>
                 </b-col>
@@ -167,7 +168,6 @@ function reformat(property) {
             Tags (optional)
             Email for notification (optional) -->
             <b-col md="auto" class="p-2 m-1 rounded-3 bg-secondary">
-              <!--<h3 class="text-center">Meta</h3>-->
               <b-row>
                 <b-col>
                   <b-form-group label-cols-md="4" label="Experiment name">
@@ -298,22 +298,26 @@ function reformat(property) {
       </b-form>
       <!--Send a plethora of mock data to the queue-->
       <b-button type="test" variant="warning" @click="sendMockData(options)"
-        >Mock</b-button
-      >
+        >Mock
+      </b-button>
       <!--Simple version of the mock-->
       <b-button
         type="test"
         variant="primary"
         @click="sendMockData(options, true)"
-        >Simple Mock</b-button
-      >
+        >Simple Mock
+      </b-button>
       <!--Simple version of the mock with metrics-->
       <b-button
         type="test"
         variant="primary"
         @click="sendMockData(options, true, true)"
-        >Metric Mock</b-button
-      >
+        >Metric Mock
+      </b-button>
+      <!--Mock button for fast E2E Testing-->
+      <b-button type="test" variant="primary" @click="form = endToEndMock"
+        >E2E Mock
+      </b-button>
     </b-card>
   </div>
 </template>

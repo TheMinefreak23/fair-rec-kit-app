@@ -1,5 +1,5 @@
 import { mount } from 'cypress/vue'
-import FormInput from '../../src/components/Form/FormInput.vue'
+import FormInput from '../../client/src/components/Form/FormInput.vue'
 
 describe('FormInput.cy.js', () => {
   it('input', () => {
@@ -7,6 +7,7 @@ describe('FormInput.cy.js', () => {
     const form = { value: 0.5 }
     cy.mount(FormInput, { props: { value, modelValue: form, maxK: 10 } })
       .get('[data-testid=input]')
-      .should('contain.text', 'Enter ')
+      .invoke('attr', 'placeholder')
+      .should('contain', 'Enter ')
   })
 })

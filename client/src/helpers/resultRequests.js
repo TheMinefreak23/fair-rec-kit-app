@@ -33,7 +33,7 @@ export async function loadResult(resultId) {
 export async function getResult() {
   const response = await fetch(url)
   const data = await response.json()
-  return data
+  return data.result
 }
 
 /**
@@ -42,15 +42,15 @@ export async function getResult() {
  * @param {Boolean} view - Whether to view the result in the result tab
  */
 export async function addResultById(resultId, view = true) {
-  //Check if the selected result is already loaded
-  let index = store.currentResults.map((result) => result.id).indexOf(resultId)
-  if (index == -1)
-  {
-    const data = await loadResult(resultId)
-    console.log('Result fetched', data.result)
-    addResult(formatResult(data.result))
-  }
-  else (store.currentResultTab = index)
+  // Check if the selected result is already loaded
+  const index = store.currentResults
+    .map((result) => result.id)
+    .indexOf(resultId)
+  if (index === -1) {
+    const dataResult = await loadResult(resultId)
+    console.log('Result fetched', dataResult)
+    addResult(formatResult(dataResult))
+  } else store.currentResultTab = index
   if (view) viewResultTab()
 }
 

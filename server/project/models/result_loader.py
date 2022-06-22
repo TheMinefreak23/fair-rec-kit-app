@@ -12,7 +12,9 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 import os
-# import pandas as pd
+from fairreckitlib.data.set.dataset import add_dataset_columns as add_data_columns
+
+from . import recommender_system
 from .constants import RESULTS_DIR
 from .result_storage import load_results_overview, load_json
 
@@ -37,16 +39,9 @@ def result_by_id(result_id, result_storage):
         for pair_id, pair_data in enumerate(run_overview['overview']):
             evaluation_path_full = os.getcwd() + "/" + \
                                    pair_data['evaluation_path']
-            # ratings_settings_path_full = os.getcwd() + "/" + \
-            #    pair_data['ratings_settings_path']
 
             if os.path.exists(evaluation_path_full):
                 evaluation_data = load_json(evaluation_path_full)
-                # TODO ratings_settings still needs to go somewhere
-                # ratings_settings_data = pd.read_csv(
-                #    ratings_settings_path_full,
-                #    sep='\t',
-                #    header=None).to_dict(orient='records')
                 dataset_index = name_to_index(data['result'],
                                               run_overview['overview'][pair_id]['dataset'],
                                               'dataset', by_name=True)
@@ -59,10 +54,7 @@ def result_by_id(result_id, result_storage):
         data['metadata']['runs'] += 1
 
     result_storage.current_result = data
-    # print('current result', json.dumps(current_result, indent=4))
 
-
-# TODO: refactor: use in result_by_id?
 def get_overview(evaluation_id, runid):
     """Return a specific entry from a specific overview.json.
 
@@ -79,15 +71,10 @@ def get_overview(evaluation_id, runid):
     overview_path = relative_path + "/overview.json"
     run_overview = load_json(overview_path)
     return run_overview['overview']
-    # rec_paths = []
-    # for index in range(0, len(run_overview['overview'])):
-    #    rec_paths[index] = run_overview['overview'][pairid]['ratings_path']
-    # return rec_paths
 
 
 def add_evaluation(data, evaluation):
     """Add an evaluation to the data."""
-    # todo: refactor docstring
     if not evaluation:
         return data
     if not data:
@@ -99,7 +86,6 @@ def add_evaluation(data, evaluation):
 
 def format_evaluation(evaluation):
     """Format an evaluation to be used in the current_result."""
-    # todo: refactor docstring
     for eval_item in evaluation:
         evaluation_list = [eval_item['evaluation']]
         eval_item.pop('evaluation')
@@ -129,11 +115,6 @@ def id_to_index(json_data, result_id):
     for iteration_id, data in enumerate(json_data['all_results']):
         if int(data['timestamp']['stamp']) == int(result_id):
             current_result_overview_id = iteration_id
-            # print('==ID TO INDEX',
-            # 'ID',result_id,'INDEX',
-            # iteration_id,
-            # 'NAME',
-            # data['metadata']['name'])
     return current_result_overview_id
 
 
@@ -152,3 +133,82 @@ def name_to_index(json_data, name, key, by_name=False):
         if by_name and result_value['name'] == name or result_value == name:
             current_index = i
     return current_index
+
+
+def get_chunk(start_rows, chunk_size, df_sorted):
+    """Get a chunk of a dataframe.
+
+    Args:
+        start_rows: rows to start at
+        chunk_size: size of the rows chunk
+        df_sorted: the sorted dataframe to get the chunk from
+
+    Returns:
+        The part of the dataframe
+    """
+    # getting only chunk of data
+    end_rows = start_rows + chunk_size
+    end_rows = int(end_rows)
+
+    # determine if at the end of the dataset
+    rows_number = len(df_sorted)
+    end_rows = min(end_rows, rows_number)
+
+    # return part of table that should be shown
+    return df_sorted[start_rows:end_rows]
+
+
+def rename_headers(dataset_name, matrix_name, df_subset):
+    """Rename the user and item headers, so they reflect their respective content.
+
+    Args:
+        dataset_name: the name of the dataset of the matrix
+        matrix_name: the matrix name of the matrix with the headers
+        df_subset: the dataframe with the headers
+
+    """
+    dataset = recommender_system.data_registry.get_set(dataset_name)
+    if not dataset is None and not dataset.get_matrix_config(matrix_name) is None:
+        item = dataset.get_matrix_config(matrix_name).item.key
+        user = dataset.get_matrix_config(matrix_name).user.key
+        df_subset.rename(columns={'user': user, 'item': item}, inplace=True)
+
+
+def add_dataset_columns(dataset_name, dataframe, columns, matrix_name):
+    """Add columns to the requested result based on its dataset.
+
+    Args:
+        dataset_name: the name of dataset belonging to the dataframe
+        dataframe: a pandas dataframe of the requested user results
+        columns: the current list of columns
+        matrix_name: the name of the matrix belonging to the dataframe
+
+    Returns:
+        The updated dataframe
+    """
+    dataset = recommender_system.data_registry.get_set(dataset_name)
+    if dataset is None:
+        return dataframe
+
+    result = list(map(lambda column: column.lower(), columns))
+    dataframe = add_data_columns(dataset, matrix_name, dataframe, result)
+    return dataframe
+
+
+def add_spotify_columns(dataset_name, dataframe):
+    """Add columns from the Spotify integration to the dataframe.
+
+    Args:
+        dataset_name: the name of dataset belonging to the dataframe
+        dataframe: a pandas dataframe of the requested user results
+
+
+    Returns:
+        The updated dataframe
+    """
+    dataset = recommender_system.data_registry.get_set(dataset_name)
+    matrix_name = 'user-track-count'
+    columns = []
+    dataframe = add_data_columns(dataset, matrix_name, dataframe, columns)
+    print(dataframe.head())
+    return dataframe

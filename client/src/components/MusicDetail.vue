@@ -30,7 +30,6 @@ async function getSpotifyTrack() {
   )
 
   track.value = tracks.value.items[0]
-  // console.log('track from music detail info', track.value)
 }
 </script>
 

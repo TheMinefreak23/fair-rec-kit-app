@@ -94,39 +94,10 @@ async function setRecs(currentTable, runID) {
   if (response.status === 200) {
     const data = await response.json()
     availableFilters.value = data.availableFilters
-    // console.log('set recs current table', currentTable)
     getUserRecs(currentTable, runID)
     getHeaderOptions(currentTable)
   }
 }
-
-/*
-//POST request: Ask server to load the evaluations of the current result
-//Currently not used, as evaluation tables are not finished
-// async function loadEvaluations() {
-//   const requestOptions = {
-//     method: 'POST',
-//     headers: { 'Content-type': 'application/json' },
-//     body: JSON.stringify({ id: props.result.id }),
-//   }
-//   const response = await fetch(
-//     API_URL + '/result/result-by-id',
-//     requestOptions
-//   ).then(() => {
-//     console.log('succesful POST request to API to retrieve evaluation data')
-//     const resultsData = await response.json()
-//     console.log('results data', resultsData)
-//     getEvaluations()
-//   })
-// }
-
-//GET request: Ask server for currently loaded evaluations
-async function getEvaluations() {
-  const response = await fetch(API_URL + '/result/result-by-id')
-  console.log('succesfully retrieved evaluation data.')
-  const resultsData = await response.json()
-  console.log('results data', resultsData)
-} */
 
 /**
  * POST request: Ask server for next part of user recommendation table.
@@ -228,9 +199,6 @@ function loadMore(increase, amount, pairid, runID) {
  */
 function paginationSort(indexVar, pairid, runID) {
   // When sorting on the same column twice in a row, switch to descending.
-  // console.log(selectedHeaders.value[runID])
-  // selectedHeaders.value[runID][pairid][indexVar] += ' yeet'
-  // console.log(selectedHeaders[runID][pairid])
   if (sortIndex.value === indexVar) {
     ascending.value = !ascending.value;
   }
@@ -374,8 +342,6 @@ function contains(string, array) {
           <p class="lead"> Results for </p>
           <h1 class="display-3"> {{ result.metadata.name }} </h1>
           <h3 class="text-muted"> {{ result.metadata.datetime }} </h3>
-          <!--TODO elapsed time-->
-          <!--<h4> done in {{ result.metadata.elapsed_time }} seconds </h4>-->
         </b-col>
         <b-col>
           <div class="float-end">
@@ -495,7 +461,6 @@ function contains(string, array) {
   (changedFilters) => changeFilters(changedFilters, index, run)
 " @updateHeaders="(headers) => updateHeaders(headers, index, run)" />
               </div>
-              <!-- </template> -->
             </template>
           </template>
         </template>

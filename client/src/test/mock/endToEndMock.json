@@ -1,0 +1,376 @@
+{
+  "lists": {
+    "datasets": {
+      "visible": true,
+      "groupCount": 1,
+      "choices": [
+        {
+          "main": {
+            "name": "ML-100K-Sample",
+            "params": {
+              "dynamic": [
+                {
+                  "name": "matrix",
+                  "options": [
+                    {
+                      "name": "user-movie-rating",
+                      "value": {
+                        "name": "user-movie-rating",
+                        "params": {
+                          "dynamic": [
+                            {
+                              "name": "rating converter",
+                              "options": [
+                                {
+                                  "name": "kl",
+                                  "value": {
+                                    "name": "kl",
+                                    "params": {
+                                      "options": [
+                                        {
+                                          "default": "None",
+                                          "name": "method",
+                                          "options": ["None"]
+                                        }
+                                      ],
+                                      "values": []
+                                    }
+                                  }
+                                },
+                                {
+                                  "name": "range",
+                                  "value": {
+                                    "name": "range",
+                                    "params": {
+                                      "options": [],
+                                      "values": [
+                                        {
+                                          "default": 5,
+                                          "max": 5,
+                                          "min": 1,
+                                          "name": "upper_bound"
+                                        }
+                                      ]
+                                    }
+                                  }
+                                }
+                              ],
+                              "single": true,
+                              "title": "conversion"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  "required": true,
+                  "single": true,
+                  "title": "matrix"
+                },
+                {
+                  "name": "filter",
+                  "options": [
+                    {
+                      "name": "Artist Gender",
+                      "value": {
+                        "name": "Artist Gender",
+                        "params": {
+                          "options": [
+                            {
+                              "name": "Gender",
+                              "options": ["Male", "Female"]
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "name": "User Gender",
+                      "value": {
+                        "name": "User Gender",
+                        "params": {
+                          "options": [
+                            {
+                              "name": "Gender",
+                              "options": ["Male", "Female"]
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "name": "Country user threshold",
+                      "value": {
+                        "name": "Country user threshold",
+                        "params": {
+                          "values": [
+                            {
+                              "default": 10,
+                              "max": 1000,
+                              "min": 1,
+                              "name": "threshold"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "name": "Age range",
+                      "value": {
+                        "name": "Age range",
+                        "params": {
+                          "values": [
+                            {
+                              "default": [18, 70],
+                              "max": 100,
+                              "min": 1,
+                              "name": "range"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  "title": "filters"
+                },
+                {
+                  "default": {
+                    "name": "random",
+                    "value": {
+                      "name": "random",
+                      "params": {
+                        "options": [],
+                        "values": [
+                          {
+                            "default": null,
+                            "max": 9223372036854776000,
+                            "min": 0,
+                            "name": "seed"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "name": "type of split",
+                  "options": [
+                    {
+                      "name": "random",
+                      "value": {
+                        "name": "random",
+                        "params": {
+                          "options": [],
+                          "values": [
+                            {
+                              "default": null,
+                              "max": 9223372036854776000,
+                              "min": 0,
+                              "name": "seed"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "name": "temporal",
+                      "value": {
+                        "name": "temporal",
+                        "params": {
+                          "options": [],
+                          "values": []
+                        }
+                      }
+                    }
+                  ],
+                  "required": true,
+                  "single": true,
+                  "title": "splitting"
+                }
+              ],
+              "user-movie-rating": {
+                "idx_item": {
+                  "file": "user-movie-rating_item_indices.hdf5",
+                  "key": "movie_id",
+                  "num_records": 100
+                },
+                "idx_user": {
+                  "file": "user-movie-rating_user_indices.hdf5",
+                  "key": "user_id",
+                  "num_records": 50
+                },
+                "matrix": {
+                  "columns": ["matrix_rating", "matrix_timestamp"],
+                  "file": {
+                    "compression": "bz2",
+                    "name": "ML-100K_user-movie-rating.tsv.bz2"
+                  },
+                  "foreign_keys": ["user_id", "movie_id"],
+                  "num_records": 1388,
+                  "primary_key": ["user_id", "movie_id"]
+                },
+                "rating_max": 5,
+                "rating_min": 1,
+                "rating_type": "explicit"
+              },
+              "values": [
+                {
+                  "default": "80",
+                  "max": 100,
+                  "min": 0,
+                  "name": "Train/testsplit"
+                }
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "Train/testsplit",
+              "value": "80"
+            }
+          ],
+          "lists": [
+            {
+              "visible": false,
+              "groupCount": 0,
+              "choices": [
+                {
+                  "single": true,
+                  "name": "matrix",
+                  "main": {
+                    "name": "user-movie-rating",
+                    "params": {
+                      "dynamic": [
+                        {
+                          "name": "rating converter",
+                          "options": [
+                            {
+                              "name": "kl",
+                              "value": {
+                                "name": "kl",
+                                "params": {
+                                  "options": [
+                                    {
+                                      "default": "None",
+                                      "name": "method",
+                                      "options": ["None"]
+                                    }
+                                  ],
+                                  "values": []
+                                }
+                              }
+                            },
+                            {
+                              "name": "range",
+                              "value": {
+                                "name": "range",
+                                "params": {
+                                  "options": [],
+                                  "values": [
+                                    {
+                                      "default": 5,
+                                      "max": 5,
+                                      "min": 1,
+                                      "name": "upper_bound"
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          ],
+                          "single": true,
+                          "title": "conversion"
+                        }
+                      ]
+                    }
+                  },
+                  "lists": [
+                    {
+                      "visible": false,
+                      "groupCount": 0,
+                      "choices": [
+                        {
+                          "single": true,
+                          "name": "conversion"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "visible": false,
+              "groupCount": 0,
+              "choices": [{}],
+              "name": "filters"
+            },
+            {
+              "visible": false,
+              "groupCount": 0,
+              "choices": [
+                {
+                  "single": true,
+                  "name": "splitting",
+                  "main": {
+                    "name": "random",
+                    "params": {
+                      "options": [],
+                      "values": [
+                        {
+                          "default": null,
+                          "max": 9223372036854776000,
+                          "min": 0,
+                          "name": "seed"
+                        }
+                      ]
+                    }
+                  },
+                  "inputs": [
+                    {
+                      "name": "seed",
+                      "value": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "metrics": {
+      "groupCount": 0,
+      "choices": [{}]
+    },
+    "approaches": {
+      "visible": true,
+      "groupCount": 1,
+      "choices": [
+        {
+          "main": {
+            "name": "Random",
+            "params": {
+              "options": [],
+              "values": [
+                {
+                  "default": null,
+                  "max": 9223372036854776000,
+                  "min": 0,
+                  "name": "seed"
+                }
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "seed",
+              "value": null
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "recommendations": 10,
+  "experimentMethod": "recommendation",
+  "includeRatedItems": true
+}
