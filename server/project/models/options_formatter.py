@@ -293,9 +293,9 @@ class OptionsFormatter:
             dataset['splitting']['test_ratio'] = (100 -
                                                   int(dataset['params']['Train/testsplit'])
                                                   ) / 100
-            
-            #dataset['splitting']['Train/testsplit'] = str(dataset['params']['Train/testsplit']) \
-            #+ '/' + str(100 - dataset['params']['Train/testsplit'])
+
+            dataset['splitting']['train/testsplit'] = str(dataset['params']['Train/testsplit']) \
+            + '/' + str(100 - dataset['params']['Train/testsplit'])
 
             del dataset['params']['Train/testsplit']
 
