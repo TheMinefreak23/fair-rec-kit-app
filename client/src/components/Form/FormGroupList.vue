@@ -243,7 +243,7 @@ function scrollToGroup(index) {
 </script>
 
 <template>
-  <b-container>
+  <b-container :id= title>
     <b-row>
       <template v-if="options && options.length === 0">
         <h4>No options available!</h4>

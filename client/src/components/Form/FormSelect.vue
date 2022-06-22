@@ -86,6 +86,7 @@ function formatOptions(options) {
     <!--Use a dropdown select form otherwise-->
     <b-form-group v-else :label="chooseLabel(option.name) + ' *'">
       <b-form-select
+        :id="option.name"
         v-model="form.value"
         :options="formatOptions(option.options)"
         text-field="name"

@@ -21,7 +21,6 @@ const props = defineProps({
   required: Boolean, // WHether the group option is required
   defaultOption: String, // The default main option
   maxK: Number, // The amount of  recommendations (caps K)
-  datasets: Object, // The chosen datasets (for filters)
   modelValue: { type: Object, required: true }, // The local form linked to the form component
   single: { type: Boolean, default: false }, // single form group or multi (form group list)
 })
@@ -177,6 +176,7 @@ function hasParams() {
                   <!-- If there is only one main option available, don't use a main selection-->
                   <b-form-select
                     v-if="options.length > 1"
+                    :id="name"
                     :class="blink ? 'subtle-blink' : ''"
                     v-model="form.main"
                     data-testid="main-select"
