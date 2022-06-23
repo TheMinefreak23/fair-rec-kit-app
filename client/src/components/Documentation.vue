@@ -144,29 +144,39 @@ function parseStructure(struct) {
 }
 
 function flattenTree(tree) {
-  return flatten(tree.nodes, 0)
+  return flatten(tree.nodes, [tree.label], 0)
 }
 
-function flatten (nodes, d) {
+function flatten (nodes, parents, d) {
   let flattenedTree = []
+
 
   for (let i = 0; i < nodes.length; i++) {
     let newtree = nodes[i]
     //console.log(newtree)
-    let item = { name: newtree.label, depth: d}
+    let item = { name: newtree.label, depth: d, parents: parents}
     console.log(item)
     flattenedTree.push(item)
 
     if (typeof newtree.nodes == 'undefined') {}
     else {
-      flattenedTree = flattenedTree.concat(flatten(newtree.nodes, d + 1))
+      let newparents = parents.concat([newtree.label])
+      flattenedTree = flattenedTree.concat(flatten(newtree.nodes, newparents,  d + 1))
     }
   }
 
   return flattenedTree
 }
 
-console.log(flattenTree(tree))
+function openParents(item) {
+  let collapse = document.getElementById(item.name.replace(" ", "_"))
+  collapse.classList.add("show")
+
+  for (let i = 0; i < item.parents.length; i ++) {
+    let c = document.getElementById(item.parents[i].replace(" ", "_"))
+    c.classList.add("show")
+  }
+}
 
 /**
  * Navigation sidebar toggle collapse
@@ -285,7 +295,7 @@ code:before {
   <!-- Navigation sidebar -->
   <div id="docSidenav" class="sidenav bg-secondary">
     <!--<a href="javascript:void(0)" class="closebtn float-end m-0" v-on:click="closeNav()">&times;</a>-->
-    <b-link class="position-relative py-0" :href='"#"+item.name.replace(" ", "_")' v-for="item in flatTree" :key="item">
+    <b-link class="position-relative py-0" data-toggle="collapse" :href='"#"+item.name.replace(" ", "_")' v-on:click='openParents(item)' v-for="item in flatTree" :key="item">
       <!-- Indentation to indicate items and subitems -->
       <span style="-webkit-user-select: none">{{"&nbsp;&nbsp;&nbsp;".repeat(item.depth)}}</span>{{item.name}}
     </b-link>

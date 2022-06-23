@@ -5,7 +5,7 @@ import { ref } from 'vue'
 let abc = "teststring";
 
 export default { 
-  props: [ 'label', 'nodes', 'depth' ],
+  props: [ 'label', 'nodes', 'depth', 'parent' ],
   name: 'tree-menu',
   data() {
     return {
@@ -141,6 +141,7 @@ function parseItem(item) {
           :nodes="node.nodes" 
           :label="node.label"
           :depth="depth+1"
+          :parent="label"
         >
         </tree-menu>
 
