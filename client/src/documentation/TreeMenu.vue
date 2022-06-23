@@ -123,7 +123,7 @@ function parseItem(item) {
 <template>
   <div class="tree-menu">
     <b-card class="border-end-0 border-top-0 border-bottom-0 border-5 bg-secondary">
-      <b-card-title>{{label}} 
+      <b-card-title v-b-toggle='label.replace(" ", "_")' style="cursor: pointer;">{{label}} 
         <b-button v-b-toggle='label.replace(" ", "_")' variant="secondary">
           <span class="when-open"><i class="bi bi-caret-up" /></span>
           <span class="when-closed"><i class="bi bi-caret-down" /></span>
