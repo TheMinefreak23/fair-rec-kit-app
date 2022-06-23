@@ -5,26 +5,29 @@ Utrecht University within the Software Project course.
 
 import { onMounted, ref } from 'vue'
 import MusicModal from './MusicModal.vue'
-import { getInfoFromSpotifyID, getSpotifyToken } from '../../helpers/songInfo'
+// import { getInfoFromSpotifyID, getSpotifyToken } from '../../helpers/songInfo'
 
 const emit = defineEmits(['update:modelValue'], ['changeColumns'])
 const props = defineProps({
   uri: String,
   // header: String, // Table column header
+  track: Object,
 })
 
-const track = ref()
+//const track = ref()
 const musicModalShow = ref(false)
 
+/*
 onMounted(() => {
   getTrackItemInfo(props.uri)
-})
+})*/
 
 /**
  * Get music detail info for a table item
  * @param {String}  spotifyId - the spotifyID of the item you want music details for
  */
 
+/*
 async function getTrackItemInfo(spotifyId) {
   const token = await getSpotifyToken()
   track.value = await getInfoFromSpotifyID(token, spotifyId)
@@ -36,7 +39,7 @@ async function getTrackItemInfo(spotifyId) {
   ]
   emit('update:modelValue', info)
 
-}
+}*/
 </script>
 
 <template>

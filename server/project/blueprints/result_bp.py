@@ -30,7 +30,7 @@ from project.models import result_loader, \
 from project.models.options_formatter import reformat_list, make_filter_option
 from project.models.result_loader import result_by_id, add_dataset_columns, \
     get_chunk, rename_headers, \
-    add_spotify_columns, id_to_index
+    add_spotify_columns, id_to_index, show_info_columns
 from project.models.result_storage import load_results_overview
 
 blueprint = Blueprint('result', __name__, url_prefix='/api/result')
@@ -162,10 +162,6 @@ def user_result():
     #Load the current recs from the storage (without changing the original)
     recs = copy.deepcopy(result_store.current_recs[run_id][pair_id])
 
-    spotify_datasets = ['LFM-2B']
-    if dataset_name in spotify_datasets:
-        recs = add_spotify_columns(dataset_name, recs)
-
     recs = filter_results(recs, json_data.get("filters", []))
 
     # Add optional columns to the dataframe (if any)
@@ -188,6 +184,8 @@ def user_result():
                           df_sorted)
 
     rename_headers(dataset_name, matrix_name, df_subset)
+
+    show_info_columns(dataset_name, matrix_name, df_subset)
 
     return df_subset.to_json(orient='records')
 

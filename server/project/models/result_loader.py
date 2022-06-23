@@ -174,6 +174,12 @@ def rename_headers(dataset_name, matrix_name, df_subset):
         df_subset.rename(columns={'user': user, 'item': item}, inplace=True)
 
 
+def show_info_columns(dataset_name, matrix_name, recs):
+    spotify_datasets = ['LFM-2B']
+    if dataset_name in spotify_datasets:
+        recs = add_spotify_columns(dataset_name, recs)
+
+
 def add_dataset_columns(dataset_name, dataframe, columns, matrix_name):
     """Add columns to the requested result based on its dataset.
 

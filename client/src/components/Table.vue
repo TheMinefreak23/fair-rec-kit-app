@@ -91,13 +91,14 @@ onMounted(() => {
     sortindex.value = props.defaultSort
     descending.value = true // For now sort by descending on default, TODO refactor
   }
+  /*
   if (
     props.headers
       .map((header) => header.name)
       .some((name) => name.includes('spotify-uri'))
   ) {
     toggleInfoColumns(['Album', 'Snippet'])
-  }
+  }*/
 })
 
 function colItemStyle(colWidth) {
@@ -146,6 +147,7 @@ function setsorting(i) {
  * @param {String}	key	- the string that needs to be checked
  * @return	{Bool} boolean stating whether the string is a key.
  */
+/*
 function isItemKey(key) {
   const lowerKey = key.toLowerCase()
   const itemKeys = ['item']
@@ -159,7 +161,7 @@ function toggleInfoColumns(addHeaders) {
     ...addHeaders.map((header) => ({ name: header })),
   ]
   additionalInfoAmount.value = addHeaders.length
-}
+}*/
 
 function isRecsHeader(key) {
   return (
@@ -297,8 +299,10 @@ const filteredHeaders = () => {
                   <template v-else></template>
                 </template>
                 <!-- Regular column -->
-                <template v-else-if="value && value.toString().startsWith('http')">
-                  <b-link :href="value" target="_blank">{{ value}}</b-link>
+                <template
+                  v-else-if="value && value.toString().startsWith('http')"
+                >
+                  <b-link :href="value" target="_blank">{{ value }}</b-link>
                 </template>
                 <template v-else>
                   {{ value }}
@@ -340,8 +344,11 @@ const filteredHeaders = () => {
                 @click="$emit('viewResult', item.id)"
                 class="m-1"
                 style="width: 142px"
-                v-if="!item.status || 
-                  item.status.slice(statusPrefix.length) == status.done" :id="item.id"
+                v-if="
+                  !item.status ||
+                  item.status.slice(statusPrefix.length) == status.done
+                "
+                :id="item.id"
               >
                 {{ viewItem ? 'View result' : 'Open result' }}
               </b-button>
@@ -356,8 +363,13 @@ const filteredHeaders = () => {
                   />
                 </b-col>
                 <b-col md="auto" class="mx-0 px-0 d-inline">
-                  <InfoModal v-if="!item.status || 
-                    item.status.slice(statusPrefix.length) == status.done" :id="item.id" />
+                  <InfoModal
+                    v-if="
+                      !item.status ||
+                      item.status.slice(statusPrefix.length) == status.done
+                    "
+                    :id="item.id"
+                  />
                 </b-col>
 
                 <b-col md="auto" class="mx-0 px-0 d-inline">
