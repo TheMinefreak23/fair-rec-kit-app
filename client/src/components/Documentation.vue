@@ -16,10 +16,13 @@ const collapse =ref([])
 let itemDicts = ref();
 let sidenavOpened = ref();
 let structure1D = ref();
+let flatTree = ref();
 
 itemDicts = parse(doctext);
 sidenavOpened = false;
 structure1D = parseStructure(structure);
+flatTree = flattenTree(tree);
+
 
 /**
  * Parses the content of documentation_items.txt into items.
@@ -140,6 +143,30 @@ function parseStructure(struct) {
   return res;
 }
 
+function flattenTree(tree) {
+  return flatten(tree.nodes)
+}
+
+function flatten (nodes) {
+  let flattenedTree = []
+
+  for (let i = 0; i < nodes.length; i++) {
+    let newtree = nodes[i]
+    //console.log(newtree)
+    console.log(newtree.label)
+    flattenedTree.push(newtree.label)
+
+    //if (typeof newtree.nodes == 'undefined') {}
+    //else {
+    //  flattenedTree.concat(flattenTree(newtree.nodes))
+    //}
+  }
+
+  return flattenedTree
+}
+
+console.log(flattenTree(tree))
+
 /**
  * Navigation sidebar toggle collapse
  */
@@ -255,11 +282,11 @@ code:before {
   <!-- Open-close button -->
   <span class="position-fixed bg-dark text-white px-2 rounded-end" style="font-size:30px; cursor:pointer" v-on:click="openCloseNav()">&#9776;</span>
   <!-- Navigation sidebar -->
-  <div id="customScrollbar" class="sidenav bg-secondary">
+  <div id="docSidenav" class="sidenav bg-secondary">
     <!--<a href="javascript:void(0)" class="closebtn float-end m-0" v-on:click="closeNav()">&times;</a>-->
-    <b-link class="position-relative py-0" :href='"#"+header.name' v-for="header in structure1D" :key="header">
+    <b-link class="position-relative py-0" :href='"#"+item' v-for="item in flatTree" :key="item">
       <!-- Indentation to indicate items and subitems -->
-      <span style="-webkit-user-select: none">{{"&nbsp;&nbsp;&nbsp;".repeat(header.depth)}}</span>{{header.name}}
+      <span style="-webkit-user-select: none"><!--{{"&nbsp;&nbsp;&nbsp;".repeat(header.depth)}}--></span>{{item}}
     </b-link>
   </div>
 

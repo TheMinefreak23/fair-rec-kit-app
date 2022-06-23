@@ -133,7 +133,7 @@ function parseItem(item) {
       <b-collapse :id='label.replace(" ", "_")' class="collapse">
 
         <b-collapse-text v-if='true'>
-          <span>{{itemDicts[label]["description"]}}</span>
+          <span v-html='itemDicts[label]["description"]'></span>
         </b-collapse-text>
 
         <tree-menu 
