@@ -2,10 +2,8 @@
 import { doctext } from './documentation_items.vue'
 import { ref } from 'vue'
 
-let abc = "teststring";
-
 export default { 
-  props: [ 'label', 'nodes', 'depth', 'parent' ],
+  props: [ 'label', 'nodes', 'depth'],
   name: 'tree-menu',
   data() {
     return {
@@ -108,6 +106,11 @@ function parseItem(item) {
   return dict;
 }
 
+function removeSpaces(string) {
+  let newstring = string.replaceAll(" ", "_").replaceAll("@","a")
+  return newstring
+}
+
 </script>
 
 <style>
@@ -123,14 +126,14 @@ function parseItem(item) {
 <template>
   <div class="tree-menu">
     <b-card class="border-end-0 border-top-0 border-bottom-0 border-5 bg-secondary">
-      <b-card-title v-b-toggle='label.replace(" ", "_")' style="cursor: pointer;">{{label}} 
-        <b-button v-b-toggle='label.replace(" ", "_")' variant="secondary">
+      <b-card-title v-b-toggle='label.replaceAll(" ", "_").replaceAll("@","a")' style="cursor: pointer;">{{label}} 
+        <b-button v-b-toggle='label.replaceAll(" ", "_").replaceAll("@","a")' variant="secondary">
           <span class="when-open"><i class="bi bi-caret-up" /></span>
           <span class="when-closed"><i class="bi bi-caret-down" /></span>
         </b-button>
       </b-card-title>
       <!-- v-if because if there is no description -> undefined, which takes space. -->    
-      <b-collapse :id='label.replace(" ", "_")' class="collapse">
+      <b-collapse :id='label.replaceAll(" ", "_").replaceAll("@","a")' class="collapse">
 
         <b-collapse-text v-if='true'>
           <span v-html='itemDicts[label]["description"]'></span>
@@ -141,7 +144,6 @@ function parseItem(item) {
           :nodes="node.nodes" 
           :label="node.label"
           :depth="depth+1"
-          :parent="label"
         >
         </tree-menu>
 

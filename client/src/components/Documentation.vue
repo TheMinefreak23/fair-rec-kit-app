@@ -8,7 +8,7 @@ Documentation tab which shows all algorithms, metrics, datasets, etc. and their 
 
 import { ref } from 'vue'
 import { structure } from '../documentation/documentation_structure.vue'
-import { tree } from '../documentation/documentation_tree.vue'
+import { tree } from '../documentation/documentation_tree2.vue'
 import TreeMenu from '../documentation/TreeMenu.vue'
 import { doctext } from '../documentation/documentation_items.vue'
 
@@ -144,7 +144,7 @@ function parseStructure(struct) {
 }
 
 function flattenTree(tree) {
-  return flatten(tree.nodes, [tree.label], 0)
+  return flatten(tree.nodes, [], 0)
 }
 
 function flatten (nodes, parents, d) {
@@ -169,11 +169,11 @@ function flatten (nodes, parents, d) {
 }
 
 function openParents(item) {
-  let collapse = document.getElementById(item.name.replace(" ", "_"))
+  let collapse = document.getElementById(item.name.replaceAll(" ", "_").replaceAll("@","a"))
   collapse.classList.add("show")
 
   for (let i = 0; i < item.parents.length; i ++) {
-    let c = document.getElementById(item.parents[i].replace(" ", "_"))
+    let c = document.getElementById(item.parents[i].replaceAll(" ", "_").replaceAll("@","a"))
     c.classList.add("show")
   }
 }
@@ -295,15 +295,15 @@ code:before {
   <!-- Navigation sidebar -->
   <div id="docSidenav" class="sidenav bg-secondary">
     <!--<a href="javascript:void(0)" class="closebtn float-end m-0" v-on:click="closeNav()">&times;</a>-->
-    <b-link class="position-relative py-0" data-toggle="collapse" :href='"#"+item.name.replace(" ", "_")' v-on:click='openParents(item)' v-for="item in flatTree" :key="item">
+    <b-link class="position-relative py-0" data-toggle="collapse" :href='"#"+item.name.replaceAll(" ", "_").replaceAll("@","a")' v-on:click='openParents(item)' v-for="item in flatTree" :key="item">
       <!-- Indentation to indicate items and subitems -->
       <span style="-webkit-user-select: none">{{"&nbsp;&nbsp;&nbsp;".repeat(item.depth)}}</span>{{item.name}}
     </b-link>
   </div>
 
   <!-- B-card items -->
-<div id="app" class="text-right pb-2 mx-5">
-  <tree-menu :label="tree.label" :nodes="tree.nodes"></tree-menu>
+<div id="app" class="text-right pb-2 mx-5" v-for='item in tree.nodes' :key="item">
+  <tree-menu :label="item.label" :nodes="item.nodes"></tree-menu>
 </div>
 
 
