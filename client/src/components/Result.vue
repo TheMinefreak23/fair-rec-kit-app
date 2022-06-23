@@ -369,18 +369,31 @@ function contains(string, array) {
     <div class="container">
       <b-row>
         <b-col>
+          <SettingsModal :resultId="result.id" />
           <p class="lead"> Results for </p>
           <h1 class="display-3"> {{ result.metadata.name }} </h1>
           <h3 class="text-muted"> {{ result.metadata.datetime }} </h3>
         </b-col>
         <b-col>
           <div class="float-end">
-            <SettingsModal :resultId="result.id" />
-            <b-form-input type="number" v-model="validationAmount" v-b-tooltip.hover title="Number of validation runs">
-            </b-form-input>
-            <b-button @click="validate()" variant="outline-primary fw-bold" v-b-tooltip.hover
-              title="Validate this experiment">Validate run
-            </b-button>
+            <div class="input-group pt-1">
+              <b-form-input 
+                style="width: 80px;"
+                class="float-start pt-1"
+                type="number" 
+                v-model="validationAmount" 
+                v-b-tooltip.hover 
+                title="Number of validation runs">
+              </b-form-input>
+              <b-button 
+                @click="validate()" 
+                class="float-start"
+                variant="outline-primary fw-bold"
+                v-b-tooltip.hover
+                title="Validate this experiment">
+                Validate run
+              </b-button>
+            </div>
           </div>
         </b-col>
       </b-row>

@@ -8,15 +8,21 @@ Documentation tab which shows all algorithms, metrics, datasets, etc. and their 
 
 import { ref } from 'vue'
 import { structure } from '../documentation/documentation_structure.vue'
+import { tree } from '../documentation/documentation_tree2.vue'
+import TreeMenu from '../documentation/TreeMenu.vue'
 import { doctext } from '../documentation/documentation_items.vue'
 
+const collapse =ref([])
 let itemDicts = ref();
 let sidenavOpened = ref();
 let structure1D = ref();
+let flatTree = ref();
 
 itemDicts = parse(doctext);
 sidenavOpened = false;
 structure1D = parseStructure(structure);
+flatTree = flattenTree(tree);
+
 
 /**
  * Parses the content of documentation_items.txt into items.
@@ -137,6 +143,41 @@ function parseStructure(struct) {
   return res;
 }
 
+function flattenTree(tree) {
+  return flatten(tree.nodes, [], 0)
+}
+
+function flatten (nodes, parents, d) {
+  let flattenedTree = []
+
+
+  for (let i = 0; i < nodes.length; i++) {
+    let newtree = nodes[i]
+    //console.log(newtree)
+    let item = { name: newtree.label, depth: d, parents: parents}
+    console.log(item)
+    flattenedTree.push(item)
+
+    if (typeof newtree.nodes == 'undefined') {}
+    else {
+      let newparents = parents.concat([newtree.label])
+      flattenedTree = flattenedTree.concat(flatten(newtree.nodes, newparents,  d + 1))
+    }
+  }
+
+  return flattenedTree
+}
+
+function openParents(item) {
+  let collapse = document.getElementById(item.name.replaceAll(" ", "_").replaceAll("@","a"))
+  collapse.classList.add("show")
+
+  for (let i = 0; i < item.parents.length; i ++) {
+    let c = document.getElementById(item.parents[i].replaceAll(" ", "_").replaceAll("@","a"))
+    c.classList.add("show")
+  }
+}
+
 /**
  * Navigation sidebar toggle collapse
  */
@@ -158,29 +199,6 @@ function closeNav() {
   document.getElementById("docSidenav").style.width = "0";
   document.getElementById("main").style.marginLeft= "0";
 }
-
-
-// ------------------------- //
-// XML Documentation attempt //
-// ------------------------- //
-
-/* 
-function displayItem(i) {
-  var xmlhttp = new XMLHttpRequest();
-  xmlhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      myFunction(this, i);
-    }
-  };
-  xmlhttp.open("GET", "documentation_items.xml", true);
-  xmlhttp.send();
-}
-
-function myFunction(xml, i) {
-  var xmlDoc = xml.responseXML;
-  x = xmlDoc.getElementsByTagName("item");
-}
-*/
 
 </script>
 
@@ -225,7 +243,7 @@ tr:nth-child(even) {
 }
 
 .sidenav a:hover {
-  color: #f1f1f1;
+  color: #017C8E;
 }
 
 .sidenav .closebtn {
@@ -253,6 +271,7 @@ pre {
   padding: 5px;
   margin: 5px;
 }
+
 /*
 pre {
   counter-reset: line;
@@ -272,35 +291,21 @@ code:before {
 <template>
 <div id="main" class="ps-0">
   <!-- Open-close button -->
-  <span class="position-fixed bg-dark text-white px-2 rounded-end" style="font-size:30px;cursor:pointer" v-on:click="openCloseNav()">&#9776;</span>
+  <span class="position-fixed bg-dark text-white px-2 rounded-end" style="font-size:30px; cursor:pointer" v-on:click="openCloseNav()">&#9776;</span>
   <!-- Navigation sidebar -->
-  <div id="docSidenav" class="sidenav bg-dark">
-    <!-- Close button -->
+  <div id="docSidenav" class="sidenav bg-secondary">
     <!--<a href="javascript:void(0)" class="closebtn float-end m-0" v-on:click="closeNav()">&times;</a>-->
-    <b-link class="position-relative text-white py-0" :href='"#"+header.name' v-for="header in structure1D" :key="header">
+    <b-link class="position-relative py-0" data-toggle="collapse" :href='"#"+item.name.replaceAll(" ", "_").replaceAll("@","a")' v-on:click='openParents(item)' v-for="item in flatTree" :key="item">
       <!-- Indentation to indicate items and subitems -->
-      <span style="-webkit-user-select: none">{{"&nbsp;&nbsp;&nbsp;".repeat(header.depth)}}</span>{{header.name}}
+      <span style="-webkit-user-select: none">{{"&nbsp;&nbsp;&nbsp;".repeat(item.depth)}}</span>{{item.name}}
     </b-link>
   </div>
 
   <!-- B-card items -->
-  <div class="text-right pb-2 mx-5" v-for="header in structure1D" :key="header">
-    <!-- Subitems have more margin than its parent. -->
-    <b-card :id='itemDicts[header.name]["name"]' :style='"margin-left:"+10*header.depth+"px"' class="border-end-0 border-top-0 border-bottom-0 border-5 bg-secondary">
-      <!-- Subitems are smaller as well. -->
-      <b-card-title :style='"font-size: "+(22-(5*(Math.floor(header.depth/3))))+"px"'>{{itemDicts[header.name]["name"]}}</b-card-title>
-      <!-- v-if because if there is no description -> undefined, which takes space. -->
-      <b-card-text v-if='itemDicts[header.name]["description"]'>
-        <span v-html='itemDicts[header.name]["description"]'></span>
-      </b-card-text>
-      <b-link :href='itemDicts[header.name]["link"]' v-if='itemDicts[header.name]["link"]'>{{ itemDicts[header.name]["link"] }}</b-link>
-      <span v-if='itemDicts[header.name]["button"]'>
-        <br>
-        <b-button variant="primary" :href='itemDicts[header.name]["button"]' v-if='itemDicts[header.name]["button"]'>
-          {{ itemDicts[header.name]["name"] }}
-        </b-button>
-      </span>
-    </b-card> 
-  </div>
+<div id="app" class="text-right pb-2 mx-5" v-for='item in tree.nodes' :key="item">
+  <tree-menu :label="item.label" :nodes="item.nodes"></tree-menu>
+</div>
+
+
 </div>
 </template>
