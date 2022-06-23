@@ -167,7 +167,7 @@ function sortItems(items) {
     </b-modal>
 
     <!-- Table -->
-    <b-table-simple hover striped responsive caption-top>
+    <b-table-simple hover striped responsive caption-top id="customScrollbar">
       <caption>
         {{
           props.caption

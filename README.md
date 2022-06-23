@@ -3,6 +3,7 @@
 [![PEP257](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/pydoctest.yml/badge.svg)](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/pydoctest.yml)
 [![Server Pytest](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/pytest.yml/badge.svg)](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/pytest.yml)
 [![Client Vitest](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/vitest.yml/badge.svg)](https://github.com/TheMinefreak23/fair-rec-kit-app/actions/workflows/vitest.yml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/TheMinefreak23/fair-rec-kit-app?label=Release)
 
 The fairreckit application is a web-based tool intended to aid in the performing and analysing of recommender system computations. It utilises a custom library called [fairreckitlib](https://github.com/TheMinefreak23/fairreckitlib) to perform its computations.
