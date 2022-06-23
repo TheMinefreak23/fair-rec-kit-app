@@ -38,10 +38,10 @@ async function loadSettings(resultId) {
  * @param {Int} selectedID - The ID of the result
  */
 async function getSettings(selectedID) {
-  const data = await loadResult(selectedID)
-  console.log('Settings succesfully requested')
-  settings.value = data.result.settings
-  settings.value.metadata = data.result.metadata
+  const result = await loadResult(selectedID)
+  console.log('Settings from ID', selectedID, 'succesfully requested')
+  settings.value = result.settings
+  settings.value.metadata = result.metadata
 }
 
 /**

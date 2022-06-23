@@ -5,18 +5,43 @@
       "params": [
         {
           "name": "K",
-          "value": "10"
+          "value": 10
         }
       ],
-      "filters": [
+      "subgroups": [
         {
-          "name": "Country user threshold",
-          "params": [
-            {
-              "name": "threshold",
-              "value": 10
-            }
-          ]
+          "name": "LFM-2B",
+          "params": [],
+          "matrix": {
+            "name": "user-track-count",
+            "params": [],
+            "subset": [
+              {
+                "name": "filter pass",
+                "params": [],
+                "filter": [
+                  {
+                    "name": "user_country_count",
+                    "params": [
+                      {
+                        "name": "threshold",
+                        "value": 100
+                      }
+                    ]
+                  },
+                  {
+                    "name": "user_gender",
+                    "params": [
+                      {
+                        "name": "values",
+                        "value": ["Male", "Neutral", "null"]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -25,20 +50,35 @@
       "params": [
         {
           "name": "K",
-          "value": "5"
+          "value": 10
         }
       ],
-      "filters": [
+      "subgroups": []
+    },
+    {
+      "name": "P@K",
+      "params": [
         {
-          "name": "Artist Gender",
-          "params": [
-            {
-              "name": "Gender",
-              "value": "Female"
-            }
-          ]
+          "name": "K",
+          "value": 5
         }
-      ]
+      ],
+      "subgroups": []
+    },
+    {
+      "name": "MRR",
+      "params": [],
+      "subgroups": []
+    },
+    {
+      "name": "Item Coverage",
+      "params": [],
+      "subgroups": []
+    },
+    {
+      "name": "MAE",
+      "params": [],
+      "subgroups": []
     }
   ]
 }

@@ -8,25 +8,29 @@
           "value": "80"
         }
       ],
-      "matrix": [
-        {
-          "name": "user-track-count",
-          "params": [],
-          "conversion": []
-        }
-      ],
-      "filters": [],
-      "splitting": [
-        {
-          "name": "random",
+      "matrix": {
+        "name": "user-track-count",
+        "params": [],
+        "conversion": {
+          "name": "range",
           "params": [
             {
-              "name": "seed",
-              "value": null
+              "name": "upper_bound",
+              "value": 1317
             }
           ]
-        }
-      ]
+        },
+        "subset": []
+      },
+      "splitting": {
+        "name": "random",
+        "params": [
+          {
+            "name": "seed",
+            "value": null
+          }
+        ]
+      }
     }
   ],
   "metrics": [],

@@ -41,13 +41,13 @@ const props = defineProps({
   filters: Object,
   filterOptions: Array,
   defaultSort: Number,
+  startIndex: Number,
 })
 
 // Column width
 const colWidth = 6
 
 // Pagination
-// const caption = ref('')
 const entryAmount = ref(10)
 
 // Modals
@@ -59,7 +59,7 @@ const filters = ref(emptyFormGroup(false))
 // Sorting
 const sortindex = ref()
 const descending = ref()
-const sortIcon = ref({true: ' ▲', false: ' ▼'})
+const sortIcon = ref({ true: ' ▲', false: ' ▼' })
 
 // Item detail
 const infoHeaders = ref([])
@@ -80,8 +80,6 @@ const subheaders = computed(() => {
 })
 
 const sorted = computed(() => {
-  // console.log(props.results)
-
   if (!props.pagination) return sort(sortindex.value)
   else return props.results
 })
@@ -93,11 +91,6 @@ onMounted(() => {
     sortindex.value = props.defaultSort
     descending.value = true // For now sort by descending on default, TODO refactor
   }
-  /* console.log(
-    'HEADERS',
-    props.headers.map((header) => header.name)
-  ) */
-  // TODO refactor includes
   if (
     props.headers
       .map((header) => header.name)
@@ -142,11 +135,11 @@ function sort(i) {
 function setsorting(i) {
   if (i === sortindex.value) {
     descending.value = !descending.value
+  } else {
+    sortindex.value = i
   }
-  else {sortindex.value = i}
   emit('paginationSort', i)
 }
-// console.log('propsfilteroptions', props.filterOptions)
 
 /**
  * Checks whether a given string is a key.
@@ -165,34 +158,22 @@ function toggleInfoColumns(addHeaders) {
     ...props.headers.filter((header) => !isItemKey(header.name)),
     ...addHeaders.map((header) => ({ name: header })),
   ]
-  additionalInfoAmount.value = addHeaders.length // TODO refactor
-  // console.log('additional info amount', additionalInfoAmount.value)
-  // console.log('toggleInfo infoHeaders', infoHeaders.value)
-  // emit('updateHeaders', newHeaders)
+  additionalInfoAmount.value = addHeaders.length
 }
 
 function isRecsHeader(key) {
-  // console.log('infoHeaders', infoHeaders.value)
-  /* console.log(
-    'filteredHeaders',
-    filteredHeaders().map((header) => header.name.toLowerCase())
-  )
-  console.log('filteredHeaders', key) */
   return (
     key &&
     filteredHeaders()
       .map((header) => header.name.toLowerCase())
-      .includes(key.split('_').join(' ')) // TODO refactor
+      .includes(key.split('_').join(' '))
   )
 }
 
-// TODO computed ?
 const filteredHeaders = () => {
-  // console.log('INFO HEADERS', infoHeaders.value)
-  // console.log('recs', props.recs)
   return !props.recs || infoHeaders.value.length === 0
     ? props.headers
-    : infoHeaders.value
+    : [...props.headers, ...[{ name: 'Album' }, { name: 'Snippet' }]]
 }
 </script>
 
@@ -207,8 +188,8 @@ const filteredHeaders = () => {
     >
       <FormGroupList
         v-model="filters"
-        name="filter"
-        title="filters"
+        name="filter pass"
+        title="subset"
         :options="filterOptions"
       />
     </b-modal>
@@ -233,7 +214,11 @@ const filteredHeaders = () => {
               :headerOptions="headerOptions"
               @updateHeaders="(e) => emit('updateHeaders', e)"
             />
-            <b-button @click="filtersModalShow = !filterModalShow" class="m-1" data-testid="filterButton">
+            <b-button
+              @click="filtersModalShow = !filterModalShow"
+              class="m-1"
+              data-testid="filterButton"
+            >
               Filters
             </b-button>
           </div>
@@ -251,14 +236,15 @@ const filteredHeaders = () => {
               :style="{ ...colItemStyle(colWidth), cursor: 'pointer' }"
               @click="setsorting(index)"
             >
-              
-              {{ header.name + (index == sortindex ? sortIcon[descending] : '' ) }}
+              {{
+                header.name + (index == sortindex ? sortIcon[descending] : '')
+              }}
             </b-th>
           </template>
           <b-th v-if="overview" :style="colItemStyle(colWidth)"></b-th>
         </b-tr>
         <!-- Subheaders -->
-        <b-tr v-if="overview">
+        <b-tr v-if="!recs">
           <template v-for="subheader in subheaders" :key="subheader">
             <b-th class="text-center" :style="colItemStyle(colWidth)">
               {{ subheader }}
@@ -277,14 +263,12 @@ const filteredHeaders = () => {
             :key="`${descending}_${sortindex}_${index}-${key}`"
           >
             <!-- For recs tables, show filtered columns -->
-            <!-- TODO refactor -->
             <b-td
               v-if="!recs || isRecsHeader(key)"
               class="text-center"
               :style="colItemStyle"
             >
               <!--Special pill format for status-->
-              <!-- TODO refactor-->
               <template
                 v-if="
                   typeof value === 'string' && value.startsWith(statusPrefix)
@@ -313,6 +297,9 @@ const filteredHeaders = () => {
                   <template v-else></template>
                 </template>
                 <!-- Regular column -->
+                <template v-else-if="value && value.toString().startsWith('http')">
+                  <b-link :href="value" target="_blank">{{ value}}</b-link>
+                </template>
                 <template v-else>
                   {{ value }}
                 </template>
@@ -320,26 +307,27 @@ const filteredHeaders = () => {
             </b-td>
           </template>
           <!-- Additional item info -->
-          <!-- TODO refactor -->
           <template v-if="recs">
-          <template v-for="i in additionalInfoAmount" :key="i">
-            <b-td
-              v-if="itemsInfo[index]"
-              class="text-center"
-              :style="colItemStyle(colWidth * 3)"
-            >
-              <template
-                v-if="
-                  itemsInfo[index][i - 1] &&
-                  itemsInfo[index][i - 1].header.toLowerCase() === 'snippet'
-                "
+            <template v-for="i in additionalInfoAmount" :key="i">
+              <b-td
+                v-if="itemsInfo[index]"
+                class="text-center"
+                :style="colItemStyle(colWidth * 3)"
               >
-                <AudioSnippet :trackId="itemsInfo[index][i - 1].value" />
-              </template>
-              <template v-else> {{ itemsInfo[index][i - 1].value }} </template>
-            </b-td>
-            <b-td :style="colItemStyle(colWidth * 3)" v-else></b-td>
-          </template>
+                <template
+                  v-if="
+                    itemsInfo[index][i - 1] &&
+                    itemsInfo[index][i - 1].header.toLowerCase() === 'snippet'
+                  "
+                >
+                  <AudioSnippet :trackId="itemsInfo[index][i - 1].value" />
+                </template>
+                <template v-else>
+                  {{ itemsInfo[index][i - 1].value }}
+                </template>
+              </b-td>
+              <b-td :style="colItemStyle(colWidth * 3)" v-else></b-td>
+            </template>
           </template>
           <b-td
             class="align-middle"
@@ -352,6 +340,8 @@ const filteredHeaders = () => {
                 @click="$emit('viewResult', item.id)"
                 class="m-1"
                 style="width: 142px"
+                v-if="!item.status || 
+                  item.status.slice(statusPrefix.length) == status.done" :id="item.id"
               >
                 {{ viewItem ? 'View result' : 'Open result' }}
               </b-button>
@@ -366,11 +356,11 @@ const filteredHeaders = () => {
                   />
                 </b-col>
                 <b-col md="auto" class="mx-0 px-0 d-inline">
-                  <InfoModal :id="item.id" />
+                  <InfoModal v-if="!item.status || 
+                    item.status.slice(statusPrefix.length) == status.done" :id="item.id" />
                 </b-col>
 
                 <b-col md="auto" class="mx-0 px-0 d-inline">
-                  <!--REFACTOR status condition-->
                   <DeletionModal
                     v-if="
                       removable &&
@@ -399,29 +389,32 @@ const filteredHeaders = () => {
     </b-table-simple>
 
     <!-- Pagination -->
-    <b-button
-      v-if="pagination"
-      @click="$emit('loadMore', false, entryAmount)"
-      variant="outline-primary"
-      :disabled="entryAmount < 1"
-    >
-      Show previous {{ entryAmount }} items
-    </b-button>
-    <b-button
-      v-if="pagination"
-      @click="$emit('loadMore', true, entryAmount)"
-      variant="outline-primary"
-      :disabled="entryAmount < 1"
-    >
-      Show next {{ entryAmount }} items
-    </b-button>
-    <b-form-input
-      v-model="entryAmount"
-      v-if="pagination"
-      :state="entryAmount >= 1"
-      type="number"
-      >20</b-form-input
-    >
+    <div v-if="pagination">
+      <b-button
+        @click="$emit('loadMore', false, entryAmount)"
+        variant="outline-primary"
+        :disabled="entryAmount < 1 || entryAmount > props.startIndex"
+      >
+        Show previous {{ entryAmount }} items
+      </b-button>
+      Showing entries {{ props.startIndex + 1 }} -
+      {{ props.startIndex + props.results.length }}
+      <b-button
+        @click="$emit('loadMore', true, entryAmount)"
+        variant="outline-primary"
+        :disabled="entryAmount < 1"
+      >
+        Show next {{ entryAmount }} items
+      </b-button>
+      <b-form-input
+        v-model="entryAmount"
+        :state="entryAmount >= 1"
+        type="number"
+        v-on:keyup.enter="$emit('loadMore', null, entryAmount)"
+        v-on:focusout="$emit('loadMore', null, entryAmount)"
+        >20</b-form-input
+      >
+    </div>
   </div>
 </template>
 

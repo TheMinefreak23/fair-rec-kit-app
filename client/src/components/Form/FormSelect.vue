@@ -9,6 +9,8 @@ import {
   capitalise,
   underscoreToSpace,
 } from '../../helpers/resultFormatter'
+import { formatDefault } from '../../helpers/optionsFormatter'
+import DropdownTags from './DropdownTags.vue'
 
 const emit = defineEmits(['update:modelValue'])
 const props = defineProps({
@@ -43,7 +45,6 @@ function checkboxLabel() {
 }
 
 function formatOptions(options) {
-  console.log(options)
   return options.map((option) => ({
     name: capitalise(String(option)),
     value: option,
@@ -74,13 +75,18 @@ function formatOptions(options) {
         form.value ? 'Yes' : 'No'
       }}</b-form-checkbox>
     </b-form-group>
+    <!--Use a tags dropdown for selecting multiple values.-->
+    <b-form-group v-if="option.name.toLowerCase().includes('values')">
+      <DropdownTags
+        name="filters"
+        v-model="form.value"
+        :options="formatDefault(option.options)"
+      />
+    </b-form-group>
     <!--Use a dropdown select form otherwise-->
-    <b-form-group
-      v-if="option.options.length > 2"
-      :label="chooseLabel(option.name) + ' *'"
-    >
-      <!--TODO: ADD MULTIPLE SELECT FOR FILTERS (MODAL?)-->
+    <b-form-group v-else :label="chooseLabel(option.name) + ' *'">
       <b-form-select
+        :id="option.name"
         v-model="form.value"
         :options="formatOptions(option.options)"
         text-field="name"

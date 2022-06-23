@@ -6,7 +6,7 @@ Utrecht University within the Software Project course.
 import { ref } from 'vue'
 import { API_URL } from '../../../api'
 import { status, statusPrefix } from '../../../helpers/queueFormatter'
-import { store } from '../../../store'
+import { getQueue, store } from '../../../store'
 
 const props = defineProps({ item: Object, removalUrl: String })
 
@@ -20,11 +20,18 @@ async function removeEntry() {
     // Remove first matching item from store
     const list = entry.value.fromQueue ? store.queue : store.allResults
     for (const i in list) {
-      console.log(list[i])
       if (list[i].id === entry.value.id) {
         list.splice(i, 1)
         console.log(entry.value.id, 'removed from store')
         break
+      }
+    }
+    if (!entry.value.fromQueue) {
+      for (const i in store.currentResults) {
+        // A deleted entry cannot be open on the results tab
+        if (store.currentResults[i].id === entry.value.id) {
+          store.currentResults.splice(i, 1)
+        }
       }
     }
   }
@@ -37,6 +44,7 @@ async function removeEntry() {
   }
   fetch(API_URL + props.removalUrl, requestOptions).then(() => {
     console.log('Item', entry.value.id, 'removed succesfully')
+    getQueue()
   })
 }
 

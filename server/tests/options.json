@@ -14,48 +14,52 @@
     "recommendations": 57,
     "experimentMethod": "recommendation",
     "lists": {
-        "datasets": [
+      "datasets": [
+        {
+          "name": "LFM-2B",
+          "params": [
             {
-                "name": "LFM-2B",
-                "params": [
-                    {
-                        "name": "Train/testsplit",
-                        "value": "80"
-                    }
-                ],
-                "matrix": [
-                    {
-                        "name": "user-track-count",
-                        "params": [],
-                        "conversion": []
-                    }
-                ],
-                "filters": [],
-                "splitting": [
-                    {
-                        "name": "random",
-                        "params": [
-                            {
-                                "name": "seed",
-                                "value": null
-                            }
-                        ]
-                    }
-                ]
+              "name": "Train/testsplit",
+              "value": "80"
             }
-        ],
-        "metrics": [],
-        "approaches": [
+          ],
+          "matrix": {
+            "name": "user-track-count",
+            "params": [],
+            "conversion": {
+              "name": "range",
+              "params": [
+                {
+                  "name": "upper_bound",
+                  "value": 1317
+                }
+              ]
+            },
+            "subset": []
+          },
+          "splitting": {
+            "name": "random",
+            "params": [
+              {
+                "name": "seed",
+                "value": null
+              }
+            ]
+          }
+        }
+      ],
+      "metrics": [],
+      "approaches": [
+        {
+          "name": "Random",
+          "params": [
             {
-                "name": "Random",
-                "params": [
-                    {
-                        "name": "seed",
-                        "value": null
-                    }
-                ]
+              "name": "seed",
+              "value": null
             }
-        ]
+          ]
+        }
+      ]
     }
 },
     "progress": "Not Available"

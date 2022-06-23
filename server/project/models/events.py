@@ -1,4 +1,11 @@
-"""
+"""This file handles events from the fairreckitlib library, e.g. an experiment finish.
+
+classes:
+    EventHandler
+
+methods:
+    do_nothing
+
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
@@ -15,15 +22,27 @@ from .experiment import Status, ProgressStatus
 
 
 class EventHandler:
-    """Handles the events"""
+    """Handle the events.
+
+    methods:
+        __init__
+        handle_event
+        on_begin_experiment_thread
+        on_end_experiment_thread
+    """
 
     def __init__(self, experiment, result_storage, mail_sender):
+        """Initialize an instance of EventHandler.
+
+        args:
+            experiment(obj): the experiment that will have its events handled.
+            result_storage(obj): the current result_storage instance being used.
+            mail_sender(obj): the current mail sender instance being used.
+        """
         self.experiment = experiment
         self.result_storage = result_storage
         self.mail_sender = mail_sender
         event_ids = [
-            # ON_BEGIN_EXPERIMENT_PIPELINE: lambda x, **kwargs: print('uwu'),
-            # ON_END_EXPERIMENT_PIPELINE: self.on_end_experiment,
             ON_BEGIN_EXPERIMENT_THREAD,
             ON_END_EXPERIMENT_THREAD,
             # ON_PARSE, TODO doesn't work in Lib?
@@ -37,6 +56,12 @@ class EventHandler:
         self.events = {event_id : self.handle_event for event_id in event_ids}
 
     def handle_event(self, event_listener, event_args, **kwargs):
+        """Handle the event based on its ID.
+
+        args:
+            event_listener(obj): the event_listener to be used
+            event_args(dict): the event arguments
+        """
         do_nothing(event_listener, kwargs)
 
         progress_dict = {
@@ -54,36 +79,30 @@ class EventHandler:
         elif event_args.event_id == ON_END_EXPERIMENT_THREAD:
             self.on_end_experiment_thread()
         else:
-            """Change progress status."""
+            # Change progress status.
             self.experiment.progress = progress_dict[event_args.event_id]
 
     def on_begin_experiment_thread(self):
-        """Change progress status to started
-        and update the experiment status to active."""
+        """Change progress status to started and update the experiment status to active."""
         self.experiment.status = Status.ACTIVE
         self.experiment.progress = ProgressStatus.STARTED
 
     def on_end_experiment_thread(self):
-        """Change progress status to finished
-        and experiment status to done.
-        Also sends an email if possible."""
+        """Change progress status to finished and experiment status to "done".
+
+        Also sends an email if possible.
+        """
         if self.experiment.status is not Status.ABORTED:
             if not self.experiment.validating:
-                # TODO Update experiment data: Save elapsed time
-                #self.experiment.job['metadata']['duration'] = kwargs['elapsed_time']
                 self.result_storage.save_result(self.experiment.job, self.experiment.config)
                 if 'email' in self.experiment.job['metadata']:
-                    self.mail_sender.send_mail(self.experiment.job['metadata']['email'],
-                              self.experiment.job['metadata']['name'],
-                              self.experiment.job['timestamp']['datetime'])
-            # else: self.experiment.job['runs'] = kwargs['num_runs']
+                    self.mail_sender.send_mail(self.experiment.job)
 
             self.experiment.status = Status.DONE
             self.experiment.progress = ProgressStatus.FINISHED
 
 
 def do_nothing(event_listener, kwargs):
-    """This function only exists so that pylint stops complaining."""
+    """do_nothing only exists so that pylint stops complaining."""
     if event_listener or kwargs:
         print(kwargs)
-
