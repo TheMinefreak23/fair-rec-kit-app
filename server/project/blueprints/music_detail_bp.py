@@ -34,12 +34,18 @@ blueprint = Blueprint('music', __name__, url_prefix='/api/music')
 SPOTIFY_API = 'https://api.spotify.com/v1/'
 AB_API = 'https://acousticbrainz.org/api/v1/'
 LFM_API = 'http://ws.audioscrobbler.com/2.0/'
-LFM_key = '5ffe852eb4ffb7e7d5d53e71981cad7f'
+LFM_KEY = '5ffe852eb4ffb7e7d5d53e71981cad7f'
 MAX_TRACK_LIMIT = 50
 
 
 @blueprint.route('/song-info', methods=['POST'])
 def song_info():
+    """Get the LastFM and AcousticBrainz data from a song
+     using their respecitve API's.
+
+    Returns:
+         Object with AcousticBrainz and LastFM data
+    """
     json_data = request.json
     try:
         track = json_data['track']
@@ -56,6 +62,12 @@ def song_info():
 
 @blueprint.route('/spotify-info', methods=['POST'])
 def spotify_info():
+    """Request Spotify data by making a query with artist
+     and track name.
+
+    Returns:
+        Spotify tracks found by query, each track containing data
+    """
     json_data = request.json
     try:
         track = json_data['track']
@@ -71,6 +83,11 @@ def spotify_info():
 
 @blueprint.route('/spotify-track', methods=['POST'])
 def spotify_track():
+    """Request Spotify track from its ID.
+
+    Returns:
+        the Spotify track
+    """
     json_data = request.json
     try:
         track_id = json_data['id']
@@ -82,32 +99,37 @@ def spotify_track():
 
 
 def last_fm_info(artist, track, mbid):
+    """Request song-data from LastFM.
+
+    Args:
+        artist: the artist name
+        track: the track name
+        mbid: MBID unique hash-token
+
+    Returns:
+        Object containing all LastFM data about a track
+    """
+    # Use MBID instead of artist and track name
     if mbid:
-        url = LFM_API + '?method=track.getInfo&api_key=' + LFM_key + \
+        url = LFM_API + '?method=track.getInfo&api_key=' + LFM_KEY + \
               '&mbid=' + mbid + '&autocorrect=1&format=json'
     else:
-        url = LFM_API + '?method=track.getInfo&api_key=' + LFM_key + \
+        url = LFM_API + '?method=track.getInfo&api_key=' + LFM_KEY + \
               '&artist=' + artist + \
               '&track=' + track + '&autocorrect=1&format=json'
     res = requests.get(url)
     return json.loads(res.text)
 
 
-# @blueprint.route('/AcousticBrainz', methods=['POST'])
 def get_acousticbrainz_data(mbid):
     """Request High-Level audio features from the AcousticBrainz API using a MusicBrainzID.
+
+    Args:
+        mbid: Unique MusicBrainz identifier, which can be retrieved from LastFM
 
     Returns:
         Dict: Dictionary with all High-Level audiofeatures
     """
-    """
-    json_data = request.json
-    try:
-        musicbrainz_id = json_data['mbid']
-    except KeyError:
-        return BAD_REQUEST_RESPONSE
-    """
-
     url = AB_API + 'high-level' + '?recording_ids=' + mbid
     res = requests.get(url)
     return json.loads(res.text)
