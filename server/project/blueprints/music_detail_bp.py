@@ -40,8 +40,7 @@ MAX_TRACK_LIMIT = 50
 
 @blueprint.route('/song-info', methods=['POST'])
 def song_info():
-    """Get the LastFM and AcousticBrainz data from a song
-     using their respecitve API's.
+    """Get the LastFM and AcousticBrainz data from a song using their APIs.
 
     Returns:
          Object with AcousticBrainz and LastFM data
@@ -62,8 +61,7 @@ def song_info():
 
 @blueprint.route('/spotify-info', methods=['POST'])
 def spotify_info():
-    """Request Spotify data by making a query with artist
-     and track name.
+    """Request Spotify data by making a query with artist and track name.
 
     Returns:
         Spotify tracks found by query, each track containing data
@@ -223,13 +221,14 @@ def get_unique_n(query, amount, category, image):
     """
     # Amount of items returned are a multiple of 10.
     limit = 10
-    url = 'search?' + query + \
+    url = SPOTIFY_API + 'search?' + query + \
           '&type=' + category + '&limit=' + str(limit)
 
     items = []
     # Get next until we have n items.
     while len(items) < amount:
-        query = request_spotify_data(url)
+        query = request_spotify_data(url, full_url=True)
+        print(query)
         category_data = query[category + 's']
         if image:
             items = list(set(items + [item['images'][1]['url']
@@ -244,16 +243,17 @@ def get_unique_n(query, amount, category, image):
     return items
 
 
-def request_spotify_data(url):
+def request_spotify_data(url, full_url=False):
     """Make an authorised Spotify JSON request from the url.
 
     Args:
         url: the url at which to do the request
+        full_url: whether the url contains the Spotify endpoint already
 
     Returns:
         the response text
     """
-    full_url = SPOTIFY_API + url
+    full_url = url if full_url else SPOTIFY_API + url
     # print('spotify request url', full_url)
     get_spotify_token()
     headers = {'Authorization': tok.token_type + ' ' + tok.access_token,
