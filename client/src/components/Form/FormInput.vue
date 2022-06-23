@@ -39,34 +39,7 @@ const form = computed({
         (value.name.toLowerCase() == 'k' ? props.maxK : value.max)
       "
       required
-      ><!--Regular input-->
-      <!--The max k value is based on the amount of recommendations.
-                Because of this we use a separate setting to cover for it.-->
-
-      <!--v-model="form.value"-->
-      <b-form-input
-        v-if="!value.name.includes('split')"
-        v-model="form.value"
-        :state="
-          form.value >= value.min &&
-          form.value <=
-            (value.name.toLowerCase() == 'k' ? props.maxK : value.max)
-        "
-        :type="Number.isInteger(form.value) ? 'number' : 'text'"
-        number
-        :placeholder="'Enter ' + underscoreToSpace(value.name)"
-        validated="true"
-        data-testid="input"
-      />
-      <!--Use a range slider if it's a train/test split option-->
-      <SplitRange
-        v-if="value.name.toLowerCase().includes('train')"
-        v-model="form.value"
-        :min="value.min"
-        :max="value.max"
-        :name="value.name"
-        :step="5"
-      />
+    >
       <!-- Use a slider with 2 sliders if a range is needed-->
       <MultiRangeSlider
         v-if="value.name.toLowerCase().includes('range')"
@@ -76,10 +49,41 @@ const form = computed({
         :step="1"
         :ruler="false"
         :label="true"
-        :minValue="value[0]"
-        :maxValue="value[1]"
-        @input="form.value = [$event.minValue, $event.maxValue]"
+        :minValue="value.min"
+        :maxValue="value.max"
+        @input="form.value = { min: $event.minValue, max: $event.maxValue }"
       />
+      <template v-else>
+        <!--Regular input-->
+        <!--The max k value is based on the amount of recommendations.
+                Because of this we use a separate setting to cover for it.-->
+
+        <!--v-model="form.value"-->
+        <b-form-input
+          v-if="!value.name.includes('split')"
+          v-model="form.value"
+          :state="
+            form.value >= value.min &&
+            form.value <=
+              (value.name.toLowerCase() == 'k' ? props.maxK : value.max)
+          "
+          :type="Number.isInteger(form.value) ? 'number' : 'text'"
+          number
+          :placeholder="'Enter ' + underscoreToSpace(value.name)"
+          validated="true"
+          data-testid="input"
+        />
+
+        <!--Use a range slider if it's a train/test split option-->
+        <SplitRange
+          v-if="value.name.toLowerCase().includes('train')"
+          v-model="form.value"
+          :min="value.min"
+          :max="value.max"
+          :name="value.name"
+          :step="5"
+        />
+      </template>
       <!--Display the seed label for the seed option.-->
       <div
         v-if="value.name.includes('seed') && form.value == null"

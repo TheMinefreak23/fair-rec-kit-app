@@ -5,11 +5,14 @@ Utrecht University within the Software Project course.
 
 import Table from './Table.vue'
 import { onMounted, ref } from 'vue'
+import { emptyFormGroup, reformat } from '../helpers/optionsFormatter'
 import { store, pollForResult, getQueue } from '../store.js'
-import { emptyFormGroup } from '../helpers/optionsFormatter'
 import { makeHeader } from '../helpers/resultFormatter'
 import { API_URL } from '../api'
 import SettingsModal from './Table/Modals/SettingsModal.vue'
+
+const runNumbers = [...Array(props.result.metadata.runs).keys()]
+const RESULT_URL = API_URL + '/result/'
 
 const props = defineProps({ headers: Array, result: Object });
 
@@ -18,17 +21,15 @@ const selectedHeaders = ref([[
   [{ name: 'Rank' }, { name: 'User' }, { name: 'Item' }, { name: 'Score' }],
 ]]);
 
-
 const data = ref({ results: [] })
-const runNumbers = [...Array(props.result.metadata.runs).keys()]
 const startIndex = ref(0)
 const sortIndex = ref(0)
 const ascending = ref(true)
 const entryAmount = ref(10)
 const optionalHeaders = ref([[]])
-const availableFilters = ref([])
-const filters = ref(emptyFormGroup(false))
+const filters = ref(reformat(emptyFormGroup(false)))
 const optionalHeaderOptions = ref([])
+const availableFilters = ref([])
 const userTables = combineResults(props.result.result)
 const visibleDatasets = ref([])
 const visibleMetrics = ref([])
@@ -54,8 +55,6 @@ onMounted(() => {
       setRecs(parseInt(index), parseInt(run))
     }
   }
-
-  console.log('availableFilters', availableFilters.value);
 });
 
 /** 
@@ -70,11 +69,32 @@ async function getHeaderOptions(index) {
       name: props.result.result[index].dataset.dataset,
     }),
   }
-  const response = await fetch(API_URL + '/result/headers', requestOptions)
+  const response = await fetch(RESULT_URL + 'headers', requestOptions)
   const data = await response.json()
   const headerOptions = data
   optionalHeaderOptions.value[index] = headerOptions
 }
+
+
+/**
+ * GET request: Ask server for available filters
+ * @param {Int}   currentTable  - Index of which result file to load (from overview.json)
+ */
+async function getFilters(currentTable) {
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      dataset: props.result.result[currentTable].dataset.dataset,
+      matrix: props.result.result[currentTable].dataset.matrix
+    }),
+  }
+  const response = await fetch(RESULT_URL + 'filters', requestOptions)
+  const data = await response.json()
+  availableFilters.value[currentTable] = data.filters
+  // console.log('available filters', availableFilters.value[currentTable])
+} 
+
 
 // POST request: Send result ID to the server to set recommendations for the current experiment.
 async function setRecs(currentTable, runID) {
@@ -89,14 +109,14 @@ async function setRecs(currentTable, runID) {
   };
   console.log('sending to server:', requestOptions.body);
   const response = await fetch(
-    API_URL + '/result/set-recs',
+    RESULT_URL + 'set-recs',
     requestOptions
   )
   if (response.status === 200) {
-    const data = await response.json()
-    availableFilters.value = data.availableFilters
+    // console.log('set recs current table', currentTable)
     getUserRecs(currentTable, runID)
     getHeaderOptions(currentTable)
+    getFilters(currentTable)
   }
 }
 
@@ -123,7 +143,7 @@ async function getUserRecs(currentTable, runID) {
       matrix: props.result.result[currentTable].dataset.matrix
     }),
   };
-  const response = await fetch(API_URL + '/result/', requestOptions);
+  const response = await fetch(RESULT_URL, requestOptions);
   data.value.results[runID][currentTable] = await response.json();
   selectedHeaders.value[runID][currentTable] = Object.keys(
     data.value.results[0][currentTable][0]
@@ -166,7 +186,7 @@ async function validate() {
                          }),
   }
   await fetch(
-    API_URL + '/result/validate',
+    RESULT_URL + 'validate',
     requestOptions
   ).then(() => {
     console.log('Validation added to the queue')
@@ -235,7 +255,9 @@ function updateHeaders(headers, pairid, runID) {
  * @param {int}    runID          - Index of the run this result belongs to
  */
 function changeFilters(changedFilters, pairid, runID) {
-  filters.value = changedFilters;
+  // TODO why filters ref? refactor?
+  filters.value = reformat(changedFilters)
+  console.log('changeFilters filters', filters.value)
   getUserRecs(pairid, runID);
 }
 
@@ -462,7 +484,7 @@ function contains(string, array) {
               <div :class="visibleMatrices.length > 1 ? 'col-6' : 'col'">
                 <Table v-if="selectedHeaders[run][index]" :key="props.result.id" :caption="entry"
                   :results="data.results[run][index]" :headers="selectedHeaders[run][index].map(makeHeader)"
-                  :filters="filters" :filterOptions="availableFilters" :headerOptions="optionalHeaderOptions[index]" defaultSort="0"
+                  :filters="filters" :filterOptions="availableFilters[index]" :headerOptions="optionalHeaderOptions[index]" defaultSort="0"
                   :startIndex = "startIndex" pagination expandable :recs="snippet" @paginationSort="(i) => paginationSort(i, index, run)" @loadMore="
                     (increase, amount) => loadMore(increase, amount, index, run)
                   " @changeFilters="

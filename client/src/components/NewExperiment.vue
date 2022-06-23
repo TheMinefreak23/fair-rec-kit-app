@@ -7,16 +7,20 @@ import FormGroupList from './Form/FormGroupList.vue'
 import { sendMockData } from '../test/mock/mockExperimentOptions.js'
 import { store, pollForResult } from '../store.js'
 import { API_URL, DEV } from '../api'
-import { emptyFormGroup, validateEmail } from '../helpers/optionsFormatter'
+import {
+  emptyFormGroup,
+  validateEmail,
+  reformat,
+} from '../helpers/optionsFormatter'
 import { progress } from '../helpers/queueFormatter'
 import Tags from './Tags.vue'
 import { useFetch } from '../composables/useFetch'
 import endToEndMock from '../test/mock/endToEndMock.json'
 
+import filterForm from '../test/mock/filterMock.json'
 // GET request: Get available options for selection from server
 const { data, error, retry } = useFetch(API_URL + '/experiment/options')
 const options = ref()
-
 // Store the settings of the form in a reference
 const form = ref(initForm())
 const metadata = ref({})
@@ -38,6 +42,9 @@ watch(
   }
 )
 
+/**
+ * Watch for change of global form settings, copy them
+ */
 watch(
   () => store.settings,
   (newSettings) => {
@@ -47,6 +54,37 @@ watch(
     store.currentTab = 0
   }
 )
+
+/**
+ * Update the options based on the chosen datasets
+ */
+watch(
+  () => reformat(form.value.lists.datasets),
+  (newDatasets, oldDatasets) => {
+    console.log('new datasets', newDatasets)
+    if (
+      newDatasets.name !== oldDatasets.name ||
+      newDatasets.matrix !== oldDatasets.matrix
+    )
+      setOptions(newDatasets)
+  },
+  {
+    immediate: false,
+  }
+)
+
+// POST request: Get available options for selection from server
+async function setOptions(chosenDatasets = []) {
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ datasets: chosenDatasets }),
+  }
+  const response = await fetch(API_URL + '/experiment/options', requestOptions)
+  const data = await response.json()
+  options.value = JSON.parse(JSON.stringify(data.options))
+  // console.log('new options', options.value)
+}
 
 // POST request: Send form to server.
 async function sendToServer() {
@@ -98,34 +136,6 @@ function initForm() {
     experimentMethod: 'recommendation', // The default experiment type
     includeRatedItems: true,
   }
-}
-
-// Change the form format into a data format
-function reformat(property) {
-  const formattedChoices = []
-  for (const i in property.choices) {
-    const choices = property.choices[i]
-    if (choices.main) {
-      // Direct settings (inputs/selects)
-      let params = []
-      if (choices.inputs) params = params.concat(choices.inputs)
-      if (choices.selects) params = params.concat(choices.selects)
-      formattedChoices[i] = {
-        name: choices.main.name,
-        params,
-      }
-      // Nested formgrouplists
-      if (choices.lists != null) {
-        for (const list of choices.lists) {
-          if (list.choices[0].single) {
-            // formgroup not list
-            formattedChoices[i][list.choices[0].name] = reformat(list)
-          } else formattedChoices[i][list.name] = reformat(list)
-        }
-      }
-    }
-  }
-  return formattedChoices
 }
 
 /**
@@ -340,6 +350,10 @@ function validName(inputName) {
           <b-button type="test" variant="primary" @click="form = endToEndMock"
             >E2E Mock
           </b-button>
+          <!--Fill the form with mock filter options-->
+          <b-button type="test" variant="primary" @click="form = filterForm"
+            >Filter Mock</b-button
+          >
         </template>
       </b-card>
     </div>

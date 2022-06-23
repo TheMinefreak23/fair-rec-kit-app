@@ -7,7 +7,7 @@ import {
   formatResults,
   formatMultipleItems,
   showDatasetInfo,
-  formatMetric,
+  formatMetricName,
   formatArray,
   makeHeader,
   shortResultDescription,
@@ -213,15 +213,15 @@ describe('format metric', () => {
         K: 10,
       },
     }
-    expect(formatMetric(metric)).toBe('P@10')
+    expect(formatMetricName(metric)).toBe('P@10')
   })
   // A metric without parameters should just show its name
   test('no parameter metric', () => {
-    expect(formatMetric({ name: 'foo' })).toBe('foo')
+    expect(formatMetricName({ name: 'foo' })).toBe('foo')
   })
   // If an empty name is assigned, an empty name is returned
   test('no name', () => {
-    expect(formatMetric({ name: '' }).length).toBe(0)
+    expect(formatMetricName({ name: '' }).length).toBe(0)
   })
 })
 

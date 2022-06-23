@@ -15,9 +15,10 @@ const props = defineProps({
   name: String, // List name for display in the buttons
   groupId: String, // Group ID for autoscroll
   title: String, // List title for display in the header
+  description: String, // Option description for display in the header
   options: Array, // The available options to choose from
   required: Boolean, // Whether the list option is required
-  maxK: Number, // The amount of  recommendations (caps K)
+  maxK: Number, // The amount of recommendations (caps K)
   modelValue: { type: Object, required: true }, // The local form linked to the form component
 })
 
@@ -66,7 +67,10 @@ watch(
   () => {
     // Update form if this changes
     // TODO refactor
-    if (props.name === 'approach' || props.name === 'metric') update()
+    if (props.name === 'approach' || props.name === 'metric') update(true)
+
+    //console.log(props.name)
+    // if (props.name === 'dataset') update(false)
   },
   {
     // Make sure this does not trigger on initialization.
@@ -138,12 +142,15 @@ function showFormToast(object, actionMessage) {
 /**
  * Update the options that cannot be be submitted due to changing experiment type.
  */
-function update() {
-  const entries = props.options
-    .map((category) => category.options)
-    .concat()
-    .flat()
-    .map((entry) => entry.name)
+function update(nested) {
+  const flattened = nested
+    ? props.options
+        .map((category) => category.options)
+        .concat()
+        .flat()
+    : props.options
+  const entries = flattened.map((entry) => entry.name)
+  // console.log(props.name, 'entries', entries)
 
   const deleteEntry = 'NULL'
   for (let i = 0; i < form.value.choices.length; i++) {
@@ -235,12 +242,20 @@ function scrollToGroup(index) {
 </script>
 
 <template>
-  <b-container :id= title>
+  <b-container :id="title">
     <b-row>
-      <h3 class="text-center text-white mb-0">
+      <template v-if="options && options.length === 0">
+        <h4>No options available!</h4>
+        <h4 v-if="title === 'subgroups'">
+          Please select a dataset and matrix.
+        </h4>
+      </template>
+      <h3 v-else class="text-center text-white mb-0">
         <b-card no-body class="mb-0 bg-dark">
           <!--Capitalise the title.-->
-          {{ title && capitalise(title) }}
+          <!--TODO refactor-->
+          <!--{{ title && capitalise(title) }}-->
+          {{ description ? capitalise(description) : capitalise(title) }}
           <!--Collapsable group list toggle button-->
           <b-button
             class="text-start"
@@ -283,13 +298,7 @@ function scrollToGroup(index) {
                           <b-button
                             class="text-start"
                             block
-                            @click="
-                              // TODO this is pretty hacky
-                              /*visibleGroup == i
-                              ? (visibleGroup = -1)
-                              : (visibleGroup = i)*/
-                              groupVisible[i - 1] = !groupVisible[i - 1]
-                            "
+                            @click="groupVisible[i - 1] = !groupVisible[i - 1]"
                             :variant="
                               //visibleGroup == i ? 'secondary' : 'dark'
                               groupVisible[i - 1] ? 'secondary' : 'dark'
@@ -330,7 +339,7 @@ function scrollToGroup(index) {
                       v-model="form.choices[i - 1]"
                       :index="i - 1"
                       :name="name"
-                      :groupId="name"
+                      :groupId="scrollId"
                       :options="options"
                       :required="
                         // If the option is needed, at least one selection must've been made

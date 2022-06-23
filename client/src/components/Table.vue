@@ -188,8 +188,8 @@ const filteredHeaders = () => {
     >
       <FormGroupList
         v-model="filters"
-        name="filter"
-        title="filters"
+        name="filter pass"
+        title="subset"
         :options="filterOptions"
       />
     </b-modal>
@@ -244,7 +244,7 @@ const filteredHeaders = () => {
           <b-th v-if="overview" :style="colItemStyle(colWidth)"></b-th>
         </b-tr>
         <!-- Subheaders -->
-        <b-tr v-if="overview">
+        <b-tr v-if="!recs">
           <template v-for="subheader in subheaders" :key="subheader">
             <b-th class="text-center" :style="colItemStyle(colWidth)">
               {{ subheader }}
