@@ -28,7 +28,6 @@ export const tree = {
                          }
                      ]
                  },
-             
                  {
                      label: 'Filters'
                  },
