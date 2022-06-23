@@ -50,4 +50,23 @@ async function getSpotifyInfo(track, artist) {
   return await response.json()
 }
 
-export { getSongInfo, getSpotifyInfo }
+/**
+ *
+ * @param {String} id
+ */
+async function getSpotifyTrack(id) {
+  const requestOptions = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      id,
+    }),
+  }
+  const url = API_URL + '/music/spotify-track'
+  const response = await fetch(url, requestOptions)
+  return await response.json()
+}
+
+export { getSongInfo, getSpotifyInfo, getSpotifyTrack }

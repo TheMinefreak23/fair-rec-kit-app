@@ -7,7 +7,7 @@ import Table from './Table.vue'
 import { onMounted, ref } from 'vue'
 import { emptyFormGroup, reformat } from '../helpers/optionsFormatter'
 import { store, pollForResult, getQueue } from '../store.js'
-import { makeHeader } from '../helpers/resultFormatter'
+import { makeHeader, STANDARD_HEADERS} from '../helpers/resultFormatter'
 import { API_URL } from '../api'
 import SettingsModal from './Table/Modals/SettingsModal.vue'
 
@@ -51,7 +51,8 @@ onMounted(() => {
     for (const index in userTables) {
       selectedHeaders.value[run][index] = []
       data.value.results[run][index] = []
-      optionalHeaders.value[index] = ['track_spotify-uri']
+      // Default shown optional headers
+      optionalHeaders.value[index] = STANDARD_HEADERS
       setRecs(parseInt(index), parseInt(run))
     }
   }
@@ -59,20 +60,21 @@ onMounted(() => {
 
 /** 
  * GET request: Get available header options for selection from server
- * @param {Int}  index  - index of the current result table
+ * @param {Int}  currentTable  - index of the current result table
  */
-async function getHeaderOptions(index) {
+async function getHeaderOptions(currentTable) {
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      name: props.result.result[index].dataset.dataset,
+      dataset: props.result.result[currentTable].dataset.dataset,
+      matrix: props.result.result[currentTable].dataset.matrix
     }),
   }
   const response = await fetch(RESULT_URL + 'headers', requestOptions)
   const data = await response.json()
   const headerOptions = data
-  optionalHeaderOptions.value[index] = headerOptions
+  optionalHeaderOptions.value[currentTable] = headerOptions
 }
 
 
@@ -459,10 +461,10 @@ function contains(string, array) {
         </h4>
         <h4 v-else>Predicted rating per user</h4>
       </div>
-      <div class="form-check">
+      <!--<div class="form-check">
       <input v-model="snippet" class="form-check-input" type="checkbox" :id="snippet" />
       <label class="form-check-label" :id="snippet">Show snippets</label>
-      </div>
+      </div>-->
       <p>
         Select items to be shown:
       <div class="form-check" v-for="entry in userTables">
@@ -485,7 +487,7 @@ function contains(string, array) {
                 <Table v-if="selectedHeaders[run][index]" :key="props.result.id" :caption="entry"
                   :results="data.results[run][index]" :headers="selectedHeaders[run][index].map(makeHeader)"
                   :filters="filters" :filterOptions="availableFilters[index]" :headerOptions="optionalHeaderOptions[index]" defaultSort="0"
-                  :startIndex = "startIndex" pagination expandable :recs="snippet" @paginationSort="(i) => paginationSort(i, index, run)" @loadMore="
+                  :startIndex = "startIndex" pagination expandable recs @paginationSort="(i) => paginationSort(i, index, run)" @loadMore="
                     (increase, amount) => loadMore(increase, amount, index, run)
                   " @changeFilters="
   (changedFilters) => changeFilters(changedFilters, index, run)

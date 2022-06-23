@@ -4,14 +4,18 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
 
 import { ref } from 'vue'
-import { makeHeader, capitalise } from '../../../helpers/resultFormatter'
+import {
+  makeHeader,
+  capitalise,
+  STANDARD_HEADERS,
+} from '../../../helpers/resultFormatter'
 
 const props = defineProps({ headerOptions: Object })
 defineEmits(['updateHeaders'])
 const updateHeadersModalShow = ref(false)
 
 // Columns
-const checkedColumns = ref(["track_spotify-uri"])
+const checkedColumns = ref(STANDARD_HEADERS)
 </script>
 
 <template>

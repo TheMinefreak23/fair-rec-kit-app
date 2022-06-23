@@ -44,13 +44,14 @@ def song_info():
     try:
         track = json_data['track']
         artist = json_data['artist']
-        mbid = json_data['mbid']
     except KeyError:
         return BAD_REQUEST_RESPONSE
+    mbid = json_data.get('mbid')
     lastfm_data = last_fm_info(artist, track, mbid)
-    if not mbid and lastfm_data.track:
-        mbid = lastfm_data.track.mbid
-    return {'AcousticBrainz': get_acousticbrainz_data(mbid), 'LastFM': lastfm_data}
+    if not mbid and lastfm_data['track'] and 'mbid' in lastfm_data['track']:
+        mbid = lastfm_data['track']['mbid']
+    return {'AcousticBrainz': get_acousticbrainz_data(mbid) if mbid else None,
+            'LastFM': lastfm_data}
 
 
 @blueprint.route('/spotify-info', methods=['POST'])
@@ -70,9 +71,14 @@ def spotify_info():
 
 @blueprint.route('/spotify-track', methods=['POST'])
 def spotify_track():
-    url = 'tracks/' + id
+    json_data = request.json
+    try:
+        track_id = json_data['id']
+    except KeyError:
+        return BAD_REQUEST_RESPONSE
+    url = 'tracks/' + track_id
     data = request_spotify_data(url)
-    return data['tracks']
+    return data
 
 
 def last_fm_info(artist, track, mbid):
@@ -83,7 +89,7 @@ def last_fm_info(artist, track, mbid):
         url = LFM_API + '?method=track.getInfo&api_key=' + LFM_key + \
               '&artist=' + artist + \
               '&track=' + track + '&autocorrect=1&format=json'
-    res = request.get(url)
+    res = requests.get(url)
     return json.loads(res.text)
 
 
@@ -226,12 +232,12 @@ def request_spotify_data(url):
         the response text
     """
     full_url = SPOTIFY_API + url
-    print('spotify request url', full_url)
+    # print('spotify request url', full_url)
     get_spotify_token()
     headers = {'Authorization': tok.token_type + ' ' + tok.access_token,
                'Content-Type': 'application/json'}
     res = requests.get(full_url, headers=headers)
-    print('spotify request data', json.loads(res.text))
+    # print('spotify request data', json.loads(res.text))
     return json.loads(res.text)
 
 
