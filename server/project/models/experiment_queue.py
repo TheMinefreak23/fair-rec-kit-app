@@ -12,11 +12,10 @@ Utrecht University within the Software Project course.
 """
 
 import time
-from datetime import datetime
 
 from .constants import MAIL_KEY
 from .events import EventHandler
-from .experiment import Status, ProgressStatus, QueueItem, Experiment, Progress
+from .experiment import Status, ProgressStatus, QueueItem, Experiment, Progress, current_dt
 
 
 class ExperimentQueue:
@@ -107,10 +106,8 @@ class ExperimentQueue:
 
         # Set time
         timestamp = time.time()
-        now = datetime.now()
-        current_dt = now.strftime('%Y-%m-%d %H:%M:%S')
         job = {'timestamp': {'stamp': str(int(timestamp)),
-                             'datetime': current_dt},
+                             'datetime': current_dt()},
                'metadata': metadata,
                'settings': settings}
 
@@ -127,14 +124,16 @@ class ExperimentQueue:
         self.filter_queue()
         self.queue.append(experiment)
 
-    def add_validation(self, file_path, amount, result):
+    def add_validation(self, overview_index, file_path, amount, result):
         """Add a validation experiment to the queue.
 
         Args:
+            overview_index(int): the index in the results overview
             file_path(str): the path to the existing experiment result
             amount(int): the amount of runs for validation
 
         """
+        result['overview_index'] = overview_index
         result['file_path'] = file_path
         result['amount'] = amount
         queue_item = QueueItem(job=result,

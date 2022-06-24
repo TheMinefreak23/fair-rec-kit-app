@@ -23,7 +23,7 @@ from fairreckitlib.data.pipeline.data_event import \
     ON_BEGIN_DATA_PIPELINE, ON_BEGIN_FILTER_DATASET, \
     ON_BEGIN_SPLIT_DATASET, \
     ON_BEGIN_CONVERT_RATINGS, ON_BEGIN_SAVE_SETS
-from .experiment import Status, ProgressStatus, Progress
+from .experiment import Status, ProgressStatus, Progress, current_dt
 
 PROGRESS_DICT = {
     ON_BEGIN_EXPERIMENT_PIPELINE: ProgressStatus.EXPERIMENT,
@@ -146,7 +146,13 @@ class EventHandler:
             status=ProgressStatus.STARTED,
             progress=0,
             message='')
+
+        # Set maximal progress number based on runs
         self.max_progress = args.num_runs * len(STATUS_ORDER)
+
+        # Add experiment execution data to settings
+        self.experiment.job.setdefault('experiments', []).append({'started': current_dt()})
+
 
     def on_end_experiment_thread(self, args, kwargs):
         """Change progress status to finished and experiment status to "done".
@@ -154,13 +160,26 @@ class EventHandler:
         Also sends an email if possible.
         """
         if self.experiment.status is not Status.ABORTED:
+            # Execution data
+            elapsed_time = kwargs['elapsed_time']
+            last_exp = self.experiment.job['experiments'][-1]
+            last_exp['ended'] = current_dt()
+            last_exp['elapsed_time'] = elapsed_time
+
             if not self.experiment.validating:
+                # Save result and send mail
+                self.experiment.job['experiments'][-1] = last_exp
                 self.result_storage.save_result(self.experiment.job,
                                                 self.experiment.config)
                 if 'email' in self.experiment.job['metadata']:
                     self.mail_sender.send_mail(self.experiment.job)
+            else:
+                # Update entry with execution data
+                last_exp['runs'] = self.experiment.job['amount']
+                self.result_storage.update_result(self.experiment.job['overview_index'],
+                                                  last_exp)
 
-            elapsed_time = kwargs['elapsed_time']
+            # Update progress and status
             self.experiment.progress = Progress(
                 status=ProgressStatus.FINISHED,
                 progress=100,

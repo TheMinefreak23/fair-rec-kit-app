@@ -12,6 +12,7 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
+from datetime import datetime
 import enum
 import os
 from dataclasses import dataclass
@@ -159,3 +160,8 @@ class Experiment:
         self.recommender_system.validate_experiment(result_dir=self.queue_item.job['file_path'],
                                                     num_runs=self.queue_item.job['amount'],
                                                     events=events)
+
+
+def current_dt():
+    """Give formatted current date time."""
+    return datetime.now().strftime('%Y-%m-%d %H:%M:%S')

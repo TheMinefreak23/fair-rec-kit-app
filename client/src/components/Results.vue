@@ -11,7 +11,7 @@ import { status } from '../helpers/queueFormatter'
 import { shortResultDescription } from '../helpers/resultFormatter'
 
 const emit = defineEmits(['toast'])
-const showResultModal = ref(false)
+// const showResultModal = ref(false)
 const currentTab = ref(0)
 const blink = ref(-1)
 
@@ -72,7 +72,7 @@ function closeResult(index) {
 
 <template>
   <!--Show modal overlay when there is a new result-->
-  <b-modal
+  <!--<b-modal
     id="result-modal"
     v-model="showResultModal"
     title="New result"
@@ -82,7 +82,7 @@ function closeResult(index) {
     @ok="store.currentTab = 3"
   >
     <p>An experiment has finished.</p>
-  </b-modal>
+  </b-modal>-->
   <!--Result content-->
   <b-card>
     <div class="mx-5 mt-2">

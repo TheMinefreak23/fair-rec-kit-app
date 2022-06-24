@@ -60,7 +60,7 @@ onMounted(() => {
             </span>
           </b-progress-bar>
         </b-progress>
-        <h4>{{ store.currentExperiment.progress.message }}</h4>
+        <!--<p>{{ store.currentExperiment.progress.message }}</p>-->
       </template>
       <!--<p>{{ store.currentExperiment.progress }}</p>-->
       <!--Show the queue with this session's experiments.-->

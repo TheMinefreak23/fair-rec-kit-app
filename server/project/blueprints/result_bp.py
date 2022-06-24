@@ -232,8 +232,9 @@ def validate():
         return BAD_REQUEST_RESPONSE
 
     overview = load_results_overview()
-    result = overview['all_results'][id_to_index(overview, result_id)]
+    overview_index = id_to_index(overview, result_id)
+    result = overview['all_results'][overview_index]
     amount = int(json_data.get('amount', 1))
-    queue.add_validation(file_path, amount, result)
+    queue.add_validation(overview_index, file_path, amount, result)
     queue.run_first()
     return "Validated"
