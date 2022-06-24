@@ -24,6 +24,7 @@ CONFIG_DIR = 'config_files'
 
 class Status(enum.Enum):
     """Experiment status in queue."""
+
     TODO = 'To Do'
     ACTIVE = 'Active'
     ABORTED = 'Aborted'
@@ -57,6 +58,7 @@ class ProgressStatus(enum.Enum):
 @dataclass
 class Progress:
     """Dataclass for showing the progress of an experiment."""
+
     status: ProgressStatus
     progress: int # Progress out of 100
     message: str
@@ -79,6 +81,7 @@ def progress_to_dict(progress):
 @dataclass
 class QueueItem:
     """Dataclass for experiment setting items in the queue."""
+
     job: dict
     config: dict
     status: Status

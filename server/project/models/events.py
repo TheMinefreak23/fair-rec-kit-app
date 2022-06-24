@@ -10,14 +10,19 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
-from fairreckitlib.evaluation.pipeline.evaluation_event import ON_BEGIN_EVAL_PIPELINE, ON_BEGIN_FILTER_RECS
+from fairreckitlib.evaluation.pipeline.evaluation_event import \
+    ON_BEGIN_EVAL_PIPELINE, ON_BEGIN_FILTER_RECS
 from fairreckitlib.experiment.experiment_event import \
-    ON_END_EXPERIMENT_THREAD, ON_BEGIN_EXPERIMENT_THREAD, ON_END_EXPERIMENT_PIPELINE, ON_BEGIN_EXPERIMENT_PIPELINE
-from fairreckitlib.model.pipeline.model_event import ON_BEGIN_MODEL_PIPELINE, \
-    ON_BEGIN_TRAIN_MODEL, ON_BEGIN_LOAD_TRAIN_SET, ON_BEGIN_RECONSTRUCT_RATINGS, ON_BEGIN_TEST_MODEL
-from fairreckitlib.data.pipeline.data_event import ON_BEGIN_DATA_PIPELINE, \
-    ON_BEGIN_FILTER_DATASET, ON_BEGIN_SPLIT_DATASET, ON_BEGIN_LOAD_DATASET, ON_BEGIN_CONVERT_RATINGS, ON_BEGIN_SAVE_SETS
-from fairreckitlib.core.parsing.parse_event import ON_PARSE
+    ON_END_EXPERIMENT_THREAD, ON_BEGIN_EXPERIMENT_THREAD, \
+    ON_BEGIN_EXPERIMENT_PIPELINE
+from fairreckitlib.model.pipeline.model_event import \
+    ON_BEGIN_MODEL_PIPELINE, ON_BEGIN_TRAIN_MODEL,\
+    ON_BEGIN_LOAD_TRAIN_SET, ON_BEGIN_RECONSTRUCT_RATINGS,\
+    ON_BEGIN_TEST_MODEL
+from fairreckitlib.data.pipeline.data_event import \
+    ON_BEGIN_DATA_PIPELINE, ON_BEGIN_FILTER_DATASET, \
+    ON_BEGIN_SPLIT_DATASET, \
+    ON_BEGIN_CONVERT_RATINGS, ON_BEGIN_SAVE_SETS
 from .experiment import Status, ProgressStatus, Progress
 
 PROGRESS_DICT = {
@@ -155,11 +160,12 @@ class EventHandler:
                 if 'email' in self.experiment.job['metadata']:
                     self.mail_sender.send_mail(self.experiment.job)
 
+            elapsed_time = kwargs['elapsed_time']
             self.experiment.progress = Progress(
                 status=ProgressStatus.FINISHED,
                 progress=100,
-                message='Finished %s experiment(s) with name %s in %1.4fs'
-                        % (args.num_runs, args.experiment_name, kwargs['elapsed_time'])
+                message=f'Finished {args.num_runs} experiment(s) '
+                        f'with name {args.experiment_name} in '
+                        f'{elapsed_time:1.4f}s'
             )
             self.experiment.status = Status.DONE
-
