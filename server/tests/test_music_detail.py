@@ -15,36 +15,16 @@ Utrecht University within the Software Project course.
 import numpy as np
 from sewar.full_ref import uqi
 from PIL import Image
-from project.blueprints.music_detail_bp import collage
+from project.blueprints.music_detail_bp import collage, get_acousticbrainz_data
 from project.blueprints.music_detail_bp import request_spotify_data
-from tests.common import check_bad_request
 
 URL_PREFIX = '/api/music'
 
 
-def test_spotify_token(client):
-    """Test the generating of a Spotify Auth token.
-
-    Args:
-        client: The client component used to send requests to the server
-    """
-    response = client.get(URL_PREFIX + '/token')
-    assert response.status_code == 200
-
-
-def test_acousticbrainz_data(client):
-    """Test if AcousticBrainz successfully gets requested.
-
-    Args:
-        client: The client component used to send requests to the server
-    """
-    url = URL_PREFIX + '/AcousticBrainz'
-
-    assert check_bad_request(client, url)
-
-    params = {'mbid': 'bab7f3de-56e3-42fd-be0d-f122960e6a13'}
-    response = client.post(url, json=params)
-    assert response.status_code == 200
+def test_acousticbrainz_data():
+    """Test if AcousticBrainz successfully gets requested."""
+    ab_data = get_acousticbrainz_data('bab7f3de-56e3-42fd-be0d-f122960e6a13')
+    assert ab_data
 
 
 def test_background(client):
@@ -83,6 +63,6 @@ def test_unique_album_background(client):
 
 def test_spotify_data():
     """Test if Spotify track data gets successfully requested."""
-    url = 'https://api.spotify.com/v1/search?q=scatman%20john&type=track'
+    url = 'search?q=scatman%20john&type=track'
     result = request_spotify_data(url)
     assert "Scatman" in result['tracks']['items'][0]['album']['name']

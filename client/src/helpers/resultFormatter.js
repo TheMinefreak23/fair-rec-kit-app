@@ -3,6 +3,16 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
 import { statusPrefix, status } from './queueFormatter'
 
+export const STANDARD_HEADERS = [
+  'track_spotify-uri',
+  'track_name',
+  'artist_name',
+  'artist_mbID',
+  'movie_imdbID',
+  'movie_title',
+  'movie_imdb url',
+]
+
 // Format data for a results overview
 // TODO refactor so headers are dynamic (no separate case for status header)
 export function formatResults(allResults, showStatus) {
@@ -75,9 +85,11 @@ export function statusVariant(rawStatus) {
  */
 export function formatResult(result) {
   // console.log('before format', JSON.parse(JSON.stringify(result)))
+  const { rawSettings, ...restSettings } = result.settings
   const formattedResult = {
     id: result.timestamp.stamp,
     metadata: result.metadata,
+    settings: restSettings,
     result: result.result
       // Format result per dataset
       .map((datasetResult) => {
