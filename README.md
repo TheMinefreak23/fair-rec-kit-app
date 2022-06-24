@@ -9,7 +9,15 @@
 The fairreckit application is a web-based tool intended to aid in the performing and analysing of recommender system computations. It utilises a custom library called [fairreckitlib](https://github.com/TheMinefreak23/fairreckitlib) to perform its computations.
 
 This program has been developed by students from the bachelor Computer Science at
-Utrecht University within the Software Project course.  
+Utrecht University within the Software Project course, commissioned by dr. Christine Bauer. 
+
+Lennard Chung           Aleksej Cornelissen
+Isabelle van Driessel   Diede van der Hoorn
+Yme de Jong             Lan Le
+Sanaz Najiyan Tabriz    Roderick Spaans
+Casper Thijsen          Robert Verbeeten
+Vos Wesseling           Fern Wieland           
+
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 
 ## Running the client & server
