@@ -43,29 +43,45 @@ mechanisms of recommender systems. It includes:
 <li> 20 algorithms </li>
 </ul> 
 
-This web-app uses the FairRecKit Library to execute all the experiments. A link to the wiki can 
-be found <a href=https://github.com/TheMinefreak23/fairreckitlib/wiki>here.
+On this page you can find the information on how to use it per tab, and information on the datasets, metrics and algorithms that are used. 
+
+<p>This web-app uses the <b>FairRecKit Library</b> to execute all the experiments. A link to the FairRecKitLib wiki can 
+be found <a href=https://github.com/TheMinefreak23/fairreckitlib/wiki>here</a>.</p>
 </description>
 }-
 
------
--{
-<name> Documentation </name>
-<description>
 
-</description>
-}-
------
-
------
 -{
 <name> How to use </name>
 <description>
+The FairRecKit can be used to analyse different recommender approaches and datasets, using different metrics. You can run an experiment with different settings, you can see the progress and then 
+view the result. 
+
+ <p> There are three ways you can run an experiment:
+  <ul>
+  <li>Start a new experiment</li>
+  <li>Validate a finished experiment</li>
+  <li>Copy settings from a finished experiment</li>
+  </ul>
+
+  <p> The basic way to run an experiment is by starting a <b>new experiment</b>. This can be done in the <i>New Experiment tab</i> , which is explained further down below. You select all the settings that you 
+  want and then <i>send</i> the experiment to the server to be run.  
+  </p>
+
+  <p> In case you want to <b>validate</b> a finished experiment, you go to the result of the experiment, which can be done through the <i>All Results tab</i>. You go to view the result, which opens it on the
+  <i>Result tab</i>. Here, you have the option on the top right to fill in how many times you would like the experiment to be run again and then press the button <i> validate run</i>.</p>
+
+  <p> The last option is to <b>copy settings</b> from a finished experiment. Just as validation, you first need to make sure you have the result you want to copy open in the <i> Result tab</i>. Then you select the <i>copy settings</i> button, which
+  will take you to the <i>New Experiment tab</i> but it will have all the settings that you applied already filled in, so you can just change what you want to have differently.</p>
+  
+  </p>
+
+<b> What are the tabs? </b>
 <ul>
-<li> Start a new experiment on <a href="tabIndex=1">New Experiment tab</a>. More information <a href="#New Experiment">below</a>. </li>
-<li> Check progress in the <a href="tabIndex=2">Experiment Queue</a>. More information <a href="#Experiment Queue">below</a>.</li>
-<li> Get insights into the results in the <a href="tabIndex=3">Results Tab</a>. More information <a href="#Results">below</a>. </li>
-<li> See all earlier experiments and edit them on the <a href="tabIndex=4">All Results Tab</a>. More information <a href="#All Results">below</a>.</li>
+<li> Start a new experiment on <a href="tabIndex=1">New Experiment tab</a>. </li>
+<li> Check progress in the <a href="tabIndex=2">Experiment Queue</a>. </li>
+<li> Get insights into the results in the <a href="tabIndex=3">Results Tab</a>. </li>
+<li> See all earlier experiments and edit them on the <a href="tabIndex=4">All Results Tab</a>. </li>
 </ul>
 
 </description>
@@ -74,8 +90,9 @@ be found <a href=https://github.com/TheMinefreak23/fairreckitlib/wiki>here.
 Tabs:
 
 -{
-<name> New Experiment </name>
+<name> New Experiment Tab </name>
 <description>
+
 <p> You can start out with selecting whether the experiment type should be <b>recommendation or prediction</b>.
 Predictions are predicted ratings for known user-item pairs in the data , while recommendations are a list of recommended items for a user based on these predicted ratings.
 </p>
@@ -88,48 +105,55 @@ For each dataset you add, you can give the train/testsplit, type of split, selec
 You can also select the number of recommendations per user and choose if you want to include already rated items in recommendations. This is only possible for recommendation algorithms, not for prediction algorithms.</p>
 <p> The final step is to select <b>metrics</b>. For more information on the metrics, see <a href="#Metrics">below</a>. You can add one or more metrics. For each metric you can define the necessary parameters and an optional filter.</p>
 
-<p>For more information about each step, refer to the list below:</p>
-<ul>
-<li><a href="#Datasets">Datasets</li>
-<li><a href="#Recommender Approaches">Recommender approaches</li>
-<li><a href="#Metrics">Metrics</li>
-</ul>
 </description>
 }-
 
 -{
-<name> Experiment Queue </name>
+<name> Experiment Queue Tab </name>
 <description> 
-The experiment queue shows the progress of the current experiment and the queue of experiments that still need to be started or have just started.
-This is also the place to go when you want to cancel or abort an experiment in case you do not want it anymore. When an experiment is finished, you can also go to the experiment
+The experiment queue <b>shows the progress</b> of the current experiment and the queue of experiments that still need to be started or have just started.
+This is also the place to go when you want to <b>cancel or abort</b> an experiment in case you do not want it anymore. When an experiment is finished, you can also go to the experiment
 result from here.
 </description>
 }-
 
 
 -{
-<name> Results </name>
-<description> This tab shows the results of experiments. New experiment results automatically display here, and you can use the previous results button to the right to open any experiment results.
-<p> It shows the title, date and any tags that you added. The filters you applied when before starting the experiment are also displayed. The first table(s) shown on this page display the metrics per run, per dataset. The approach is shown, together with any metrics you selected
-when customizing your experiment. You can also copy the experiment settings if you want to run the same experiment again. Another possibility is to validate the experiment. Lastly, you can also export the table with the metric results, so that you can
-easily use this for you research. </p>
-<h6> Customizability </h6>
-<p> Using the checkboxes on the top, you are able to select what you want to be visible in the results. You can choose which datasets show the items per user tables at the bottom. You can also select which
-metrics are shown in the tables with the result. </p>
+<name> Results Tab </name>
+<description> This tab <b>shows the results of an experiment</b>. New experiment results automatically display here, and you can use the previous results button to the right to open any experiment results.
+<p> On this tab you can:
+<ul>
+<li> View a specific result </li>
+<li> Copy settings </li>
+<li> Validate experiment </li>
+</ul>
+</p>
 
-<p> If you look at the tables showing the item per user, you can find two checkboxes above that.
-With the first, you can turn the audio snippets on and off, and the second set of checkboxes displays all the tables that are
-available and you can select which ones are visible. </p>
+<h5> Viewing a specific result </h5>
+<p> When viewing a specific result the title, date and any tags that you added are shown. The filters you applied when before starting the experiment are also displayed. The result <b>metrics</b> are displayed in the first few tables on the page, they are 
+shown per run, per dataset. Below the Metrics header, the <b> user-item results</b> are shown in table form. </p>
 
-<p> If you have a table that shows the recommended or predicted items per user, you are able to customize this table even more. 
-First, you can sort the table on any column. Furthermore, you can select any other columns that you want to see in the result. The columns that are available
-are dependent on the data that is available in the datasets, such as user or artist gender for music datasets. Another thing that is possible is
-to filter the results, so that you can get even more insights into the specific results. </p>
+<p> You can <b>customize your view</b>. You can select which datasets are showing the items per user, you can select which user/item tables show and select if snippets are shown. You can also sort the tables and for the user/item tables, you can change the pagination.
+<ul>
+<li> For selecting which datasets are showing items per user you can use checkboxes under the "Datasets showing items per user:" and select the datasets. </li>
+<li> To turn on snippets you can select or deselect the checkbox that says "show snippets".</li>
+<li> To select which user/item tables are shown you can select the checkboxes under "select items to be shown:". </li>
+<li> For sorting tables, you can click on the header that you want it to be sorted on.</li>
+</ul>
+<p> Lastly, you can also <b>export your result</b>. For this, you can use the "export" button that appears under the table that shows the metrics.</p>
+
+<h5> Copy settings </h5>
+For copying settings of the experiment, you go to the top and press the <i> copy settings </i> button. This shows all the settings that you had for that experiment, and if you confirm, you will go
+to the New Experiment tab, but with all these settings pre filled.
+
+<h5> Validate experiment </h5>
+For validating an experiment, you go to the top right. Here you see a field where you can fill in the number of runs. Press the <i>validate run</i> button to add the validation experiments to the queue.
+
 </description>
 }-
 
 -{
-<name> All Results </name>
+<name> All Results Tab </name>
 <description> The all results tab shows all of the previously executed experiments. From here you can copy settings to start a new experiment.
 You can also view the result, which will open it in the results tab. You can edit the name and tags of your experiment and change your email address, for example if you want to validate
 that result and have the notification be sent to another address. You can also remove your result if you decide that you will not need it anymore. </description>
@@ -138,8 +162,7 @@ that result and have the notification be sent to another address. You can also r
 -{
 <name> Datasets </name>
 <description> When you select a dataset, the first thing you choose is the train/testsplit. The standard value for this is 80/20, but you can select any division that you prefer. Next, you select the matrix that you want to use. Then you can choose if you want to apply any filters. These filters are dependent on what information is available in the dataset. 
-You can add one or more filters, which creates a subset of the dataset. Then you select the type of split, which can be random or temporal.
-or temporal. </description>
+You can add one or more filters, which creates a subset of the dataset. Then you select the type of split, which can be random or temporal. </description>
 }-
 
 -{
@@ -253,8 +276,34 @@ from the libraries that they come from.</p>
 
 -{
 <name> Metrics </name>
-<description> A metric is an algorithm which measures the performance/quality of approaches. You can also apply a filter to your metrics. This allows you to customize your
-metrics even more.</description>
+<description> <p> A metric is an algorithm which measures the performance/quality of approaches. You can also apply a filter to your metrics. This allows you to customize your
+metrics even more. For the metrics, implementations from <a href="https://lkpy.readthedocs.io/en/stable/">LensKit</a> and <a href="https://rexmex.readthedocs.io/en/latest/index.html">Rexmex</a> have been used. The following metrics are available: </p>
+<b>Accuracy: </b>
+<ul>
+<li> HR@K (LensKit) </li>
+<li> NDCG@K (LensKit) </li>
+<li> P@K (LensKit) </li>
+<li> R@K (LensKit)</li>
+<li> MRR (LensKit)</li>
+</ul>
+
+<b> Coverage: </b>
+<ul>
+<li> Item Coverage (Rexmex)</li>
+<li> User Coverage (Rexmex)</li>
+</ul>
+
+<b> Rating: </b>
+<ul>
+<li> MAE (LensKit)</li>
+<li> MAPE (Rexmex)</li>
+<li> MSE (Rexmex)</li>
+<li> RMSE (LensKit)</li>
+</ul>
+
+
+
+</description>
 }-
 
 
@@ -262,45 +311,60 @@ metrics even more.</description>
 <name> LensKit Metrics </name>
 }-
 
+
 -{
 <name> HR@K </name>
-<description> HR@K is an LensKit Accuracy metric. It computes whether of not a list is a hit; any list with at least one relevant item in the first k positions is scored as 0, and lists with no relevant items as 0. Not available for predictions.  </description>
+<description> HR@K is an LensKit Accuracy metric. It computes whether of not a list is a hit; any list with at least one relevant item in the first k positions is scored as 0, and lists with no relevant items as 0. Not available for predictions.  
+Documentation can be found <a href="https://lkpy.readthedocs.io/en/stable/evaluation/topn-metrics.html#lenskit.metrics.topn.hit">here</a>.
+</description>
 <link> https://lkpy.readthedocs.io/en/stable/evaluation/topn-metrics.html#lenskit.metrics.topn.hit </link>
 }-
 
 -{
 <name> NDCG@K </name>
-<description> A LensKit Accuracy metric. The NDCG function estimates a utility score for a ranked list of recommendations. Not available for predictions. </description>
+<description> A LensKit Accuracy metric. The NDCG function estimates a utility score for a ranked list of recommendations. Not available for predictions. 
+Documentation can be found <a href="https://lkpy.readthedocs.io/en/stable/evaluation/topn-metrics.html#lenskit.metrics.topn.ndcg">here</a>.
+</description>
 <link> https://lkpy.readthedocs.io/en/stable/evaluation/topn-metrics.html#lenskit.metrics.topn.ndcg </link>
 }-
 
 -{
 <name> P@K </name>
-<description> Compute the recommendation precision. Not available for predictions. </description>
+<description> Compute the recommendation precision. Not available for predictions. 
+Documentation can be found <a href="https://lkpy.readthedocs.io/en/stable/evaluation/topn-metrics.html#lenskit.metrics.topn.precision">here</a>.
+</description>
 <link> https://lkpy.readthedocs.io/en/stable/evaluation/topn-metrics.html#lenskit.metrics.topn.precision </link>
 }-
 
 -{
 <name> R@K </name>
-<description> Compute the recommendation recall. Not available for predictions. </description>
+<description> Compute the recommendation recall. Not available for predictions. 
+Documentation can be found <a href="https://lkpy.readthedocs.io/en/stable/evaluation/topn-metrics.html#lenskit.metrics.topn.recall">here</a>.
+</description>
 <link> https://lkpy.readthedocs.io/en/stable/evaluation/topn-metrics.html#lenskit.metrics.topn.recall </link>
 }-
 
 -{
 <name> MRR </name>
-<description> Compute the reciprocal rank of the first relevant item in a list of recommendations. Not available for predictions. </description>
+<description> Compute the reciprocal rank of the first relevant item in a list of recommendations. Not available for predictions. 
+Documentation can be found <a href="">here</a>.
+</description>
 <link> https://lkpy.readthedocs.io/en/stable/evaluation/topn-metrics.html#lenskit.metrics.topn.recip_rank </link>
 }-
 
 -{
 <name> RMSE </name>
-<description> This metric gives the root mean squared approximation error. </description>
+<description> This metric gives the root mean squared approximation error. 
+Documentation can be found <a href="">here</a>.
+</description>
 <link> https://lkpy.readthedocs.io/en/stable/evaluation/predict-metrics.html#lenskit.metrics.predict.rmse </link>
 }-
 
 -{
 <name> MAE </name>
-<description> This metric gives the mean absolute approximation error. </description>
+<description> This metric gives the mean absolute approximation error. 
+Documentation can be found <a href="">here</a>.
+</description>
 <link> https://lkpy.readthedocs.io/en/stable/evaluation/predict-metrics.html#lenskit.metrics.predict.mae </link>
 }-
 
@@ -310,25 +374,33 @@ metrics even more.</description>
 
 -{
 <name> MAPE </name>
-<description> Calculates the mean absolute percentage error (MAPE) for a ground-truth prediction vector pair. </description>
+<description> Calculates the mean absolute percentage error (MAPE) for a ground-truth prediction vector pair. 
+Documentation can be found <a href="">here</a>.
+</description>
 <link> https://rexmex.readthedocs.io/en/latest/modules/root.html#rexmex.metrics.rating.mean_absolute_percentage_error </link>
 }-
 
 -{
 <name> MSE </name>
-<description> Calculate the root mean squared error (RMSE) for a ground-truth prediction vector pair. </description>
+<description> Calculate the root mean squared error (RMSE) for a ground-truth prediction vector pair. 
+Documentation can be found <a href="">here</a>.
+</description>
 <link> https://rexmex.readthedocs.io/en/latest/modules/root.html#rexmex.metrics.rating.mean_squared_error </link>
 }-
 
 -{
 <name> ItemCoverage </name>
-<description> It shows the fraction of items which got recommended at least once. Calculates the coverage value for items in possible_user_items given the collcation of recommendations. Recommendation over user/items not in possible_user_items are discarded.  </description>
+<description> It shows the fraction of items which got recommended at least once. Calculates the coverage value for items in possible_user_items given the collcation of recommendations. Recommendation over user/items not in possible_user_items are discarded.  
+Documentation can be found <a href="">here</a>.
+</description>
 <link> https://rexmex.readthedocs.io/en/latest/modules/root.html#rexmex.metrics.coverage.item_coverage </link>
 }-
 
 -{
 <name> UserCoverage </name>
-<description> It shows the fraction of users who got at least one recommendation out of all possible users. It calculates the coverage value for users in possible_users_items given the collection of recommendations. Recommendations over users/items not in possible_user_items are discarded. </description>
+<description> It shows the fraction of users who got at least one recommendation out of all possible users. It calculates the coverage value for users in possible_users_items given the collection of recommendations. Recommendations over users/items not in possible_user_items are discarded. 
+Documentation can be found <a href="">here</a>.
+</description>
 <link> https://rexmex.readthedocs.io/en/latest/modules/root.html#rexmex.metrics.coverage.user_coverage </link>
 }-
 
