@@ -118,15 +118,15 @@ function callToast() {
               </div>
             </template>
           </b-tab>
-          <b-tab title="Documentation" data-testid="DocTab">
-            <Documentation
-          /></b-tab>
           <b-tab :title-item-class="blink ? 'blink' : ''" title="Results">
             <Results @toast="onNewResult"
           /></b-tab>
           <b-tab title="All results" data-testid="AllResults">
             <PreviousResults viewItem />
           </b-tab>
+          <b-tab title="Documentation" data-testid="DocTab">
+            <Documentation
+          /></b-tab>
           <b-tab v-if="DEV" title="Music Detail">
             <MusicDetail />
           </b-tab>
