@@ -242,13 +242,18 @@ function contains(string, array) {
           <!-- Filter for each dataset-->
           {{ datasetResult.dataset.name }}
           <b-list-group>
-            <b-list-group-item v-for="filter in datasetResult.dataset.filters" :key="filter">
-              {{ filter.name }}: {{ Object.values(filter.params)[0] }}
+            <b-list-group-item v-for="(filterGroup, index) in datasetResult.dataset.subset" :key="filterGroup">
+              Filter pass {{index}}
+              <b-list-group v-for="filters in filterGroup" :key="filters">
+            <b-list-group-item v-for="filter in filters">
+              {{ filter.name }} : {{ Object.values(filter.params).flat() }}
+            </b-list-group-item>
+              </b-list-group>
             </b-list-group-item>
             <ul>
               <li v-for="evale in datasetResult.evals" :key="evale">
                 <!-- Filter for each metric-->
-                {{ evale.evaluation.filtered }}
+                {{ evale.evaluation }}
               </li>
             </ul>
           </b-list-group>
