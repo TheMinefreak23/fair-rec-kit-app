@@ -16,7 +16,7 @@ from fairreckitlib.data.pipeline.data_event \
     import ON_BEGIN_DATA_PIPELINE, ON_BEGIN_FILTER_DATASET, \
     ON_BEGIN_SPLIT_DATASET
 from fairreckitlib.experiment.experiment_event \
-    import ON_BEGIN_EXPERIMENT_THREAD, ExperimentThreadEventArgs, 
+    import ON_BEGIN_EXPERIMENT_THREAD, ExperimentThreadEventArgs
 from fairreckitlib.model.pipeline.model_event \
     import ON_BEGIN_LOAD_TRAIN_SET, ON_BEGIN_MODEL_PIPELINE, \
     ON_BEGIN_TRAIN_MODEL
