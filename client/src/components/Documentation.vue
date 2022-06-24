@@ -12,17 +12,16 @@ import { tree } from '../documentation/documentation_tree2.vue'
 import TreeMenu from '../documentation/TreeMenu.vue'
 import { doctext } from '../documentation/documentation_items.vue'
 
-const collapse =ref([])
-let itemDicts = ref();
-let sidenavOpened = ref();
-let structure1D = ref();
-let flatTree = ref();
+const collapse = ref([])
+let itemDicts = ref()
+let sidenavOpened = ref()
+let structure1D = ref()
+let flatTree = ref()
 
-itemDicts = parse(doctext);
-sidenavOpened = false;
-structure1D = parseStructure(structure);
-flatTree = flattenTree(tree);
-
+itemDicts = parse(doctext)
+sidenavOpened = false
+structure1D = parseStructure(structure)
+flatTree = flattenTree(tree)
 
 /**
  * Parses the content of documentation_items.txt into items.
@@ -30,13 +29,13 @@ flatTree = flattenTree(tree);
  * @return {[Dict]} Array of items represented as a dictionary.
  */
 function parse(text) {
-  let stringItems = parseTextIntoItems(text);
-  let items = {};
-  for (let i = 0; i< stringItems.length; i++) {
-    let idict = parseItem(stringItems[i]);
-    items[idict["name"]] = idict;
+  let stringItems = parseTextIntoItems(text)
+  let items = {}
+  for (let i = 0; i < stringItems.length; i++) {
+    let idict = parseItem(stringItems[i])
+    items[idict['name']] = idict
   }
-  return items;
+  return items
 }
 
 /**
@@ -46,31 +45,31 @@ function parse(text) {
  */
 function parseTextIntoItems(text) {
   // An item is defined as anything between -{...}- as defined in documents_items.txt
-  let items = [];
-  let item = "";
-  let readItem = false;
-  let textLines = text.split("\n");
+  let items = []
+  let item = ''
+  let readItem = false
+  let textLines = text.split('\n')
 
-  for (let j = 0;  j < textLines.length; j++) {
+  for (let j = 0; j < textLines.length; j++) {
     // Parse each sentence
-    let line = textLines[j];
+    let line = textLines[j]
     for (let i = 0; i < line.length; i++) {
-      let character = line[i];
-      if (character + line[i+1] == "-{") {
-        readItem = true;
-        i += 1;
-        continue;
+      let character = line[i]
+      if (character + line[i + 1] == '-{') {
+        readItem = true
+        i += 1
+        continue
       }
-      if (character + line[i+1] == "}-") {
-        readItem = false;
-        items.push(item);
-        item = ""
+      if (character + line[i + 1] == '}-') {
+        readItem = false
+        items.push(item)
+        item = ''
       }
       if (readItem) {
-        item += character;
+        item += character
       }
     }
-    item += "\n";
+    item += '\n'
   }
   return items
 }
@@ -81,38 +80,40 @@ function parseTextIntoItems(text) {
  * @return {Dict} Dictionary of an item as key, value: dict["name"] = "Algorithm 123".
  */
 function parseItem(item) {
-  let dict = {};
-  let key = "";
-  let value = "";
-  let keytagFound = false; // Prevents nested tags.
-  let itemLines = item.split("\n");
+  let dict = {}
+  let key = ''
+  let value = ''
+  let keytagFound = false // Prevents nested tags.
+  let itemLines = item.split('\n')
   for (let j = 0; j < itemLines.length; j++) {
-    let words = itemLines[j].split(" ");
+    let words = itemLines[j].split(' ')
     for (let i = 0; i < words.length; i++) {
-      let word = words[i];
+      let word = words[i]
       if (word.match(/<.*>/)) {
-        const endTag = new RegExp("</" + key + ">", 'g'); // Ending tag e.g., </name>.
+        const endTag = new RegExp('</' + key + '>', 'g') // Ending tag e.g., </name>.
         if (word.match(endTag)) {
-          value = value.slice(0, -1); // Remove trailing whitespace.
-          dict[key] = value;
-          key = "";
-          value = "";
-          keytagFound = false;
-          i -= 1;
+          value = value.slice(0, -1) // Remove trailing whitespace.
+          dict[key] = value
+          key = ''
+          value = ''
+          keytagFound = false
+          i -= 1
         }
         // Starting tag e.g., <name>.
         else if (!keytagFound && word.match(/<[^\/].*>/)) {
-          keytagFound = true;
-          key = word.match(/(?<=<).*(?=>)/)[0];
-          value = "";
-          continue;
+          keytagFound = true
+          key = word.match(/(?<=<).*(?=>)/)[0]
+          value = ''
+          continue
         }
       }
-      if (key) { value += word + " "; }
+      if (key) {
+        value += word + ' '
+      }
     }
-    value += "\n";
+    value += '\n'
   }
-  return dict;
+  return dict
 }
 
 /**
@@ -121,47 +122,49 @@ function parseItem(item) {
  * @return {[{String, Int}]} 1-dimensional array of headers.
  */
 function parseStructure(struct) {
-  let res = [];
-  parsePartialStructure(struct, -1);
-  
+  let res = []
+  parsePartialStructure(struct, -1)
+
   /**
    * Recursive function to flatten a jagged array.
-   * @param {[String]} struct 
-   * @param {Int} start_depth 
+   * @param {[String]} struct
+   * @param {Int} start_depth
    */
   function parsePartialStructure(struct, start_depth) {
     for (let j = 0; j < struct.length; j++) {
-      let item = struct[j];
-      if (item instanceof Array) { // List of subheaders
-        parsePartialStructure(item, start_depth + 1);
-      }
-      else { // Regular header
-        res.push({name: item, depth: start_depth});
+      let item = struct[j]
+      if (item instanceof Array) {
+        // List of subheaders
+        parsePartialStructure(item, start_depth + 1)
+      } else {
+        // Regular header
+        res.push({ name: item, depth: start_depth })
       }
     }
   }
-  return res;
+  return res
 }
 
 function flattenTree(tree) {
   return flatten(tree.nodes, [], 0)
 }
 
-function flatten (nodes, parents, d) {
+function flatten(nodes, parents, d) {
   let flattenedTree = []
-
 
   for (let i = 0; i < nodes.length; i++) {
     let newtree = nodes[i]
-    //console.log(newtree)
-    let item = { name: newtree.label, depth: d, parents: parents}
-    console.log(item)
+    // console.log(newtree)
+    let item = { name: newtree.label, depth: d, parents: parents }
+    // console.log(item)
     flattenedTree.push(item)
 
-    if (typeof newtree.nodes == 'undefined') {}
-    else {
+    if (typeof newtree.nodes == 'undefined') {
+    } else {
       let newparents = parents.concat([newtree.label])
-      flattenedTree = flattenedTree.concat(flatten(newtree.nodes, newparents,  d + 1))
+      flattenedTree = flattenedTree.concat(
+        flatten(newtree.nodes, newparents, d + 1)
+      )
     }
   }
 
@@ -169,12 +172,16 @@ function flatten (nodes, parents, d) {
 }
 
 function openParents(item) {
-  let collapse = document.getElementById(item.name.replaceAll(" ", "_").replaceAll("@","a"))
-  collapse.classList.add("show")
+  let collapse = document.getElementById(
+    item.name.replaceAll(' ', '_').replaceAll('@', 'a')
+  )
+  collapse.classList.add('show')
 
-  for (let i = 0; i < item.parents.length; i ++) {
-    let c = document.getElementById(item.parents[i].replaceAll(" ", "_").replaceAll("@","a"))
-    c.classList.add("show")
+  for (let i = 0; i < item.parents.length; i++) {
+    let c = document.getElementById(
+      item.parents[i].replaceAll(' ', '_').replaceAll('@', 'a')
+    )
+    c.classList.add('show')
   }
 }
 
@@ -183,23 +190,21 @@ function openParents(item) {
  */
 function openCloseNav() {
   if (sidenavOpened) {
-    closeNav();
-  }
-  else {
-    openNav();
+    closeNav()
+  } else {
+    openNav()
   }
 }
 function openNav() {
-  sidenavOpened = true;
-  document.getElementById("docSidenav").style.width = "250px";
-  document.getElementById("main").style.marginLeft = "250px";
+  sidenavOpened = true
+  document.getElementById('docSidenav').style.width = '250px'
+  document.getElementById('main').style.marginLeft = '250px'
 }
 function closeNav() {
-  sidenavOpened = false;
-  document.getElementById("docSidenav").style.width = "0";
-  document.getElementById("main").style.marginLeft= "0";
+  sidenavOpened = false
+  document.getElementById('docSidenav').style.width = '0'
+  document.getElementById('main').style.marginLeft = '0'
 }
-
 </script>
 
 <style>
@@ -210,7 +215,8 @@ table {
   width: 100%;
 }
 
-td, th {
+td,
+th {
   border: 1px solid #dddddd;
   text-align: left;
   padding: 8px;
@@ -243,7 +249,7 @@ tr:nth-child(even) {
 }
 
 .sidenav a:hover {
-  color: #017C8E;
+  color: #017c8e;
 }
 
 .sidenav .closebtn {
@@ -255,13 +261,17 @@ tr:nth-child(even) {
 }
 
 #main {
-  transition: margin-left .5s;
+  transition: margin-left 0.5s;
   padding: 16px;
 }
 
 @media screen and (max-height: 450px) {
-  .sidenav {padding-top: 15px;}
-  .sidenav a {font-size: 18px;}
+  .sidenav {
+    padding-top: 15px;
+  }
+  .sidenav a {
+    font-size: 18px;
+  }
 }
 
 pre {
@@ -289,23 +299,41 @@ code:before {
 </style>
 
 <template>
-<div id="main" class="ps-0">
-  <!-- Open-close button -->
-  <span class="position-fixed bg-dark text-white px-2 rounded-end" style="font-size:30px; cursor:pointer" v-on:click="openCloseNav()">&#9776;</span>
-  <!-- Navigation sidebar -->
-  <div id="docSidenav" class="sidenav bg-secondary">
-    <!--<a href="javascript:void(0)" class="closebtn float-end m-0" v-on:click="closeNav()">&times;</a>-->
-    <b-link class="position-relative py-0" data-toggle="collapse" :href='"#"+item.name.replaceAll(" ", "_").replaceAll("@","a")' v-on:click='openParents(item)' v-for="item in flatTree" :key="item">
-      <!-- Indentation to indicate items and subitems -->
-      <span style="-webkit-user-select: none">{{"&nbsp;&nbsp;&nbsp;".repeat(item.depth)}}</span>{{item.name}}
-    </b-link>
+  <div id="main" class="ps-0">
+    <!-- Open-close button -->
+    <span
+      class="position-fixed bg-dark text-white px-2 rounded-end"
+      style="font-size: 30px; cursor: pointer"
+      v-on:click="openCloseNav()"
+      >&#9776;</span
+    >
+    <!-- Navigation sidebar -->
+    <div id="docSidenav" class="sidenav bg-secondary">
+      <!--<a href="javascript:void(0)" class="closebtn float-end m-0" v-on:click="closeNav()">&times;</a>-->
+      <b-link
+        class="position-relative py-0"
+        data-toggle="collapse"
+        :href="'#' + item.name.replaceAll(' ', '_').replaceAll('@', 'a')"
+        v-on:click="openParents(item)"
+        v-for="item in flatTree"
+        :key="item"
+      >
+        <!-- Indentation to indicate items and subitems -->
+        <span style="-webkit-user-select: none">{{
+          '&nbsp;&nbsp;&nbsp;'.repeat(item.depth)
+        }}</span
+        >{{ item.name }}
+      </b-link>
+    </div>
+
+    <!-- B-card items -->
+    <div
+      id="app"
+      class="text-right pb-2 mx-5"
+      v-for="item in tree.nodes"
+      :key="item"
+    >
+      <tree-menu :label="item.label" :nodes="item.nodes"></tree-menu>
+    </div>
   </div>
-
-  <!-- B-card items -->
-<div id="app" class="text-right pb-2 mx-5" v-for='item in tree.nodes' :key="item">
-  <tree-menu :label="item.label" :nodes="item.nodes"></tree-menu>
-</div>
-
-
-</div>
 </template>

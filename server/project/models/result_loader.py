@@ -18,6 +18,10 @@ from . import recommender_system
 from .constants import RESULTS_DIR
 from .result_storage import load_results_overview, load_json
 
+ADDITIONAL_COLUMNS = {
+    'user-track-count': {'spotify': ['audio_snippet']}
+}
+
 
 def result_by_id(result_id, result_storage):
     """Set the current result to a result in the results overview by its id.
@@ -54,6 +58,7 @@ def result_by_id(result_id, result_storage):
         data['metadata']['runs'] += 1
 
     result_storage.current_result = data
+
 
 def get_overview(evaluation_id, runid):
     """Return a specific entry from a specific overview.json.
@@ -168,10 +173,58 @@ def rename_headers(dataset_name, matrix_name, df_subset):
 
     """
     dataset = recommender_system.data_registry.get_set(dataset_name)
-    if not dataset is None and not dataset.get_matrix_config(matrix_name) is None:
+    if dataset is not None and not dataset.get_matrix_config(matrix_name) is None:
         item = dataset.get_matrix_config(matrix_name).item.key
         user = dataset.get_matrix_config(matrix_name).user.key
         df_subset.rename(columns={'user': user, 'item': item}, inplace=True)
+
+
+def sort_headers(df_subset):
+    """Sort the ratings headers.
+
+    Args:
+        df_subset: the ratings dataframe
+    """
+    for header_prefix in ['artist', 'track', 'movie']:
+        name_headers = [header for header in df_subset.columns.values
+                        if header in (header_prefix + '_name',
+                                      header_prefix + '_title')]
+        # print(name_headers)
+
+        # Copy
+        old_df = df_subset.copy()
+
+        # Remove old headers
+        for name_header in name_headers:
+            df_subset.pop(name_header)
+
+        # Get index of the first ID column
+        score_index = list(df_subset.columns.values).index('score')
+        id_index = next((i for i, e in enumerate(df_subset.columns.values)
+                         if header_prefix + '_id' == e),
+                        score_index - 1)
+        # print(id_index)
+
+        # Put identifying columns after ID columns
+        for (index, name_header) in enumerate(name_headers):
+            df_subset.insert(id_index + index + 1, name_header, old_df[name_header])
+
+
+def show_info_columns(matrix_name, columns, recs):
+    """Show additional info columns for the ratings.
+
+    Args:
+        matrix_name: the matrix of the experiment result
+        columns(list): the columns selected for viewing
+        recs: the recommendations/ratings result
+
+    Returns:
+        (dataframe) the ratings with the added info columns
+    """
+    if matrix_name == 'user-track-count':
+        if 'audio_snippet' in columns:
+            recs['audio_snippet'] = recs['track_spotify-uri']
+    return recs
 
 
 def add_dataset_columns(dataset_name, dataframe, columns, matrix_name):
@@ -192,23 +245,6 @@ def add_dataset_columns(dataset_name, dataframe, columns, matrix_name):
 
     result = list(map(lambda column: column.lower(), columns))
     dataframe = add_data_columns(dataset, matrix_name, dataframe, result)
-    return dataframe
 
-
-def add_spotify_columns(dataset_name, dataframe):
-    """Add columns from the Spotify integration to the dataframe.
-
-    Args:
-        dataset_name: the name of dataset belonging to the dataframe
-        dataframe: a pandas dataframe of the requested user results
-
-
-    Returns:
-        The updated dataframe
-    """
-    dataset = recommender_system.data_registry.get_set(dataset_name)
-    matrix_name = 'user-track-count'
-    columns = []
-    dataframe = add_data_columns(dataset, matrix_name, dataframe, columns)
-    print(dataframe.head())
+    show_info_columns(matrix_name, result, dataframe)
     return dataframe
