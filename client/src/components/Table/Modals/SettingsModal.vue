@@ -82,10 +82,10 @@ function cleanSettings() {
   <b-button
     variant="outline-primary fw-bold"
     v-b-tooltip.hover
-    title="Copy result settings to new experiment"
+    title="Show settings (for copying to a new experiment)"
     data-testid="copy-settings"
     @click="loadSettings(resultId)"
   >
-    Copy settings
+    Settings (copy)
   </b-button>
 </template>

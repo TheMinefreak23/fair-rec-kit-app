@@ -171,6 +171,16 @@ class OptionsFormatter:
             datasets = self.recommender_system.get_available_datasets()
             self.dataset_matrices = {dataset: list(matrices.keys()) for (
                 dataset, matrices) in datasets.items()}
+
+            # Print all available headers
+            #for (dataset_name, matrix_names) in self.dataset_matrices.items():
+            #    dataset = self.recommender_system.data_registry.get_set(dataset_name)
+            #    if dataset:
+            #        for matrix_name in matrix_names:
+            #            print('dataset', dataset_name,
+            #                  'matrix', matrix_name,
+            #                  dataset.get_available_columns(matrix_name))
+
             predictors = self.recommender_system.get_available_algorithms(TYPE_PREDICTION)
             recommenders = self.recommender_system.get_available_algorithms(
                 TYPE_RECOMMENDATION)

@@ -30,7 +30,7 @@ from project.models import result_loader, \
 from project.models.options_formatter import reformat_list, make_filter_option
 from project.models.result_loader import result_by_id, add_dataset_columns, \
     get_chunk, rename_headers, \
-    add_spotify_columns, id_to_index
+    id_to_index, ADDITIONAL_COLUMNS, sort_headers
 from project.models.result_storage import load_results_overview
 
 blueprint = Blueprint('result', __name__, url_prefix='/api/result')
@@ -159,12 +159,8 @@ def user_result():
     matrix_name = json_data.get('matrix', '')
     dataset_name = json_data.get('dataset', '')
 
-    #Load the current recs from the storage (without changing the original)
+    # Load the current recs from the storage (without changing the original)
     recs = copy.deepcopy(result_store.current_recs[run_id][pair_id])
-
-    spotify_datasets = ['LFM-2B']
-    if dataset_name in spotify_datasets:
-        recs = add_spotify_columns(dataset_name, recs)
 
     recs = filter_results(recs, json_data.get("filters", []))
 
@@ -174,11 +170,12 @@ def user_result():
         recs = add_dataset_columns(
             dataset_name, recs, chosen_headers, matrix_name)
 
+    # Sort rows
     # Make sure not to sort on a column that does not exist anymore
     sort_index = json_data.get("sortindex", 0)
     if len(recs.columns) <= sort_index:
         sort_index = 0
-    # sort dataframe based on index and ascending or not
+    # Sort dataframe based on index and ascending or not
     df_sorted = recs.sort_values(
         by=recs.columns[sort_index], ascending=json_data.get("ascending"))
 
@@ -188,6 +185,10 @@ def user_result():
                           df_sorted)
 
     rename_headers(dataset_name, matrix_name, df_subset)
+
+    sort_headers(df_subset)
+
+    print(df_subset.head())
 
     return df_subset.to_json(orient='records')
 
@@ -200,15 +201,19 @@ def headers():
        (JSON) A list of the available headers for this dataset
     """
     try:
-        dataset_name = request.json['name']
+        dataset_name = request.json['dataset']
+        matrix_name = request.json['matrix']
     except KeyError:
         return BAD_REQUEST_RESPONSE
 
     columns = {}
     dataset = recommender_system.data_registry.get_set(dataset_name)
     if dataset:
-        for matrix_name in dataset.get_available_matrices():
-            columns = dataset.get_available_columns(matrix_name)
+        columns = dataset.get_available_columns(matrix_name)
+
+    if matrix_name in ADDITIONAL_COLUMNS:
+        columns.update(ADDITIONAL_COLUMNS[matrix_name])
+
     return columns
 
 

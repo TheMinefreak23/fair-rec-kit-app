@@ -129,12 +129,12 @@ def test_headers(client):
     assert check_bad_request(client, url)
 
     # Check that an invalid name does not return anything
-    response = client.post(url, json={'name': 'foo'})
+    response = client.post(url, json={'dataset': 'foo', 'matrix': 'bar'})
     result1 = json.loads(response.data)
     assert result1 == {}
 
     # Check that a valid name does return something
-    response = client.post(url, json={'name': 'ML-100K'})
+    response = client.post(url, json={'dataset': 'ML-100K', 'matrix': 'user-movie-rating'})
     result2 = json.loads(response.data)
 
     assert result2

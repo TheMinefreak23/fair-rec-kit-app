@@ -6,6 +6,7 @@ import { computed, onMounted, ref } from 'vue'
 import sortBy from 'just-sort-by'
 import FormGroupList from './Form/FormGroupList.vue'
 import { emptyFormGroup } from '../helpers/optionsFormatter'
+// import { HEADERS_ORDER } from '../helpers/resultFormatter'
 import { statusPrefix, statusVariant, status } from '../helpers/queueFormatter'
 import SettingsModal from './Table/Modals/SettingsModal.vue'
 import MusicItem from './ItemDetail/MusicItem.vue'
@@ -24,21 +25,19 @@ const emit = defineEmits([
   'updateHeaders',
 ])
 const props = defineProps({
-  viewItem: Boolean,
-  recs: Boolean,
   overview: Boolean,
+  pagination: Boolean,
+  recs: Boolean,
   results: Array,
   headers: Array,
   removeText: String,
   removable: Boolean,
   editable: Boolean,
+  viewItem: Boolean,
   serverFile: String,
   serverFile2: String,
-  pagination: Boolean,
   caption: String,
-  expandable: Boolean,
   headerOptions: Object,
-  filters: Object,
   filterOptions: Array,
   defaultSort: Number,
   startIndex: Number,
@@ -50,21 +49,16 @@ const colWidth = 6
 // Pagination
 const entryAmount = ref(10)
 
-// Modals
-const filtersModalShow = ref(false)
-
-// Filters
-const filters = ref(emptyFormGroup(false))
-
 // Sorting
 const sortindex = ref()
 const descending = ref()
 const sortIcon = ref({ true: ' ▲', false: ' ▼' })
 
-// Item detail
-const infoHeaders = ref([])
-const itemsInfo = ref([])
-const additionalInfoAmount = ref(0)
+// Modals
+const filtersModalShow = ref(false)
+
+// Filters
+const filters = ref(emptyFormGroup(false))
 
 const subheaders = computed(() => {
   const result = []
@@ -90,13 +84,6 @@ onMounted(() => {
   if (props.defaultSort) {
     sortindex.value = props.defaultSort
     descending.value = true // For now sort by descending on default, TODO refactor
-  }
-  if (
-    props.headers
-      .map((header) => header.name)
-      .some((name) => name.includes('spotify-uri'))
-  ) {
-    toggleInfoColumns(['Album', 'Snippet'])
   }
 })
 
@@ -140,41 +127,6 @@ function setsorting(i) {
   }
   emit('paginationSort', i)
 }
-
-/**
- * Checks whether a given string is a key.
- * @param {String}	key	- the string that needs to be checked
- * @return	{Bool} boolean stating whether the string is a key.
- */
-function isItemKey(key) {
-  const lowerKey = key.toLowerCase()
-  const itemKeys = ['item']
-  return itemKeys.includes(lowerKey) || lowerKey.includes('id')
-}
-
-// Hide item (ID) columns and show info columns
-function toggleInfoColumns(addHeaders) {
-  infoHeaders.value = [
-    ...props.headers.filter((header) => !isItemKey(header.name)),
-    ...addHeaders.map((header) => ({ name: header })),
-  ]
-  additionalInfoAmount.value = addHeaders.length
-}
-
-function isRecsHeader(key) {
-  return (
-    key &&
-    filteredHeaders()
-      .map((header) => header.name.toLowerCase())
-      .includes(key.split('_').join(' '))
-  )
-}
-
-const filteredHeaders = () => {
-  return !props.recs || infoHeaders.value.length === 0
-    ? props.headers
-    : [...props.headers, ...[{ name: 'Album' }, { name: 'Snippet' }]]
-}
 </script>
 
 <template>
@@ -193,7 +145,6 @@ const filteredHeaders = () => {
         :options="filterOptions"
       />
     </b-modal>
-
     <!-- Table -->
     <b-table-simple hover striped responsive caption-top id="customScrollbar">
       <caption>
@@ -201,15 +152,14 @@ const filteredHeaders = () => {
           props.caption
         }}
 
-        <template v-if="expandable">
-          <!-- Bootstrap icons -->
-          <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
-            rel="stylesheet"
-          />
-
+        <template v-if="recs">
           <!-- Headers and filters modal buttons -->
           <div class="float-end">
+            <!--TODO use Table slot for the headers/filters, handle them in RatingsTable-->
+            <!--
+            <h2>{{ headerOptions }}</h2>
+            <h2>{{ filterOptions }}</h2>
+            -->
             <HeadersModal
               :headerOptions="headerOptions"
               @updateHeaders="(e) => emit('updateHeaders', e)"
@@ -229,7 +179,7 @@ const filteredHeaders = () => {
       <b-thead head-variant="dark">
         <!-- Main headers -->
         <b-tr>
-          <template v-for="(header, index) in filteredHeaders()" :key="header">
+          <template v-for="(header, index) in headers" :key="header">
             <b-th
               class="text-center"
               :colspan="header.subheaders ? header.subheaders.length : 1"
@@ -262,12 +212,7 @@ const filteredHeaders = () => {
             v-for="[key, value] in Object.entries(item)"
             :key="`${descending}_${sortindex}_${index}-${key}`"
           >
-            <!-- For recs tables, show filtered columns -->
-            <b-td
-              v-if="!recs || isRecsHeader(key)"
-              class="text-center"
-              :style="colItemStyle"
-            >
+            <b-td class="text-center" :style="colItemStyle">
               <!--Special pill format for status-->
               <template
                 v-if="
@@ -289,46 +234,31 @@ const filteredHeaders = () => {
               </template>
               <!-- Non-status columns -->
               <template v-else>
-                <!-- Spotify column -->
-                <template v-if="key === 'track_spotify-uri'">
-                  <template v-if="value">
-                    <MusicItem v-model="itemsInfo[index]" :uri="item[key]" />
+                <template v-if="value">
+                  <!-- Spotify column -->
+                  <template v-if="key === 'track_spotify-uri'">
+                    <MusicItem :uri="item[key]" />
                   </template>
-                  <template v-else></template>
+                  <!-- Audio snippet column -->
+                  <template v-if="key === 'audio_snippet'">
+                    <AudioSnippet :trackId="value" />
+                  </template>
+
+                  <!-- Regular column -->
+                  <template
+                    v-else-if="value && value.toString().startsWith('http')"
+                  >
+                    <b-link :href="value" target="_blank">{{ value }}</b-link>
+                  </template>
+                  <template v-else>
+                    {{ value }}
+                  </template>
                 </template>
-                <!-- Regular column -->
-                <template v-else-if="value && value.toString().startsWith('http')">
-                  <b-link :href="value" target="_blank">{{ value}}</b-link>
-                </template>
-                <template v-else>
-                  {{ value }}
-                </template>
+                <template v-else></template>
               </template>
             </b-td>
           </template>
-          <!-- Additional item info -->
-          <template v-if="recs">
-            <template v-for="i in additionalInfoAmount" :key="i">
-              <b-td
-                v-if="itemsInfo[index]"
-                class="text-center"
-                :style="colItemStyle(colWidth * 3)"
-              >
-                <template
-                  v-if="
-                    itemsInfo[index][i - 1] &&
-                    itemsInfo[index][i - 1].header.toLowerCase() === 'snippet'
-                  "
-                >
-                  <AudioSnippet :trackId="itemsInfo[index][i - 1].value" />
-                </template>
-                <template v-else>
-                  {{ itemsInfo[index][i - 1].value }}
-                </template>
-              </b-td>
-              <b-td :style="colItemStyle(colWidth * 3)" v-else></b-td>
-            </template>
-          </template>
+
           <b-td
             class="align-middle"
             v-if="overview || removable"
@@ -340,8 +270,11 @@ const filteredHeaders = () => {
                 @click="$emit('viewResult', item.id)"
                 class="m-1"
                 style="width: 142px"
-                v-if="!item.status || 
-                  item.status.slice(statusPrefix.length) == status.done" :id="item.id"
+                v-if="
+                  !item.status ||
+                  item.status.slice(statusPrefix.length) == status.done
+                "
+                :id="item.id"
               >
                 {{ viewItem ? 'View result' : 'Open result' }}
               </b-button>
@@ -356,8 +289,13 @@ const filteredHeaders = () => {
                   />
                 </b-col>
                 <b-col md="auto" class="mx-0 px-0 d-inline">
-                  <InfoModal v-if="!item.status || 
-                    item.status.slice(statusPrefix.length) == status.done" :id="item.id" />
+                  <InfoModal
+                    v-if="
+                      !item.status ||
+                      item.status.slice(statusPrefix.length) == status.done
+                    "
+                    :id="item.id"
+                  />
                 </b-col>
 
                 <b-col md="auto" class="mx-0 px-0 d-inline">
