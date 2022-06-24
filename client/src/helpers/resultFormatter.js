@@ -85,9 +85,11 @@ export function statusVariant(rawStatus) {
  */
 export function formatResult(result) {
   // console.log('before format', JSON.parse(JSON.stringify(result)))
+  const { rawSettings, ...restSettings } = result.settings
   const formattedResult = {
     id: result.timestamp.stamp,
     metadata: result.metadata,
+    settings: restSettings,
     result: result.result
       // Format result per dataset
       .map((datasetResult) => {

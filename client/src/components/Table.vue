@@ -25,21 +25,19 @@ const emit = defineEmits([
   'updateHeaders',
 ])
 const props = defineProps({
-  viewItem: Boolean,
-  recs: Boolean,
   overview: Boolean,
+  pagination: Boolean,
+  recs: Boolean,
   results: Array,
   headers: Array,
   removeText: String,
   removable: Boolean,
   editable: Boolean,
+  viewItem: Boolean,
   serverFile: String,
   serverFile2: String,
-  pagination: Boolean,
   caption: String,
-  expandable: Boolean,
   headerOptions: Object,
-  filters: Object,
   filterOptions: Array,
   defaultSort: Number,
   startIndex: Number,
@@ -51,16 +49,16 @@ const colWidth = 6
 // Pagination
 const entryAmount = ref(10)
 
+// Sorting
+const sortindex = ref()
+const descending = ref()
+const sortIcon = ref({ true: ' ▲', false: ' ▼' })
+
 // Modals
 const filtersModalShow = ref(false)
 
 // Filters
 const filters = ref(emptyFormGroup(false))
-
-// Sorting
-const sortindex = ref()
-const descending = ref()
-const sortIcon = ref({ true: ' ▲', false: ' ▼' })
 
 const subheaders = computed(() => {
   const result = []
@@ -129,24 +127,6 @@ function setsorting(i) {
   }
   emit('paginationSort', i)
 }
-
-/*
-function sortHeaders(headers) {
-  if (!props.recs) return headers
-  console.log('sort headers:', headers)
-  // Standard order
-  return (
-    headers.filter((h) => HEADERS_ORDER.includes(h.name.toLowerCase())) +
-    headers.filter((h) => !HEADERS_ORDER.includes(h.name.toLowerCase()))
-  )
-}
-
-function sortItems(items) {
-  if (!props.recs) return items
-  console.log('sort items:', items)
-  // Standard order
-  return items
-}*/
 </script>
 
 <template>
@@ -165,7 +145,6 @@ function sortItems(items) {
         :options="filterOptions"
       />
     </b-modal>
-
     <!-- Table -->
     <b-table-simple hover striped responsive caption-top id="customScrollbar">
       <caption>
@@ -173,15 +152,14 @@ function sortItems(items) {
           props.caption
         }}
 
-        <template v-if="expandable">
-          <!-- Bootstrap icons -->
-          <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
-            rel="stylesheet"
-          />
-
+        <template v-if="recs">
           <!-- Headers and filters modal buttons -->
           <div class="float-end">
+            <!--TODO use Table slot for the headers/filters, handle them in RatingsTable-->
+            <!--
+            <h2>{{ headerOptions }}</h2>
+            <h2>{{ filterOptions }}</h2>
+            -->
             <HeadersModal
               :headerOptions="headerOptions"
               @updateHeaders="(e) => emit('updateHeaders', e)"
