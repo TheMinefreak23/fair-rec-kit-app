@@ -24,7 +24,8 @@ from unittest.mock import patch
 # import polling
 from fairreckitlib.recommender_system import RecommenderSystem
 
-from project.models.experiment import QueueItem, Status, ProgressStatus, Experiment
+from project.models.experiment import QueueItem, Status, \
+    ProgressStatus, Experiment, progress_to_dict, Progress
 from project.models import queue, options_formatter
 from project.models.experiment_queue import formatted_experiment
 from tests.common import check_bad_request
@@ -47,7 +48,13 @@ def get_mock_options():
     """
     name = mock_options['metadata']['name']
     mock_options['timestamp'] = {'stamp': str(time.time())}
-    queue_item = QueueItem(mock_options, {}, Status.TODO, ProgressStatus.NA, name)
+    queue_item = QueueItem(mock_options,
+                           {},
+                           Status.TODO,
+                           Progress(status=ProgressStatus.NA,
+                                    progress=0,
+                                    message=''),
+                           name)
     experiment = Experiment(queue_item, RecommenderSystem('datasets', TEST_RESULTS_PATH))
     # Make new timestamp
     print(experiment)
@@ -67,7 +74,6 @@ def test_queue_format():
     assert queue_result == []
 
 
-
 def test_experiment_format():
     """Test whether an experiment gets formatted correctly."""
     # NoneType experiment gives empty dictionary
@@ -79,8 +85,7 @@ def test_experiment_format():
     queue_item = experiment.queue_item
     experiment_result = formatted_experiment(experiment)
     assert experiment_result['status'] == queue_item.status.value
-    assert experiment_result['progress'] == queue_item.progress.value
-
+    assert experiment_result['progress'] == progress_to_dict(queue_item.progress)
 
 
 def test_params(client):
@@ -122,6 +127,7 @@ def test_experiment_route_get(client):
     data = json.loads(get_response.data)
     assert 'status' in data
 
+
 def test_queue(client):
     """Test GET request on queue route.
 
@@ -149,13 +155,13 @@ def test_abort(client):
     experiment.queue_item.status = Status.TODO
     queue.queue.append(experiment)
     client.post(url, json={'id': experiment_id})
-    queue.queue.pop() # Empty queue
+    queue.queue.pop()  # Empty queue
     assert experiment.queue_item.status == Status.CANCELLED
 
     experiment.queue_item.status = Status.ACTIVE
     queue.queue.append(experiment)
     client.post(url, json={'id': experiment_id})
-    queue.queue.pop() # Empty queue
+    queue.queue.pop()  # Empty queue
     assert experiment.queue_item.status == Status.ABORTED
 
 
@@ -175,14 +181,14 @@ def test_append():
     assert float(queue_item.job['timestamp']['stamp']) > time.time() - 1
 
     assert queue_item.status == Status.TODO
-    assert queue_item.progress == ProgressStatus.NA
+    assert queue_item.progress.status == ProgressStatus.NA
 
     # Test empty metadata
     with open('tests/options.json', encoding='utf-8') as file:
         mock = json.load(file)
     queue.append_queue({}, mock['settings'])
     queue_item = queue.queue.pop().queue_item
-    assert queue_item.job['metadata'] == { 'name': 'Untitled' }
+    assert queue_item.job['metadata'] == {'name': 'Untitled'}
 
 
 @patch('project.models.recommender_system', RecommenderSystem('datasets', MOCK_RESULTS_DIR))
@@ -199,4 +205,4 @@ def test_add_validation():
     assert queue_item.validating
 
     assert queue_item.status == Status.TODO
-    assert queue_item.progress == ProgressStatus.NA
+    assert queue_item.progress.status == ProgressStatus.NA

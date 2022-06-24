@@ -4,32 +4,36 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
 
 import { ref } from 'vue'
-import { makeHeader, capitalise } from '../../../helpers/resultFormatter'
+import {
+  makeHeader,
+  capitalise,
+  STANDARD_HEADERS,
+} from '../../../helpers/resultFormatter'
 
-const props = defineProps({ headerOptions: Object })
+defineProps({ headerOptions: Object })
 defineEmits(['updateHeaders'])
 const updateHeadersModalShow = ref(false)
 
 // Columns
-const checkedColumns = ref(["track_spotify-uri"])
+const checkedColumns = ref(STANDARD_HEADERS)
 </script>
 
 <template>
   <div>
     <!-- Modal used for changing the headers of the user recommendations table -->
     <b-modal
-      v-if="props.headerOptions"
+      v-if="headerOptions"
       id="change-columns-modal"
       v-model="updateHeadersModalShow"
       title="Select headers"
       @ok="$emit('updateHeaders', checkedColumns)"
     >
       <p>Select the extra headers you want to be shown</p>
-      <div v-for="category in Object.keys(props.headerOptions)" :key="category">
+      <div v-for="category in Object.keys(headerOptions)" :key="category">
         <p>{{ capitalise(category) }} specific:</p>
         <div
           class="form-check form-switch"
-          v-for="header in props.headerOptions[category]"
+          v-for="header in headerOptions[category]"
           :key="header"
         >
           <input

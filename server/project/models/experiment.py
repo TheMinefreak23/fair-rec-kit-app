@@ -55,12 +55,13 @@ class ProgressStatus(enum.Enum):
     FINISHED = 'Finished'
     NA = 'Not Available'
 
+
 @dataclass
 class Progress:
     """Dataclass for showing the progress of an experiment."""
 
     status: ProgressStatus
-    progress: int # Progress out of 100
+    progress: int  # Progress out of 100
     message: str
 
 
@@ -76,6 +77,7 @@ def progress_to_dict(progress):
     return {'status': progress.status.value,
             'number': progress.progress,
             'message': progress.message}
+
 
 # TODO refactor job and config_dict overlap
 @dataclass
@@ -148,7 +150,6 @@ class Experiment:
         # Delete temporary YML config
         os.remove(config_file_path + '.yml')
 
-
     def validate_experiment(self, events):
         """Validate an experiment by running it multiple times, using the experiment file path.
 
@@ -156,5 +157,5 @@ class Experiment:
             experiment(QueueItem): the experiment to validate
         """
         self.recommender_system.validate_experiment(result_dir=self.queue_item.job['file_path'],
-                                               num_runs=self.queue_item.job['amount'],
-                                               events=events)
+                                                    num_runs=self.queue_item.job['amount'],
+                                                    events=events)

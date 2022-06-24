@@ -124,12 +124,12 @@ class EventHandler:
             progress_number = int(self.current_index *
                                   (STATUS_ORDER.index(progress_status) + 1) /
                                   self.max_progress * 100)
-            print('CURRENT INDEX', self.current_index,
-                  'MAX PROGRESS', self.max_progress,
-                  'RELATIVE PROGRESS', (self.current_index *
-                                  (STATUS_ORDER.index(progress_status) + 1) /
-                                  self.max_progress),
-                  'PROGRESS NUMBER', progress_number)
+            #print('CURRENT INDEX', self.current_index,
+            #      'MAX PROGRESS', self.max_progress,
+            #      'RELATIVE PROGRESS', (self.current_index *
+            #                      (STATUS_ORDER.index(progress_status) + 1) /
+            #                      self.max_progress),
+            #      'PROGRESS NUMBER', progress_number)
             self.experiment.progress = Progress(
                 status=progress_status,
                 progress=progress_number,
