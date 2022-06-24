@@ -34,15 +34,15 @@ function getCalculation() {
         .then((data) => {
           console.log('polling experiment, status:', data.status)
           store.currentExperiment.status = data.status
+
+          // Update queue and progress while waiting for a result
+          getQueue()
           if ([status.done, status.aborted].includes(data.status)) {
             clearInterval(store.resultPoll)
             if (data.status === status.done)
               addResultById(data.experimentID, false)
             console.log('DONE or ABORTED!!')
           }
-
-          // Update queue and progress while waiting for a result
-          getQueue()
         })
     } catch (e) {
       console.log(e)

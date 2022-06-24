@@ -23,6 +23,8 @@ from fairreckitlib.model.pipeline.model_event \
     ON_BEGIN_TRAIN_MODEL
 
 from project.models.events import Status, ProgressStatus, EventHandler
+from project.models.experiment import Progress
+
 
 @dataclass
 class TestClassHelper:
@@ -40,7 +42,7 @@ class TestClass:
 
 Self = TestClass
 Self.experiment.status = Status
-Self.experiment.progress = ProgressStatus
+Self.experiment.progress = Progress
 eventListener = Any
 
 
@@ -49,26 +51,26 @@ def test_events():
     event_handler = EventHandler(Self.experiment, None, None)
 
     event_handler.handle_event(eventListener, EventArgs(event_id=ON_PARSE))
-    assert Self.experiment.progress == ProgressStatus.PARSING
+    assert Self.experiment.progress.status == ProgressStatus.PARSING
 
     event_handler.handle_event(eventListener, EventArgs(event_id=ON_BEGIN_DATA_PIPELINE))
-    assert Self.experiment.progress == ProgressStatus.PROCESSING_DATA
+    assert Self.experiment.progress.status == ProgressStatus.PROCESSING_DATA
 
     event_handler.handle_event(eventListener, EventArgs(event_id=ON_BEGIN_FILTER_DATASET))
-    assert Self.experiment.progress == ProgressStatus.FILTERING_DATA
+    assert Self.experiment.progress.status == ProgressStatus.FILTERING_DATA
 
     event_handler.handle_event(eventListener, EventArgs(event_id=ON_BEGIN_SPLIT_DATASET))
-    assert Self.experiment.progress == ProgressStatus.SPLITTING_DATA
+    assert Self.experiment.progress.status == ProgressStatus.SPLITTING_DATA
 
     event_handler.handle_event(eventListener, EventArgs(event_id=ON_BEGIN_MODEL_PIPELINE))
-    assert Self.experiment.progress == ProgressStatus.MODEL
+    assert Self.experiment.progress.status == ProgressStatus.MODEL
 
     event_handler.handle_event(eventListener, EventArgs(event_id=ON_BEGIN_LOAD_TRAIN_SET))
-    assert Self.experiment.progress == ProgressStatus.MODEL_LOAD
+    assert Self.experiment.progress.status == ProgressStatus.MODEL_LOAD
 
     event_handler.handle_event(eventListener, EventArgs(event_id=ON_BEGIN_TRAIN_MODEL))
-    assert Self.experiment.progress == ProgressStatus.TRAINING
+    assert Self.experiment.progress.status == ProgressStatus.TRAINING
 
     event_handler.handle_event(eventListener, EventArgs(event_id=ON_BEGIN_EXPERIMENT_THREAD))
     assert Self.experiment.status == Status.ACTIVE
-    assert Self.experiment.progress == ProgressStatus.STARTED
+    assert Self.experiment.progress.status == ProgressStatus.STARTED

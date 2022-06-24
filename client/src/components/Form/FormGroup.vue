@@ -47,7 +47,7 @@ const form = computed({
 onMounted(() => {
   // Reset main option (TODO temporary measure for changing options prop)
   if (form.value.main) {
-    console.log(props.title, form.value.main)
+    // console.log(props.title, form.value.main)
     form.value.main = ''
   }
   form.value.single = props.single

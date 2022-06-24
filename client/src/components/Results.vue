@@ -79,9 +79,7 @@ function closeResult(index) {
     ok-title="View new result"
     ok-variant="danger"
     cancel-title="Cancel"
-    @ok="
-      store.currentTab = 3
-    "
+    @ok="store.currentTab = 3"
   >
     <p>An experiment has finished.</p>
   </b-modal>
@@ -134,7 +132,7 @@ function closeResult(index) {
         <!--Toggled results sidebar (offcanvas)-->
         <div
           class="offcanvas offcanvas-end"
-          :style="{ width: '60em', overflowY: 'scroll' }"
+          :style="{ width: '60vw', overflowY: 'scroll' }"
           tabindex="-1"
           id="offcanvasRight"
           aria-labelledby="offcanvasRightLabel"
