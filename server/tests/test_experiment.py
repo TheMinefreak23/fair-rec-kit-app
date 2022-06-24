@@ -197,8 +197,9 @@ def test_add_validation():
     test_path = '1654518468_Test938_perturbance'
     test_amount = 0
     result = {}
-    queue.add_validation(test_path, test_amount, result)
+    queue.add_validation(0, test_path, test_amount, result)
     queue_item = queue.queue.pop().queue_item
+    assert queue_item.job['overview_index'] == 0
     assert queue_item.job['file_path'] == test_path
     assert queue_item.job['amount'] == test_amount
     assert queue_item.name == ''
