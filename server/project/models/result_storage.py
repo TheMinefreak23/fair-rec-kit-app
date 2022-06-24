@@ -52,6 +52,18 @@ class ResultStorage:
         self.current_result = experiment
         add_result(self.current_result)
 
+    def update_result(self, overview_index, execution_data):
+        """Update the result with the new validation execution data.
+
+        Args:
+            overview_index(int): the index of the result in the overview
+            execution_data(dict): the experiment execution data
+        """
+        # TODO: NOTE: could update runs here
+        overview = load_results_overview()
+        overview['all_results'][overview_index]['experiments'].append(execution_data)
+        write_results_overview(overview)
+
     @staticmethod
     def format_result(settings):
         """Mock result experiment.

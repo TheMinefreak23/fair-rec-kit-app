@@ -15,10 +15,22 @@ const store = reactive({
   toast: null, // Toast settings to show in the toast over the app
 })
 
+// App tabs (TODO use these for dynamic app order)
+const APP_TABS = [
+  'New Experiment',
+  'Experiment Queue',
+  'Results',
+  'All Results',
+  'Documentation',
+  'Music Detail',
+]
+
 /**
  * Poll for the current experiment result
  */
 function pollForResult() {
+  // Switch to queue
+  store.currentTab = APP_TABS.indexOf('Experiment Queue')
   const interval = 300
   store.resultPoll = setInterval(getCalculation, interval)
 }
@@ -34,15 +46,15 @@ function getCalculation() {
         .then((data) => {
           console.log('polling experiment, status:', data.status)
           store.currentExperiment.status = data.status
+
+          // Update queue and progress while waiting for a result
+          getQueue()
           if ([status.done, status.aborted].includes(data.status)) {
             clearInterval(store.resultPoll)
             if (data.status === status.done)
               addResultById(data.experimentID, false)
             console.log('DONE or ABORTED!!')
           }
-
-          // Update queue and progress while waiting for a result
-          getQueue()
         })
     } catch (e) {
       console.log(e)
@@ -85,6 +97,7 @@ function removeResult(index) {
 
 export {
   store,
+  APP_TABS,
   addResult,
   removeResult,
   getCalculation,

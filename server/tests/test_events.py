@@ -12,63 +12,71 @@ from dataclasses import dataclass
 from typing import Any
 
 from fairreckitlib.core.events.event_args import EventArgs
-from fairreckitlib.core.parsing.parse_event import ON_PARSE
 from fairreckitlib.data.pipeline.data_event \
     import ON_BEGIN_DATA_PIPELINE, ON_BEGIN_FILTER_DATASET, \
     ON_BEGIN_SPLIT_DATASET
 from fairreckitlib.experiment.experiment_event \
-    import ON_BEGIN_EXPERIMENT_THREAD
+    import ON_BEGIN_EXPERIMENT_THREAD, ExperimentThreadEventArgs
 from fairreckitlib.model.pipeline.model_event \
     import ON_BEGIN_LOAD_TRAIN_SET, ON_BEGIN_MODEL_PIPELINE, \
     ON_BEGIN_TRAIN_MODEL
 
-from project.models.events import Status, ProgressStatus, EventHandler
+from project.models import ResultStorage
+from project.models.events import Status, Progress, ProgressStatus, EventHandler
+
 
 @dataclass
 class TestClassHelper:
     """Class with an status and progress attribute used for testing."""
 
-    status = Any
-    progress = Any
-
-@dataclass
-class TestClass:
-    """Class with an experiment attribute used for testing."""
-
-    experiment = TestClassHelper
+    status = ProgressStatus
+    progress = Progress
+    validating = True
+    job = {'amount': 0, 'overview_index': 0}
 
 
-Self = TestClass
-Self.experiment.status = Status
-Self.experiment.progress = ProgressStatus
+Experiment = TestClassHelper
+Experiment.status = Status
+Experiment.progress = Progress
 eventListener = Any
 
 
 def test_events():
     """Tests the events to see if they correctly change the status and progress attributes."""
-    event_handler = EventHandler(Self.experiment, None, None)
-
-    event_handler.handle_event(eventListener, EventArgs(event_id=ON_PARSE))
-    assert Self.experiment.progress == ProgressStatus.PARSING
+    event_handler = EventHandler(Experiment, ResultStorage(), None)
+    event_handler.max_progress = 100
 
     event_handler.handle_event(eventListener, EventArgs(event_id=ON_BEGIN_DATA_PIPELINE))
-    assert Self.experiment.progress == ProgressStatus.PROCESSING_DATA
+    assert Experiment.progress.status == ProgressStatus.PROCESSING_DATA
 
     event_handler.handle_event(eventListener, EventArgs(event_id=ON_BEGIN_FILTER_DATASET))
-    assert Self.experiment.progress == ProgressStatus.FILTERING_DATA
+    assert Experiment.progress.status == ProgressStatus.FILTERING_DATA
 
     event_handler.handle_event(eventListener, EventArgs(event_id=ON_BEGIN_SPLIT_DATASET))
-    assert Self.experiment.progress == ProgressStatus.SPLITTING_DATA
+    assert Experiment.progress.status == ProgressStatus.SPLITTING_DATA
 
     event_handler.handle_event(eventListener, EventArgs(event_id=ON_BEGIN_MODEL_PIPELINE))
-    assert Self.experiment.progress == ProgressStatus.MODEL
+    assert Experiment.progress.status == ProgressStatus.MODEL
 
     event_handler.handle_event(eventListener, EventArgs(event_id=ON_BEGIN_LOAD_TRAIN_SET))
-    assert Self.experiment.progress == ProgressStatus.MODEL_LOAD
+    assert Experiment.progress.status == ProgressStatus.MODEL_LOAD
 
     event_handler.handle_event(eventListener, EventArgs(event_id=ON_BEGIN_TRAIN_MODEL))
-    assert Self.experiment.progress == ProgressStatus.TRAINING
+    assert Experiment.progress.status == ProgressStatus.MODEL_TRAINING
 
-    event_handler.handle_event(eventListener, EventArgs(event_id=ON_BEGIN_EXPERIMENT_THREAD))
-    assert Self.experiment.status == Status.ACTIVE
-    assert Self.experiment.progress == ProgressStatus.STARTED
+    event_handler.handle_event(eventListener,
+                               ExperimentThreadEventArgs(event_id=ON_BEGIN_EXPERIMENT_THREAD,
+                                                         num_runs=0,
+                                                         experiment_name='foo'),
+                               elapsed_time=0)
+    assert Experiment.status == Status.ACTIVE
+    assert Experiment.progress.status == ProgressStatus.STARTED
+
+    #event_handler.handle_event(eventListener,
+    #                           ExperimentThreadEventArgs(event_id=ON_END_EXPERIMENT_THREAD,
+    #                                                     num_runs=0,
+    #                                                     experiment_name='foo'),
+    #                           elapsed_time=0)
+    #assert experiment.status == Status.DONE
+    #assert experiment.progress.status == ProgressStatus.FINISHED
+    #assert experiment.progress.message == 'Finished 0 experiment(s) with name foo in 0.0000s'

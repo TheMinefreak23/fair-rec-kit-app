@@ -10,6 +10,7 @@ import { API_URL } from '../api'
 import SettingsModal from './Table/Modals/SettingsModal.vue'
 // import VueDragResize from 'vue-drag-resize/src/component/vue-drag-resize.vue';
 import RatingsTable from './Table/RatingsTable.vue';
+import { capitalise } from '../helpers/resultFormatter'
 
 const props = defineProps({ headers: Array, result: Object });
 
@@ -193,6 +194,14 @@ function contains(string, array) {
           <p class="lead"> Results for </p>
           <h1 class="display-3"> {{ result.metadata.name }} </h1>
           <h3 class="text-muted"> {{ result.metadata.datetime }} </h3>
+          <!--Show experiments data (original experiment and validations)-->
+          <b v-if="result.experiments.length > 1">Experiments:</b>
+          <ul>
+          <li v-for="(experiment, index) in result.experiments">
+          {{index !== 0 ? experiment.runs + ' Validation experiments' : 'Experiment' }} started at {{experiment.started}} and ended at {{experiment.ended}}.
+          {{index !== 0 && experiment.runs > 1 ? 'They' : 'It'}} took {{new Date(1000 * experiment.elapsed_time).toISOString().substr(11, 8)}} to complete.
+           </li>
+           </ul>
         </b-col>
         <b-col>
           <div class="float-end">

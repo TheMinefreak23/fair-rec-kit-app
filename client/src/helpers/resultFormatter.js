@@ -89,6 +89,7 @@ export function formatResult(result) {
   const formattedResult = {
     id: result.timestamp.stamp,
     metadata: result.metadata,
+    experiments: result.experiments,
     settings: restSettings,
     result: result.result
       // Format result per dataset

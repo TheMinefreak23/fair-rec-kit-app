@@ -5,7 +5,7 @@ Utrecht University within the Software Project course.
 import { computed, onMounted, ref, watch } from 'vue'
 import FormGroupList from './Form/FormGroupList.vue'
 import { sendMockData } from '../test/mock/mockExperimentOptions.js'
-import { store, pollForResult } from '../store.js'
+import { store, pollForResult, APP_TABS } from '../store.js'
 import { API_URL, DEV } from '../api'
 import {
   emptyFormGroup,
@@ -51,7 +51,7 @@ watch(
     console.log('newExperiment watch new settings:', newSettings)
     form.value = newSettings.form
     metadata.value = newSettings.metadata
-    store.currentTab = 0
+    store.currentTab = APP_TABS.indexOf('New Experiment')
   }
 )
 
@@ -113,8 +113,6 @@ async function sendToServer() {
   const data = await response.json()
   store.queue = data.queue
   console.log('sendToServer() queue', store.queue)
-  // Switch to queue
-  store.currentTab = 1
   pollForResult()
 }
 

@@ -12,11 +12,10 @@ Utrecht University within the Software Project course.
 """
 
 import time
-from datetime import datetime
 
 from .constants import MAIL_KEY
 from .events import EventHandler
-from .experiment import Status, ProgressStatus, QueueItem, Experiment
+from .experiment import Status, ProgressStatus, QueueItem, Experiment, Progress, current_dt
 
 
 class ExperimentQueue:
@@ -107,10 +106,8 @@ class ExperimentQueue:
 
         # Set time
         timestamp = time.time()
-        now = datetime.now()
-        current_dt = now.strftime('%Y-%m-%d %H:%M:%S')
         job = {'timestamp': {'stamp': str(int(timestamp)),
-                             'datetime': current_dt},
+                             'datetime': current_dt()},
                'metadata': metadata,
                'settings': settings}
 
@@ -118,30 +115,32 @@ class ExperimentQueue:
         config_dict, config_id = self.options_formatter.config_dict_from_settings(job)
 
         # TODO refactor job and config_dict overlap
-        queue_item = QueueItem(job,
-                                config_dict,
-                                Status.TODO,
-                                ProgressStatus.NA,
-                                config_id)
+        queue_item = QueueItem(job=job,
+                               config=config_dict,
+                               status=Status.TODO,
+                               progress=Progress(ProgressStatus.NA, 0, ''),
+                               name=config_id)
         experiment = Experiment(queue_item, self.recommender_system)
         self.filter_queue()
         self.queue.append(experiment)
 
-    def add_validation(self, file_path, amount, result):
+    def add_validation(self, overview_index, file_path, amount, result):
         """Add a validation experiment to the queue.
 
         Args:
+            overview_index(int): the index in the results overview
             file_path(str): the path to the existing experiment result
             amount(int): the amount of runs for validation
 
         """
+        result['overview_index'] = overview_index
         result['file_path'] = file_path
         result['amount'] = amount
-        queue_item = QueueItem(job = result,
+        queue_item = QueueItem(job=result,
                                config={},
                                name='',
                                status=Status.TODO,
-                               progress=ProgressStatus.NA,
+                               progress=Progress(ProgressStatus.NA, 0, ''),
                                validating=True)
         experiment = Experiment(queue_item, self.recommender_system)
         self.filter_queue()
@@ -150,12 +149,13 @@ class ExperimentQueue:
     def filter_queue(self):
         """Filter out finished experiments when the queue is too long."""
         finished_experiments = len([
-        item for item in self.queue
-        if item.queue_item.status in (Status.DONE, Status.ABORTED)
-    ])
+            item for item in self.queue
+            if item.queue_item.status in (Status.DONE, Status.ABORTED)
+        ])
         while finished_experiments > 5:
             self.queue.pop(0)
             finished_experiments -= 1
+
 
 def formatted_experiment(experiment):
     """Format the experiment to a dictionary.

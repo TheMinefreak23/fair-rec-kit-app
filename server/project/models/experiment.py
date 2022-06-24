@@ -12,6 +12,7 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
+from datetime import datetime
 import enum
 import os
 from dataclasses import dataclass
@@ -38,15 +39,45 @@ class ProgressStatus(enum.Enum):
 
     STARTED = 'Started'
     PARSING = 'Parsing'
+    EXPERIMENT = 'Started experiment'
     PROCESSING_DATA = 'Processing Data'
+    LOADING_DATA = 'Loading Data'
     FILTERING_DATA = 'Filtering Data'
+    CONVERTING_DATA = 'Converting Data Ratings'
     SPLITTING_DATA = 'Splitting Data'
+    SAVING_DATA = 'Saving Data'
     MODEL = 'Starting approach'
+    MODEL_RECONSTRUCTING = 'Reconstructing ratings'
     MODEL_LOAD = 'Loading train set'
-    TRAINING = 'Training'
+    MODEL_TRAINING = 'Training'
+    MODEL_TESTING = 'Testing'
     EVALUATING = 'Evaluating'
+    EVAL_FILTERING = 'Filtering ratings'
     FINISHED = 'Finished'
     NA = 'Not Available'
+
+
+@dataclass
+class Progress:
+    """Dataclass for showing the progress of an experiment."""
+
+    status: ProgressStatus
+    progress: int  # Progress out of 100
+    message: str
+
+
+def progress_to_dict(progress):
+    """Convert progress to dictionary format.
+
+    Args:
+        progress: the progress indication
+
+    Returns:
+        the converted progress
+    """
+    return {'status': progress.status.value,
+            'number': progress.progress,
+            'message': progress.message}
 
 
 # TODO refactor job and config_dict overlap
@@ -57,7 +88,7 @@ class QueueItem:
     job: dict
     config: dict
     status: Status
-    progress: ProgressStatus
+    progress: Progress
     name: str
     validating: bool = False
 
@@ -89,7 +120,7 @@ class Experiment:
             The QueueItem as a dictionary
         """
         self.queue_item.job['status'] = self.queue_item.status.value
-        self.queue_item.job['progress'] = self.queue_item.progress.value
+        self.queue_item.job['progress'] = progress_to_dict(self.queue_item.progress)
         return self.queue_item.job
 
     def run_new_experiment(self, events):
@@ -120,7 +151,6 @@ class Experiment:
         # Delete temporary YML config
         os.remove(config_file_path + '.yml')
 
-
     def validate_experiment(self, events):
         """Validate an experiment by running it multiple times, using the experiment file path.
 
@@ -128,5 +158,10 @@ class Experiment:
             experiment(QueueItem): the experiment to validate
         """
         self.recommender_system.validate_experiment(result_dir=self.queue_item.job['file_path'],
-                                               num_runs=self.queue_item.job['amount'],
-                                               events=events)
+                                                    num_runs=self.queue_item.job['amount'],
+                                                    events=events)
+
+
+def current_dt():
+    """Give formatted current date time."""
+    return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
