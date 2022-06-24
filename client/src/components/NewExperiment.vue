@@ -63,10 +63,16 @@ watch(
   (newDatasets, oldDatasets) => {
     // console.log('new datasets', newDatasets)
     if (
-      newDatasets.name !== oldDatasets.name ||
-      newDatasets.matrix !== oldDatasets.matrix
-    )
+      [...newDatasets.keys()].some(
+        (i) =>
+          !oldDatasets[i] ||
+          newDatasets[i].name !== oldDatasets[i].name ||
+          newDatasets[i].matrix !== oldDatasets[i].matrix
+      )
+    ) {
+      console.log('dataset or matrix change')
       setOptions(newDatasets)
+    }
   },
   {
     immediate: false,
