@@ -61,7 +61,7 @@ watch(
 watch(
   () => reformat(form.value.lists.datasets),
   (newDatasets, oldDatasets) => {
-    console.log('new datasets', newDatasets)
+    // console.log('new datasets', newDatasets)
     if (
       newDatasets.name !== oldDatasets.name ||
       newDatasets.matrix !== oldDatasets.matrix

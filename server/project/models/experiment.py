@@ -24,7 +24,6 @@ CONFIG_DIR = 'config_files'
 
 class Status(enum.Enum):
     """Experiment status in queue."""
-
     TODO = 'To Do'
     ACTIVE = 'Active'
     ABORTED = 'Aborted'
@@ -38,26 +37,52 @@ class ProgressStatus(enum.Enum):
 
     STARTED = 'Started'
     PARSING = 'Parsing'
+    EXPERIMENT = 'Started experiment'
     PROCESSING_DATA = 'Processing Data'
+    LOADING_DATA = 'Loading Data'
     FILTERING_DATA = 'Filtering Data'
+    CONVERTING_DATA = 'Converting Data Ratings'
     SPLITTING_DATA = 'Splitting Data'
+    SAVING_DATA = 'Saving Data'
     MODEL = 'Starting approach'
+    MODEL_RECONSTRUCTING = 'Reconstructing ratings'
     MODEL_LOAD = 'Loading train set'
-    TRAINING = 'Training'
+    MODEL_TRAINING = 'Training'
+    MODEL_TESTING = 'Testing'
     EVALUATING = 'Evaluating'
+    EVAL_FILTERING = 'Filtering ratings'
     FINISHED = 'Finished'
     NA = 'Not Available'
 
+@dataclass
+class Progress:
+    """Dataclass for showing the progress of an experiment."""
+    status: ProgressStatus
+    progress: int # Progress out of 100
+    message: str
+
+
+def progress_to_dict(progress):
+    """Convert progress to dictionary format.
+
+    Args:
+        progress: the progress indication
+
+    Returns:
+        the converted progress
+    """
+    return {'status': progress.status.value,
+            'number': progress.progress,
+            'message': progress.message}
 
 # TODO refactor job and config_dict overlap
 @dataclass
 class QueueItem:
     """Dataclass for experiment setting items in the queue."""
-
     job: dict
     config: dict
     status: Status
-    progress: ProgressStatus
+    progress: Progress
     name: str
     validating: bool = False
 
@@ -89,7 +114,7 @@ class Experiment:
             The QueueItem as a dictionary
         """
         self.queue_item.job['status'] = self.queue_item.status.value
-        self.queue_item.job['progress'] = self.queue_item.progress.value
+        self.queue_item.job['progress'] = progress_to_dict(self.queue_item.progress)
         return self.queue_item.job
 
     def run_new_experiment(self, events):

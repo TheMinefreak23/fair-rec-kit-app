@@ -26,7 +26,6 @@ const headers = ref([
 ])
 
 const progressMax = 100 // the maximal value of the progress bar
-const previousNumber = ref(0) // the previous progress number
 
 /**
  * Retrieve the queue when the page is loaded
@@ -37,34 +36,6 @@ onMounted(() => {
     pollForResult()
   }
 })
-
-/**
- * Return a progress number based on the progress status
- * @param {String} progressStatus - the progress status
- */
-function progressNumber(progressStatus) {
-  // progress statuses in order
-  const progresses = [
-    progress.started,
-    progress.processingData,
-    progress.splittingData,
-    progress.model,
-    progress.modelLoad,
-    progress.training,
-    progress.finished,
-  ]
-  const progressNumbers = {}
-  for (const progressIndex in progresses) {
-    progressNumbers[progresses[progressIndex]] = Math.floor(
-      (progressIndex / progresses.length) * progressMax
-    )
-  }
-  progressNumber.value = progressNumbers[progressStatus]
-  if (progressNumber) {
-    previousNumber.value = progressNumber
-  }
-  return previousNumber.value
-}
 </script>
 
 <template>
@@ -80,22 +51,18 @@ function progressNumber(progressStatus) {
         }}
       </h4>
       <!--Show the experiment progress.-->
-      <b-progress
-        v-if="store.currentExperiment.status == status.active"
-        :max="progressMax"
-        height="2rem"
-        show-progress
-        animated
-      >
-        <b-progress-bar
-          :value="progressNumber(store.currentExperiment.progress)"
-        >
-          <span>
-            Progress:
-            {{ store.currentExperiment.progress }}
-          </span>
-        </b-progress-bar>
-      </b-progress>
+      <template v-if="store.currentExperiment.status == status.active">
+        <b-progress :max="progressMax" height="2rem" show-progress animated>
+          <b-progress-bar :value="store.currentExperiment.progress.number">
+            <span>
+              Progress:
+              {{ store.currentExperiment.progress.status }}
+            </span>
+          </b-progress-bar>
+        </b-progress>
+        <h4>{{ store.currentExperiment.progress.message }}</h4>
+      </template>
+      <p>{{ store.currentExperiment.progress }}</p>
       <!--Show the queue with this session's experiments.-->
       <Table
         @viewResult="addResultById"

@@ -16,7 +16,7 @@ from datetime import datetime
 
 from .constants import MAIL_KEY
 from .events import EventHandler
-from .experiment import Status, ProgressStatus, QueueItem, Experiment
+from .experiment import Status, ProgressStatus, QueueItem, Experiment, Progress
 
 
 class ExperimentQueue:
@@ -118,11 +118,11 @@ class ExperimentQueue:
         config_dict, config_id = self.options_formatter.config_dict_from_settings(job)
 
         # TODO refactor job and config_dict overlap
-        queue_item = QueueItem(job,
-                                config_dict,
-                                Status.TODO,
-                                ProgressStatus.NA,
-                                config_id)
+        queue_item = QueueItem(job=job,
+                               config=config_dict,
+                               status=Status.TODO,
+                               progress=Progress(ProgressStatus.NA, 0, ''),
+                               name=config_id)
         experiment = Experiment(queue_item, self.recommender_system)
         self.filter_queue()
         self.queue.append(experiment)
@@ -137,11 +137,11 @@ class ExperimentQueue:
         """
         result['file_path'] = file_path
         result['amount'] = amount
-        queue_item = QueueItem(job = result,
+        queue_item = QueueItem(job=result,
                                config={},
                                name='',
                                status=Status.TODO,
-                               progress=ProgressStatus.NA,
+                               progress=Progress(ProgressStatus.NA, 0, ''),
                                validating=True)
         experiment = Experiment(queue_item, self.recommender_system)
         self.filter_queue()
@@ -150,12 +150,13 @@ class ExperimentQueue:
     def filter_queue(self):
         """Filter out finished experiments when the queue is too long."""
         finished_experiments = len([
-        item for item in self.queue
-        if item.queue_item.status in (Status.DONE, Status.ABORTED)
-    ])
+            item for item in self.queue
+            if item.queue_item.status in (Status.DONE, Status.ABORTED)
+        ])
         while finished_experiments > 5:
             self.queue.pop(0)
             finished_experiments -= 1
+
 
 def formatted_experiment(experiment):
     """Format the experiment to a dictionary.
