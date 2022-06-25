@@ -27,50 +27,13 @@ from project.blueprints.constants import BAD_REQUEST_RESPONSE
 from project.models import result_loader, \
     result_store, \
     recommender_system, queue
-from project.models.options_formatter import reformat_list, make_filter_option
+from project.models.options_formatter import make_filter_option
 from project.models.result_loader import result_by_id, add_dataset_columns, \
     get_chunk, rename_headers, \
-    id_to_index, ADDITIONAL_COLUMNS, sort_headers
+    id_to_index, ADDITIONAL_COLUMNS, sort_headers, filter_results
 from project.models.result_storage import load_results_overview
 
 blueprint = Blueprint('result', __name__, url_prefix='/api/result')
-
-
-def filter_results(dataframe, filters):
-    """Filter a dataframe with results using specified filters.
-
-    Args:
-        dataframe: a dataframe containing results that need to be filtered
-        filters(list): filter settings
-
-    Returns:
-        results after filtering
-    """
-    # print('raw filters from client: ', filters)
-
-    # Convert filters
-    settings = {} # TODO refactor?
-    reformat_list(settings, 'subset', filters) # TODO use reformat option instead?
-    # print('after reformat list', settings)
-
-    # TODO refactor (duplicate code in options formatter)
-    subset = []
-    for filter_pass in settings['subset']:
-        subset.append({'filter_pass': filter_pass['filter']})
-
-    # print('filters data format', json.dumps(subset, indent=4))
-    print('TODO make a filter config and filter with it')
-
-    # TODO global import
-    #from fairreckitlib.data.pipeline.data_pipeline import DataPipeline
-    #from fairreckitlib.data.filter.filter_config_parsing import parse_data_subset_config
-    #from fairreckitlib.data.filter.filter_config import DataSubsetConfig
-
-    #parse_data_subset_config()
-    #DataSubsetConfig()
-    #DataPipeline().filter_rows(dataframe,)
-
-    return dataframe
 
 
 @blueprint.route('/set-recs', methods=['POST'])
@@ -162,7 +125,7 @@ def user_result():
     # Load the current recs from the storage (without changing the original)
     recs = copy.deepcopy(result_store.current_recs[run_id][pair_id])
 
-    recs = filter_results(recs, json_data.get("filters", []))
+    recs = filter_results(recs, dataset_name, matrix_name, json_data.get("filters", []))
 
     # Add optional columns to the dataframe (if any)
     chosen_headers = json_data.get("optionalHeaders", [])

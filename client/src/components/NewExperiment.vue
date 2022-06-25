@@ -61,12 +61,25 @@ watch(
 watch(
   () => reformat(form.value.lists.datasets),
   (newDatasets, oldDatasets) => {
-    // console.log('new datasets', newDatasets)
     if (
-      newDatasets.name !== oldDatasets.name ||
-      newDatasets.matrix !== oldDatasets.matrix
-    )
+      [...newDatasets.keys()].some(
+        (i) =>
+          !oldDatasets[i] ||
+          newDatasets[i].name !== oldDatasets[i].name ||
+          (newDatasets[i].matrix && !oldDatasets[i].matrix) ||
+          (newDatasets[i].matrix &&
+            oldDatasets[i].matrix &&
+            newDatasets[i].matrix.name !== oldDatasets[i].matrix.name)
+      )
+    ) {
+      /* console.log('dataset or matrix change')
+      console.log(
+        'new datasets',
+        newDatasets[0].matrix,
+        oldDatasets[0] && oldDatasets[0].matrix
+      ) */
       setOptions(newDatasets)
+    }
   },
   {
     immediate: false,

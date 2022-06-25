@@ -13,7 +13,7 @@ Utrecht University within the Software Project course.
 """
 import os
 from fairreckitlib.data.set.dataset import add_dataset_columns as add_data_columns
-
+from project.models.options_formatter import reformat_list
 from . import recommender_system
 from .constants import RESULTS_DIR
 from .result_storage import load_results_overview, load_json
@@ -247,4 +247,57 @@ def add_dataset_columns(dataset_name, dataframe, columns, matrix_name):
     dataframe = add_data_columns(dataset, matrix_name, dataframe, result)
 
     show_info_columns(matrix_name, result, dataframe)
+    return dataframe
+
+
+def filter_results(dataframe, dataset_name, matrix_name, filters):
+    """Filter a dataframe with results using specified filters.
+
+    Args:
+        dataframe: a dataframe containing results that need to be filtered
+        dataset_name: the name of the dataframe dataset
+        matrix_name: the name of the dataframe matrix
+        filters(list): filter settings
+
+    Returns:
+        results after filtering
+    """
+    print('raw filters from client: ', filters)
+
+    # Convert filters
+    settings = {} # TODO refactor?
+    reformat_list(settings, 'subset', filters) # TODO use reformat option instead?
+    # print('after reformat list', settings)
+
+    # TODO refactor (duplicate code in options formatter)
+    subset = []
+    for filter_pass in settings['subset']:
+        subset.append({'filter_pass': filter_pass['filter']})
+
+    #import json
+    #print('filters data format', json.dumps(subset, indent=4))
+    print('TODO make a filter config and filter with it')
+
+    # TODO global import
+    #from fairreckitlib.data.pipeline.data_pipeline import DataPipeline
+    #from fairreckitlib.data.filter.filter_config_parsing import parse_data_subset_config
+    #from fairreckitlib.data.filter.filter_config import DataSubsetConfig
+
+    #parse_data_subset_config()
+    #from fairreckitlib.data.filter.filter_config import FilterConfig
+
+    #filter_pass_configs=[]
+    #for filter_pass in settings['subset']:
+        #for filters in filter_pass['filter']:
+        #    print(filters)
+        #filter_configs = [FilterConfig(name=, params=) ]
+        #filter_pass_configs.append(FilterPassConfig(filters=filter_configs))
+
+    #subset_config = DataSubsetConfig(dataset=dataset_name,
+    # matrix=matrix_name,
+    # filter_passes=filter_pass_configs)
+    #DataPipeline(None,None).filter_rows('filtered', dataframe, subset_config)
+    #from fairreckitlib.data.filter.filter_passes import filter_from_filter_passes
+    #filter_from_filter_passes('filtered',dataframe,subset_config,)
+
     return dataframe

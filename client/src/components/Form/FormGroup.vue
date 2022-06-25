@@ -5,8 +5,16 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
 import FormGroupList from './FormGroupList.vue'
 import { computed, onMounted, watch } from 'vue'
-import { article } from '../../helpers/resultFormatter'
-import { emptyFormGroup, formatDefault } from '../../helpers/optionsFormatter'
+import {
+  article,
+  underscoreToSpace,
+  capitalise,
+} from '../../helpers/resultFormatter'
+import {
+  emptyFormGroup,
+  reformat,
+  formatDefault,
+} from '../../helpers/optionsFormatter'
 import '../../../node_modules/multi-range-slider-vue/MultiRangeSliderBlack.css'
 import FormInput from './FormInput.vue'
 import FormSelect from './FormSelect.vue'
@@ -23,6 +31,7 @@ const props = defineProps({
   maxK: Number, // The amount of  recommendations (caps K)
   modelValue: { type: Object, required: true }, // The local form linked to the form component
   single: { type: Boolean, default: false }, // single form group or multi (form group list)
+  useFilterModal: { type: Boolean, default: true },
 })
 
 /**
@@ -170,7 +179,9 @@ function hasParams() {
                   :label="
                     props.options.length > 1
                       ? 'Select ' + article(name) + ' ' + name + ' *'
-                      : form.main && name + ': ' + form.main.name
+                      : form.main &&
+                        name != 'filter pass' &&
+                        name + ': ' + form.main.name
                   "
                 >
                   <!-- If there is only one main option available, don't use a main selection-->
@@ -261,7 +272,39 @@ function hasParams() {
               :options="option.options"
               :defaultOption="option.default"
               :required="option.required"
+              :useFilterModal="useFilterModal"
             />
+            <!--Make a modal list if it's a filter-->
+            <div v-else-if="useFilterModal && option.title === 'filter'">
+              <b-list-group>
+                <template v-if="reformat(form.lists[index]).length === 0">
+                  No filters selected
+                </template>
+                <b-list-group-item v-for="f in reformat(form.lists[index])">
+                  <b>{{ capitalise(underscoreToSpace(f.name)) }}</b>
+                  <p>
+                    {{
+                      f.params
+                        .map(
+                          (p) =>
+                            underscoreToSpace(p.name) +
+                            ': ' +
+                            (p.name === 'range'
+                              ? 'min: ' + p.value.min + ' max: ' + p.value.max
+                              : p.value)
+                        )
+                        .join(', ')
+                    }}
+                  </p>
+                </b-list-group-item>
+              </b-list-group>
+              <b-button
+                variant="info"
+                @click="form.lists[index].show = !form.lists[index].show"
+                >Show filters
+              </b-button>
+            </div>
+            <!--Make a regular list otherwise-->
             <FormGroupList
               v-else
               v-model="form.lists[index]"
@@ -279,7 +322,28 @@ function hasParams() {
               :options="option.options"
               :defaultOption="option.default"
               :required="false"
+              :useFilterModal="useFilterModal"
             />
+            <b-modal v-model="form.lists[index].show">
+              <FormGroupList
+                v-model="form.lists[index]"
+                :groupId="
+                  (groupId ? groupId : name) +
+                  ' ' +
+                  props.index +
+                  ' ' +
+                  option.name
+                "
+                :name="form.main.name + ' ' + option.name"
+                :index="index"
+                :title="option.title"
+                :description="name + ' ' + option.title"
+                :options="option.options"
+                :defaultOption="option.default"
+                :required="false"
+                :useFilterModal="useFilterModal"
+              />
+            </b-modal>
           </b-card>
         </b-col>
       </b-col>

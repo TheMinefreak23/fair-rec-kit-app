@@ -143,6 +143,7 @@ function setsorting(i) {
         name="filter pass"
         title="subset"
         :options="filterOptions"
+        :useFilterModal="false"
       />
     </b-modal>
     <!-- Table -->
