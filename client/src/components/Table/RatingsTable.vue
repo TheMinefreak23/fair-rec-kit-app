@@ -5,18 +5,24 @@ Utrecht University within the Software Project course.
 
 import { makeHeader, STANDARD_HEADERS } from '../../helpers/resultFormatter'
 import { emptyFormGroup, reformat } from '../../helpers/optionsFormatter'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import FormGroupList from '../Form/FormGroupList.vue'
+// import VueDragResize from 'vue-drag-resize/src/component/vue-drag-resize.vue'
 import { API_URL } from '../../api'
 import Table from '../Table.vue'
+import HeadersModal from '../Table/Modals/HeadersModal.vue'
 
 const RESULT_URL = API_URL + '/result/'
 
+const emit = defineEmits(['add'])
 const props = defineProps({
   id: String,
   entry: String,
   pairData: Object,
   pairIndex: Number,
   runIndex: Number,
+  //poppable: { type: Boolean, default: true },
+  comparing: { type: Boolean, default: false },
 })
 
 // Default headers for recommendation experiments.
@@ -34,13 +40,24 @@ const entryAmount = ref(10)
 // Headers (column filters) and filters (row filters)
 const optionalHeaders = ref(STANDARD_HEADERS)
 const optionalHeaderOptions = ref({})
-const filters = ref(reformat(emptyFormGroup(false)))
+const filters = ref(emptyFormGroup(false))
 const availableFilters = ref([])
 
+// Modals
+const filtersModalShow = ref(false)
+
+// Pop out
+// const showPopout = ref(false)
+
 onMounted(() => {
+  if (props.comparing) entryAmount.value = 5
   // Load in all the user recommendation/prediction tables
   // Also initialize the components for table storage
   setRecs(parseInt(props.pairIndex), parseInt(props.runIndex))
+})
+
+watch(optionalHeaders, () => {
+  getUserRecs()
 })
 
 /**
@@ -57,7 +74,7 @@ async function getHeaderOptions() {
   }
   const response = await fetch(RESULT_URL + 'headers', requestOptions)
   const data = await response.json()
-  // console.log(data)
+  console.log(data)
   optionalHeaderOptions.value = data
 }
 
@@ -101,7 +118,6 @@ function paginationSort(indexVar) {
  */
 function updateHeaders(headers) {
   optionalHeaders.value = headers
-  getUserRecs()
 }
 
 /**
@@ -110,7 +126,7 @@ function updateHeaders(headers) {
  */
 function changeFilters(changedFilters) {
   // TODO why filters ref? refactor?
-  filters.value = reformat(changedFilters)
+  filters.value = changedFilters
   console.log('changeFilters filters', filters.value)
   getUserRecs()
 }
@@ -171,7 +187,7 @@ async function getUserRecs() {
       sortindex: sortIndex.value,
       ascending: ascending.value,
       amount: entryAmount.value,
-      filters: filters.value,
+      filters: reformat(filters.value),
       optionalHeaders: optionalHeaders.value,
       dataset: props.pairData.dataset,
       matrix: props.pairData.matrix,
@@ -184,8 +200,37 @@ async function getUserRecs() {
 </script>
 
 <template>
-  <div>
-    <h4>Run {{ runIndex }}</h4>
+  <b-overlay :show="!ratings">
+    <!-- Filters Modal -->
+    <b-modal
+      id="change-columns-modal"
+      v-model="filtersModalShow"
+      title="Change filters"
+      @ok="changeFilters"
+    >
+      <FormGroupList
+        v-model="filters"
+        name="filter pass"
+        title="subset"
+        :options="availableFilters"
+      />
+    </b-modal>
+    <!--Clone this table to the popout.-->
+    <!--<VueDragResize :isActive="false" v-if="poppable && showPopout">
+      <b-card>
+        <b-button @click="showPopout = !showPopout">Close</b-button>
+        <RatingsTable
+          :id="id"
+          :entry="entry"
+          :pairData="pairData"
+          :pairIndex="pairIndex"
+          :runIndex="runIndex"
+          :poppable="false"
+        />
+      </b-card>
+    </VueDragResize>
+    <b-button @click="showPopout = !showPopout">Pop out</b-button>
+    -->
     <Table
       :key="
         availableFilters +
@@ -198,16 +243,91 @@ async function getUserRecs() {
       :caption="entry"
       :results="ratings"
       :headers="selectedHeaders.map(makeHeader)"
-      :filterOptions="availableFilters"
-      :headerOptions="optionalHeaderOptions"
       :defaultSort="0"
       :startIndex="startIndex"
       pagination
       recs
+      :comparing="comparing"
       @paginationSort="(i) => paginationSort(i)"
       @loadMore="(increase, amount) => loadMore(increase, amount)"
       @changeFilters="(changedFilters) => changeFilters(changedFilters)"
       @updateHeaders="(headers) => updateHeaders(headers)"
-    />
-  </div>
+    >
+      <b-container>
+        <b-row>
+          <!--Main headers selection-->
+          <b-col>
+            <b-button
+              variant="info"
+              @click="$emit('add', props.runIndex, props.pairIndex)"
+              >Add table to comparison
+            </b-button>
+            <b-row>
+              <!--HELLO?
+      <b-col v-for="category in Object.keys(optionalHeaderOptions)">
+        {{ category }}
+        <b-form-checkbox-group v-model="optionalHeaders">
+          <template v-for="header in optionalHeaderOptions[category]">
+            {{ header }}
+            <template v-if="STANDARD_HEADERS.includes(header)">
+              <b-form-checkbox :value="header" switch>{{
+                header
+              }}</b-form-checkbox>
+            </template>
+          </template>
+        </b-form-checkbox-group>
+      </b-col>-->
+              <b-col> <p>Main headers:</p></b-col>
+              <template
+                v-for="category in Object.keys(optionalHeaderOptions)"
+                :key="category"
+              >
+                <b-col
+                  md="auto"
+                  class="form-check form-switch"
+                  v-for="header in optionalHeaderOptions[category]"
+                  :key="header"
+                >
+                  <template v-if="STANDARD_HEADERS.includes(header)">
+                    <input
+                      v-model="optionalHeaders"
+                      class="form-check-input"
+                      type="checkbox"
+                      :value="header"
+                      :id="header"
+                    />
+                    <label class="form-check-label" :id="header">
+                      {{ makeHeader(header).name }}
+                    </label>
+                  </template>
+                </b-col>
+              </template>
+            </b-row>
+          </b-col>
+          <b-col>
+            <!-- Headers and filters modal buttons -->
+            <div class="float-end">
+              <!--TODO use Table slot for the headers/filters, handle them in RatingsTable-->
+              <!--
+            <h2>{{ headerOptions }}</h2>
+            <h2>{{ filterOptions }}</h2>
+            -->
+              <HeadersModal
+                :headerOptions="optionalHeaderOptions"
+                @updateHeaders="updateHeaders"
+              />
+              <b-button
+                @click="filtersModalShow = !filterModalShow"
+                class="m-1"
+                data-testid="filterButton"
+                variant="warning"
+              >
+                Select Filters
+              </b-button>
+            </div>
+          </b-col>
+        </b-row>
+      </b-container>
+    </Table>
+  </b-overlay>
 </template>

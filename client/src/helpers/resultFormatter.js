@@ -54,7 +54,7 @@ export function formatMultipleItems(items) {
   } else {
     string = items
       .filter(() => true) // remove empty array slots
-      .map((item) => item.name)
+      .map((item) => underscoreToSpace(item.name))
       .filter(() => true) // remove empty array slots
       .join(', ')
   }
