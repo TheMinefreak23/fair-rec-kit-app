@@ -188,7 +188,7 @@ function formatEvaluation(e, index, result, runID) {
                 ' ' +
                 '(' +
                 paramName +
-                ' ' +
+                ': ' +
                 paramValue +
                 ')'
             )
