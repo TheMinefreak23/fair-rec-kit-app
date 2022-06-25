@@ -38,10 +38,10 @@ async function loadSettings(resultId) {
  * @param {Int} selectedID - The ID of the result
  */
 async function getSettings(selectedID) {
-  const data = await loadResult(selectedID)
-  console.log('Settings succesfully requested')
-  settings.value = data.result.settings
-  settings.value.metadata = data.result.metadata
+  const result = await loadResult(selectedID)
+  console.log('Settings from ID', selectedID, 'succesfully requested')
+  settings.value = result.settings
+  settings.value.metadata = result.metadata
 }
 
 /**
@@ -82,10 +82,10 @@ function cleanSettings() {
   <b-button
     variant="outline-primary fw-bold"
     v-b-tooltip.hover
-    title="Copy result settings to new experiment"
+    title="Show settings (for copying to a new experiment)"
     data-testid="copy-settings"
     @click="loadSettings(resultId)"
   >
-    Copy settings
+    Settings (copy)
   </b-button>
 </template>

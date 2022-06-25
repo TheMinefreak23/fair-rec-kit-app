@@ -1,4 +1,10 @@
-"""
+"""This module mock runs an experiment, recommendation or evaluation.
+
+mock_experiment(): mock run an experiment and save the mock result.
+mock_recommend(dataset, approach): mock recommendation.
+mock_evaluate_all(approach, metric): mock evaluation for all filters.
+mock_evaluate(approach, metric): mock evaluation.
+
 This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
@@ -10,7 +16,7 @@ from project.models import result_store
 
 
 def mock_experiment():
-    """Mock running an experiment and save the mock result."""
+    """Mock run an experiment and save the mock result."""
     # Mock experiment duration.
     time.sleep(2.5)
 
@@ -35,8 +41,7 @@ def mock_recommend(dataset, approach):
 
 
 def mock_evaluate_all(approach, metric):
-    """
-    Do a mock evaluation for all filters.
+    """Do a mock evaluation for all filters.
 
     Args:
         approach(dict): the approach with a name
@@ -61,8 +66,7 @@ def mock_evaluate_all(approach, metric):
 
 
 def mock_evaluate(approach, metric):
-    """
-    Mock evaluation: Give a magic number using an approach and metric.
+    """Mock evaluation: Give a magic number using an approach and metric.
 
     Args:
         approach(dict): an approach with a name
@@ -73,10 +77,8 @@ def mock_evaluate(approach, metric):
     # Mock evaluation
 
     result = len(approach['name']) * len(metric['name'])
-    # print('metric:', metric)
     # Do something with the metrics parameters.
     if metric['params']:
-        # print(metric['name'], 'has params', metric['params'])
         for (name, value) in metric['params'].items():
             val = int(value) if value else 0
             result *= len(name) * val

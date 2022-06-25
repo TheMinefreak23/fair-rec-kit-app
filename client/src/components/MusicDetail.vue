@@ -5,16 +5,14 @@ Utrecht University within the Software Project course.
 
 import { onMounted, ref } from 'vue'
 import MusicModal from './ItemDetail/MusicModal.vue'
-import { getSpotifyToken, getSpotifyInfo } from '../helpers/songInfo'
+import { getSpotifyInfo } from '../helpers/songInfo'
 const track = ref()
-const token = ref('test')
 const tracks = ref([])
 const query = ref({ track: 'orion', artist: 'metallica' })
 
 const modalShow = ref(false)
 
 onMounted(async () => {
-  token.value = await getSpotifyToken()
   getSpotifyTrack()
 })
 
@@ -23,14 +21,9 @@ onMounted(async () => {
 
  */
 async function getSpotifyTrack() {
-  tracks.value = await getSpotifyInfo(
-    token.value,
-    query.value.track,
-    query.value.artist
-  )
+  tracks.value = await getSpotifyInfo(query.value.track, query.value.artist)
 
   track.value = tracks.value.items[0]
-  // console.log('track from music detail info', track.value)
 }
 </script>
 

@@ -31,20 +31,26 @@ function format() {
   >
     <!-- Don't show empty option lists -->
     <b-card
-      v-if="!Array.isArray(value) || value.length > 0"
-      header-bg-variant="dark"
-      header-text-variant="light"
+      v-if="(key !== 'test_ratio' && !Array.isArray(value)) || value.length > 0"
+      :header-bg-variant="alternateBg ? 'secondary' : 'dark'"
+      :header-text-variant="alternateBg ? 'black' : 'white'"
       :header="key"
-      class="text-center pt-1 mt-1"
+      class="text-center pt-0 mt-1"
     >
       <b-col>
         <!-- Loop if the value is an array -->
         <template v-if="value && Array.isArray(value)">
-          <DictionaryDisplay
-            v-for="val in value"
-            :dict="val"
-            :alternateBg="!alternateBg"
-        /></template>
+          <b-card
+            v-for="(val, index) in value"
+            :header-bg-variant="!alternateBg ? 'secondary' : 'dark'"
+            :header-text-variant="!alternateBg ? 'black' : 'white'"
+            :header="'#' + (parseInt(index) + 1)"
+            class="text-center pt-0 mt-1"
+            pt-0
+          >
+            <DictionaryDisplay :dict="val" :alternateBg="alternateBg"
+          /></b-card>
+        </template>
         <!-- Display the value using a display if it's an object -->
         <template v-else>
           <DictionaryDisplay
@@ -52,9 +58,10 @@ function format() {
             :dict="value"
             :alternateBg="!alternateBg"
           />
-          <template v-else
-            ><b-button>{{ value ? value : 'None' }}</b-button></template
-          >
+          <template v-else>
+            <!-- <b-button disabled>{{ value ? value : 'None' }}</b-button> -->
+            {{ value ? value : 'None' }}
+          </template>
         </template>
       </b-col>
     </b-card>
