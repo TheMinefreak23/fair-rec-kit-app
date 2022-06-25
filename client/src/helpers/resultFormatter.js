@@ -24,7 +24,7 @@ export function formatResults(allResults, showStatus) {
       datetime: rawResult.timestamp.datetime,
       name: rawResult.metadata.name,
       tags: formatArray(rawResult.metadata.tags),
-      dataset: formatMultipleItems(rawResult.settings.datasets),
+      dataset: formatMultipleItems(rawResult.settings.datasets, 'dataset'),
       approach: formatMultipleItems(rawResult.settings.approaches),
       metric: formatMultipleItems(rawResult.settings.metrics),
     }
@@ -47,14 +47,14 @@ export function formatArray(array) {
 }
 
 // Format an array of named objects into a comma separated string
-export function formatMultipleItems(items) {
+export function formatMultipleItems(items, altKey) {
   let string = ''
   if (items == null) {
     string = 'None'
   } else {
     string = items
       .filter(() => true) // remove empty array slots
-      .map((item) => item.name)
+      .map((item) => underscoreToSpace(item.name ? item.name : item[altKey]))
       .filter(() => true) // remove empty array slots
       .join(', ')
   }

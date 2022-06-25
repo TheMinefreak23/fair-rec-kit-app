@@ -5,11 +5,12 @@
     "cypress:open": "cypress open"
   },
   "dependencies": {
-    "@testing-library/cypress": "^8.0.2"
+    "@testing-library/cypress": "^8.0.2",
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
-    "cypress": "^10.1.0",
     "@vitejs/plugin-vue": "^2.2.2",
+    "cypress": "^10.1.0",
     "vite": "^2.8.4"
   }
 }

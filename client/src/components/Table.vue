@@ -4,8 +4,6 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
 import { computed, onMounted, ref } from 'vue'
 import sortBy from 'just-sort-by'
-import FormGroupList from './Form/FormGroupList.vue'
-import { emptyFormGroup } from '../helpers/optionsFormatter'
 // import { HEADERS_ORDER } from '../helpers/resultFormatter'
 import { statusPrefix, statusVariant, status } from '../helpers/queueFormatter'
 import SettingsModal from './Table/Modals/SettingsModal.vue'
@@ -14,7 +12,6 @@ import AudioSnippet from './ItemDetail/AudioSnippet.vue'
 import InfoModal from './Table/Modals/InfoModal.vue'
 import DeletionModal from './Table/Modals/DeletionModal.vue'
 import EditModal from './Table/Modals/EditModal.vue'
-import HeadersModal from './Table/Modals/HeadersModal.vue'
 
 const emit = defineEmits([
   'viewResult',
@@ -28,6 +25,7 @@ const props = defineProps({
   overview: Boolean,
   pagination: Boolean,
   recs: Boolean,
+  comparing: Boolean,
   results: Array,
   headers: Array,
   removeText: String,
@@ -37,8 +35,6 @@ const props = defineProps({
   serverFile: String,
   serverFile2: String,
   caption: String,
-  headerOptions: Object,
-  filterOptions: Array,
   defaultSort: Number,
   startIndex: Number,
 })
@@ -53,12 +49,6 @@ const entryAmount = ref(10)
 const sortindex = ref()
 const descending = ref()
 const sortIcon = ref({ true: ' ▲', false: ' ▼' })
-
-// Modals
-const filtersModalShow = ref(false)
-
-// Filters
-const filters = ref(emptyFormGroup(false))
 
 const subheaders = computed(() => {
   const result = []
@@ -79,6 +69,7 @@ const sorted = computed(() => {
 })
 
 onMounted(() => {
+  if (props.comparing) entryAmount.value = 5
   // Sort on default column if it is given
   // If no column is given, the table is not sortable
   if (props.defaultSort) {
@@ -130,50 +121,16 @@ function setsorting(i) {
 </script>
 
 <template>
-  <div>
-    <!-- Filters Modal -->
-    <b-modal
-      id="change-columns-modal"
-      v-model="filtersModalShow"
-      title="Change filters"
-      @ok="$emit('changeFilters', filters)"
-    >
-      <FormGroupList
-        v-model="filters"
-        name="filter pass"
-        title="subset"
-        :options="filterOptions"
-        :useFilterModal="false"
-      />
-    </b-modal>
+  <b-overlay :show="results === []">
     <!-- Table -->
     <b-table-simple hover striped responsive caption-top id="customScrollbar">
       <caption>
         {{
           props.caption
         }}
-
-        <template v-if="recs">
-          <!-- Headers and filters modal buttons -->
-          <div class="float-end">
-            <!--TODO use Table slot for the headers/filters, handle them in RatingsTable-->
-            <!--
-            <h2>{{ headerOptions }}</h2>
-            <h2>{{ filterOptions }}</h2>
-            -->
-            <HeadersModal
-              :headerOptions="headerOptions"
-              @updateHeaders="(e) => emit('updateHeaders', e)"
-            />
-            <b-button
-              @click="filtersModalShow = !filterModalShow"
-              class="m-1"
-              data-testid="filterButton"
-            >
-              Filters
-            </b-button>
-          </div>
-        </template>
+        <div v-if="recs">
+          <slot></slot>
+        </div>
       </caption>
 
       <!-- Headers -->
@@ -188,7 +145,8 @@ function setsorting(i) {
               @click="setsorting(index)"
             >
               {{
-                header.name + (index == sortindex ? sortIcon[descending] : '')
+                header.name +
+                (sortindex && index == sortindex ? sortIcon[descending] : '')
               }}
             </b-th>
           </template>
@@ -213,7 +171,18 @@ function setsorting(i) {
             v-for="[key, value] in Object.entries(item)"
             :key="`${descending}_${sortindex}_${index}-${key}`"
           >
-            <b-td class="text-center" :style="colItemStyle">
+            <!-- Audio snippet column -->
+            <b-td
+              v-if="key === 'audio_snippet'"
+              class="text-center"
+              style="width: 400px"
+            >
+              <template v-if="value">
+                <AudioSnippet :trackId="value"
+              /></template>
+              <template v-else></template>
+            </b-td>
+            <b-td v-else class="text-center" :style="colItemStyle">
               <!--Special pill format for status-->
               <template
                 v-if="
@@ -240,15 +209,8 @@ function setsorting(i) {
                   <template v-if="key === 'track_spotify-uri'">
                     <MusicItem :uri="item[key]" />
                   </template>
-                  <!-- Audio snippet column -->
-                  <template v-if="key === 'audio_snippet'">
-                    <AudioSnippet :trackId="value" />
-                  </template>
-
                   <!-- Regular column -->
-                  <template
-                    v-else-if="value && value.toString().startsWith('http')"
-                  >
+                  <template v-else-if="value.toString().startsWith('http')">
                     <b-link :href="value" target="_blank">{{ value }}</b-link>
                   </template>
                   <template v-else>
@@ -351,10 +313,9 @@ function setsorting(i) {
         type="number"
         v-on:keyup.enter="$emit('loadMore', null, entryAmount)"
         v-on:focusout="$emit('loadMore', null, entryAmount)"
-        >20</b-form-input
-      >
+      />
     </div>
-  </div>
+  </b-overlay>
 </template>
 
 <style scoped>
