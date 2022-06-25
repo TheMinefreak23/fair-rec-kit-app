@@ -5,8 +5,16 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
 import FormGroupList from './FormGroupList.vue'
 import { computed, onMounted, watch } from 'vue'
-import { article } from '../../helpers/resultFormatter'
-import { emptyFormGroup } from '../../helpers/optionsFormatter'
+import {
+  article,
+  underscoreToSpace,
+  capitalise,
+} from '../../helpers/resultFormatter'
+import {
+  emptyFormGroup,
+  reformat,
+  formatDefault,
+} from '../../helpers/optionsFormatter'
 import '../../../node_modules/multi-range-slider-vue/MultiRangeSliderBlack.css'
 import FormInput from './FormInput.vue'
 import FormSelect from './FormSelect.vue'
@@ -23,6 +31,7 @@ const props = defineProps({
   maxK: Number, // The amount of  recommendations (caps K)
   modelValue: { type: Object, required: true }, // The local form linked to the form component
   single: { type: Boolean, default: false }, // single form group or multi (form group list)
+  useFilterModal: { type: Boolean, default: true },
 })
 
 /**
@@ -45,13 +54,19 @@ const form = computed({
  * Initialise form values: single, name and default option.
  */
 onMounted(() => {
+  // Reset main option (TODO temporary measure for changing options prop)
+  if (form.value.main) {
+    // console.log(props.title, form.value.main)
+    form.value.main = ''
+  }
   form.value.single = props.single
   form.value.name = props.title
   if (props.defaultOption) {
     form.value.main = props.defaultOption.value
   }
+  // If there is only one option (no main selection), use it as the default
+  if (props.options.length === 1) form.value.main = props.options[0].value
   // console.log('form', form.value)
-  // scroll to new group
 })
 
 /**
@@ -60,8 +75,24 @@ onMounted(() => {
 watch(
   () => form.value.main,
   () => {
-    // console.log('form', form.value)
-    setParameterDefaults()
+    // Whether the form options have already been set.
+    if (!(form.value.values || form.value.options || form.value.lists)) {
+      if (form.value.main) setParameterDefaults()
+    }
+  }
+)
+
+/**
+ * Set the parameter defaults when the main option changes.
+ */
+watch(
+  () => props.options,
+  () => {
+    // Reset main option (TODO temporary measure for changing options prop)
+    if (props.name === 'metric' && form.value.main) {
+      // console.log(props.name, form.value.main)
+      form.value.main = ''
+    }
   }
 )
 
@@ -89,22 +120,10 @@ watch(
  * Set default values for the group parameters.
  */
 function setParameterDefaults() {
-  /**
-   * Whether the form options have already been set.
-   */
-  function formSet() {
-    return form.value.values || form.value.options || form.value.lists
-  }
-
   const option = form.value.main
-  // console.log('setting parameter', props.name, props.options, form.value.main)
   let choices
-  // console.log(option)
-  /* if (formSet()) {
-    console.log('BINGO')
-  } */
   // Only set defaults if the form hasn't been set (when copying)
-  if (option.params && !formSet()) {
+  if (option.params) {
     // console.log('option', props.name, option.name, 'params', option.params)
     if (option.params.values && option.params.values.length > 0) {
       choices = option.params.values
@@ -118,7 +137,7 @@ function setParameterDefaults() {
       choices = option.params.options
       form.value.selects = choices.map((param) => ({
         name: param.name,
-        value: param.default,
+        value: formatDefault(param.default),
       }))
     }
     // console.log('selects', form.value.selects)
@@ -141,7 +160,11 @@ function hasParams() {
 </script>
 
 <template>
-  <b-row class="align-items-end">
+  <template v-if="options && options.length === 0">
+    <h4>No options available!</h4>
+    <h4 v-if="title === 'matrix'">Please select a dataset and matrix.</h4>
+  </template>
+  <b-row v-else class="align-items-end">
     <b-col>
       <b-col>
         <b-row>
@@ -149,10 +172,22 @@ function hasParams() {
             <b-row>
               <!--Main option selection-->
               <b-col cols="12">
+                <h4 v-if="props.name === 'metric'">
+                  NOTE: resets when changing dataset
+                </h4>
                 <b-form-group
-                  :label="'Select ' + article(name) + ' ' + name + ' *'"
+                  :label="
+                    props.options.length > 1
+                      ? 'Select ' + article(name) + ' ' + name + ' *'
+                      : form.main &&
+                        name != 'filter pass' &&
+                        name + ': ' + form.main.name
+                  "
                 >
+                  <!-- If there is only one main option available, don't use a main selection-->
                   <b-form-select
+                    v-if="options.length > 1"
+                    :id="name"
                     :class="blink ? 'subtle-blink' : ''"
                     v-model="form.main"
                     data-testid="main-select"
@@ -174,11 +209,11 @@ function hasParams() {
                     variant="primary"
                     >Copy {{ name }}...</b-button
                   >
-                  <template #first>
+                  <!--<template #first>
                     <b-form-select-option value="" disabled
                       >Choose..</b-form-select-option
                     >
-                  </template>
+                  </template>-->
                 </b-form-group>
               </b-col>
               <!--Show settings for selected option.-->
@@ -224,28 +259,91 @@ function hasParams() {
               v-if="option.single"
               single
               v-model="form.lists[index].choices[0]"
-              :groupId="name + ' ' + props.index + ' ' + option.name"
+              :groupId="
+                (groupId ? groupId : name) +
+                ' ' +
+                props.index +
+                ' ' +
+                option.name
+              "
               :name="form.main.name + ' ' + option.name"
               :index="index"
               :title="option.title"
               :options="option.options"
               :defaultOption="option.default"
               :required="option.required"
+              :useFilterModal="useFilterModal"
             />
+            <!--Make a modal list if it's a filter-->
+            <div v-else-if="useFilterModal && option.title === 'filter'">
+              <b-list-group>
+                <template v-if="reformat(form.lists[index]).length === 0">
+                  No filters selected
+                </template>
+                <b-list-group-item v-for="f in reformat(form.lists[index])">
+                  <b>{{ capitalise(underscoreToSpace(f.name)) }}</b>
+                  <p>
+                    {{
+                      f.params
+                        .map(
+                          (p) =>
+                            underscoreToSpace(p.name) +
+                            ': ' +
+                            (p.name === 'range'
+                              ? 'min: ' + p.value.min + ' max: ' + p.value.max
+                              : p.value)
+                        )
+                        .join(', ')
+                    }}
+                  </p>
+                </b-list-group-item>
+              </b-list-group>
+              <b-button
+                variant="info"
+                @click="form.lists[index].show = !form.lists[index].show"
+                >Show filters
+              </b-button>
+            </div>
+            <!--Make a regular list otherwise-->
             <FormGroupList
               v-else
               v-model="form.lists[index]"
-              :groupId="name + ' ' + props.index + ' ' + option.name"
+              :groupId="
+                (groupId ? groupId : name) +
+                ' ' +
+                props.index +
+                ' ' +
+                option.name
+              "
               :name="form.main.name + ' ' + option.name"
               :index="index"
               :title="option.title"
-              :description="
-                option.title + ' for ' + name + ' ' + form.main.name
-              "
+              :description="name + ' ' + option.title"
               :options="option.options"
               :defaultOption="option.default"
               :required="false"
+              :useFilterModal="useFilterModal"
             />
+            <b-modal v-model="form.lists[index].show">
+              <FormGroupList
+                v-model="form.lists[index]"
+                :groupId="
+                  (groupId ? groupId : name) +
+                  ' ' +
+                  props.index +
+                  ' ' +
+                  option.name
+                "
+                :name="form.main.name + ' ' + option.name"
+                :index="index"
+                :title="option.title"
+                :description="name + ' ' + option.title"
+                :options="option.options"
+                :defaultOption="option.default"
+                :required="false"
+                :useFilterModal="useFilterModal"
+              />
+            </b-modal>
           </b-card>
         </b-col>
       </b-col>

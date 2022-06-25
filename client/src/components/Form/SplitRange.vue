@@ -21,6 +21,7 @@ const value = computed({
     return props.modelValue
   },
   set(localValue) {
+    // console.log('local form change to', localValue)
     emit('update:modelValue', localValue)
   },
 })
@@ -42,11 +43,7 @@ const rightVal = computed({
  * (between min and max and divisible by step)
  */
 function correctValue() {
-  return (
-    value.value > props.min &&
-    value.value < props.max &&
-    value.value % props.step === 0
-  )
+  return value.value > props.min && value.value < props.max
 }
 </script>
 

@@ -7,12 +7,11 @@ import {
   formatResults,
   formatMultipleItems,
   showDatasetInfo,
-  formatMetric,
+  formatMetricName,
   formatArray,
   makeHeader,
-  capitalise,
   shortResultDescription,
-} from '../helpers/resultFormatter'
+} from '../../helpers/resultFormatter'
 
 /**
  * Test the formatting of all results
@@ -27,7 +26,7 @@ describe('format results', () => {
       name: 'Test784_ghostwrites',
       tags: ['foziness', 'mortal', 'cymbiform', 'sliprail', 'plateaued'],
     },
-    status: "Active",
+    status: 'Active',
     settings: {
       recommendations: 63,
       experimentMethod: 'recommendation',
@@ -94,7 +93,7 @@ describe('format results', () => {
   test('empty', () => {
     expect(formatResults([], true).length).toBe(0)
   })
-  //Test if the status condition is correctly applied
+  // Test if the status condition is correctly applied
   test('status', () => {
     expect(formatResults([result], true)[0].status).toBe('status_Active')
   })
@@ -214,15 +213,15 @@ describe('format metric', () => {
         K: 10,
       },
     }
-    expect(formatMetric(metric)).toBe('P@10')
+    expect(formatMetricName(metric)).toBe('P@10')
   })
   // A metric without parameters should just show its name
   test('no parameter metric', () => {
-    expect(formatMetric({ name: 'foo' })).toBe('foo')
+    expect(formatMetricName({ name: 'foo' })).toBe('foo')
   })
   // If an empty name is assigned, an empty name is returned
   test('no name', () => {
-    expect(formatMetric({ name: '' }).length).toBe(0)
+    expect(formatMetricName({ name: '' }).length).toBe(0)
   })
 })
 
@@ -240,27 +239,5 @@ describe('configure header', () => {
   test('starts with number', () => {
     const header = '2_isanumber'
     expect(makeHeader(header).name).toBe('2 isanumber')
-  })
-})
-
-/**
- * Test the capitalise function
- */
-describe('capitalise', () => {
-  test('several words', () => {
-    const string = 'a random set of words'
-    expect(capitalise(string)).toBe('A Random Set OF Words')
-  })
-  test('abbreviations', () => {
-    const string = 'da'
-    expect(capitalise(string)).toBe('DA')
-  })
-  test('contains numbers', () => {
-    const string = '123'
-    expect(capitalise(string)).toBe('123')
-  })
-  test('only spaces', () => {
-    const string = '     '
-    expect(capitalise(string).length).toBe(5)
   })
 })

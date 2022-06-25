@@ -16,7 +16,7 @@ This program has been developed by students from the bachelor Computer Science a
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
-# from copy import deepcopy
+
 import json
 import os
 import shutil
@@ -26,8 +26,16 @@ from project.models.constants import RESULTS_DIR, RESULTS_OVERVIEW_PATH
 
 
 class ResultStorage:
-    """Handle the storage of the results in the result overview and store the current result"""
+    """Handle the storage of the results in the result overview and store the current result.
+
+    methods:
+        __init__
+        save_result
+        do_nothing
+    """
+
     def __init__(self):
+        """Initialise ResultStorage."""
         # current result variables
         self.current_result = {}
         self.current_recs = {}
@@ -39,51 +47,48 @@ class ResultStorage:
         experiment(dict): the experiment input settings
         config(dict): the final experiment configuration
         """
-        experiment['result'] = format_result(config)
+        experiment['result'] = ResultStorage.format_result(config)
 
         self.current_result = experiment
         add_result(self.current_result)
-        # print('current result', self.current_result)
 
-    # TODO
+    def update_result(self, overview_index, execution_data):
+        """Update the result with the new validation execution data.
+
+        Args:
+            overview_index(int): the index of the result in the overview
+            execution_data(dict): the experiment execution data
+        """
+        # TODO: NOTE: could update runs here
+        overview = load_results_overview()
+        overview['all_results'][overview_index]['experiments'].append(execution_data)
+        write_results_overview(overview)
+
     @staticmethod
-    def do_nothing():
-        """This function exists to quit pylint from yappin"""
-        return None
+    def format_result(settings):
+        """Mock result experiment.
 
+        Args:
+            settings(dict): the experiment settings
 
-def format_result(settings):
-    """Mock result experiment.
-
-    Args:
-        settings(dict): the experiment settings
-
-    Returns: (list) the mock result
-    """
-    # print('== settings ==', settings)
-    result = []
-    datasets = settings['data']
-    for (dataset_index, dataset) in enumerate(datasets):
-        # Add dataset identifier to name
-        dataset['name'] = dataset['dataset'] + '_' + \
-                          dataset['matrix'] + '_' + str(dataset_index)
-        recs = []
-        for (api, approaches) in settings['models'].items():
-            for (approach_index, approach) in enumerate(approaches):
-                # Add approach, with index as identifier in the name
-                recommendation = {'approach': api + '_' + approach['name'] + '_'
-                                              + str(approach_index),
-                                  # 'recommendation': mock_recommend(dataset, approach),
-                                  'evals': []}
-                # for metric in settings['metrics']:
-                #     evaluation = mock_evaluate_all(approach, metric)
-                #     recommendation['evals'].append(
-                #         {'name': metric['name'], 'evaluation': evaluation,
-                #          'params': metric['params']})
-                #     print(metric)
-                recs.append(recommendation)
-        result.append({'dataset': dataset, 'recs': recs})
-    return result
+        Returns: (list) the mock result
+        """
+        result = []
+        datasets = settings['data']
+        for (dataset_index, dataset) in enumerate(datasets):
+            # Add dataset identifier to name
+            dataset['name'] = dataset['dataset'] + '_' + \
+                              dataset['matrix'] + '_' + str(dataset_index)
+            recs = []
+            for (api, approaches) in settings['models'].items():
+                for (approach_index, approach) in enumerate(approaches):
+                    # Add approach, with index as identifier in the name
+                    recommendation = {'approach': api + '_' + approach['name'] + '_'
+                                                  + str(approach_index),
+                                      'evals': []}
+                    recs.append(recommendation)
+            result.append({'dataset': dataset, 'recs': recs})
+        return result
 
 
 def load_json(path):
@@ -181,7 +186,6 @@ def edit_result(result_id, new_name, new_tags, new_email):
     for (data_name, new_data) in [('name', new_name), ('tags', new_tags), ('email', new_email)]:
         edit_metadata(data_name, new_data)
 
-    # TODO Add more editable values
     file_results[index] = to_edit_result
 
     write_results_overview({'all_results': file_results})
@@ -189,8 +193,6 @@ def edit_result(result_id, new_name, new_tags, new_email):
     # Update the folder name to match the new name
     new_path = makepath(result_id, to_edit_result)
 
-    # TODO catch error
-    # if os.path.isdir(old_path):
     print('renaming path', old_path, 'to', new_path)
     os.rename(old_path, new_path)
 
@@ -198,7 +200,7 @@ def edit_result(result_id, new_name, new_tags, new_email):
 
 
 def update_overviews(new_path, old_name, new_name):
-    """Update the name in all overview.json files
+    """Update the name in all overview.json files.
 
     Args:
         new_path: new result file path
@@ -219,7 +221,7 @@ def update_overviews(new_path, old_name, new_name):
 
 
 def makepath(result_id, result):
-    """Make result path from result ID and result
+    """Make result path from result ID and result.
 
     Args:
         result_id: the result ID
@@ -240,9 +242,6 @@ def create_results_overview():
         # Open the file in write mode.
         with open(RESULTS_OVERVIEW_PATH, 'w', encoding='utf-8') as file:
             json.dump({'all_results': []}, file, indent=4)
-
-
-# TODO UNUSED
 
 
 def parse_tags(tags_string):

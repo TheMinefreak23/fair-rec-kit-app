@@ -1,6 +1,5 @@
 import { reactive } from 'vue'
 import { API_URL } from './api'
-import { formatResult } from './helpers/resultFormatter'
 import { status } from './helpers/queueFormatter'
 import { addResultById } from './helpers/resultRequests'
 
@@ -16,10 +15,22 @@ const store = reactive({
   toast: null, // Toast settings to show in the toast over the app
 })
 
+// App tabs (TODO use these for dynamic app order)
+const APP_TABS = [
+  'New Experiment',
+  'Experiment Queue',
+  'Results',
+  'All Results',
+  'Documentation',
+  'Music Detail',
+]
+
 /**
  * Poll for the current experiment result
  */
 function pollForResult() {
+  // Switch to queue
+  store.currentTab = APP_TABS.indexOf('Experiment Queue')
   const interval = 300
   store.resultPoll = setInterval(getCalculation, interval)
 }
@@ -28,28 +39,25 @@ function pollForResult() {
  * GET request: Ask server for latest calculation
  */
 function getCalculation() {
-  if (store.currentExperiment.status != status.notAvailable) {
-    // console.log('fetching result')
+  if (store.currentExperiment.status !== status.notAvailable) {
     try {
       fetch(API_URL + '/experiment/')
         .then((response) => response.json())
         .then((data) => {
           console.log('polling experiment, status:', data.status)
           store.currentExperiment.status = data.status
-          if ([status.done, status.aborted].includes(data.status)) {
-            clearInterval(store.resultPoll)
-            if (data.status === status.done)
-              // addResult(formatResult(data.calculation))
-              // addResultById(data.calculation.timestamp.stamp, false)
-              addResultById(data.experimentID, false)
-            console.log('DONE or ABORTED!!')
-          }
 
           // Update queue and progress while waiting for a result
           getQueue()
+          if ([status.done, status.aborted].includes(data.status)) {
+            clearInterval(store.resultPoll)
+            if (data.status === status.done)
+              addResultById(data.experimentID, false)
+            console.log('DONE or ABORTED!!')
+          }
         })
     } catch (e) {
-      console.log(e) // TODO better error handling, composable
+      console.log(e)
       store.currentExperiment = null
     }
   }
@@ -61,15 +69,11 @@ function getCalculation() {
 async function getQueue() {
   const response = await fetch(API_URL + '/experiment/queue')
   const data = await response.json()
-  // store.queue = formatResults(data).map(x=>x.omit(x,'ID'))
-  // store.queue = formatResults(data)
-  // console.log('queue latest', data.current)
+
   // Update latest experiment (queue item)
-  if (data.current && data.current.status != status.notAvailable) {
-    // console.log(data.current)
+  if (data.current && data.current.status !== status.notAvailable) {
     store.currentExperiment = data.current
     console.log('progress:', data.current.progress)
-    // store.queue[store.queue.length - 1] = data.current
   }
   store.queue = data.queue
 }
@@ -79,19 +83,8 @@ async function getQueue() {
  * @param {Object} result - The new result
  */
 function addResult(result) {
-  // store.currentResults = [result, ...store.currentResults]
-  /* console.log(
-    'currentResults before addResult',
-    JSON.parse(JSON.stringify(store.currentResults))
-  ) */
   store.currentResults.push(result)
-  /* console.log(
-    'currentResults after addResult',
-    JSON.parse(JSON.stringify(store.currentResults))
-  ) */
   store.currentResultTab = store.currentResults.length - 1
-  // console.log('currentResultTab', store.currentResultTab)
-  // console.log(store.currentResults)
 }
 
 /**
@@ -104,6 +97,7 @@ function removeResult(index) {
 
 export {
   store,
+  APP_TABS,
   addResult,
   removeResult,
   getCalculation,
