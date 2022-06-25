@@ -274,8 +274,8 @@ def filter_results(dataframe, dataset_name, matrix_name, filters):
     for filter_pass in settings['subset']:
         subset.append({'filter_pass': filter_pass['filter']})
 
-    import json
-    print('filters data format', json.dumps(subset, indent=4))
+    #import json
+    #print('filters data format', json.dumps(subset, indent=4))
     print('TODO make a filter config and filter with it')
 
     # TODO global import
@@ -293,7 +293,9 @@ def filter_results(dataframe, dataset_name, matrix_name, filters):
         #filter_configs = [FilterConfig(name=, params=) ]
         #filter_pass_configs.append(FilterPassConfig(filters=filter_configs))
 
-    #subset_config = DataSubsetConfig(dataset=dataset_name, matrix=matrix_name, filter_passes=filter_pass_configs)
+    #subset_config = DataSubsetConfig(dataset=dataset_name,
+    # matrix=matrix_name,
+    # filter_passes=filter_pass_configs)
     #DataPipeline(None,None).filter_rows('filtered', dataframe, subset_config)
     #from fairreckitlib.data.filter.filter_passes import filter_from_filter_passes
     #filter_from_filter_passes('filtered',dataframe,subset_config,)
