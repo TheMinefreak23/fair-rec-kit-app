@@ -19,13 +19,12 @@ export function formatResults(allResults, showStatus) {
   const results = []
   for (const i in allResults) {
     const rawResult = allResults[i]
-    console.log(rawResult)
     results[i] = {
       id: rawResult.timestamp.stamp,
       datetime: rawResult.timestamp.datetime,
       name: rawResult.metadata.name,
       tags: formatArray(rawResult.metadata.tags),
-      dataset: formatMultipleItems(rawResult.settings.datasets),
+      dataset: formatMultipleItems(rawResult.settings.datasets, 'dataset'),
       approach: formatMultipleItems(rawResult.settings.approaches),
       metric: formatMultipleItems(rawResult.settings.metrics),
     }
@@ -48,14 +47,14 @@ export function formatArray(array) {
 }
 
 // Format an array of named objects into a comma separated string
-export function formatMultipleItems(items) {
+export function formatMultipleItems(items, altKey) {
   let string = ''
   if (items == null) {
     string = 'None'
   } else {
     string = items
       .filter(() => true) // remove empty array slots
-      .map((item) => underscoreToSpace(item.name))
+      .map((item) => underscoreToSpace(item.name ? item.name : item[altKey]))
       .filter(() => true) // remove empty array slots
       .join(', ')
   }
