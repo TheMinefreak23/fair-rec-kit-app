@@ -20,6 +20,7 @@ const props = defineProps({
   required: Boolean, // Whether the list option is required
   maxK: Number, // The amount of recommendations (caps K)
   modelValue: { type: Object, required: true }, // The local form linked to the form component
+  useFilterModal: { type: Boolean, default: true },
 })
 
 /**
@@ -349,6 +350,7 @@ function scrollToGroup(index) {
                       "
                       :default="defaultOption"
                       :maxK="maxK"
+                      :useFilterModal="useFilterModal"
                       @copy="copyItem(i - 1)"
                     />
                   </b-collapse>
