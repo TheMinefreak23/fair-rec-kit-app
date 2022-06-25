@@ -19,6 +19,7 @@ export function formatResults(allResults, showStatus) {
   const results = []
   for (const i in allResults) {
     const rawResult = allResults[i]
+    console.log(rawResult)
     results[i] = {
       id: rawResult.timestamp.stamp,
       datetime: rawResult.timestamp.datetime,

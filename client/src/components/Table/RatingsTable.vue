@@ -213,6 +213,7 @@ async function getUserRecs() {
         name="filter pass"
         title="subset"
         :options="availableFilters"
+        :useFilterModal="false"
       />
     </b-modal>
     <!--Clone this table to the popout.-->
