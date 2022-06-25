@@ -8,9 +8,9 @@ import { computed, ref } from 'vue'
 
 const emit = defineEmits(['update:modelValue'])
 const props = defineProps({
+  modelValue: { required: true },
   name: String,
   options: Array,
-  modelValue: Array,
 })
 
 const search = ref('')
@@ -23,7 +23,7 @@ const value = computed({
   },
   // setter
   set(localValue) {
-    console.log('local form change to', localValue)
+    // console.log('local form change to', localValue)
     emit('update:modelValue', localValue)
   },
 })
@@ -69,12 +69,12 @@ function onOptionClick({ option, addTag }) {
         <ul v-if="tags.length > 0" class="list-inline d-inline-block mb-2">
           <li v-for="tag in tags" :key="tag" class="list-inline-item">
             <b-form-tag
-              @remove="removeTag(tag)"
+              @remove="value = value.filter((t) => t !== tag)"
               :title="tag"
               :disabled="disabled"
               :variant="tag === 'null' ? 'warning' : 'info'"
-              >{{ tag }}</b-form-tag
-            >
+              >{{ tag }}
+            </b-form-tag>
           </li>
         </ul>
 
@@ -87,7 +87,7 @@ function onOptionClick({ option, addTag }) {
           <template #button-content>
             <b-icon icon="tag-fill"></b-icon> Choose {{ name }}
           </template>
-          <b-dropdown-form @submit.stop.prevent="() => {}">
+          <b-dropdown-form>
             <b-form-group
               label="Search tags"
               label-for="tag-search-input"
