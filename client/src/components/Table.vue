@@ -313,8 +313,7 @@ function setsorting(i) {
         type="number"
         v-on:keyup.enter="$emit('loadMore', null, entryAmount)"
         v-on:focusout="$emit('loadMore', null, entryAmount)"
-        >20</b-form-input
-      >
+      />
     </div>
   </b-overlay>
 </template>

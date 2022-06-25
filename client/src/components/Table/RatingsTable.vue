@@ -53,11 +53,11 @@ onMounted(() => {
   if (props.comparing) entryAmount.value = 5
   // Load in all the user recommendation/prediction tables
   // Also initialize the components for table storage
-  setRecs(parseInt(props.pairIndex), parseInt(props.runIndex))
+  setRecs()
 })
 
 watch(optionalHeaders, () => {
-  getUserRecs()
+  if (props.ratings) getUserRecs()
 })
 
 /**
@@ -200,7 +200,7 @@ async function getUserRecs() {
 </script>
 
 <template>
-  <b-overlay :show="!ratings">
+  <b-overlay :show="ratings == []">
     <!-- Filters Modal -->
     <b-modal
       id="change-columns-modal"
@@ -278,31 +278,35 @@ async function getUserRecs() {
           </template>
         </b-form-checkbox-group>
       </b-col>-->
-              <b-col> <p>Main headers:</p></b-col>
-              <template
-                v-for="category in Object.keys(optionalHeaderOptions)"
-                :key="category"
-              >
-                <b-col
-                  md="auto"
-                  class="form-check form-switch"
-                  v-for="header in optionalHeaderOptions[category]"
-                  :key="header"
-                >
-                  <template v-if="STANDARD_HEADERS.includes(header)">
-                    <input
-                      v-model="optionalHeaders"
-                      class="form-check-input"
-                      type="checkbox"
-                      :value="header"
-                      :id="header"
-                    />
-                    <label class="form-check-label" :id="header">
-                      {{ makeHeader(header).name }}
-                    </label>
+              <b-col>
+                <b-row> <p>Main headers:</p></b-row>
+                <b-row md="auto">
+                  <template
+                    v-for="category in Object.keys(optionalHeaderOptions)"
+                    :key="category"
+                  >
+                    <b-col
+                      md="auto"
+                      class="form-check form-switch"
+                      v-for="header in optionalHeaderOptions[category]"
+                      :key="header"
+                    >
+                      <template v-if="STANDARD_HEADERS.includes(header)">
+                        <input
+                          v-model="optionalHeaders"
+                          class="form-check-input"
+                          type="checkbox"
+                          :value="header"
+                          :id="header"
+                        />
+                        <label class="form-check-label" :id="header">
+                          {{ makeHeader(header).name }}
+                        </label>
+                      </template>
+                    </b-col>
                   </template>
-                </b-col>
-              </template>
+                </b-row>
+              </b-col>
             </b-row>
           </b-col>
           <b-col>

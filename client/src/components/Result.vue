@@ -18,12 +18,12 @@ const runNumbers = [...Array(props.result.metadata.runs).keys()]
 const RESULT_URL = API_URL + '/result/'
 
 // Metrics and ratings table selection
-const userTables = combineResults(props.result.result)
+const [userTables, tablePairs] = combineResults(props.result.result)
 const visibleDatasets = ref([])
 const visibleMetrics = ref([])
 const availableMetrics = ref([])
 const uniqueDatasets = findUniqueDatasets()
-const visibleMatrices = ref([])
+const visibleTables = ref([])
 
 const validationAmount = ref(1)
 const showComparison = ref(false)
@@ -85,17 +85,24 @@ async function validate() {
  * @returns {Array}   - An array of all the user recommendation tables for this run
  */
 function combineResults(results) {
+  const tableNames = []
   const tables = []
   for (const dataset in results) {
     for (const approach in results[dataset].results[0]) {
-      tables.push(
+      const name =
         results[dataset].dataset.dataset +
-          '_' +
-          results[dataset].results[0][approach].approach
-      )
+        '_' +
+        results[dataset].results[0][approach].approach
+      tableNames.push(name)
+      tables.push({
+        name,
+        dataset: results[dataset].dataset.dataset,
+        matrix: results[dataset].dataset.matrix,
+      })
     }
   }
-  return tables
+  console.log('rating tables', tables)
+  return [tableNames, tables]
 }
 
 /**
@@ -423,7 +430,7 @@ function contains(string, array) {
                           <RatingsTable
                             :id="result.id"
                             :entry="userTables[element.pair]"
-                            :pairData="result.result[element.pair].dataset"
+                            :pairData="tablePairs[element.pair]"
                             :pairIndex="element.pair"
                             :runIndex="element.run"
                             @add="
@@ -484,7 +491,7 @@ function contains(string, array) {
                 :key="entry"
               >
                 <input
-                  v-model="visibleMatrices"
+                  v-model="visibleTables"
                   class="form-check-input"
                   type="checkbox"
                   :value="entry"
@@ -512,25 +519,30 @@ function contains(string, array) {
             <b-collapse visible :id="'recs' + run">
               <b-container>
                 <b-row>
-                  <template v-for="(entry, index) in userTables">
+                  <template v-for="(entry, index) in tablePairs">
                     <template
                       v-if="
-                        visibleDatasets.includes(getDatasetName(entry)) &&
-                        visibleMatrices.includes(entry)
+                        visibleDatasets.includes(entry.dataset) &&
+                        visibleTables.includes(entry.name)
                       "
                     >
                       <div
-                        :class="visibleMatrices.length > 1 ? 'col-6' : 'col'"
+                        :class="visibleTables.length > 1 ? 'col-6' : 'col'"
                         :key="run + entry"
                       >
                         <RatingsTable
                           :id="result.id"
-                          :entry="underscoreToSpace(entry)"
-                          :pairData="result.result[index].dataset"
+                          :entry="underscoreToSpace(entry.name)"
+                          :pairData="entry"
                           :pairIndex="index"
                           :runIndex="run"
                           @add="
-                            (r, p) => comparisonTables.push({ run: r, pair: p })
+                            (r, p) =>
+                              comparisonTables.push({
+                                run: r,
+                                pair: p,
+                                id: r + ',' + p,
+                              })
                           "
                         />
                       </div>
