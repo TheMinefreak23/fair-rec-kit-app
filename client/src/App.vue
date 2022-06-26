@@ -71,6 +71,7 @@ function callToast() {
       :toast="{ root: true }"
       fluid="sm"
       position="position-fixed"
+      style="z-index: 9999"
       @click="done ? viewResultTab() : () => {}"
     >
     </b-container>

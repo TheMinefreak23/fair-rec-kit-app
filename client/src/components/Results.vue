@@ -6,7 +6,7 @@ import { ref, watch } from 'vue'
 import Result from './Result.vue'
 import VDismissButton from './VDismissButton.vue'
 import PreviousResults from './PreviousResults.vue'
-import { store, removeResult } from '../store'
+import { store, removeResult, APP_TABS } from '../store'
 import { status } from '../helpers/queueFormatter'
 import { shortResultDescription } from '../helpers/resultFormatter'
 
@@ -26,7 +26,6 @@ watch(
       emit('toast')
       store.currentExperiment.status = status.notAvailable
       blink.value = store.currentResults.length
-      console.log(blink.value)
     }
   }
 )
@@ -49,7 +48,7 @@ watch(
   () => store.currentTab,
   // This activates upon opening the results tab
   (index) => {
-    if (index == 3) {
+    if (index === APP_TABS.indexOf('Results')) {
       if (blink.value >= 0) {
         // Blink fades after 5 seconds
         const timeoutMs = 5000
