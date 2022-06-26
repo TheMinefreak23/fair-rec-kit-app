@@ -5,11 +5,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
 import FormGroupList from './FormGroupList.vue'
 import { computed, onMounted, watch } from 'vue'
-import {
-  article,
-  underscoreToSpace,
-  capitalise,
-} from '../../helpers/resultFormatter'
+import { article } from '../../helpers/resultFormatter'
 import {
   emptyFormGroup,
   reformat,
@@ -18,6 +14,7 @@ import {
 import '../../../node_modules/multi-range-slider-vue/MultiRangeSliderBlack.css'
 import FormInput from './FormInput.vue'
 import FormSelect from './FormSelect.vue'
+import FilterOverview from './FilterOverview.vue'
 
 const emit = defineEmits(['copy', 'scroll', 'update:modelValue'])
 const props = defineProps({
@@ -276,28 +273,7 @@ function hasParams() {
             />
             <!--Make a modal list if it's a filter-->
             <div v-else-if="useFilterModal && option.title === 'filter'">
-              <b-list-group>
-                <template v-if="reformat(form.lists[index]).length === 0">
-                  No filters selected
-                </template>
-                <b-list-group-item v-for="f in reformat(form.lists[index])">
-                  <b>{{ capitalise(underscoreToSpace(f.name)) }}</b>
-                  <p>
-                    {{
-                      f.params
-                        .map(
-                          (p) =>
-                            underscoreToSpace(p.name) +
-                            ': ' +
-                            (p.name === 'range'
-                              ? 'min: ' + p.value.min + ' max: ' + p.value.max
-                              : p.value)
-                        )
-                        .join(', ')
-                    }}
-                  </p>
-                </b-list-group-item>
-              </b-list-group>
+              <FilterOverview :filters="form.lists[index]" />
               <b-button
                 variant="info"
                 @click="form.lists[index].show = !form.lists[index].show"

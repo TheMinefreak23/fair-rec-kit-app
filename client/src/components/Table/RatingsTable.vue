@@ -11,6 +11,7 @@ import FormGroupList from '../Form/FormGroupList.vue'
 import { API_URL } from '../../api'
 import Table from '../Table.vue'
 import HeadersModal from '../Table/Modals/HeadersModal.vue'
+import FilterOverview from '../Form/FilterOverview.vue'
 
 const RESULT_URL = API_URL + '/result/'
 
@@ -337,6 +338,10 @@ async function getUserRecs() {
               >
                 Select Filters
               </b-button>
+              <!--TODO: show selected filters-->
+              <!--<b-row>
+                <FilterOverview :filters="filters" />
+              </b-row>-->
             </div>
           </b-col>
         </b-row>

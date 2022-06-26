@@ -204,7 +204,7 @@ function addToComparison({ run, pair, settings }) {
   comparisonTables.value.push({
     run,
     pair,
-    id: run + ',' + pair,
+    id: run + ',' + pair + ',' + settings,
     settings,
   })
 }
@@ -427,7 +427,11 @@ function addToComparison({ run, pair, settings }) {
               <p v-if="comparisonTables.length === 0">No tables selected.</p>
               <template v-else>
                 <b>Drag the tables to compare them.</b>
-                <draggable v-model="comparisonTables" item-key="id" class="row">
+                <draggable
+                  v-model="comparisonTables"
+                  :item-key="id"
+                  class="row"
+                >
                   <template #item="{ element, index }">
                     <b-col cols="6">
                       <b-row>

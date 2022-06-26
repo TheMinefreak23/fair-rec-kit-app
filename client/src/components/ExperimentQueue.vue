@@ -60,9 +60,9 @@ onMounted(() => {
             </span>
           </b-progress-bar>
         </b-progress>
+        <!--TODO show message (more elaborate message from server needed)-->
         <!--<p>{{ store.currentExperiment.progress.message }}</p>-->
       </template>
-      <!--<p>{{ store.currentExperiment.progress }}</p>-->
       <!--Show the queue with this session's experiments.-->
       <Table
         @viewResult="addResultById"
