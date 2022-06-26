@@ -61,8 +61,6 @@ def handle_experiment():
 
         # Run first experiment from the queue
         queue.run_first()
-
-        response = {'queue': queue.formatted_queue()}
     else:
         # TODO catch error
         if not queue.current_experiment:
@@ -72,13 +70,10 @@ def handle_experiment():
         if queue.current_experiment:
             current_queue_item = queue.current_experiment.queue_item
             # Set status
-            response['status'] = current_queue_item.status.value
+            # response['status'] = current_queue_item.status.value
+            response = formatted_experiment(queue.current_experiment)
             # Experiment thread has finished: reset and possibly run the next one
             if current_queue_item.status in [Status.DONE, Status.ABORTED]:
-                if current_queue_item.status == Status.DONE:
-                    experiment_id = current_queue_item.job['timestamp']['stamp']
-                    response['experimentID'] = experiment_id
-                queue.current_experiment = None
                 queue.run_first()
     return response
 

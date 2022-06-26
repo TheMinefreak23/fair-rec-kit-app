@@ -4,7 +4,7 @@ Utrecht University within the Software Project course.
 
 import words from 'an-array-of-english-words'
 import { API_URL } from '../../api'
-import { getCalculation, pollForResult, store } from '../../store'
+import { getCalculation, getQueue, pollForResult, store } from '../../store'
 import { ref, onMounted } from 'vue'
 import mockLists from './mockLists.json'
 import mockMetrics from './mockMetrics.json'
@@ -40,25 +40,17 @@ async function sendMockData(options, simple = false, metrics = false) {
     tags: randomWords(),
   }
 
-  // TODO get from server?
-  store.currentExperiment = {
-    metadata,
-    settings: form,
-    progress: progress.notAvailable,
-  }
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(store.currentExperiment),
+    body: JSON.stringify({
+      metadata,
+      settings: form,
+    }),
   }
-  const response = await fetch(API_URL + '/experiment/', requestOptions)
+  await fetch(API_URL + '/experiment/', requestOptions)
   // Update queue
-  const data = await response.json()
-  store.queue = data.queue
-  console.log('sendToServer() queue', store.queue)
-  // Switch to queue
-  store.currentTab = 1
-  pollForResult()
+  getQueue()
 }
 
 function generateRandomApproach(options) {
