@@ -18,18 +18,9 @@ export const status = {
 // TODO get from server
 /**
  * Available types of experiment progress
+ * (NOTE this only contains the finished progress status for now)
  */
 export const progress = {
-  notAvailable: 'Not Available',
-  started: 'Started',
-  parsing: 'Parsing',
-  processingData: 'Processing Data',
-  filteringData: 'Filtering Data',
-  splittingData: 'Splitting Data',
-  model: 'Starting approach',
-  modelLoad: 'Loading train set',
-  training: 'Training',
-  evaluating: 'Evaluating',
   finished: 'Finished',
 }
 

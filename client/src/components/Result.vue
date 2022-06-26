@@ -74,8 +74,6 @@ async function validate() {
   await fetch(RESULT_URL + 'validate', requestOptions).then(() => {
     console.log('Validation added to the queue')
     getQueue()
-    store.currentTab = 1
-    pollForResult()
   })
 }
 
