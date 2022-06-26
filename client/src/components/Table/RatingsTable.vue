@@ -27,6 +27,8 @@ const props = defineProps({
   comparing: { type: Boolean, default: false },
 })
 
+const loading = ref(true)
+
 // Default headers for recommendation experiments.
 const selectedHeaders = ref([
   [[{ name: 'Rank' }, { name: 'User' }, { name: 'Item' }, { name: 'Score' }]],
@@ -195,11 +197,12 @@ async function getUserRecs() {
   const response = await fetch(RESULT_URL, requestOptions)
   ratings.value = await response.json()
   selectedHeaders.value = Object.keys(ratings.value[0])
+  loading.value = false
 }
 </script>
 
 <template>
-  <b-overlay :show="ratings == []">
+  <b-overlay :show="loading">
     <!-- Filters Modal -->
     <b-modal
       id="change-columns-modal"
