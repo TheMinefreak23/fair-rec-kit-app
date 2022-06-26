@@ -22,6 +22,7 @@ const props = defineProps({
   pairIndex: Number,
   runIndex: Number,
   //poppable: { type: Boolean, default: true },
+  initValues: Object,
   comparing: { type: Boolean, default: false },
 })
 
@@ -51,13 +52,21 @@ const filtersModalShow = ref(false)
 
 onMounted(() => {
   if (props.comparing) entryAmount.value = 5
-  // Load in all the user recommendation/prediction tables
-  // Also initialize the components for table storage
+  // Set initial values if given
+  if (props.initValues) {
+    console.log('initial values', props.initValues)
+    startIndex.value = props.initValues.startIndex
+    sortIndex.value = props.initValues.sortIndex
+    ascending.value = props.initValues.ascending
+    optionalHeaders.value = props.initValues.optionalHeaders
+    filters.value = props.initValues.filters
+  }
+  // Load the full user recommendation/prediction table
   setRecs()
 })
 
 watch(optionalHeaders, () => {
-  if (props.ratings) getUserRecs()
+  if (ratings.value) getUserRecs()
 })
 
 /**
@@ -74,7 +83,6 @@ async function getHeaderOptions() {
   }
   const response = await fetch(RESULT_URL + 'headers', requestOptions)
   const data = await response.json()
-  console.log(data)
   optionalHeaderOptions.value = data
 }
 
@@ -118,17 +126,6 @@ function paginationSort(indexVar) {
  */
 function updateHeaders(headers) {
   optionalHeaders.value = headers
-}
-
-/**
- * Update headers shown in user recommendations
- * @param {Array}  changedFilters - A list of filters that are selected
- */
-function changeFilters(changedFilters) {
-  // TODO why filters ref? refactor?
-  filters.value = changedFilters
-  console.log('changeFilters filters', filters.value)
-  getUserRecs()
 }
 
 /**
@@ -193,6 +190,7 @@ async function getUserRecs() {
       matrix: props.pairData.matrix,
     }),
   }
+  console.log('getting ratings for', props.id)
   const response = await fetch(RESULT_URL, requestOptions)
   ratings.value = await response.json()
   selectedHeaders.value = Object.keys(ratings.value[0])
@@ -206,7 +204,7 @@ async function getUserRecs() {
       id="change-columns-modal"
       v-model="filtersModalShow"
       title="Change filters"
-      @ok="changeFilters"
+      @ok="getUserRecs"
     >
       <FormGroupList
         v-model="filters"
@@ -251,8 +249,6 @@ async function getUserRecs() {
       :comparing="comparing"
       @paginationSort="(i) => paginationSort(i)"
       @loadMore="(increase, amount) => loadMore(increase, amount)"
-      @changeFilters="(changedFilters) => changeFilters(changedFilters)"
-      @updateHeaders="(headers) => updateHeaders(headers)"
     >
       <b-container>
         <b-row>
@@ -260,7 +256,19 @@ async function getUserRecs() {
           <b-col>
             <b-button
               variant="info"
-              @click="$emit('add', props.runIndex, props.pairIndex)"
+              @click="
+                $emit('add', {
+                  run: runIndex,
+                  pair: pairIndex,
+                  settings: {
+                    startIndex: startIndex,
+                    sortIndex: sortIndex,
+                    ascending: ascending,
+                    optionalHeaders: optionalHeaders,
+                    filters: filters,
+                  },
+                })
+              "
               >Add table to comparison
             </b-button>
             <b-row>

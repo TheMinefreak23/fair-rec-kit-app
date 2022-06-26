@@ -198,6 +198,16 @@ function hideResults(results) {
 function contains(string, array) {
   return array.some((element) => string.startsWith(element))
 }
+
+function addToComparison({ run, pair, settings }) {
+  console.log('run', run, 'pair', pair, 'settings', settings)
+  comparisonTables.value.push({
+    run,
+    pair,
+    id: run + ',' + pair,
+    settings,
+  })
+}
 </script>
 
 <template>
@@ -433,14 +443,8 @@ function contains(string, array) {
                             :pairData="tablePairs[element.pair]"
                             :pairIndex="element.pair"
                             :runIndex="element.run"
-                            @add="
-                              (r, p) =>
-                                comparisonTables.push({
-                                  run: r,
-                                  pair: p,
-                                  id: r + ',' + p,
-                                })
-                            "
+                            :initValues="element.settings"
+                            @add="addToComparison"
                             comparing
                           />
                         </b-card>
@@ -536,14 +540,7 @@ function contains(string, array) {
                           :pairData="entry"
                           :pairIndex="index"
                           :runIndex="run"
-                          @add="
-                            (r, p) =>
-                              comparisonTables.push({
-                                run: r,
-                                pair: p,
-                                id: r + ',' + p,
-                              })
-                          "
+                          @add="addToComparison"
                         />
                       </div>
                     </template>

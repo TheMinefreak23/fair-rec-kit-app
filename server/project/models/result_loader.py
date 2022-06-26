@@ -263,41 +263,61 @@ def filter_results(dataframe, dataset_name, matrix_name, filters):
         results after filtering
     """
     print('raw filters from client: ', filters)
+    if not filters:
+        return dataframe
 
     # Convert filters
     settings = {} # TODO refactor?
     reformat_list(settings, 'subset', filters) # TODO use reformat option instead?
-    # print('after reformat list', settings)
+    print('after reformat list', settings)
+    # TODO global import
 
-    # TODO refactor (duplicate code in options formatter)
-    subset = []
+    from fairreckitlib.data.filter.filter_config import FilterConfig
+    from fairreckitlib.data.filter.filter_config import FilterPassConfig
+    filter_pass_configs=[]
     for filter_pass in settings['subset']:
-        subset.append({'filter_pass': filter_pass['filter']})
+        print(filter_pass)
+        filter_configs = [FilterConfig(name=f['name'], params=f['params']) for f in filter_pass['filter']]
+        filter_pass_configs.append(FilterPassConfig(filters=filter_configs))
 
+    from fairreckitlib.data.filter.filter_config import DataSubsetConfig
+
+    subset_config = DataSubsetConfig(dataset=dataset_name,
+    matrix=matrix_name,
+    filter_passes=filter_pass_configs)
+
+    from fairreckitlib.data.pipeline.data_pipeline import DataPipeline
+    from fairreckitlib.core.config.config_factories import GroupFactory
+    from fairreckitlib.data.filter.filter_factory import create_filter_factory
+    from fairreckitlib.core.events.event_dispatcher import EventDispatcher
+
+    data_factory = GroupFactory('subset')
+    data_factory.add_factory(create_filter_factory(recommender_system.data_registry))
+    print(data_factory)
+
+    # TODO: could also use parsing
+    # TODO refactor (duplicate code in options formatter)
+    #subset = []
+    #for filter_pass in settings['subset']:
+    #    subset.append({'filter_pass': filter_pass['filter']})
+    #
     #import json
     #print('filters data format', json.dumps(subset, indent=4))
-    print('TODO make a filter config and filter with it')
-
-    # TODO global import
-    #from fairreckitlib.data.pipeline.data_pipeline import DataPipeline
     #from fairreckitlib.data.filter.filter_config_parsing import parse_data_subset_config
-    #from fairreckitlib.data.filter.filter_config import DataSubsetConfig
+    #subset_config = parse_data_subset_config({'subset': subset},
+    #                                         recommender_system.data_registry,
+    #                                         data_factory,
+    #                                         EventDispatcher())
 
-    #parse_data_subset_config()
-    #from fairreckitlib.data.filter.filter_config import FilterConfig
+    print('subset config', subset_config)
 
-    #filter_pass_configs=[]
-    #for filter_pass in settings['subset']:
-        #for filters in filter_pass['filter']:
-        #    print(filters)
-        #filter_configs = [FilterConfig(name=, params=) ]
-        #filter_pass_configs.append(FilterPassConfig(filters=filter_configs))
+    temp_filter_dir = 'filtered'
+    os.mkdir(temp_filter_dir)
 
-    #subset_config = DataSubsetConfig(dataset=dataset_name,
-    # matrix=matrix_name,
-    # filter_passes=filter_pass_configs)
-    #DataPipeline(None,None).filter_rows('filtered', dataframe, subset_config)
+    dataframe = DataPipeline(data_factory,EventDispatcher()).filter_rows(temp_filter_dir, dataframe, subset_config)
     #from fairreckitlib.data.filter.filter_passes import filter_from_filter_passes
     #filter_from_filter_passes('filtered',dataframe,subset_config,)
+
+    os.rmdir(temp_filter_dir)
 
     return dataframe
