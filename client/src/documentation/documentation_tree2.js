@@ -4,28 +4,14 @@ Utrecht University within the Software Project course.
 import { switchToTab, tabs } from '../store'
 import { capitalise } from '../helpers/resultFormatter'
 
-// adapted from https://stackoverflow.com/questions/3813294/how-to-get-element-by-innertext
 export function scrollToDocText(text) {
-  // switch to documentation tab
-  /*const xpath = "//a[contains(text(),'" + capitaliseFirst(text) + "')]"
-  const matchingElement = document.evaluate(
-    xpath,
-    document,
-    null,
-    XPathResult.FIRST_ORDERED_NODE_TYPE,
-    null
-  ).singleNodeValue
-  if (matchingElement) {
-    matchingElement.scrollIntoView({ behavior: 'smooth' })
-  } else {
-    console.log(capitaliseFirst(text), 'not found in documentation tab!')
-  }*/
   const formattedText = capitaliseFirst(text)
   const itemWithText = flatTree.find((item) =>
     item.name.includes(formattedText)
   )
   if (itemWithText) {
     // console.log('Found item', itemWithText, 'for text')
+    // switch to documentation tab
     switchToTab(tabs.documentation)
     openParents(itemWithText)
     // TODO refactor replace (used in documentation component as well)

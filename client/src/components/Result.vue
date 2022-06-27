@@ -421,9 +421,8 @@ function contains(string, array) {
                     <b-col cols="6">
                       <b-row>
                         <b-button @click="comparisonTables.splice(index, 1)"
-                          >X</b-button
-                        ></b-row
-                      >
+                          ><i class="bi bi-x" /></b-button
+                      ></b-row>
                       <b-row>
                         <b-card>
                           <RatingsTable

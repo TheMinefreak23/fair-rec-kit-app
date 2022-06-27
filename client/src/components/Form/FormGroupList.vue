@@ -350,8 +350,8 @@ function scrollToGroup(index) {
                           variant="danger"
                           class="mb-2 mr-sm-2 mb-sm-0 float-end"
                           style="width: 90%"
-                          >X</b-button
-                        >
+                          ><i class="bi bi-x"
+                        /></b-button>
                       </b-col>
                     </b-row>
                   </b-row>

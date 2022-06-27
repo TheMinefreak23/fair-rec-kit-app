@@ -13,8 +13,11 @@ const show = ref(false)
 
 <template>
   <div v-if="capitalise(name) in descriptions">
-    <b-popover :show="show" :target="name + 'info'" triggers="click blur">
-      <template #title>{{ capitalise(name) }}</template>
+    <b-popover :show.sync="show" :target="name + 'info'" triggers="click blur">
+      <template #title>
+        {{ capitalise(name) }}
+        <b-button @click="show = false"><i class="bi bi-x" /> </b-button>
+      </template>
       {{ descriptions[capitalise(name)] }}
       <b-button
         variant="outline-info"
@@ -25,8 +28,9 @@ const show = ref(false)
           }
         "
       >
-        Go to documentation</b-button
-      >
+        Go to documentation
+        <i class="bi bi-arrow-right-short"
+      /></b-button>
     </b-popover>
 
     <b-button
