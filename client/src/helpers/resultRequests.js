@@ -43,6 +43,7 @@ export async function getResult() {
  * @param {Boolean} newResult - Whether we just ran the experiment
  */
 export async function addResultById(resultId, view = true, newResult = false) {
+  if (newResult) store.polling = false
   console.log('addResultById', resultId)
   // Check if the selected result is already loaded
   const index = store.currentResults
@@ -64,5 +65,5 @@ export async function addResultById(resultId, view = true, newResult = false) {
  * Make result tab the active tab
  */
 export function viewResultTab() {
-  switchToTab(tabs.result)
+  switchToTab(tabs.results)
 }
