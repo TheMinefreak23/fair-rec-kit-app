@@ -47,6 +47,7 @@ def result_by_id(result_id, result_storage):
     data = results_overview['all_results'][id_to_index(
         results_overview, result_id)]
     data['metadata']['runs'] = 0  # Store runs
+
     # loops through all the subdirectories, and thus - runs, of a certain calculation
 
     for subdir in [f.path for f in os.scandir(relative_path) if f.is_dir()]:

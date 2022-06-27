@@ -111,7 +111,7 @@ async function getQueue() {
     ) {
       store.currentExperiment = data.current
       pollForResult()
-      store.polling = true
+      // store.polling = true
       // console.log('new experiment started running')
     }
   }
