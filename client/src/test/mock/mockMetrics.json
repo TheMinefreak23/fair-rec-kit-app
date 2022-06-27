@@ -10,7 +10,7 @@
       ],
       "subgroups": [
         {
-          "name": "LFM-2B",
+          "name": "LFM-2B-Sample",
           "params": [],
           "matrix": {
             "name": "user-track-count",
