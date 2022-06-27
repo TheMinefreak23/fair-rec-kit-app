@@ -71,14 +71,14 @@ function formatOptions(options) {
     <!--Use a checkbox if the options are of a binary (True or False) nature.-->
     <b-form-group
       :label="checkboxLabel() + ' *'"
-      v-if="option.options[0] == true || option.options[0] == false"
+      v-else-if="option.options[0] == true || option.options[0] == false"
     >
       <b-form-checkbox v-model="form.value" size="lg" required>{{
         form.value ? 'Yes' : 'No'
       }}</b-form-checkbox>
     </b-form-group>
     <!--Use a tags dropdown for selecting multiple values.-->
-    <b-form-group v-if="option.name.toLowerCase().includes('values')">
+    <b-form-group v-else-if="option.name.toLowerCase().includes('values')">
       <DropdownTags
         name="filters"
         v-model="form.value"
