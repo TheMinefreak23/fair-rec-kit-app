@@ -21,7 +21,7 @@ import { useFetch } from './composables/useFetch'
 let toast = useToast()
 
 // Ping server
-const { data, error, retry } = useFetch(API_URL)
+const { data, error, retry } = useFetch(API_URL + '/')
 
 const done = ref(false)
 const blink = ref(false)
