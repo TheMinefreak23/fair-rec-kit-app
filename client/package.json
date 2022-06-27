@@ -19,7 +19,8 @@
     "requirejs": "^2.3.6",
     "vitest": "^0.6.3",
     "vue": "^3.2.31",
-    "vue-chartjs": "^4.1.0"
+    "vue-chartjs": "^4.1.0",
+    "vuedraggable": "^2.24.3"
   },
   "devDependencies": {
     "@testing-library/vue": "^6.5.1",
