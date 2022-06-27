@@ -74,8 +74,6 @@ async function validate() {
   await fetch(RESULT_URL + 'validate', requestOptions).then(() => {
     console.log('Validation added to the queue')
     getQueue()
-    store.currentTab = 1
-    pollForResult()
   })
 }
 
@@ -197,6 +195,16 @@ function hideResults(results) {
  */
 function contains(string, array) {
   return array.some((element) => string.startsWith(element))
+}
+
+function addToComparison({ run, pair, settings }) {
+  console.log('run', run, 'pair', pair, 'settings', settings)
+  comparisonTables.value.push({
+    run,
+    pair,
+    id: run + ',' + pair + ',' + settings,
+    settings,
+  })
 }
 </script>
 
@@ -393,9 +401,10 @@ function contains(string, array) {
                           :headers="hideHeaders(datasetResult.headers)"
                           :removable="false"
                         />
-                        <b-button @click="exportTable(index, runID)"
-                          >Export table</b-button
-                        >
+                        <b-button @click="exportTable(index, runID)">
+                          <i class="bi bi-arrow-down-circle" />
+                          Export table
+                        </b-button>
                       </template>
                     </b-col>
                   </b-row>
@@ -417,14 +426,17 @@ function contains(string, array) {
               <p v-if="comparisonTables.length === 0">No tables selected.</p>
               <template v-else>
                 <b>Drag the tables to compare them.</b>
-                <draggable v-model="comparisonTables" item-key="id" class="row">
+                <draggable
+                  v-model="comparisonTables"
+                  :item-key="id"
+                  class="row"
+                >
                   <template #item="{ element, index }">
                     <b-col cols="6">
                       <b-row>
                         <b-button @click="comparisonTables.splice(index, 1)"
-                          >X</b-button
-                        ></b-row
-                      >
+                          ><i class="bi bi-x" /></b-button
+                      ></b-row>
                       <b-row>
                         <b-card>
                           <RatingsTable
@@ -433,14 +445,8 @@ function contains(string, array) {
                             :pairData="tablePairs[element.pair]"
                             :pairIndex="element.pair"
                             :runIndex="element.run"
-                            @add="
-                              (r, p) =>
-                                comparisonTables.push({
-                                  run: r,
-                                  pair: p,
-                                  id: r + ',' + p,
-                                })
-                            "
+                            :initValues="element.settings"
+                            @add="addToComparison"
                             comparing
                           />
                         </b-card>
@@ -536,14 +542,7 @@ function contains(string, array) {
                           :pairData="entry"
                           :pairIndex="index"
                           :runIndex="run"
-                          @add="
-                            (r, p) =>
-                              comparisonTables.push({
-                                run: r,
-                                pair: p,
-                                id: r + ',' + p,
-                              })
-                          "
+                          @add="addToComparison"
                         />
                       </div>
                     </template>

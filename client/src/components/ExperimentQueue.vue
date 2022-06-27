@@ -2,11 +2,10 @@
 /* This program has been developed by students from the bachelor Computer Science at
     Utrecht University within the Software Project course.
     © Copyright Utrecht University (Department of Information and Computing Sciences) */
-import { API_URL } from '../api.js'
 import Table from './Table.vue'
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 import { formatResults } from '../helpers/resultFormatter.js'
-import { status, progress } from '../helpers/queueFormatter.js'
+import { status } from '../helpers/queueFormatter.js'
 import { store, getQueue, pollForResult } from '../store.js'
 import { addResultById } from '../helpers/resultRequests.js'
 
@@ -32,9 +31,6 @@ const progressMax = 100 // the maximal value of the progress bar
  */
 onMounted(() => {
   getQueue()
-  if (store.currentExperiment.status === status.active) {
-    pollForResult()
-  }
 })
 </script>
 
@@ -60,9 +56,9 @@ onMounted(() => {
             </span>
           </b-progress-bar>
         </b-progress>
+        <!--TODO show message (more elaborate message from server needed)-->
         <!--<p>{{ store.currentExperiment.progress.message }}</p>-->
       </template>
-      <!--<p>{{ store.currentExperiment.progress }}</p>-->
       <!--Show the queue with this session's experiments.-->
       <Table
         @viewResult="addResultById"

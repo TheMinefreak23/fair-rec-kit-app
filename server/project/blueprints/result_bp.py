@@ -131,6 +131,7 @@ def user_result():
 
     # Add optional columns to the dataframe (if any)
     chosen_headers = json_data.get("optionalHeaders", [])
+    print(chosen_headers)
     if len(chosen_headers) > 0:
         recs = add_dataset_columns(
             dataset_name, recs, chosen_headers, matrix_name)

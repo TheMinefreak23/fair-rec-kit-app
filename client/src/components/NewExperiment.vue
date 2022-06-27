@@ -2,17 +2,16 @@
 /* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
-import { computed, onMounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import FormGroupList from './Form/FormGroupList.vue'
 import { sendMockData } from '../test/mock/mockExperimentOptions.js'
-import { store, pollForResult, APP_TABS } from '../store.js'
+import { store, switchToTab, tabs, getQueue } from '../store.js'
 import { API_URL, DEV } from '../api'
 import {
   emptyFormGroup,
   validateEmail,
   reformat,
 } from '../helpers/optionsFormatter'
-import { progress } from '../helpers/queueFormatter'
 import Tags from './Tags.vue'
 import { useFetch } from '../composables/useFetch'
 import endToEndMock from '../test/mock/endToEndMock.json'
@@ -51,7 +50,7 @@ watch(
     console.log('newExperiment watch new settings:', newSettings)
     form.value = newSettings.form
     metadata.value = newSettings.metadata
-    store.currentTab = APP_TABS.indexOf('New Experiment')
+    switchToTab(tabs.newExperiment)
   }
 )
 
@@ -110,23 +109,17 @@ async function sendToServer() {
   sendForm.lists.datasets = reformat(sendForm.lists.datasets)
   console.log('sendForm', sendForm)
 
-  store.currentExperiment = {
-    metadata: metadata.value,
-    settings: sendForm,
-    progress: progress.notAvailable,
-  }
-  // Post settings to server
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(store.currentExperiment),
+    body: JSON.stringify({
+      metadata: metadata.value,
+      settings: sendForm,
+    }),
   }
-  const response = await fetch(API_URL + '/experiment/', requestOptions)
+  await fetch(API_URL + '/experiment/', requestOptions)
   // Update queue
-  const data = await response.json()
-  store.queue = data.queue
-  console.log('sendToServer() queue', store.queue)
-  pollForResult()
+  getQueue()
 }
 
 // Declare default values of the form

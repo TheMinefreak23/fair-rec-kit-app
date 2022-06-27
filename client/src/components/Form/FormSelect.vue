@@ -54,6 +54,8 @@ function formatOptions(options) {
 
 <template>
   <div>
+    <!--TODO parameter tooltip with information-->
+    <!--<i v-b-tooltip="" class="bi bi-info-circle"/>-->
     <!--Use a radio group if there are a few options and they aren't true/false.-->
     <b-form-group
       :label="chooseLabel() + ' *'"
