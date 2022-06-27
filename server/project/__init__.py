@@ -46,7 +46,7 @@ def create_app():
     logger.setLevel(logging.DEBUG)
 
     # Route: Main.
-    @app.route('/api', methods=['GET'])
+    @app.route('/api/', methods=['GET'])
     def main():
         return {"msg": "Server online."}
 
