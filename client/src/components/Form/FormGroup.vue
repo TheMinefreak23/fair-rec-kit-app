@@ -15,6 +15,7 @@ import '../../../node_modules/multi-range-slider-vue/MultiRangeSliderBlack.css'
 import FormInput from './FormInput.vue'
 import FormSelect from './FormSelect.vue'
 import FilterOverview from './FilterOverview.vue'
+import DocumentationButton from './DocumentationButton.vue'
 
 const emit = defineEmits(['copy', 'scroll', 'update:modelValue'])
 const props = defineProps({
@@ -169,9 +170,6 @@ function hasParams() {
             <b-row>
               <!--Main option selection-->
               <b-col cols="12">
-                <h4 v-if="props.name === 'metric'">
-                  NOTE: resets when changing dataset
-                </h4>
                 <b-form-group
                   :label="
                     props.options.length > 1
@@ -182,24 +180,33 @@ function hasParams() {
                   "
                 >
                   <!-- If there is only one main option available, don't use a main selection-->
-                  <b-form-select
-                    v-if="options.length > 1"
-                    :id="name"
-                    :class="blink ? 'subtle-blink' : ''"
-                    v-model="form.main"
-                    data-testid="main-select"
-                    :options="options"
-                    text-field="name"
-                    :required="required"
-                  >
-                    <template #first>
-                      <b-form-select-option
-                        :value="''"
-                        data-testid="main-option"
-                        >Choose..</b-form-select-option
+                  <b-container>
+                    <b-row>
+                      <b-col>
+                        <b-form-select
+                          v-if="options.length > 1"
+                          :id="name"
+                          :class="blink ? 'subtle-blink' : ''"
+                          v-model="form.main"
+                          data-testid="main-select"
+                          :options="options"
+                          text-field="name"
+                          :required="required"
+                        >
+                          <template #first>
+                            <b-form-select-option
+                              :value="''"
+                              data-testid="main-option"
+                              >Choose..</b-form-select-option
+                            >
+                          </template>
+                        </b-form-select></b-col
                       >
-                    </template>
-                  </b-form-select>
+                      <b-col v-if="form.main" cols="2">
+                        <DocumentationButton :name="form.main.name" dark />
+                      </b-col>
+                    </b-row>
+                  </b-container>
                   <b-button
                     v-if="!single && form.main"
                     @click="$emit('copy')"

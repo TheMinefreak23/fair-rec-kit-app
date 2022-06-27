@@ -1,27 +1,30 @@
 <script setup>
-/*This program has been developed by students from the bachelor Computer Science at
+/* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Poject course.
-© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+© Copyright Utrecht University (Department of Information and Computing Sciences) */
 /*
 Documentation tab which shows all algorithms, metrics, datasets, etc. and their description.
 */
 
 import { ref } from 'vue'
-import { structure } from '../documentation/documentation_structure.vue'
-import { tree } from '../documentation/documentation_tree2.vue'
+// import { structure } from '../documentation/documentation_structure.vue'
+import {
+  tree,
+  flatTree,
+  openParents,
+  formatId,
+} from '../documentation/documentation_tree2'
 import TreeMenu from '../documentation/TreeMenu.vue'
-import { doctext } from '../documentation/documentation_items.vue'
+// import { doctext } from '../documentation/documentation_items.vue'
 
-const collapse = ref([])
-let itemDicts = ref()
+// const collapse = ref([])
+// let itemDicts = ref()
 let sidenavOpened = ref()
-let structure1D = ref()
-let flatTree = ref()
+// let structure1D = ref()
 
-itemDicts = parse(doctext)
+// itemDicts = parse(doctext)
 sidenavOpened = false
-structure1D = parseStructure(structure)
-flatTree = flattenTree(tree)
+// structure1D = parseStructure(structure)
 
 /**
  * Parses the content of documentation_items.txt into items.
@@ -29,11 +32,11 @@ flatTree = flattenTree(tree)
  * @return {[Dict]} Array of items represented as a dictionary.
  */
 function parse(text) {
-  let stringItems = parseTextIntoItems(text)
-  let items = {}
+  const stringItems = parseTextIntoItems(text)
+  const items = {}
   for (let i = 0; i < stringItems.length; i++) {
-    let idict = parseItem(stringItems[i])
-    items[idict['name']] = idict
+    const idict = parseItem(stringItems[i])
+    items[idict.name] = idict
   }
   return items
 }
@@ -45,16 +48,16 @@ function parse(text) {
  */
 function parseTextIntoItems(text) {
   // An item is defined as anything between -{...}- as defined in documents_items.txt
-  let items = []
+  const items = []
   let item = ''
   let readItem = false
-  let textLines = text.split('\n')
+  const textLines = text.split('\n')
 
   for (let j = 0; j < textLines.length; j++) {
     // Parse each sentence
-    let line = textLines[j]
+    const line = textLines[j]
     for (let i = 0; i < line.length; i++) {
-      let character = line[i]
+      const character = line[i]
       if (character + line[i + 1] == '-{') {
         readItem = true
         i += 1
@@ -80,15 +83,15 @@ function parseTextIntoItems(text) {
  * @return {Dict} Dictionary of an item as key, value: dict["name"] = "Algorithm 123".
  */
 function parseItem(item) {
-  let dict = {}
+  const dict = {}
   let key = ''
   let value = ''
   let keytagFound = false // Prevents nested tags.
-  let itemLines = item.split('\n')
+  const itemLines = item.split('\n')
   for (let j = 0; j < itemLines.length; j++) {
-    let words = itemLines[j].split(' ')
+    const words = itemLines[j].split(' ')
     for (let i = 0; i < words.length; i++) {
-      let word = words[i]
+      const word = words[i]
       if (word.match(/<.*>/)) {
         const endTag = new RegExp('</' + key + '>', 'g') // Ending tag e.g., </name>.
         if (word.match(endTag)) {
@@ -122,74 +125,34 @@ function parseItem(item) {
  * @return {[{String, Int}]} 1-dimensional array of headers.
  */
 function parseStructure(struct) {
-  let res = []
+  const res = []
   parsePartialStructure(struct, -1)
 
   /**
    * Recursive function to flatten a jagged array.
    * @param {[String]} struct
-   * @param {Int} start_depth
+   * @param {Int} startDepth
    */
-  function parsePartialStructure(struct, start_depth) {
+  function parsePartialStructure(struct, startDepth) {
     for (let j = 0; j < struct.length; j++) {
-      let item = struct[j]
+      const item = struct[j]
       if (item instanceof Array) {
         // List of subheaders
-        parsePartialStructure(item, start_depth + 1)
+        parsePartialStructure(item, startDepth + 1)
       } else {
         // Regular header
-        res.push({ name: item, depth: start_depth })
+        res.push({ name: item, depth: startDepth })
       }
     }
   }
   return res
 }
 
-function flattenTree(tree) {
-  return flatten(tree.nodes, [], 0)
-}
-
-function flatten(nodes, parents, d) {
-  let flattenedTree = []
-
-  for (let i = 0; i < nodes.length; i++) {
-    let newtree = nodes[i]
-    // console.log(newtree)
-    let item = { name: newtree.label, depth: d, parents: parents }
-    // console.log(item)
-    flattenedTree.push(item)
-
-    if (typeof newtree.nodes == 'undefined') {
-    } else {
-      let newparents = parents.concat([newtree.label])
-      flattenedTree = flattenedTree.concat(
-        flatten(newtree.nodes, newparents, d + 1)
-      )
-    }
-  }
-
-  return flattenedTree
-}
-
-function openParents(item) {
-  let collapse = document.getElementById(
-    item.name.replaceAll(' ', '_').replaceAll('@', 'a')
-  )
-  collapse.classList.add('show')
-
-  for (let i = 0; i < item.parents.length; i++) {
-    let c = document.getElementById(
-      item.parents[i].replaceAll(' ', '_').replaceAll('@', 'a')
-    )
-    c.classList.add('show')
-  }
-}
-
 /**
  * Navigation sidebar toggle collapse
  */
 function openCloseNav() {
-  if (sidenavOpened) {
+  if (sidenavOpened.value) {
     closeNav()
   } else {
     openNav()
@@ -313,7 +276,7 @@ code:before {
       <b-link
         class="position-relative py-0"
         data-toggle="collapse"
-        :href="'#' + item.name.replaceAll(' ', '_').replaceAll('@', 'a')"
+        :href="'#' + formatId(item.name)"
         v-on:click="openParents(item)"
         v-for="item in flatTree"
         :key="item"
@@ -333,7 +296,7 @@ code:before {
       v-for="item in tree.nodes"
       :key="item"
     >
-      <tree-menu :label="item.label" :nodes="item.nodes"></tree-menu>
+      <TreeMenu :label="item.label" :nodes="item.nodes"></TreeMenu>
     </div>
   </div>
 </template>

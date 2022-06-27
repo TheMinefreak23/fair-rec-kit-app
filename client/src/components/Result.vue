@@ -401,9 +401,10 @@ function addToComparison({ run, pair, settings }) {
                           :headers="hideHeaders(datasetResult.headers)"
                           :removable="false"
                         />
-                        <b-button @click="exportTable(index, runID)"
-                          >Export table</b-button
-                        >
+                        <b-button @click="exportTable(index, runID)">
+                          <i class="bi bi-arrow-down-circle" />
+                          Export table
+                        </b-button>
                       </template>
                     </b-col>
                   </b-row>
@@ -434,9 +435,8 @@ function addToComparison({ run, pair, settings }) {
                     <b-col cols="6">
                       <b-row>
                         <b-button @click="comparisonTables.splice(index, 1)"
-                          >X</b-button
-                        ></b-row
-                      >
+                          ><i class="bi bi-x" /></b-button
+                      ></b-row>
                       <b-row>
                         <b-card>
                           <RatingsTable

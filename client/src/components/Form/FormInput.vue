@@ -7,6 +7,7 @@ import { computed } from 'vue'
 import { capitalise, underscoreToSpace } from '../../helpers/resultFormatter'
 import SplitRange from './SplitRange.vue'
 import MultiRangeSlider from 'multi-range-slider-vue'
+import { store, switchToTab, tabs } from '../../store'
 
 const emit = defineEmits(['update:modelValue'])
 const props = defineProps({
@@ -30,6 +31,8 @@ const form = computed({
 </script>
 <template>
   <b-col :cols="!value.name.includes('split') ? 6 : 12">
+    <!--TODO parameter tooltip with information-->
+    <!--<i v-b-tooltip="" class="bi bi-info-circle"/>-->
     <b-form-group
       :label="capitalise(underscoreToSpace(value.name)) + ' *'"
       :description="
