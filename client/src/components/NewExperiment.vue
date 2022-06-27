@@ -5,14 +5,13 @@ Utrecht University within the Software Project course.
 import { ref, watch } from 'vue'
 import FormGroupList from './Form/FormGroupList.vue'
 import { sendMockData } from '../test/mock/mockExperimentOptions.js'
-import { store, APP_TABS, getQueue } from '../store.js'
+import { store, switchToTab, tabs, getQueue } from '../store.js'
 import { API_URL, DEV } from '../api'
 import {
   emptyFormGroup,
   validateEmail,
   reformat,
 } from '../helpers/optionsFormatter'
-import { progress } from '../helpers/queueFormatter'
 import Tags from './Tags.vue'
 import { useFetch } from '../composables/useFetch'
 import endToEndMock from '../test/mock/endToEndMock.json'
@@ -51,7 +50,7 @@ watch(
     console.log('newExperiment watch new settings:', newSettings)
     form.value = newSettings.form
     metadata.value = newSettings.metadata
-    store.currentTab = APP_TABS.indexOf('New Experiment')
+    switchToTab(tabs.newExperiment)
   }
 )
 

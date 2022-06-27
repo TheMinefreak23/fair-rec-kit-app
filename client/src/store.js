@@ -16,15 +16,28 @@ const store = reactive({
   toast: null, // Toast settings to show in the toast over the app
 })
 
-// App tabs (TODO use these for dynamic app order)
+// App tabs and order (TODO use these for dynamic app order)
+const tabs = {
+  newExperiment: 'New Experiment',
+  experimentQueue: 'Experiment Queue',
+  results: 'Results',
+  allResults: 'All Results',
+  documentation: 'Documentation',
+  musicDetail: 'Music Detail',
+}
+
 const APP_TABS = [
-  'New Experiment',
-  'Experiment Queue',
-  'Results',
-  'All Results',
-  'Documentation',
-  'Music Detail',
+  tabs.newExperiment,
+  tabs.experimentQueue,
+  tabs.results,
+  tabs.allResults,
+  tabs.documentation,
+  tabs.musicDetail,
 ]
+
+function switchToTab(tab) {
+  store.currentTab = APP_TABS.indexOf(tab)
+}
 
 /**
  * Poll for the current experiment result
@@ -32,7 +45,7 @@ const APP_TABS = [
 function pollForResult() {
   if (!store.polling) {
     // Switch to queue
-    store.currentTab = APP_TABS.indexOf('Experiment Queue')
+    switchToTab(tabs.experimentQueue)
     const interval = 600
     store.resultPoll = setInterval(getExperiment, interval)
     store.polling = true
@@ -124,6 +137,8 @@ function removeResult(index) {
 export {
   store,
   APP_TABS,
+  tabs,
+  switchToTab,
   addResult,
   removeResult,
   getExperiment as getCalculation,

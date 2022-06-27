@@ -9,6 +9,7 @@ import { capitalise } from '../../helpers/resultFormatter'
 
 import FormGroup from './FormGroup.vue'
 import { store } from '../../store'
+import DocumentationButton from './DocumentationButton.vue'
 
 const emit = defineEmits(['update:modelValue'])
 const props = defineProps({
@@ -247,15 +248,13 @@ function scrollToGroup(index) {
     <b-row>
       <template v-if="options && options.length === 0">
         <h4>No options available!</h4>
-        <h4 v-if="title === 'subgroups'">
+        <h4 v-if="title.toLowerCase() === 'subgroups'">
           Please select a dataset and matrix.
         </h4>
       </template>
       <h3 v-else class="text-center text-white mb-0">
         <b-card no-body class="mb-0 bg-dark">
           <!--Capitalise the title.-->
-          <!--TODO refactor-->
-          <!--{{ title && capitalise(title) }}-->
           {{ description ? capitalise(description) : capitalise(title) }}
           <!--Collapsable group list toggle button-->
           <b-button
@@ -276,10 +275,24 @@ function scrollToGroup(index) {
     <b-row>
       <b-collapse id="collapse" :visible="form.visible">
         <b-card class="g-0">
-          <!--<p>
+          <b-row>
+            <b-col>
+              <b
+                class="lead"
+                style="color: orangered"
+                v-if="title.toLowerCase() === 'metrics'"
+              >
+                NOTE: resets when changing dataset
+              </b>
+            </b-col>
+            <!--<p>
         {{ capitalise(title) }} selected:
         {{ formatMultipleItems(form.main) }}
       </p>-->
+            <b-col cols="4">
+              <DocumentationButton :name="title" />
+            </b-col>
+          </b-row>
           <b-row>
             <TransitionGroup name="list">
               <b-col

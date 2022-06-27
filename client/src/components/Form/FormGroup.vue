@@ -18,6 +18,7 @@ import {
 import '../../../node_modules/multi-range-slider-vue/MultiRangeSliderBlack.css'
 import FormInput from './FormInput.vue'
 import FormSelect from './FormSelect.vue'
+import DocumentationButton from './DocumentationButton.vue'
 
 const emit = defineEmits(['copy', 'scroll', 'update:modelValue'])
 const props = defineProps({
@@ -172,9 +173,7 @@ function hasParams() {
             <b-row>
               <!--Main option selection-->
               <b-col cols="12">
-                <h4 v-if="props.name === 'metric'">
-                  NOTE: resets when changing dataset
-                </h4>
+                <DocumentationButton v-if="form.main" :name="form.main.name" />
                 <b-form-group
                   :label="
                     props.options.length > 1

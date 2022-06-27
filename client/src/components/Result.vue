@@ -391,9 +391,10 @@ function contains(string, array) {
                           :headers="hideHeaders(datasetResult.headers)"
                           :removable="false"
                         />
-                        <b-button @click="exportTable(index, runID)"
-                          >Export table</b-button
-                        >
+                        <b-button @click="exportTable(index, runID)">
+                          <i class="bi bi-arrow-down-circle" />
+                          Export table
+                        </b-button>
                       </template>
                     </b-col>
                   </b-row>
