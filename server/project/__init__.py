@@ -14,6 +14,8 @@ Utrecht University within the Software Project course.
 import sys
 import logging
 from flask import Flask
+from flask import logging
+from flask.logging import create_logger
 from flask_cors import CORS
 
 from project.models.result_storage import create_results_overview
