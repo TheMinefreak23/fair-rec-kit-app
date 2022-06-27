@@ -9,6 +9,7 @@ import { capitalise } from '../../helpers/resultFormatter'
 
 import FormGroup from './FormGroup.vue'
 import { store } from '../../store'
+import DocumentationButton from './DocumentationButton.vue'
 
 const emit = defineEmits(['update:modelValue'])
 const props = defineProps({
@@ -247,16 +248,26 @@ function scrollToGroup(index) {
     <b-row>
       <template v-if="options && options.length === 0">
         <h4>No options available!</h4>
-        <h4 v-if="title === 'subgroups'">
+        <h4 v-if="title.toLowerCase() === 'subgroups'">
           Please select a dataset and matrix.
         </h4>
       </template>
+      <!--Collapse header-->
       <h3 v-else class="text-center text-white mb-0">
         <b-card no-body class="mb-0 bg-dark">
+          <!---<b-button :id="slotProps.id">-->
           <!--Capitalise the title.-->
-          <!--TODO refactor-->
-          <!--{{ title && capitalise(title) }}-->
-          {{ description ? capitalise(description) : capitalise(title) }}
+          <b-container>
+            <b-row class="my-1">
+              <b-col cols="1"></b-col>
+              <b-col>
+                {{ description ? capitalise(description) : capitalise(title) }}
+              </b-col>
+              <b-col cols="1">
+                <DocumentationButton :name="title" />
+              </b-col>
+            </b-row>
+          </b-container>
           <!--Collapsable group list toggle button-->
           <b-button
             class="text-start"
@@ -276,10 +287,21 @@ function scrollToGroup(index) {
     <b-row>
       <b-collapse id="collapse" :visible="form.visible">
         <b-card class="g-0">
-          <!--<p>
+          <b-row>
+            <b-col>
+              <b
+                class="lead"
+                style="color: orangered"
+                v-if="title.toLowerCase() === 'metrics'"
+              >
+                NOTE: resets when changing dataset
+              </b>
+            </b-col>
+            <!--<p>
         {{ capitalise(title) }} selected:
         {{ formatMultipleItems(form.main) }}
       </p>-->
+          </b-row>
           <b-row>
             <TransitionGroup name="list">
               <b-col
@@ -328,8 +350,8 @@ function scrollToGroup(index) {
                           variant="danger"
                           class="mb-2 mr-sm-2 mb-sm-0 float-end"
                           style="width: 90%"
-                          >X</b-button
-                        >
+                          ><i class="bi bi-x"
+                        /></b-button>
                       </b-col>
                     </b-row>
                   </b-row>

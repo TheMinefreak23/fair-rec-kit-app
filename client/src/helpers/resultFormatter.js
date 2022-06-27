@@ -183,15 +183,13 @@ function formatEvaluation(e, index, result, runID) {
         )) {
           subgroupName +=
             ' ' +
-            capitalise(
-              underscoreToSpace(filterPass.name) +
-                ' ' +
-                '(' +
-                paramName +
-                ': ' +
-                paramValue +
-                ')'
-            )
+            capitalise(underscoreToSpace(filterPass.name)) +
+            ' ' +
+            '(' +
+            (paramName === 'range'
+              ? 'min: ' + paramValue.min + ' max: ' + paramValue.max
+              : paramName + ': ' + paramValue) +
+            ')'
         }
       }
     }

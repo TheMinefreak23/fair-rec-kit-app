@@ -121,7 +121,7 @@ function setsorting(i) {
 </script>
 
 <template>
-  <b-overlay :show="results === []">
+  <div>
     <!-- Table -->
     <b-table-simple hover striped responsive caption-top id="customScrollbar">
       <caption>
@@ -315,7 +315,7 @@ function setsorting(i) {
         v-on:focusout="$emit('loadMore', null, entryAmount)"
       />
     </div>
-  </b-overlay>
+  </div>
 </template>
 
 <style scoped>

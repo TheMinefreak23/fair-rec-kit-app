@@ -112,7 +112,6 @@ def test_experiment_route_post(client):
     # Test mock
     post_response = client.post(url, json=mock_options)
     assert post_response.status_code == 200
-    assert json.loads(post_response.data)['queue'] == queue.formatted_queue()
 
 
 def test_experiment_route_get(client):

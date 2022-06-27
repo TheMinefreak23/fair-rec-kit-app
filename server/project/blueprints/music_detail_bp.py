@@ -53,8 +53,10 @@ def song_info():
         return BAD_REQUEST_RESPONSE
     mbid = json_data.get('mbid')
     lastfm_data = last_fm_info(artist, track, mbid)
-    if not mbid and lastfm_data['track'] and 'mbid' in lastfm_data['track']:
-        mbid = lastfm_data['track']['mbid']
+    if 'track' in lastfm_data:
+        lastfm_track = lastfm_data['track']
+        if not mbid and lastfm_track and 'mbid' in lastfm_track:
+            mbid = lastfm_track['mbid']
     return {'AcousticBrainz': get_acousticbrainz_data(mbid) if mbid else None,
             'LastFM': lastfm_data}
 
