@@ -12,11 +12,8 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences)
 """
 import sys
-#import logging
-
+import logging
 from flask import Flask
-from flask import logging
-from flask.logging import create_logger
 from flask_cors import CORS
 
 from project.models.result_storage import create_results_overview
@@ -44,9 +41,9 @@ def create_app():
     CORS(app)
 
     # Add console output to log
-    app.logger = create_logger(app)
-    app.logger.addHandler(logging.StreamHandler(sys.stdout))
-    app.logger.setLevel(logging.DEBUG)
+    logger = logging.getLogger('logger')
+    logger.addHandler(logging.StreamHandler(sys.stdout))
+    logger.setLevel(logging.DEBUG)
 
     # Route: Main.
     @app.route('/api', methods=['GET'])
