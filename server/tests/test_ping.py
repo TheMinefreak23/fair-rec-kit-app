@@ -19,5 +19,5 @@ def test_greeting_example(client):
 
 def test_ping(client):
     """Test ping route."""
-    response = client.get(URL_PREFIX)
+    response = client.get(URL_PREFIX+'/')
     assert b'Server online' in response.data

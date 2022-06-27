@@ -297,13 +297,15 @@ async function getUserRecs() {
                     v-for="category in Object.keys(optionalHeaderOptions)"
                     :key="category"
                   >
-                    <b-col
-                      md="auto"
-                      class="form-check form-switch"
+                    <template
                       v-for="header in optionalHeaderOptions[category]"
                       :key="header"
                     >
-                      <template v-if="STANDARD_HEADERS.includes(header)">
+                      <b-col
+                        md="auto"
+                        class="form-check form-switch"
+                        v-if="STANDARD_HEADERS.includes(header)"
+                      >
                         <input
                           v-model="optionalHeaders"
                           class="form-check-input"
@@ -314,8 +316,8 @@ async function getUserRecs() {
                         <label class="form-check-label" :id="header">
                           {{ makeHeader(header).name }}
                         </label>
-                      </template>
-                    </b-col>
+                      </b-col>
+                    </template>
                   </template>
                 </b-row>
               </b-col>
