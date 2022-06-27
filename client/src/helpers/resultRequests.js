@@ -3,7 +3,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
 
 import { API_URL } from '../api'
-import { addResult, APP_TABS, store } from '../store'
+import { addResult, tabs, store, switchToTab } from '../store'
 import { formatResult } from './resultFormatter'
 
 const resultsRoute = '/result/result-by-id'
@@ -64,5 +64,5 @@ export async function addResultById(resultId, view = true, newResult = false) {
  * Make result tab the active tab
  */
 export function viewResultTab() {
-  store.currentTab = APP_TABS.indexOf('Results')
+  switchToTab(tabs.result)
 }

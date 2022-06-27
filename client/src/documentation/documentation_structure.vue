@@ -11,25 +11,12 @@ export const structure = [
       'Metrics',
       [
         'LensKit Metrics',
-        [
-          'HR@K',
-          'NDCG@K',
-          'P@K',
-          'R@K',
-          'MRR',
-          'RMSE',
-          'MAE'
-        ],
+        ['HR@K', 'NDCG@K', 'P@K', 'R@K', 'MRR', 'RMSE', 'MAE'],
 
         'Rexmex',
-        [
-          'MAPE',
-          'MSE',
-          'ItemCoverage',
-          'UserCoverage'
-        ]
-      ]
-    ]
+        ['MAPE', 'MSE', 'ItemCoverage', 'UserCoverage'],
+      ],
+    ],
   ],
   ['Experiment Queue'],
   ['Results'],

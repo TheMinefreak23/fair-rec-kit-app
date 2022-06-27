@@ -1,12 +1,12 @@
 <script setup>
-/*This program has been developed by students from the bachelor Computer Science at
+/* This program has been developed by students from the bachelor Computer Science at
 Utrecht University within the Software Project course.
-© Copyright Utrecht University (Department of Information and Computing Sciences)*/
+© Copyright Utrecht University (Department of Information and Computing Sciences) */
 import { ref, watch } from 'vue'
 import Result from './Result.vue'
 import VDismissButton from './VDismissButton.vue'
 import PreviousResults from './PreviousResults.vue'
-import { store, removeResult, APP_TABS } from '../store'
+import { store, removeResult, APP_TABS, tabs } from '../store'
 import { status } from '../helpers/queueFormatter'
 import { shortResultDescription } from '../helpers/resultFormatter'
 
@@ -48,7 +48,7 @@ watch(
   () => store.currentTab,
   // This activates upon opening the results tab
   (index) => {
-    if (index === APP_TABS.indexOf('Results')) {
+    if (index === APP_TABS.indexOf(tabs.results)) {
       if (blink.value >= 0) {
         // Blink fades after 5 seconds
         const timeoutMs = 5000
@@ -70,18 +70,6 @@ function closeResult(index) {
 </script>
 
 <template>
-  <!--Show modal overlay when there is a new result-->
-  <!--<b-modal
-    id="result-modal"
-    v-model="showResultModal"
-    title="New result"
-    ok-title="View new result"
-    ok-variant="danger"
-    cancel-title="Cancel"
-    @ok="store.currentTab = 3"
-  >
-    <p>An experiment has finished.</p>
-  </b-modal>-->
   <!--Result content-->
   <b-card>
     <div class="mx-5 mt-2">

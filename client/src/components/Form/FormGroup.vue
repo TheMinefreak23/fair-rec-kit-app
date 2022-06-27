@@ -5,11 +5,7 @@ Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
 import FormGroupList from './FormGroupList.vue'
 import { computed, onMounted, watch } from 'vue'
-import {
-  article,
-  underscoreToSpace,
-  capitalise,
-} from '../../helpers/resultFormatter'
+import { article } from '../../helpers/resultFormatter'
 import {
   emptyFormGroup,
   reformat,
@@ -18,6 +14,8 @@ import {
 import '../../../node_modules/multi-range-slider-vue/MultiRangeSliderBlack.css'
 import FormInput from './FormInput.vue'
 import FormSelect from './FormSelect.vue'
+import FilterOverview from './FilterOverview.vue'
+import DocumentationButton from './DocumentationButton.vue'
 
 const emit = defineEmits(['copy', 'scroll', 'update:modelValue'])
 const props = defineProps({
@@ -172,9 +170,6 @@ function hasParams() {
             <b-row>
               <!--Main option selection-->
               <b-col cols="12">
-                <h4 v-if="props.name === 'metric'">
-                  NOTE: resets when changing dataset
-                </h4>
                 <b-form-group
                   :label="
                     props.options.length > 1
@@ -185,24 +180,33 @@ function hasParams() {
                   "
                 >
                   <!-- If there is only one main option available, don't use a main selection-->
-                  <b-form-select
-                    v-if="options.length > 1"
-                    :id="name"
-                    :class="blink ? 'subtle-blink' : ''"
-                    v-model="form.main"
-                    data-testid="main-select"
-                    :options="options"
-                    text-field="name"
-                    :required="required"
-                  >
-                    <template #first>
-                      <b-form-select-option
-                        :value="''"
-                        data-testid="main-option"
-                        >Choose..</b-form-select-option
+                  <b-container>
+                    <b-row>
+                      <b-col>
+                        <b-form-select
+                          v-if="options.length > 1"
+                          :id="name"
+                          :class="blink ? 'subtle-blink' : ''"
+                          v-model="form.main"
+                          data-testid="main-select"
+                          :options="options"
+                          text-field="name"
+                          :required="required"
+                        >
+                          <template #first>
+                            <b-form-select-option
+                              :value="''"
+                              data-testid="main-option"
+                              >Choose..</b-form-select-option
+                            >
+                          </template>
+                        </b-form-select></b-col
                       >
-                    </template>
-                  </b-form-select>
+                      <b-col v-if="form.main" cols="2">
+                        <DocumentationButton :name="form.main.name" dark />
+                      </b-col>
+                    </b-row>
+                  </b-container>
                   <b-button
                     v-if="!single && form.main"
                     @click="$emit('copy')"
@@ -276,28 +280,7 @@ function hasParams() {
             />
             <!--Make a modal list if it's a filter-->
             <div v-else-if="useFilterModal && option.title === 'filter'">
-              <b-list-group>
-                <template v-if="reformat(form.lists[index]).length === 0">
-                  No filters selected
-                </template>
-                <b-list-group-item v-for="f in reformat(form.lists[index])">
-                  <b>{{ capitalise(underscoreToSpace(f.name)) }}</b>
-                  <p>
-                    {{
-                      f.params
-                        .map(
-                          (p) =>
-                            underscoreToSpace(p.name) +
-                            ': ' +
-                            (p.name === 'range'
-                              ? 'min: ' + p.value.min + ' max: ' + p.value.max
-                              : p.value)
-                        )
-                        .join(', ')
-                    }}
-                  </p>
-                </b-list-group-item>
-              </b-list-group>
+              <FilterOverview :filters="form.lists[index]" />
               <b-button
                 variant="info"
                 @click="form.lists[index].show = !form.lists[index].show"

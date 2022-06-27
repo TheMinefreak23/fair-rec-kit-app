@@ -166,7 +166,7 @@ You can add one or more filters, which creates a subset of the dataset. Then you
 }-
 
 -{
-<name> LFM2B </name>
+<name> LFM-2B </name>
 <description> Last.fm 2 Billion dataset is a corpus of Music Listening Events for Music Recommendation. It contains more than two billion listening events, intended to be used for various music retrieval and recommendation tasks.
 <p> The dataset can be downloaded from <a href="http://www.cp.jku.at/datasets/LFM-2b/">this</a> website.</p>
 <p> There are extra optional files that contain extra information, which are all available in the library. All files included in the library are: <i> albums.tsv, artists.tsv, liseting-counts.tsv, listeing-events.tsv, spotify-uris.tsv, tracks.tsv, users.tsv, user_artist_playcound.tsv</i>.
@@ -177,7 +177,7 @@ Apart from the required files that contain the listening counts, listening event
 }-
 
 -{
-<name> LFM1B </name>
+<name> LFM-1B </name>
 <description> 
 The Last.fm 1 Billion dataset is a corpus of Music Listening Events for Music Recommendation. It has more than one billion listening events.
 <p> The dataset and user genre profile can be found on <a href="http://www.cp.jku.at/datasets/LFM-1b/">this</a> website. The enriched artist gender information can be retrieved <a href=" https://zenodo.org/record/3748787#.YowEBqhByUk">here</a>.</p>
@@ -199,7 +199,7 @@ The Last.fm 1 Billion dataset is a corpus of Music Listening Events for Music Re
 }-
 
 -{
-<name> LFM360K </name>
+<name> LFM-360K </name>
 <description> The Last.fm 360K dataset contains <user, artist, plays> tuples that have been collected from the Last.fm API.
 <p> The dataset can be downloaded from <a href="https://www.upf.edu/web/mtg/lastfm360k"> here</a>. The enriched artist gender information can be retrieved from <a href="https://zenodo.org/record/3748787#.YowEBqhByUk">this</a> link. </p>
 <p> The following files are handled in the library: <i>usersha1-artmbid-artname-plays.tsv, usersha1-profile.tsv, lfm-360-gender.json </i> </p>
@@ -209,7 +209,7 @@ The Last.fm 1 Billion dataset is a corpus of Music Listening Events for Music Re
 }-
 
 -{
-<name> ML25M </name>
+<name> ML-25M </name>
 <description> The MovieLens-25M dataset contains 25 million ratings and one million tag applications applied to 62 000 movies by 162 000 users. 
 <p> The dataset can be downloaded from <a href="https://grouplens.org/datasets/movielens/25m/">this</a> website.</p>
 <p> The following files are handled in the library: <i> genome-scores.csv, genome-tags.csv, links.csv, movies.csv, ratings.csv, tags.csv. </i>
@@ -219,7 +219,7 @@ Which means that there is information available on the genome tags and their sco
 }-
 
 -{
-<name> ML100K </name>
+<name> ML-100K </name>
 <description> The MovieLens-100K dataset contains 100 000 ratings from 1000 users on 1700 movies. 
 <p> The dataset can be found on <a href="https://grouplens.org/datasets/movielens/100k/">this</a> website. </p>
 <p> The library handles the following files <i>u.data, u.user, u.item</i>. 
