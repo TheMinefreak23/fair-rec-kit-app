@@ -3,18 +3,39 @@
 Utrecht University within the Software Project course.
 © Copyright Utrecht University (Department of Information and Computing Sciences) */
 import { scrollToDocText } from '../../documentation/documentation_tree2'
+import { capitalise } from '../../helpers/resultFormatter'
+import descriptions from '../../documentation/descriptions.json'
+import { ref } from 'vue'
 
-defineProps({ name: String })
+defineProps({ name: String, dark: Boolean })
+const show = ref(false)
 </script>
 
 <template>
-  <b-button
-    variant="light"
-    v-b-tooltip.hover
-    title="Go to documentation"
-    @click="scrollToDocText(name)"
-  >
-    <i class="bi bi-info-circle" />
-    <i class="bi bi-arrow-right-short" />
-  </b-button>
+  <div v-if="capitalise(name) in descriptions">
+    <b-popover :show="show" :target="name + 'info'" triggers="click blur">
+      <template #title>{{ capitalise(name) }}</template>
+      {{ descriptions[capitalise(name)] }}
+      <b-button
+        variant="outline-info"
+        @click="
+          () => {
+            scrollToDocText(name)
+            show = false
+          }
+        "
+      >
+        Go to documentation</b-button
+      >
+    </b-popover>
+
+    <b-button
+      @click="show = true"
+      :id="name + 'info'"
+      :variant="dark ? 'light' : 'outline-light'"
+    >
+      <i class="bi bi-info-circle-fill" />
+    </b-button>
+    <!--<slot :id="name + 'info'"></slot>-->
+  </div>
 </template>

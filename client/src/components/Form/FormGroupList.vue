@@ -252,10 +252,22 @@ function scrollToGroup(index) {
           Please select a dataset and matrix.
         </h4>
       </template>
+      <!--Collapse header-->
       <h3 v-else class="text-center text-white mb-0">
         <b-card no-body class="mb-0 bg-dark">
+          <!---<b-button :id="slotProps.id">-->
           <!--Capitalise the title.-->
-          {{ description ? capitalise(description) : capitalise(title) }}
+          <b-container>
+            <b-row class="my-1">
+              <b-col cols="1"></b-col>
+              <b-col>
+                {{ description ? capitalise(description) : capitalise(title) }}
+              </b-col>
+              <b-col cols="1">
+                <DocumentationButton :name="title" />
+              </b-col>
+            </b-row>
+          </b-container>
           <!--Collapsable group list toggle button-->
           <b-button
             class="text-start"
@@ -289,9 +301,6 @@ function scrollToGroup(index) {
         {{ capitalise(title) }} selected:
         {{ formatMultipleItems(form.main) }}
       </p>-->
-            <b-col cols="4">
-              <DocumentationButton :name="title" />
-            </b-col>
           </b-row>
           <b-row>
             <TransitionGroup name="list">
