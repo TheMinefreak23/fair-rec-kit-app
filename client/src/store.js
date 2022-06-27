@@ -36,6 +36,7 @@ const APP_TABS = [
 ]
 
 function switchToTab(tab) {
+  console.log(tab, APP_TABS.indexOf(tab))
   store.currentTab = APP_TABS.indexOf(tab)
 }
 
@@ -44,11 +45,11 @@ function switchToTab(tab) {
  */
 function pollForResult() {
   if (!store.polling) {
+    store.polling = true
     // Switch to queue
     switchToTab(tabs.experimentQueue)
     const interval = 600
     store.resultPoll = setInterval(getExperiment, interval)
-    store.polling = true
   }
 }
 
@@ -58,7 +59,8 @@ function pollForResult() {
 function getExperiment() {
   if (
     store.currentExperiment.status !== status.notAvailable &&
-    store.currentExperiment.progress !== progress.finished
+    store.currentExperiment.progress !== progress.finished &&
+    store.polling
   ) {
     try {
       fetch(API_URL + '/experiment/')
@@ -109,6 +111,7 @@ async function getQueue() {
     ) {
       store.currentExperiment = data.current
       pollForResult()
+      store.polling = true
       // console.log('new experiment started running')
     }
   }

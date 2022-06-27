@@ -53,6 +53,8 @@ def set_recs():
 
     path = result_loader.get_overview(result_id, run_id)[
         pair_id]['ratings_path']
+    # TODO REMOVE WHEN LIB IS UP TO DATE: TEMPORARY FIX
+    path = path.replace('\\', '/')
     # Declare current_recs as a dictionary in a dictionary
     if not run_id in result_store.current_recs:
         result_store.current_recs[run_id] = {}

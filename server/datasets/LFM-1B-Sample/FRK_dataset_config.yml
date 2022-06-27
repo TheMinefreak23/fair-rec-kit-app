@@ -1,4 +1,4 @@
-dataset: LFM-1B
+dataset: LFM-1B-Sample
 matrices:
   user-artist-count:
     idx_item:

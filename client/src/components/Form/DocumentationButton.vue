@@ -9,16 +9,33 @@ import { ref } from 'vue'
 
 defineProps({ name: String, dark: Boolean })
 const show = ref(false)
+
+/*
+function hasDescription(string) {
+  const capitalised = capitalise(string)
+  return Object.keys(descriptions).some(
+    (key) => key.includes(capitalised) || capitalised.includes(key)
+  )
+}*/
+
+function findDescription(string) {
+  const capitalised = capitalise(string)
+  return descriptions[
+    Object.keys(descriptions).find(
+      (key) => key.includes(capitalised) || capitalised.includes(key)
+    )
+  ]
+}
 </script>
 
 <template>
-  <div v-if="capitalise(name) in descriptions">
+  <div v-if="findDescription(name)">
     <b-popover :show.sync="show" :target="name + 'info'" triggers="click blur">
       <template #title>
         {{ capitalise(name) }}
         <b-button @click="show = false"><i class="bi bi-x" /> </b-button>
       </template>
-      {{ descriptions[capitalise(name)] }}
+      {{ findDescription(name) }}
       <b-button
         variant="outline-info"
         @click="

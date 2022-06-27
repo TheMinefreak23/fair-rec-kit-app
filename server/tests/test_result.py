@@ -98,7 +98,7 @@ def test_get_recs(client):
         'runid': 0,
         'amount': amount,
         'ascending': True,
-        'dataset': 'LFM-2B'
+        'dataset': 'LFM-2B-Sample'
     }
     response = client.post(url, json=settings)
     result2 = json.loads(response.data)
@@ -109,7 +109,7 @@ def test_get_recs(client):
         'pairid': 0,
         'runid': 0,
         'amount': amount,
-        'dataset': 'LFM-2B',
+        'dataset': 'LFM-2B-Sample',
         'matrix': 'user-track-count',
         'optionalHeaders': ['user_age']
     }
