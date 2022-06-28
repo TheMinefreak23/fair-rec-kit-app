@@ -1,0 +1,53 @@
+# Lints only in modified files
+name: Partial Pylint
+
+on:
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  lintchanges:
+    runs-on: ubuntu-latest # windows-latest | macos-latest
+    name: Retrieve and lint changed files
+    outputs:
+      files: steps.changedfiles.changed-files.outputs
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # OR "2" -> To retrieve the preceding commit.
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v18.7
+        with:
+          files: |
+            **/*.py
+          files_ignore: |
+            !**.py
+
+      - name: Any changes?
+        run: |
+          echo "${{ steps.changed-files.outputs.any_changed }}"
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+
+      - uses: actions/cache@v2
+        with:
+          path: ${{ env.pythonLocation }}
+          key: ${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
+
+      - name: Install dependencies
+        run: |
+          cd ./server
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pylint
+          pip install pytest
+
+      - name: Lint all changed files
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            pylint --disable=R0913,W0511,W0613 $file
+          done

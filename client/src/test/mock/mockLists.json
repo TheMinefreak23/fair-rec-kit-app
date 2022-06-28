@@ -1,0 +1,48 @@
+{
+  "datasets": [
+    {
+      "name": "LFM-2B-Sample",
+      "params": [
+        {
+          "name": "Train/testsplit",
+          "value": "80"
+        }
+      ],
+      "matrix": {
+        "name": "user-track-count",
+        "params": [],
+        "conversion": {
+          "name": "range",
+          "params": [
+            {
+              "name": "upper_bound",
+              "value": 1317
+            }
+          ]
+        },
+        "subset": []
+      },
+      "splitting": {
+        "name": "random",
+        "params": [
+          {
+            "name": "seed",
+            "value": null
+          }
+        ]
+      }
+    }
+  ],
+  "metrics": [],
+  "approaches": [
+    {
+      "name": "Random",
+      "params": [
+        {
+          "name": "seed",
+          "value": null
+        }
+      ]
+    }
+  ]
+}

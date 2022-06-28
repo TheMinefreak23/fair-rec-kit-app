@@ -1,0 +1,79 @@
+@import 'bootstrap/scss/functions';
+
+//custom color-scheme:
+$customprimary:#3c6e71;
+$customsecondary:#eee;
+$customdark: #017C8E;
+//$secondary: #121212;
+
+@function shade-color($color, $weight) {
+  @return mix(black, $color, $weight);
+}
+// Gradient list
+//$list: $blue, $green, $orange;
+$list: #0aa4ca, #111, rgb(70, 70, 70);
+$list2: $customdark, $customprimary;
+$subtle: rgb(80, 80, 80), rgb(104, 104, 104);
+
+@mixin gradient($direction, $list2) {
+  background: -webkit-linear-gradient($direction, $list2);
+  background: -moz-linear-gradient($direction, $list2);
+  background: -o-linear-gradient($direction, $list2);
+  background: linear-gradient($direction, $list2);
+}
+
+$offcanvas-horizontal-width: 50%;
+
+//give main button gradient color
+.btn-primary {
+  @include gradient(bottom, $list2);
+}
+.btn-outline-primary {
+  //@include gradient(bottom, $list2);
+}
+$darkencustomdark: shade-color($customdark, 15%);
+$darkencustomprimary: shade-color($customprimary, 15%);
+$darkenlist2: $darkencustomdark, $darkencustomprimary;
+.btn-primary:hover {
+  @include gradient(bottom, $darkenlist2);
+  transition: background .15s ease-in-out, border-color .15s ease-in-out;
+}
+.btn-outline-primary:hover {
+  @include gradient(bottom, $list2);
+  transition: background .15s ease-in-out, border-color .15s ease-in-out;
+}
+//give danger button gradient color
+// Override default variables.
+$primary: $customprimary;
+$secondary: $customsecondary;
+$dark: $customdark;
+
+
+
+// Default variable overrides
+//$body-bg: #fff;
+//$body-color: #111;
+
+body {
+  background-color:  var(--color-background);
+  color: var(--color-text);
+}
+
+// custom documentation sidenav scrollbar 
+#customScrollbar::-webkit-scrollbar-track
+{
+	background-color: #D0D0D0;
+}
+
+#customScrollbar::-webkit-scrollbar
+{
+	width: 12px;
+	background-color: #D0D0D0;
+}
+
+#customScrollbar::-webkit-scrollbar-thumb
+{
+	background-color: #017C8E;
+}
+
+@import 'bootstrap/scss/bootstrap';

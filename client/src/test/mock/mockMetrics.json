@@ -1,0 +1,84 @@
+{
+  "metrics": [
+    {
+      "name": "P@K",
+      "params": [
+        {
+          "name": "K",
+          "value": 10
+        }
+      ],
+      "subgroups": [
+        {
+          "name": "LFM-2B-Sample",
+          "params": [],
+          "matrix": {
+            "name": "user-track-count",
+            "params": [],
+            "subset": [
+              {
+                "name": "filter pass",
+                "params": [],
+                "filter": [
+                  {
+                    "name": "user_country_count",
+                    "params": [
+                      {
+                        "name": "threshold",
+                        "value": 100
+                      }
+                    ]
+                  },
+                  {
+                    "name": "user_gender",
+                    "params": [
+                      {
+                        "name": "values",
+                        "value": ["Male", "Neutral", "null"]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "P@K",
+      "params": [
+        {
+          "name": "K",
+          "value": 10
+        }
+      ],
+      "subgroups": []
+    },
+    {
+      "name": "P@K",
+      "params": [
+        {
+          "name": "K",
+          "value": 5
+        }
+      ],
+      "subgroups": []
+    },
+    {
+      "name": "MRR",
+      "params": [],
+      "subgroups": []
+    },
+    {
+      "name": "Item Coverage",
+      "params": [],
+      "subgroups": []
+    },
+    {
+      "name": "MAE",
+      "params": [],
+      "subgroups": []
+    }
+  ]
+}

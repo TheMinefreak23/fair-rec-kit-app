@@ -1,1 +1,0 @@
-{"all_results": [{"timestamp": {"stamp": 1, "datetime": "2022-03-24T13:54:49-30"}, "metadata": {"name": "HelloWorld"}, "settings": {"datasets": ["LFM1B"], "recommendations": 10, "split": 80, "splitMethod": "random", "approaches": [{"name": "POP", "parameter": {"name": "method", "value": "quantile"}}], "metrics": [{"name": "HR@K", "parameter": {"name": "k", "value": 10}}]}}]}

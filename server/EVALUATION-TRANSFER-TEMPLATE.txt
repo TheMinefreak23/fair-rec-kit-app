@@ -1,0 +1,96 @@
+{
+            "timestamp":{
+                "stamp"
+                "datetime"
+            },
+            "metadata": {
+                "name"
+            },
+            "settings": {
+                "recommendations"
+                "experimentMethod"
+                "datasets": [
+                    {
+                        "name"
+                        "params": {
+                            "Train/testsplit"
+                        },
+                        "filters"
+                        "conversion"
+                        "splitting": {
+                            "name":
+                            "params": {
+                                "seed"
+                            },
+                            "test_ratio"
+                        }
+                    },
+                    [additional datasets]
+                ],
+                "metrics": [
+                    {
+                        "name"
+                        "params": {
+                            "K"
+                        },
+                        "filters": []
+                    },
+                    [additional metrics]
+                ],
+                "approaches": [
+                    {
+                        "name"
+                        "params": {
+                            "seed"
+                        }
+                    },
+                    [additional approaches]
+                ]
+            },
+            "status"
+            "result": [
+                {
+                    "dataset": {
+                        "name":
+                        "params": {
+                            "Train/testsplit"
+                        },
+                        "filters": [],
+                        "conversion": [],
+                        "splitting": {
+                            "name"
+                            "params": {
+                                "seed"
+                            },
+                            "test_ratio"
+                        }
+                    },
+                    "recs": [
+                        {
+                            "approach"
+                            "recommendation"
+                            "evals": [
+                                {
+                                    "name"
+                                    "evaluations": [
+                                        {
+                                            "global"
+                                            "filtered"
+                                        },
+                                        [further evaluations of subsequent runs]
+                                    ]
+
+                                    ,
+                                    "params": {
+                                        "K": "10"
+                                    }
+                                }
+                                [further evaluations]
+                            ]
+                        }
+                        [further evaluations of different recommender systems (with the same dataset)]
+                    ]
+                }
+                [further datasets]
+            ]
+        }
